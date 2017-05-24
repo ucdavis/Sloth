@@ -1,0 +1,51 @@
+version: 1.0.0.{build}
+
+environment:
+  configuration: Release
+
+branches:
+  except:
+  - design
+
+image: Visual Studio 2017
+
+install:
+- cmd: appveyor-retry dotnet restore
+- cmd: echo %APPVEYOR_REPO_COMMIT_MESSAGE% > commit.txt
+
+cache:
+- '%USERPROFILE%\.nuget\packages -> **\*.csproj'
+
+before_build:
+- ps: |
+    $path = (Get-Item .\Sloth.Api\Sloth.Api.csproj).FullName
+    $csproj = [xml](Get-Content $path)
+    $csproj.Project.PropertyGroup.Version = $Env:APPVEYOR_BUILD_VERSION
+    $csproj.Save($path)
+
+build_script:
+- cmd: msbuild /t:Build /p:Configuration=%configuration%;RunOctoPack=true;PackageVersion=%APPVEYOR_BUILD_VERSION%;OctoPackReleaesNotesFile=..\commit.txt
+
+test_script:
+- cmd: vstest.console /logger:Appveyor %appveyor_build_folder%\Test\bin\%configuration%\netcoreapp1.1\Sloth.Test.dll
+
+artifacts:
+- path: '**/bin/**/Sloth.*.nupkg'
+  name: nugetweb
+
+deploy:
+- provider: NuGet
+  server: https://scruffy.caes.ucdavis.edu/nuget/packages
+  api_key:
+    secure: 1hsYGsL3yZ8BwgerEIpOo3+P5nfg3usv3ADOwxdEhkA=
+  skip_symbols: true
+  on:
+    branch: master
+
+notifications:
+- provider: Slack
+  incoming_webhook: https://hooks.slack.com/services/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
+  channel: caes-development
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false
