@@ -7,12 +7,11 @@ namespace Sloth.Core
 {
     public partial class SlothDbContext : DbContext
     {
-        public DbSet<Scrubber> Scrubbers { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        public SlothDbContext(DbContextOptions options) : base(options)
         {
-            optionsBuilder.UseSqlServer(@"Server=.\sqlexpress;Database=sloth;Trusted_Connection=True;");
         }
+
+        public DbSet<Scrubber> Scrubbers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
