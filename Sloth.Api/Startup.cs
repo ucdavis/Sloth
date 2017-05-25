@@ -67,6 +67,9 @@ namespace Sloth.Api
                         { "ProjectUrl", "https://www.github.com/ucdavis/sloth" }
                     }
                 });
+
+                var xmlFilePath = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "Sloth.Api.xml");
+                c.IncludeXmlComments(xmlFilePath);
             });
         }
 
