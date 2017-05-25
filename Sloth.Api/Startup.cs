@@ -41,6 +41,8 @@ namespace Sloth.Api
             loggerFactory.AddDebug();
 
             app.UseMvc();
+
+            DbInitializer.Initialize(context);
         }
     }
 }
