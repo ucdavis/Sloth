@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Sloth.Core;
 
 namespace Sloth.Api
 {
@@ -29,6 +30,8 @@ namespace Sloth.Api
         {
             // Add framework services.
             services.AddMvc();
+
+            services.AddDbContext<SlothDbContext>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
