@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Test", "Sloth.Test\Sl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Api", "Sloth.Api\Sloth.Api.csproj", "{DD650A1F-65A5-4213-A2FA-A8C793A99FED}"
 EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Sloth.Sql", "Sloth.Sql\Sloth.Sql.sqlproj", "{47A0677C-322E-404E-9F33-8F0B9D57669E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,12 @@ Global
 		{DD650A1F-65A5-4213-A2FA-A8C793A99FED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD650A1F-65A5-4213-A2FA-A8C793A99FED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD650A1F-65A5-4213-A2FA-A8C793A99FED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
