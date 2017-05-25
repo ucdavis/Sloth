@@ -46,7 +46,7 @@ namespace Sloth.Api.Swagger
             {
                 new Dictionary<string, IEnumerable<string>>
                 {
-                    { "apikey", requiredClaimTypes }
+                    { "apiKey", requiredClaimTypes }
                 }
             };
         }

@@ -72,9 +72,11 @@ namespace Sloth.Api
                 var xmlFilePath = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "Sloth.Api.xml");
                 c.IncludeXmlComments(xmlFilePath);
 
-                c.AddSecurityDefinition("apikey", new ApiKeyScheme()
+                c.AddSecurityDefinition("apiKey", new ApiKeyScheme()
                 {
-                    Type = "apikey",
+                    Description = "API Key Authentication",
+                    Name = "Authorization",
+                    In = "header"
                 });
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
