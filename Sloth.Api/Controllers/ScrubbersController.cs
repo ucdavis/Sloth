@@ -11,8 +11,7 @@ using Sloth.Core.Models;
 
 namespace Sloth.Api.Controllers
 {
-    [Route("api/[controller]")]
-    public class ScrubbersController : Controller
+    public class ScrubbersController : SuperController
     {
         private readonly SlothDbContext _context;
 
@@ -21,9 +20,12 @@ namespace Sloth.Api.Controllers
             _context = context;
         }
 
-        // GET: api/values
+        /// <summary>
+        /// Fetch Top 1 Scrubber
+        /// </summary>
         [HttpGet]
-        public async Task<List<Scrubber>> Get()
+        [ProducesResponseType(typeof(IList<Scrubber>), 200)]
+        public async Task<IList<Scrubber>> Get()
         {
             var scrubbers = await _context.Scrubbers
                 .Take(1)
@@ -32,7 +34,6 @@ namespace Sloth.Api.Controllers
             return scrubbers;
         }
 
-        // GET api/values/5
         [HttpGet("{id}")]
         public async Task<Scrubber> Get(int id)
         {
@@ -42,19 +43,16 @@ namespace Sloth.Api.Controllers
             return scrubber;
         }
 
-        // POST api/values
         [HttpPost]
         public void Post([FromBody]string value)
         {
         }
 
-        // PUT api/values/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody]string value)
         {
         }
 
-        // DELETE api/values/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
