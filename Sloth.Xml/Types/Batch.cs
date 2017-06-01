@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Xml.Serialization;
 
 namespace Sloth.Xml
 {
@@ -8,6 +9,7 @@ namespace Sloth.Xml
     public class Batch
     {
         /// <remarks/>
+        [Required]
         [XmlElement("header", Order = 1)]
         public Header Header { get; set; }
 
@@ -20,6 +22,7 @@ namespace Sloth.Xml
         public Detail[] Detail { get; set; }
 
         /// <remarks/>
+        [Required]
         [XmlElement("trailer", Order = 4)]
         public Trailer Trailer { get; set; }
     }
