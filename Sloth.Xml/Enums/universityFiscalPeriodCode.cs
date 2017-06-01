@@ -3,7 +3,7 @@
 namespace Sloth.Xml
 {
     /// <remarks/>
-    [XmlType(Namespace="http://www.kuali.org/kfs/gl/collector")]
+    [XmlType("universityFisccalPeriodCode", Namespace="http://www.kuali.org/kfs/gl/collector")]
     [XmlRoot("fiscalPeriod", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum universityFiscalPeriodCode {
         

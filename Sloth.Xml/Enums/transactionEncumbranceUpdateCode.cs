@@ -3,7 +3,7 @@
 namespace Sloth.Xml
 {
     /// <remarks/>
-    [XmlType(Namespace="http://www.kuali.org/kfs/gl/collector")]
+    [XmlType("transactionEncumbranceUpdateCode", Namespace="http://www.kuali.org/kfs/gl/collector")]
     [XmlRoot("encumbCode", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum transactionEncumbranceUpdateCode {
         

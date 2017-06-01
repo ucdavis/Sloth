@@ -3,7 +3,7 @@
 namespace Sloth.Xml
 {
     /// <remarks/>
-    [XmlType(Namespace="http://www.kuali.org/kfs/gl/collector")]
+    [XmlType("transactionDebitCreditCode", Namespace="http://www.kuali.org/kfs/gl/collector")]
     [XmlRoot("debitCredit", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum transactionDebitCreditCode {
         
