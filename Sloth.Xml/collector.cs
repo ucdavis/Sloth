@@ -190,7 +190,6 @@ namespace Sloth.Xml {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     [System.Xml.Serialization.XmlRootAttribute("batch", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public partial class batchType {
@@ -249,7 +248,6 @@ namespace Sloth.Xml {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     public partial class headerType {
         
@@ -386,7 +384,6 @@ namespace Sloth.Xml {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     public partial class trailerType {
         
@@ -419,7 +416,6 @@ namespace Sloth.Xml {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     public partial class detailType {
         
@@ -630,7 +626,6 @@ namespace Sloth.Xml {
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     public partial class glEntryType {
         
