@@ -17,7 +17,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     [System.Xml.Serialization.XmlRootAttribute(Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum campusCode {
@@ -31,7 +30,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     [System.Xml.Serialization.XmlRootAttribute("balanceType", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum financialBalanceTypeCode {
@@ -66,7 +64,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     [System.Xml.Serialization.XmlRootAttribute("fiscalPeriod", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum universityFiscalPeriodCode {
@@ -130,7 +127,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     [System.Xml.Serialization.XmlRootAttribute("docType", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum financialDocumentTypeCode {
@@ -159,7 +155,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     [System.Xml.Serialization.XmlRootAttribute("debitCredit", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum transactionDebitCreditCode {
@@ -177,7 +172,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
     [System.Xml.Serialization.XmlRootAttribute("encumbCode", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum transactionEncumbranceUpdateCode {
@@ -195,7 +189,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
@@ -255,7 +248,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
@@ -393,7 +385,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
@@ -427,7 +418,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
@@ -639,7 +629,6 @@ namespace Sloth.Xml {
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.33440")]
-    [System.SerializableAttribute()]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.kuali.org/kfs/gl/collector")]
