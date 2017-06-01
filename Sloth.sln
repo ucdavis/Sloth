@@ -11,6 +11,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Api", "Sloth.Api\Slot
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Sloth.Sql", "Sloth.Sql\Sloth.Sql.sqlproj", "{47A0677C-322E-404E-9F33-8F0B9D57669E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Xml", "Sloth.Xml\Sloth.Xml.csproj", "{14D605C4-A265-462A-B51C-49A18494E0C7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{8A3F61DD-FDBF-49E7-A939-F112DCE88B70}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +42,10 @@ Global
 		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{47A0677C-322E-404E-9F33-8F0B9D57669E}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{14D605C4-A265-462A-B51C-49A18494E0C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{14D605C4-A265-462A-B51C-49A18494E0C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{14D605C4-A265-462A-B51C-49A18494E0C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{14D605C4-A265-462A-B51C-49A18494E0C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
