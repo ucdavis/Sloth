@@ -12,30 +12,30 @@ namespace Sloth.Test.Xml
         [TestMethod]
         public void TestSimpleSerialzation()
         {
-            var xs = new XmlSerializer(typeof(batchType));
+            var xs = new XmlSerializer(typeof(Batch));
             var sw = new StringWriter();
 
-            var target = new batchType()
+            var target = new Batch()
             {
-                header = new headerType()
+                Header = new Header()
                 {
                     batchDate = new DateTime(2000, 01, 01)
                 },
-                detail = new[]
+                Detail = new[]
                 {
-                    new detailType()
+                    new Detail()
                     {
                         
                     }, 
                 },
-                glEntry = new[]
+                Entries = new[]
                 {
-                    new glEntryType()
+                    new Entry()
                     {
                         
                     }, 
                 },
-                trailer = new trailerType()
+                Trailer = new Trailer()
                 {
                     
                 },
