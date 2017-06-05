@@ -8,6 +8,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>bin\Debug\net461\win7-x86\Sloth.Api.xml</DocumentationFile>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,6 +27,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sloth.Core\Sloth.Core.csproj" />
+    <ProjectReference Include="..\Sloth.Xml\Sloth.Xml.csproj" />
   </ItemGroup>
 
 </Project>
