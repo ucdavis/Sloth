@@ -1,52 +1,81 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Text;
+using System.Xml;
 using System.Xml.Serialization;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Sloth.Xml;
+using Sloth.Xml.Types;
+using Xunit;
 
 namespace Sloth.Test.Xml
 {
-    [TestClass]
     public class SerializationTests
     {
-        [TestMethod]
+        [Fact]
         public void TestSimpleSerialzation()
         {
+            // setup
+            var target = new Batch
+            {
+                Header = new Header()
+            };
+
+            target.Entries.Add(new EntryWithDetail());
+            target.Entries.Add(new EntryWithDetail(){ Detail = new Detail() });
+            target.Entries.Add(new EntryWithDetail(){ Detail = new Detail() });
+
+            target.Trailer = new Trailer()
+            {
+                totalAmount = target.Entries.Sum(e => e.amount),
+                totalRecords = target.Entries.Count.ToString()
+            };
+
+
+            // act
             var xs = new XmlSerializer(typeof(Batch));
             var sw = new StringWriter();
 
-            var target = new Batch()
+            var xwx = new XmlWriterSettings()
             {
-                Header = new Header()
-                {
-                    batchDate = new DateTime(2000, 01, 01)
-                },
-                Detail = new[]
-                {
-                    new Detail()
-                    {
-                        
-                    }, 
-                },
-                Entries = new[]
-                {
-                    new Entry()
-                    {
-                        
-                    }, 
-                },
-                Trailer = new Trailer()
-                {
-                    
-                },
+                OmitXmlDeclaration = false,
+                Encoding = Encoding.UTF8,
+                Indent = true
             };
-            
-            // act
-            xs.Serialize(sw, target);
+            var xw = XmlWriter.Create(sw, xwx);
+
+            xs.Serialize(xw, target);
 
             // assert
             var actual = sw.ToString();
-            Assert.AreEqual(actual, "");
+            Assert.NotEmpty(actual);
+        }
+
+        [Fact]
+        public void TestSimpleDeserialization()
+        {
+            var target = 
+                "<batch xmlns=\"http://www.kuali.org/kfs/gl/collector\">" +
+                    "<header></header>" +
+                    "<entry></entry>" +
+                    "<entry></entry>" +
+                    "<detail></detail>" +
+                    "<entry></entry>" +
+                    "<detail></detail>" +
+                    "<trailer></trailer>" +
+                "</batch> ";
+
+            var ms = new MemoryStream(Encoding.Default.GetBytes(target));
+
+            // act
+            var xs = new XmlSerializer(typeof(Batch));
+            var actual = (Batch)xs.Deserialize(ms);
+
+            // assert
+            Assert.NotNull(actual);
+            Assert.NotNull(actual.Header);
+            Assert.Equal(actual.Entries.Count, 3);
+            Assert.NotNull(actual.Trailer);
         }
     }
 }
