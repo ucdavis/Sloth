@@ -4,7 +4,7 @@ namespace Sloth.Xml
 {
     /// <remarks/>
     [XmlType("glEntryType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
-    public class Entry
+    public class Entry : KfsXmlElement
     {
         /// <remarks/>
         [XmlElement("fiscalYear", DataType = "integer")]

@@ -4,7 +4,7 @@ namespace Sloth.Xml
 {
     /// <remarks/>
     [XmlType("detailType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
-    public class Detail
+    public class Detail: KfsXmlElement
     {
         /// <remarks/>
         [XmlElement("fiscalPeriod")]

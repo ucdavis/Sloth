@@ -7,6 +7,8 @@ namespace Sloth.Xml
     /// <remarks/>
     [XmlType("headerType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
     public class Header
+    [XmlType("headerType", Namespace = KfsNamespace)]
+    public class Header : KfsXmlElement
     {
         /// <remarks/>
         [MaxLength(2)]

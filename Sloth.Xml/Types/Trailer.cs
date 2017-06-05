@@ -4,7 +4,7 @@ namespace Sloth.Xml
 {
     /// <remarks/>
     [XmlType("trailerType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
-    public class Trailer
+    public class Trailer : KfsXmlElement
     {
         /// <remarks/>
         [XmlElement("totalRecords", DataType = "positiveInteger")]
