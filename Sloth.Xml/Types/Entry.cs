@@ -3,6 +3,7 @@
 namespace Sloth.Xml
 {
     /// <remarks/>
+    [XmlRoot("entry", Namespace = KfsNamespace, IsNullable = false)]
     [XmlType("glEntryType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
     public class Entry : KfsXmlElement
     {

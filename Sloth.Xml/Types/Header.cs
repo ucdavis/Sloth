@@ -5,8 +5,7 @@ using System.Xml.Serialization;
 namespace Sloth.Xml
 {
     /// <remarks/>
-    [XmlType("headerType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
-    public class Header
+    [XmlRoot("header", Namespace = KfsNamespace, IsNullable = false)]
     [XmlType("headerType", Namespace = KfsNamespace)]
     public class Header : KfsXmlElement
     {

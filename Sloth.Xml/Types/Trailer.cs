@@ -3,6 +3,7 @@
 namespace Sloth.Xml
 {
     /// <remarks/>
+    [XmlRoot("trailer", Namespace = KfsNamespace, IsNullable = false)]
     [XmlType("trailerType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
     public class Trailer : KfsXmlElement
     {
