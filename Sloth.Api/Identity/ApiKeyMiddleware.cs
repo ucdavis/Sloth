@@ -29,22 +29,20 @@ namespace Sloth.Api.Identity
 
         public Task Invoke(HttpContext context)
         {
+            // check for header
             if (!context.Request.Headers.ContainsKey(HeaderKey))
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return context.Response.WriteAsync($"Missing {HeaderKey} Header");
+                return _next(context);
             }
-
             var headerValue = context.Request.Headers[HeaderKey].FirstOrDefault();
 
             // lookup apikey from db
             var apiKey = _dbContext.ApiKeys.Find(headerValue);
             if (apiKey == null || apiKey.Revoked.HasValue)
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return context.Response.WriteAsync($"Invalid {HeaderKey} Header");
+                return _next(context);
             }
-            
+
             context.User.AddIdentity(new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.Name, apiKey.Owner)
