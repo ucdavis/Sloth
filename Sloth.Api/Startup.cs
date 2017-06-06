@@ -46,6 +46,16 @@ namespace Sloth.Api
             // Add framework services.
             services.AddMvc();
 
+            // add authentication policies
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy("ApiKey", p => p.Requirements.Add(new ApiKeyRequirement()));
+            });
+            
+            // add authentication handlers
+            services.AddSingleton<IAuthorizationHandler, ApiKeyHandler>();
+
+            // add swagger/swashbuckler
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info
@@ -87,6 +97,8 @@ namespace Sloth.Api
         {
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
+
+            app.UseMiddleware<ApiKeyMiddleware>();
 
             app.UseMvc();
 

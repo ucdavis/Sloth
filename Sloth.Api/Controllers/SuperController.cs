@@ -5,7 +5,7 @@ using Sloth.Api.Attributes;
 
 namespace Sloth.Api.Controllers
 {
-    [Authorize]
+    [Authorize(Policy = "ApiKey")]
     [VersionedRoute("[controller]")]
     public class SuperController : Controller
     {
