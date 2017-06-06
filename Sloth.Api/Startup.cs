@@ -110,7 +110,10 @@ namespace Sloth.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sloth API v1");
             });
 
-            DbInitializer.Initialize(context);
+            if (env.IsDevelopment())
+            {
+                DbInitializer.Initialize(context);
+            }
         }
     }
 }
