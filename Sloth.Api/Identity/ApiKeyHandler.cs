@@ -11,10 +11,9 @@ namespace Sloth.Api.Identity
         {
             if (context.User.HasClaim(c => c.Type == ClaimTypes.Name))
             {
-                return Task.CompletedTask;
+                context.Succeed(requirement);
             }
 
-            context.Succeed(requirement);
             return Task.CompletedTask;
         }
     }
