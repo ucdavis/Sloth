@@ -39,8 +39,9 @@ namespace Sloth.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<SlothDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
-            );
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             // Add framework services.
             services.AddMvc();
