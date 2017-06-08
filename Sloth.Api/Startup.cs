@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
 using Sloth.Api.Data;
+using Sloth.Api.Identity;
 using Sloth.Api.Swagger;
 using Sloth.Core;
 using Swashbuckle.AspNetCore.Swagger;
@@ -40,12 +39,23 @@ namespace Sloth.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<SlothDbContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"))
-            );
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
 
             // Add framework services.
             services.AddMvc();
 
+            // add authentication policies
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy("ApiKey", p => p.Requirements.Add(new ApiKeyRequirement()));
+            });
+            
+            // add authentication handlers
+            services.AddSingleton<IAuthorizationHandler, ApiKeyHandler>();
+
+            // add swagger/swashbuckler
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info
@@ -88,6 +98,8 @@ namespace Sloth.Api
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseMiddleware<ApiKeyMiddleware>();
+
             app.UseMvc();
 
             app.UseSwagger(o =>
@@ -98,7 +110,10 @@ namespace Sloth.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sloth API v1");
             });
 
-            DbInitializer.Initialize(context);
+            if (env.IsDevelopment())
+            {
+                DbInitializer.Initialize(context);
+            }
         }
     }
 }

@@ -1,15 +1,16 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Sloth.Core.Models;
 
 namespace Sloth.Core
 {
-    public partial class SlothDbContext : DbContext
+    public class SlothDbContext : DbContext
     {
         public SlothDbContext(DbContextOptions options) : base(options)
         {
         }
+
+        public DbSet<ApiKey> ApiKeys { get; set; }
 
         public DbSet<Scrubber> Scrubbers { get; set; }
 

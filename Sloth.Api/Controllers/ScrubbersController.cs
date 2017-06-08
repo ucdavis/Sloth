@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-
 namespace Sloth.Api.Controllers
 {
     public class ScrubbersController : SuperController
