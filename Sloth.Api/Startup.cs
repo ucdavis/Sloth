@@ -28,6 +28,7 @@ namespace Sloth.Api
 
             if (env.IsDevelopment())
             {
+                builder.AddUserSecrets<Startup>();
             }
 
             Configuration = builder.Build();
