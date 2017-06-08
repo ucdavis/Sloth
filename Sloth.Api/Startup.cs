@@ -31,6 +31,8 @@ namespace Sloth.Api
                 builder.AddUserSecrets<Startup>();
             }
 
+            builder.AddEnvironmentVariables();
+
             Configuration = builder.Build();
         }
 
