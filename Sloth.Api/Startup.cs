@@ -8,8 +8,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using Serilog;
 using Sloth.Api.Data;
 using Sloth.Api.Identity;
+using Sloth.Api.Logging;
 using Sloth.Api.Swagger;
 using Sloth.Core;
 using Swashbuckle.AspNetCore.Swagger;
@@ -28,9 +30,15 @@ namespace Sloth.Api
 
             if (env.IsDevelopment())
             {
+                builder.AddUserSecrets<Startup>();
             }
 
+            builder.AddEnvironmentVariables();
+
             Configuration = builder.Build();
+
+            // setup logging
+            LoggingConfiguration.Setup(env, Configuration);
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -38,12 +46,16 @@ namespace Sloth.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // add configuration options services
+            services.Configure<StackifyOptions>(Configuration.GetSection("Stackify"));
+
+            // add database connection
             services.AddDbContext<SlothDbContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            // Add framework services.
+            // add framework services.
             services.AddMvc();
 
             // add authentication policies
@@ -93,12 +105,20 @@ namespace Sloth.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, SlothDbContext context)
+        public void Configure(
+            IApplicationBuilder app, 
+            IHostingEnvironment env, 
+            ILoggerFactory loggerFactory, 
+            IApplicationLifetime appLifetime,
+            SlothDbContext context)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            loggerFactory.AddSerilog();
 
+            appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+
+            app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<ApiKeyMiddleware>();
+            app.UseMiddleware<LoggingIdentityMiddleware>();
 
             app.UseMvc();
 
