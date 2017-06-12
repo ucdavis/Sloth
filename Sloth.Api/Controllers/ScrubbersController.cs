@@ -31,6 +31,8 @@ namespace Sloth.Api.Controllers
             _logger.LogInformation("woot");
 
             var scrubbers = await _context.Scrubbers
+                .Include(s => s.Creator)
+                .Include(s => s.Transactions)
                 .Take(1)
                 .ToListAsync();
 
