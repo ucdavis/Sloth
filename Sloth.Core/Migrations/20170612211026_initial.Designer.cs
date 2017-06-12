@@ -8,9 +8,10 @@ using Sloth.Core;
 namespace Sloth.Core.Migrations
 {
     [DbContext(typeof(SlothDbContext))]
-    partial class SlothDbContextModelSnapshot : ModelSnapshot
+    [Migration("20170612211026_initial")]
+    partial class initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")
