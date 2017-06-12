@@ -27,8 +27,8 @@ namespace Sloth.Test.Xml
 
             target.Trailer = new Trailer()
             {
-                totalAmount = target.Entries.Sum(e => e.amount),
-                totalRecords = target.Entries.Count.ToString()
+                TotalAmount = target.Entries.Sum(e => e.Amount),
+                TotalRecords = target.Entries.Count.ToString()
             };
 
 
