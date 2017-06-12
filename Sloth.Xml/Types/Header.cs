@@ -9,46 +9,87 @@ namespace Sloth.Xml
     [XmlType("headerType", Namespace = KfsNamespace)]
     public class Header : KfsXmlElement
     {
-        /// <remarks/>
+        /// <summary>
+        /// Chart of Accounts Code associate with Org Code.
+        /// </summary>
         [MaxLength(2)]
+        [Required]
         [XmlElement("chart", DataType = "normalizedString")]
-        public string chart { get; set; }
+        public string Chart { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Financial System Organization responsible for GL Feed.
+        /// </summary>
         [MaxLength(4)]
+        [Required]
         [XmlElement("orgCode", DataType = "normalizedString")]
-        public string orgCode { get; set; }
+        public string OrganizationCode { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Date the file was created from source system
+        /// </summary>
+        [Required]
         [XmlElement("batchDate", DataType = "date")]
-        public DateTime batchDate { get; set; }
+        public DateTime BatchDate { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Source system batch sequence number
+        /// </summary>
+        [Range(1, 999999)]
+        [Required]
         [XmlElement("batchSequenceNum", DataType = "positiveInteger")]
-        public string batchSequenceNum { get; set; }
+        public int BatchSequenceNumber { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Campus User ID of main contact responsible for feed.
+        /// </summary>
+        [MinLength(2)]
+        [MaxLength(8)]
+        [Required]
         [XmlElement("contactUserId", DataType = "normalizedString")]
-        public string contactUserId { get; set; }
+        public string ContactUserId { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Email address used to send information when errors occur or other events. The email should match the origination code email. A distribution list is highly recommended.
+        /// </summary>
+        [MaxLength(40)]
+        [EmailAddress]
+        [Required]
         [XmlElement("contactEmail", DataType = "normalizedString")]
-        public string contactEmail { get; set; }
+        public string ContactEmail { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Financial System only code. Value to be provided by Admin IT to the integration system.
+        /// </summary>
+        [MaxLength(2)]
+        [Required]
         [XmlElement("campusCode")]
-        public campusCode campusCode { get; set; }
+        public campusCode CampusCode { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Contact number for personnel/unit responsible for feed.
+        /// </summary>
+        [MinLength(1)]
+        [MaxLength(10)]
+        [RegularExpression("[0-9]*")]
+        [Required]
         [XmlElement("contactPhoneNumber", DataType = "normalizedString")]
-        public string contactPhoneNumber { get; set; }
+        public string ContactPhoneNumber { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Brief mailing address for Department responsible for feed.
+        /// </summary>
+        [MaxLength(30)]
+        [Required]
         [XmlElement("mailingAddress", DataType = "normalizedString")]
-        public string mailingAddress { get; set; }
+        public string MailingAddress { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Department responsible for feed.
+        /// </summary>
+        [MaxLength(30)]
+        [Required]
         [XmlElement("departmentName", DataType = "normalizedString")]
-        public string departmentName { get; set; }
+        public string DepartmentName { get; set; }
     }
 }
