@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Sloth.Core;
+using Sloth.Core.Models;
 
 namespace Sloth.Core.Migrations
 {
@@ -43,35 +44,9 @@ namespace Sloth.Core.Migrations
 
                     b.Property<int>("BatchSequenceNumber");
 
-                    b.Property<string>("CampusCode")
-                        .IsRequired()
-                        .HasMaxLength(2);
-
                     b.Property<string>("Chart")
                         .IsRequired()
                         .HasMaxLength(2);
-
-                    b.Property<string>("ContactAddress")
-                        .IsRequired()
-                        .HasMaxLength(30);
-
-                    b.Property<string>("ContactDepartment")
-                        .IsRequired()
-                        .HasMaxLength(30);
-
-                    b.Property<string>("ContactEmail")
-                        .IsRequired()
-                        .HasMaxLength(40);
-
-                    b.Property<string>("ContactPhone")
-                        .IsRequired()
-                        .HasMaxLength(10);
-
-                    b.Property<string>("ContactUserId")
-                        .IsRequired()
-                        .HasMaxLength(8);
-
-                    b.Property<string>("CreatorId");
 
                     b.Property<string>("OrganizationCode")
                         .IsRequired()
@@ -79,12 +54,30 @@ namespace Sloth.Core.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CreatorId");
-
                     b.ToTable("Scrubbers");
                 });
 
             modelBuilder.Entity("Sloth.Core.Models.Transaction", b =>
+                {
+                    b.Property<string>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<string>("CreatorId");
+
+                    b.Property<string>("ScrubberId");
+
+                    b.Property<int>("Status");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreatorId");
+
+                    b.HasIndex("ScrubberId");
+
+                    b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("Sloth.Core.Models.Transfer", b =>
                 {
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
@@ -137,8 +130,6 @@ namespace Sloth.Core.Migrations
                     b.Property<string>("ReferenceId")
                         .HasMaxLength(8);
 
-                    b.Property<string>("ScrubberId");
-
                     b.Property<int>("SequenceNumber");
 
                     b.Property<string>("SubAccount")
@@ -152,11 +143,13 @@ namespace Sloth.Core.Migrations
 
                     b.Property<DateTime>("TransactionDate");
 
+                    b.Property<string>("TransactionId");
+
                     b.HasKey("Id");
 
-                    b.HasIndex("ScrubberId");
+                    b.HasIndex("TransactionId");
 
-                    b.ToTable("Transaction");
+                    b.ToTable("Transfers");
                 });
 
             modelBuilder.Entity("Sloth.Core.Models.User", b =>
@@ -180,18 +173,22 @@ namespace Sloth.Core.Migrations
                         .HasForeignKey("UserId");
                 });
 
-            modelBuilder.Entity("Sloth.Core.Models.Scrubber", b =>
+            modelBuilder.Entity("Sloth.Core.Models.Transaction", b =>
                 {
                     b.HasOne("Sloth.Core.Models.User", "Creator")
                         .WithMany()
                         .HasForeignKey("CreatorId");
-                });
 
-            modelBuilder.Entity("Sloth.Core.Models.Transaction", b =>
-                {
-                    b.HasOne("Sloth.Core.Models.Scrubber")
+                    b.HasOne("Sloth.Core.Models.Scrubber", "Scrubber")
                         .WithMany("Transactions")
                         .HasForeignKey("ScrubberId");
+                });
+
+            modelBuilder.Entity("Sloth.Core.Models.Transfer", b =>
+                {
+                    b.HasOne("Sloth.Core.Models.Transaction")
+                        .WithMany("Transfers")
+                        .HasForeignKey("TransactionId");
                 });
         }
     }

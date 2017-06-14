@@ -9,6 +9,21 @@ namespace Sloth.Core.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Scrubbers",
+                columns: table => new
+                {
+                    Id = table.Column<string>(nullable: false),
+                    BatchDate = table.Column<DateTime>(nullable: false),
+                    BatchSequenceNumber = table.Column<int>(nullable: false),
+                    Chart = table.Column<string>(maxLength: 2, nullable: false),
+                    OrganizationCode = table.Column<string>(maxLength: 4, nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Scrubbers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -42,35 +57,33 @@ namespace Sloth.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Scrubbers",
+                name: "Transactions",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
-                    BatchDate = table.Column<DateTime>(nullable: false),
-                    BatchSequenceNumber = table.Column<int>(nullable: false),
-                    CampusCode = table.Column<string>(maxLength: 2, nullable: false),
-                    Chart = table.Column<string>(maxLength: 2, nullable: false),
-                    ContactAddress = table.Column<string>(maxLength: 30, nullable: false),
-                    ContactDepartment = table.Column<string>(maxLength: 30, nullable: false),
-                    ContactEmail = table.Column<string>(maxLength: 40, nullable: false),
-                    ContactPhone = table.Column<string>(maxLength: 10, nullable: false),
-                    ContactUserId = table.Column<string>(maxLength: 8, nullable: false),
                     CreatorId = table.Column<string>(nullable: true),
-                    OrganizationCode = table.Column<string>(maxLength: 4, nullable: false)
+                    ScrubberId = table.Column<string>(nullable: true),
+                    Status = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Scrubbers", x => x.Id);
+                    table.PrimaryKey("PK_Transactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Scrubbers_Users_CreatorId",
+                        name: "FK_Transactions_Users_CreatorId",
                         column: x => x.CreatorId,
                         principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Transactions_Scrubbers_ScrubberId",
+                        column: x => x.ScrubberId,
+                        principalTable: "Scrubbers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transaction",
+                name: "Transfers",
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
@@ -89,20 +102,20 @@ namespace Sloth.Core.Migrations
                     OriginCode = table.Column<string>(maxLength: 2, nullable: false),
                     Project = table.Column<string>(maxLength: 10, nullable: true),
                     ReferenceId = table.Column<string>(maxLength: 8, nullable: true),
-                    ScrubberId = table.Column<string>(nullable: true),
                     SequenceNumber = table.Column<int>(nullable: false),
                     SubAccount = table.Column<string>(maxLength: 5, nullable: true),
                     SubObjectCode = table.Column<string>(maxLength: 3, nullable: true),
                     TrackingNumber = table.Column<string>(maxLength: 10, nullable: true),
-                    TransactionDate = table.Column<DateTime>(nullable: false)
+                    TransactionDate = table.Column<DateTime>(nullable: false),
+                    TransactionId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transaction", x => x.Id);
+                    table.PrimaryKey("PK_Transfers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transaction_Scrubbers_ScrubberId",
-                        column: x => x.ScrubberId,
-                        principalTable: "Scrubbers",
+                        name: "FK_Transfers_Transactions_TransactionId",
+                        column: x => x.TransactionId,
+                        principalTable: "Transactions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -113,14 +126,19 @@ namespace Sloth.Core.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Scrubbers_CreatorId",
-                table: "Scrubbers",
+                name: "IX_Transactions_CreatorId",
+                table: "Transactions",
                 column: "CreatorId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transaction_ScrubberId",
-                table: "Transaction",
+                name: "IX_Transactions_ScrubberId",
+                table: "Transactions",
                 column: "ScrubberId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Transfers_TransactionId",
+                table: "Transfers",
+                column: "TransactionId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -129,13 +147,16 @@ namespace Sloth.Core.Migrations
                 name: "ApiKeys");
 
             migrationBuilder.DropTable(
-                name: "Transaction");
+                name: "Transfers");
 
             migrationBuilder.DropTable(
-                name: "Scrubbers");
+                name: "Transactions");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Scrubbers");
         }
     }
 }
