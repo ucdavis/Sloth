@@ -43,44 +43,46 @@ namespace Sloth.Api.Data
                     OrganizationCode = "ACCT",
                     BatchDate = DateTime.Today,
                     BatchSequenceNumber = 1,
-                    CampusCode = "DV",
-                    ContactUserId = "jpknoll",
-                    ContactEmail = "jpknoll@ucdavis.edu",
-                    ContactAddress = "Mrak",
-                    ContactDepartment = "CRU",
-                    ContactPhone = "5307540708",
                     Transactions = new[]
                     {
                         new Transaction()
                         {
-                            Amount = 100,
-                            Chart = 3,
-                            Account = "6620001",
-                            ObjectCode = "7259",
-                            BalanceType = "AC",
-                            DocType = "GLJV",
-                            OriginCode = "92",
-                            DocumentNumber = "ADOCUMENT1",
-                            Description = "Some useful description",
-                            TransactionDate = DateTime.Today.AddDays(-1),
-                            DebitCredit = "D",
-                            TrackingNumber = "TESTTHIS1"
-                        },
-                        new Transaction()
-                        {
-                            Amount = 100,
-                            Chart = 3,
-                            Account = "1010280",
-                            ObjectCode = "0299",
-                            BalanceType = "AC",
-                            DocType = "GLJV",
-                            OriginCode = "92",
-                            DocumentNumber = "ADOCUMENT1",
-                            Description = "Test Clearing",
-                            TransactionDate = DateTime.Today.AddDays(-1),
-                            DebitCredit = "C",
-                            TrackingNumber = "*CLEARING*"
-                        },
+                            Creator = context.Users.FirstOrDefault(u => u.Username == "jpknoll"),
+                            Status = TransactionStatus.Scheduled,
+                            Transfers = new []
+                            {
+                                new Transfer()
+                                {
+                                    Amount = 100,
+                                    Chart = 3,
+                                    Account = "6620001",
+                                    ObjectCode = "7259",
+                                    BalanceType = "AC",
+                                    DocType = "GLJV",
+                                    OriginCode = "92",
+                                    DocumentNumber = "ADOCUMENT1",
+                                    Description = "Some useful description",
+                                    TransactionDate = DateTime.Today.AddDays(-1),
+                                    DebitCredit = "D",
+                                    TrackingNumber = "TESTTHIS1"
+                                },
+                                new Transfer()
+                                {
+                                    Amount = 100,
+                                    Chart = 3,
+                                    Account = "1010280",
+                                    ObjectCode = "0299",
+                                    BalanceType = "AC",
+                                    DocType = "GLJV",
+                                    OriginCode = "92",
+                                    DocumentNumber = "ADOCUMENT1",
+                                    Description = "Test Clearing",
+                                    TransactionDate = DateTime.Today.AddDays(-1),
+                                    DebitCredit = "C",
+                                    TrackingNumber = "*CLEARING*"
+                                },
+                            }
+                        }
                     }
                 },
             };
