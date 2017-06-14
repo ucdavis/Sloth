@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace Sloth.Core.Models
 {
@@ -25,7 +23,6 @@ namespace Sloth.Core.Models
         public Scrubber Scrubber { get; set; }
     }
 
-    //[JsonConverter(typeof(StringEnumConverter))]
     public enum TransactionStatus
     {
         Scheduled,
