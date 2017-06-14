@@ -28,11 +28,11 @@ namespace Sloth.Api.Controllers
         [ProducesResponseType(typeof(IList<Scrubber>), 200)]
         public async Task<IList<Scrubber>> Get()
         {
-            _logger.LogInformation("woot");
-
             var scrubbers = await _context.Scrubbers
-                .Include(s => s.Creator)
                 .Include(s => s.Transactions)
+                    .ThenInclude(t => t.Creator)
+                .Include(s => s.Transactions)
+                    .ThenInclude(t => t.Transfers)
                 .Take(1)
                 .ToListAsync();
 
