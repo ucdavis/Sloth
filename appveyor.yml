@@ -1,4 +1,4 @@
-version: 1.0.0.{build}
+﻿version: 1.0.0.{build}
 
 environment:
   configuration: Release
@@ -27,7 +27,9 @@ build_script:
 - cmd: msbuild /t:Build /p:Configuration=%configuration%;RunOctoPack=true;PackageVersion=%APPVEYOR_BUILD_VERSION%;OctoPackReleaesNotesFile=..\commit.txt
 
 test_script:
-- cmd: vstest.console /logger:Appveyor %appveyor_build_folder%\Test\bin\%configuration%\netcoreapp1.1\Sloth.Test.dll
+- ps: |
+    $testdll = (Get-ChildItem -Path %appveyor_build_folder%\Sloth.Test\bin\ -Filter Sloth.Test.dll -R).FullName
+    vstest.console /logger:Appveyor $testdll
 
 artifacts:
 - path: '**/bin/**/Sloth.*.nupkg'
