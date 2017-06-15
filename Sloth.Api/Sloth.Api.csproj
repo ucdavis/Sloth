@@ -6,9 +6,9 @@
     <PlatformTarget>x86</PlatformTarget>
     <UserSecretsId>738f155f-718e-45d3-aceb-cb0b5d4a04f8</UserSecretsId>
     <DocumentationFile>bin\Debug\net461\win7-x86\Sloth.Api.xml</DocumentationFile>
-    <NoWarn>1701;1702;1705;1591</NoWarn>
     <Version>1.0.0.0</Version>
     <Description>Scrubber Loader and Online Transaction Hub</Description>
+    <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
