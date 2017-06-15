@@ -45,7 +45,7 @@ namespace Sloth.Api.Identity
 
             context.User.AddIdentity(new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Name, apiKey.Owner)
+                new Claim(ClaimTypes.Name, apiKey.User.Username)
             }));
 
             return _next(context);

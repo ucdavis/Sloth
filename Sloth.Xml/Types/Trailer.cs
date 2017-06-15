@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Xml.Serialization;
 
 namespace Sloth.Xml
 {
@@ -7,12 +8,20 @@ namespace Sloth.Xml
     [XmlType("trailerType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
     public class Trailer : KfsXmlElement
     {
-        /// <remarks/>
+        /// <summary>
+        /// The total number of GL Entry Tags
+        /// </summary>
+        [Range(1, 1000000)]
+        [Required]
         [XmlElement("totalRecords", DataType = "positiveInteger")]
-        public string totalRecords { get; set; }
+        public int TotalRecords { get; set; }
 
-        /// <remarks/>
+        /// <summary>
+        /// Total amount of the transactions being processed in a file.
+        /// </summary>
+        [Range(typeof(decimal), "0.01", "1000000000")]
+        [Required]
         [XmlElement("totalAmount")]
-        public decimal totalAmount { get; set; }
+        public decimal TotalAmount { get; set; }
     }
 }

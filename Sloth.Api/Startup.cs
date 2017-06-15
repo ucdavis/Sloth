@@ -8,6 +8,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Api.Data;
 using Sloth.Api.Identity;
@@ -56,7 +58,12 @@ namespace Sloth.Api
             });
 
             // add framework services.
-            services.AddMvc();
+            services.AddMvc()
+                .AddJsonOptions(o =>
+                {
+                    o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    o.SerializerSettings.Converters.Add(new StringEnumConverter());
+                });
 
             // add authentication policies
             services.AddAuthorization(o =>
@@ -102,6 +109,7 @@ namespace Sloth.Api
                 });
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
