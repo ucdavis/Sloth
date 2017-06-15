@@ -27,7 +27,7 @@ build_script:
 - cmd: msbuild /t:Build /p:Configuration=%configuration%;RunOctoPack=true;PackageVersion=%APPVEYOR_BUILD_VERSION%;OctoPackReleaesNotesFile=..\commit.txt
 
 test_script:
-- cmd: dotnet test
+- ps: dotnet test .\Sloth.Test\Sloth.Test.csproj
 
 artifacts:
 - path: '**/bin/**/Sloth.*.nupkg'
