@@ -27,9 +27,7 @@ build_script:
 - cmd: msbuild /t:Build /p:Configuration=%configuration%;RunOctoPack=true;PackageVersion=%APPVEYOR_BUILD_VERSION%;OctoPackReleaesNotesFile=..\commit.txt
 
 test_script:
-- ps: |
-    $testdll = (Get-ChildItem -Path .\Sloth.Test\bin\ -Filter Sloth.Test.dll -R).FullName
-    xunit.console.clr4  $testdll /appveyor
+- cmd: dotnet test
 
 artifacts:
 - path: '**/bin/**/Sloth.*.nupkg'
