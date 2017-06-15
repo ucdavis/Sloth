@@ -19,7 +19,7 @@ namespace Sloth.Xml
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>
         [Range(1, 12)]
-        [XmlElement("fiscalYear", DataType = "integer")]
+        [XmlElement("fiscalYear", DataType = "int")]
         public int FiscalYear { get; set; }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace Sloth.Xml
         /// The system will auto-assign if not provided.
         /// </summary>
         [Range(1, 99999)]
-        [XmlElement("sequenceNum", DataType = "positiveInteger")]
+        [XmlElement("sequenceNum", DataType = "int")]
         public int SequenceNumber { get; set; }
 
         /// <summary>
