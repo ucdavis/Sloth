@@ -28,7 +28,7 @@ build_script:
 
 test_script:
 - ps: |
-    $testdll = (Get-ChildItem -Path %appveyor_build_folder%\Sloth.Test\bin\ -Filter Sloth.Test.dll -R).FullName
+    $testdll = (Get-ChildItem -Path .\Sloth.Test\bin\ -Filter Sloth.Test.dll -R).FullName
     vstest.console /logger:Appveyor $testdll
 
 artifacts:
