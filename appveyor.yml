@@ -29,7 +29,7 @@ build_script:
 test_script:
 - ps: |
     $testdll = (Get-ChildItem -Path .\Sloth.Test\bin\ -Filter Sloth.Test.dll -R).FullName
-    vstest.console /logger:Appveyor $testdll
+    xunit.console $testdll /appveyor
 
 artifacts:
 - path: '**/bin/**/Sloth.*.nupkg'
