@@ -37,7 +37,7 @@ namespace Sloth.Xml
         /// </summary>
         [Range(1, 999999)]
         [Required]
-        [XmlElement("batchSequenceNum", DataType = "positiveInteger")]
+        [XmlElement("batchSequenceNum", DataType = "int")]
         public int BatchSequenceNumber { get; set; }
 
         /// <summary>

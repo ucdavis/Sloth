@@ -14,6 +14,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{8A3F61DD-FDBF-49E7-A939-F112DCE88B70}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		appveyor.yml = appveyor.yml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Test", "Sloth.Test\Sloth.Test.csproj", "{F453C2E7-D80C-49E8-9416-1F930C3C0AAC}"

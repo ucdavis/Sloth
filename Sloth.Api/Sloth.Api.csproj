@@ -3,12 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <RuntimeIdentifier>win7-x86</RuntimeIdentifier>
-    <UserSecretsId>738f155f-718e-45d3-aceb-cb0b5d4a04f8</UserSecretsId>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DocumentationFile>bin\Debug\net461\win7-x86\Sloth.Api.xml</DocumentationFile>
     <PlatformTarget>x86</PlatformTarget>
+    <UserSecretsId>738f155f-718e-45d3-aceb-cb0b5d4a04f8</UserSecretsId>
+    <DocumentationFile>bin\Debug\net461\win7-x86\Sloth.Api.xml</DocumentationFile>
+    <Version>1.0.0.0</Version>
+    <Description>Scrubber Loader and Online Transaction Hub</Description>
     <NoWarn>1701;1702;1705;1591</NoWarn>
   </PropertyGroup>
 
@@ -23,6 +22,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
+    <PackageReference Include="OctoPack" Version="3.6.1" />
     <PackageReference Include="Serilog" Version="2.4.0" />
     <PackageReference Include="Serilog.Exceptions" Version="2.4.1" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="1.4.0" />

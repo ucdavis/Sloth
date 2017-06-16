@@ -13,7 +13,7 @@ namespace Sloth.Xml
         /// </summary>
         [Range(1, 1000000)]
         [Required]
-        [XmlElement("totalRecords", DataType = "positiveInteger")]
+        [XmlElement("totalRecords", DataType = "int")]
         public int TotalRecords { get; set; }
 
         /// <summary>
