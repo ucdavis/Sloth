@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<xs:schema xmlns="http://tempuri.org/pbdr_1_4" elementFormDefault="qualified" targetNamespace="http://tempuri.org/pbdr_1_4" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="Report">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Batches" />
+      </xs:sequence>
+      <xs:attribute name="Name" type="xs:string" use="required" />
+      <xs:attribute name="Version" type="xs:NMTOKEN" use="required" />
+      <xs:attribute name="MerchantID" type="xs:string" use="required" />
+      <xs:attribute name="ReportStartDate" type="xs:string" use="required" />
+      <xs:attribute name="ReportEndDate" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Batches">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="Batch" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Batch">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Requests" />
+      </xs:sequence>
+      <xs:attribute name="BatchID" type="xs:string" use="required" />
+      <xs:attribute name="BatchDate" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Requests">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="Request" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Request">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="TransactionReferenceNumber" />
+        <xs:element ref="TransactionId" />
+        <xs:element ref="PaymentMethod" />
+        <xs:element ref="CurrencyCode" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="CustomerId" />
+        <xs:element ref="Amount" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="LineItems" />
+        <xs:element ref="Application" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="WalletType" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="Channel" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="ProcessorTID" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="NetworkTransactionID" />
+        <xs:element minOccurs="0" maxOccurs="1" ref="EffectiveDate" />
+      </xs:sequence>
+      <xs:attribute name="RequestID" type="xs:string" use="required" />
+      <xs:attribute name="MerchantReferenceNumber" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="TransactionReferenceNumber" type="xs:string" />
+  <xs:element name="TransactionId" type="xs:string" />
+  <xs:element name="PaymentMethod" type="xs:string" />
+  <xs:element name="CurrencyCode" type="xs:string" />
+  <xs:element name="CustomerId" type="xs:string" />
+  <xs:element name="Amount" type="xs:string" />
+  <xs:element name="LineItems">
+    <xs:complexType>
+      <xs:sequence minOccurs="0" maxOccurs="unbounded">
+        <xs:element ref="LineItem" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LineItem">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="InvoiceNumber" />
+      </xs:sequence>
+      <xs:attribute name="Number" type="xs:string" use="required" />
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="InvoiceNumber" type="xs:string" />
+  <xs:element name="Application" type="xs:string" />
+  <xs:element name="WalletType" type="xs:string" />
+  <xs:element name="Channel">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="Type" />
+        <xs:element ref="SubType" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Type" type="xs:string" />
+  <xs:element name="SubType" type="xs:string" />
+  <xs:element name="ProcessorTID" type="xs:string" />
+  <xs:element name="NetworkTransactionID" type="xs:string" />
+  <xs:element name="EffectiveDate" type="xs:string" />
+</xs:schema>
