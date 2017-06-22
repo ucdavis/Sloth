@@ -19,6 +19,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{8A3F61DD-F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Test", "Sloth.Test\Sloth.Test.csproj", "{F453C2E7-D80C-49E8-9416-1F930C3C0AAC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Integrations.Cybersource", "Sloth.Integrations.Cybersource\Sloth.Integrations.Cybersource.csproj", "{D08B9958-DBB7-4AEB-884B-604126EF2E5C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{F453C2E7-D80C-49E8-9416-1F930C3C0AAC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F453C2E7-D80C-49E8-9416-1F930C3C0AAC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F453C2E7-D80C-49E8-9416-1F930C3C0AAC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D08B9958-DBB7-4AEB-884B-604126EF2E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D08B9958-DBB7-4AEB-884B-604126EF2E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D08B9958-DBB7-4AEB-884B-604126EF2E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D08B9958-DBB7-4AEB-884B-604126EF2E5C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
