@@ -2,6 +2,7 @@
 using System.Threading;
 using Hangfire;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Extensions.Configuration;
 
 namespace Sloth.Jobs.HangfireServer
 {
@@ -14,6 +15,12 @@ namespace Sloth.Jobs.HangfireServer
         {
             try
             {
+                // build app settings configuration
+                var builder = new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                    .AddUserSecrets<Startup>();
+
+                Configuration = builder.Build();
                 // configure handfire job processor
                 GlobalConfiguration.Configuration.UseSerilogLogProvider();
 
