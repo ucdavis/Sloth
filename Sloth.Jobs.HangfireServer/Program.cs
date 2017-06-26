@@ -34,6 +34,8 @@ namespace Sloth.Jobs.HangfireServer
 
                 // configure handfire job processor
                 GlobalConfiguration.Configuration.UseSerilogLogProvider();
+                // setup action filters
+                GlobalJobFilters.Filters.Add(new JobContextLoggerAttribute());
 
                 // configure job server
                 _options = new BackgroundJobServerOptions()
