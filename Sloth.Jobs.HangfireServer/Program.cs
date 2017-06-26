@@ -53,5 +53,7 @@ namespace Sloth.Jobs.HangfireServer
                 throw;
             }
         }
+
+        private static IConfigurationRoot Configuration { get; set; }
     }
 }
