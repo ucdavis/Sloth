@@ -6,7 +6,7 @@ using Serilog.Exceptions;
 
 namespace Sloth.Api.Logging
 {
-    public static class LoggingConfiguration
+    internal static class LoggingConfiguration
     {
         private static bool _loggingSetup;
 
