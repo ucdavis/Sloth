@@ -1,24 +1,25 @@
 ﻿using System;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Exceptions;
 
-namespace Sloth.Api.Logging
+namespace Sloth.Jobs.HangfireServer.Logging
 {
-    internal static class LoggingConfiguration
+    public class LoggingConfiguration
     {
         private static bool _loggingSetup;
 
-        public static LoggerConfiguration Configuration { get; set; }
+        public static LoggerConfiguration Configuration => new LoggerConfiguration()
+            .Enrich.FromLogContext()
+            .Enrich.WithExceptionDetails()
+            .WriteTo.Stackify()
+            .WriteTo.LiterateConsole();
 
         /// <summary>
         /// Configure Application Logging
         /// </summary>
-        public static void Setup(IHostingEnvironment env, IConfiguration configuration)
+        public static void Setup(IConfiguration configuration)
         {
-            if (env == null) throw new ArgumentNullException(nameof(env));
-
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
             if (_loggingSetup) return; //only setup logging once
@@ -30,19 +31,7 @@ namespace Sloth.Api.Logging
             StackifyLib.Logger.GlobalAppName = stackifyOptions.AppName;
             StackifyLib.Logger.GlobalEnvironment = stackifyOptions.Environment;
 
-            // configure serilog
-            Configuration = new LoggerConfiguration()
-                .Enrich.FromLogContext()
-                .Enrich.WithExceptionDetails()
-                .WriteTo.Stackify();
-
-            if (env.IsDevelopment())
-            {
-                Configuration = Configuration
-                    .WriteTo.LiterateConsole()
-                    .WriteTo.Trace();
-            }
-
+            // create global logger
             Log.Logger = Configuration
                 .CreateLogger();
 
