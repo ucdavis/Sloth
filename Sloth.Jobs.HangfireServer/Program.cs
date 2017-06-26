@@ -21,6 +21,9 @@ namespace Sloth.Jobs.HangfireServer
                     .AddUserSecrets<Startup>();
 
                 Configuration = builder.Build();
+
+                // configure logging
+                LoggingConfiguration.Setup(Configuration);
                 // configure handfire job processor
                 GlobalConfiguration.Configuration.UseSerilogLogProvider();
 
