@@ -1,5 +1,6 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
+using Hangfire;
+using Hangfire.Console;
 using Hangfire.RecurringJobExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -12,8 +13,8 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
-using Sloth.Api.Data;
 using Sloth.Api.Identity;
+using Sloth.Api.Jobs;
 using Sloth.Api.Logging;
 using Sloth.Api.Swagger;
 using Sloth.Core;
