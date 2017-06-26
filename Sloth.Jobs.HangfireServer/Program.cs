@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Threading;
 using Hangfire;
+using Hangfire.Console;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using Sloth.Api;
+using Sloth.Api.Jobs;
+using Sloth.Jobs.HangfireServer.Logging;
 
 namespace Sloth.Jobs.HangfireServer
 {
@@ -33,14 +38,18 @@ namespace Sloth.Jobs.HangfireServer
                     .BuildServiceProvider();
 
                 // configure handfire job processor
-                GlobalConfiguration.Configuration.UseSerilogLogProvider();
+                GlobalConfiguration.Configuration
+                    .UseConsole()
+                    .UseSerilogLogProvider()
+                    .UseActivator(new ServiceActivator(serviceProvider))
+                    .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
+
                 // setup action filters
                 GlobalJobFilters.Filters.Add(new JobContextLoggerAttribute());
 
                 // configure job server
                 _options = new BackgroundJobServerOptions()
                 {
-
                 };
 
                 // listen for shutdon
@@ -61,8 +70,9 @@ namespace Sloth.Jobs.HangfireServer
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Log.Error(ex, ex.Message);
                 throw;
             }
         }
