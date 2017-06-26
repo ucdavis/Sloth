@@ -41,6 +41,12 @@ namespace Sloth.Api
 
             // setup logging
             LoggingConfiguration.Setup(env, Configuration);
+
+            // setup hangfire storage
+            GlobalConfiguration.Configuration
+                .UseSerilogLogProvider()
+                .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"))
+                .UseConsole();
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -110,6 +116,7 @@ namespace Sloth.Api
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
+            services.AddHangfire(c => { });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -130,6 +137,7 @@ namespace Sloth.Api
 
             app.UseMvc();
 
+            // add swagger ui
             app.UseSwagger(o =>
             {
             });
@@ -138,9 +146,16 @@ namespace Sloth.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sloth API v1");
             });
 
+            // add hangfire dashboard
+            app.UseHangfireDashboard();
+            //"/hangfire", new DashboardOptions()
+            //{
+            //    Authorization = new[] { new LocalRequestsOnlyAuthorizationFilter(), }
+            //});
+
             if (env.IsDevelopment())
             {
-                DbInitializer.Initialize(context);
+                //DbInitializer.Initialize(context);
             }
         }
     }
