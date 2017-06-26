@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Hangfire.RecurringJobExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -157,6 +158,10 @@ namespace Sloth.Api
             {
                 //DbInitializer.Initialize(context);
             }
+
+            // add recurring jobs
+            GlobalConfiguration.Configuration
+                .UseRecurringJob(typeof(Heartbeat));
         }
     }
 }
