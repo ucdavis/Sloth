@@ -3,6 +3,7 @@ using System.Threading;
 using Hangfire;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Sloth.Jobs.HangfireServer
 {
@@ -24,6 +25,13 @@ namespace Sloth.Jobs.HangfireServer
 
                 // configure logging
                 LoggingConfiguration.Setup(Configuration);
+
+                // configure DI
+                var serviceProvider = new ServiceCollection()
+                    .AddTransient(s => LoggingConfiguration.Configuration)
+                    .AddTransient<Heartbeat>()
+                    .BuildServiceProvider();
+
                 // configure handfire job processor
                 GlobalConfiguration.Configuration.UseSerilogLogProvider();
 
