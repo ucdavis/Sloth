@@ -56,6 +56,7 @@ namespace Sloth.Api
             services.AddTransient(_ => LoggingConfiguration.Configuration);
             
             // add infrastructure services
+            services.AddSingleton<IKfsScrubberService, KfsScrubberService>();
             services.AddSingleton<IStorageService, StorageService>();
 
             // add database connection
