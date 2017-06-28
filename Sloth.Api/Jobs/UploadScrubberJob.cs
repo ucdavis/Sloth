@@ -26,8 +26,7 @@ namespace Sloth.Api.Jobs
         private readonly string _host;
         private readonly string _storageContainer;
 
-        public UploadScrubberJob(SlothDbContext context, IConfiguration configuration, LoggerConfiguration loggerConfiguration, IStorageService storageService) 
-            : base(loggerConfiguration)
+        public UploadScrubberJob(SlothDbContext context, IKfsScrubberService kfsScrubberService)
         {
             _context = context;
             _storageService = storageService;

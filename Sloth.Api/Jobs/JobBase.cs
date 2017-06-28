@@ -1,7 +1,8 @@
 ﻿using System;
 using Hangfire.Server;
-using Serilog;
 using Serilog.Core;
+using Sloth.Api.Jobs.Attributes;
+using Sloth.Api.Logging;
 
 namespace Sloth.Api.Jobs
 {
@@ -10,16 +11,9 @@ namespace Sloth.Api.Jobs
     {
         protected Logger Logger { get; set; }
 
-        private readonly LoggerConfiguration _loggerConfiguration;
-
-        public JobBase(LoggerConfiguration loggerConfiguration)
-        {
-            _loggerConfiguration = loggerConfiguration;
-        }
-
         protected void SetupLogging(PerformContext context)
         {
-            Logger = _loggerConfiguration
+            Logger = LoggingConfiguration.Configuration
                 .WriteTo.HangfireConsoleSink(context)
                 .CreateLogger();
         }
