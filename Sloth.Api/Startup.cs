@@ -13,9 +13,11 @@ using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
+using Sloth.Api.Data;
 using Sloth.Api.Identity;
 using Sloth.Api.Jobs;
 using Sloth.Api.Logging;
+using Sloth.Api.Services;
 using Sloth.Api.Swagger;
 using Sloth.Core;
 using Swashbuckle.AspNetCore.Swagger;
@@ -40,15 +42,6 @@ namespace Sloth.Api
             builder.AddEnvironmentVariables();
 
             Configuration = builder.Build();
-
-            // setup logging
-            LoggingConfiguration.Setup(env, Configuration);
-
-            // setup hangfire storage
-            GlobalConfiguration.Configuration
-                .UseSerilogLogProvider()
-                .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"))
-                .UseConsole();
         }
 
         public IConfigurationRoot Configuration { get; }
@@ -56,8 +49,14 @@ namespace Sloth.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // add configuration options services
-            services.Configure<StackifyOptions>(Configuration.GetSection("Stackify"));
+            // add root configuration
+            services.AddSingleton<IConfiguration>(Configuration);
+
+            // add logger configuration
+            services.AddTransient(_ => LoggingConfiguration.Configuration);
+            
+            // add infrastructure services
+            services.AddSingleton<IStorageService, StorageService>();
 
             // add database connection
             services.AddDbContext<SlothDbContext>(options =>
@@ -118,17 +117,21 @@ namespace Sloth.Api
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
 
+            // add hangfire job activator
             services.AddHangfire(c => { });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
-            IApplicationBuilder app, 
-            IHostingEnvironment env, 
-            ILoggerFactory loggerFactory, 
+            IApplicationBuilder app,
+            IHostingEnvironment env,
+            ILoggerFactory loggerFactory,
             IApplicationLifetime appLifetime,
             SlothDbContext context)
         {
+            // setup logging
+            LoggingConfiguration.Setup(Configuration);
+
             loggerFactory.AddSerilog();
 
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
@@ -148,6 +151,28 @@ namespace Sloth.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sloth API v1");
             });
 
+            // possibly reset db
+            if (env.IsDevelopment())
+            {
+                DbInitializer.Initialize(context);
+            }
+
+            ConfigureHangfire(app, env);
+        }
+
+        private void ConfigureHangfire(IApplicationBuilder app, IHostingEnvironment env)
+        {
+            // setup hangfire storage
+            GlobalConfiguration.Configuration
+                .UseSerilogLogProvider()
+                .UseConsole()
+                .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
+
+            // add recurring jobs
+            GlobalConfiguration.Configuration
+                .UseRecurringJob(typeof(Heartbeat))
+                .UseRecurringJob(typeof(UploadScrubberJob));
+
             // add hangfire dashboard
             app.UseHangfireDashboard();
             //"/hangfire", new DashboardOptions()
@@ -157,12 +182,8 @@ namespace Sloth.Api
 
             if (env.IsDevelopment())
             {
-                //DbInitializer.Initialize(context);
+                app.UseHangfireServer();
             }
-
-            // add recurring jobs
-            GlobalConfiguration.Configuration
-                .UseRecurringJob(typeof(Heartbeat));
         }
     }
 }
