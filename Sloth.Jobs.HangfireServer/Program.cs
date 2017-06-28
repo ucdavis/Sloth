@@ -9,15 +9,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Sloth.Api;
 using Sloth.Api.Jobs;
+using Sloth.Api.Jobs.Attributes;
+using Sloth.Api.Logging;
 using Sloth.Api.Services;
 using Sloth.Core;
-using Sloth.Jobs.HangfireServer.Logging;
 
 namespace Sloth.Jobs.HangfireServer
 {
     public class Program
     {
-        private static BackgroundJobServerOptions _options;
         private static CancellationToken _cancellationToken;
 
         public static void Main(string[] args)
@@ -34,6 +34,9 @@ namespace Sloth.Jobs.HangfireServer
                 // configure logging
                 LoggingConfiguration.Setup(Configuration);
 
+                // listen for shutdown
+                _cancellationToken = new WebJobsShutdownWatcher().Token;
+
                 // configure DI
                 var serviceProvider = BuildServiceProvider();
 
@@ -41,22 +44,19 @@ namespace Sloth.Jobs.HangfireServer
                 GlobalConfiguration.Configuration
                     .UseConsole()
                     .UseSerilogLogProvider()
-                    .UseActivator(new ServiceActivator(serviceProvider))
                     .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
 
                 // setup action filters
                 GlobalJobFilters.Filters.Add(new JobContextLoggerAttribute());
 
                 // configure job server
-                _options = new BackgroundJobServerOptions()
+                var options = new BackgroundJobServerOptions()
                 {
+                    Activator = new ServiceActivator(serviceProvider),
                 };
 
-                // listen for shutdon
-                _cancellationToken = new WebJobsShutdownWatcher().Token;
-
                 // startup job server
-                using (var server = new BackgroundJobServer(_options))
+                using (var server = new BackgroundJobServer(options))
                 {
                     while (true)
                     {
@@ -91,10 +91,8 @@ namespace Sloth.Jobs.HangfireServer
             });
 
             // add infrastructure services
+            services.AddTransient<IKfsScrubberService, KfsScrubberService>();
             services.AddTransient<IStorageService, StorageService>();
-
-            // add logging setup
-            services.AddTransient(s => LoggingConfiguration.Configuration);
 
             // add jobs
             services.AddTransient<Heartbeat>();
