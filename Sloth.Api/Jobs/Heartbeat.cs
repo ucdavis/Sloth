@@ -2,14 +2,11 @@
 using Hangfire.RecurringJobExtensions;
 using Hangfire.Server;
 using Serilog;
-using Serilog.Core;
 
 namespace Sloth.Api.Jobs
 {
     public class Heartbeat : JobBase
     {
-        private Logger Logger { get; set; }
-
         public Heartbeat(LoggerConfiguration loggerConfiguration) : base(loggerConfiguration)
         {
         }
@@ -17,9 +14,7 @@ namespace Sloth.Api.Jobs
         [RecurringJob(CronStrings.Minutely, RecurringJobId = "heartbeat")]
         public void Fire(PerformContext context)
         {
-            Logger = LoggerConfiguration
-                .WriteTo.HangfireConsoleSink(context)
-                .CreateLogger();
+            SetupLogging(context);
 
             Logger
                 .ForContext("jobId", context.BackgroundJob.Id)
