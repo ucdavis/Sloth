@@ -1,10 +1,6 @@
 ﻿using System;
 using Hangfire;
-using Hangfire.Server;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Sloth.Jobs.HangfireServer.Logging;
 
 namespace Sloth.Jobs.HangfireServer
 {
