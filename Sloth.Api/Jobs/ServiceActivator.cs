@@ -2,9 +2,9 @@
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Sloth.Jobs.HangfireServer
+namespace Sloth.Api.Jobs
 {
-    internal class ServiceActivator : JobActivator
+    public class ServiceActivator : JobActivator
     {
         private readonly IServiceProvider _serviceProvider;
 
