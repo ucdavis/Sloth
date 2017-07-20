@@ -1,17 +1,21 @@
 ﻿using System;
 using Hangfire.Server;
-using Serilog;
+using Serilog.Core;
+using Sloth.Api.Jobs.Attributes;
+using Sloth.Api.Logging;
 
 namespace Sloth.Api.Jobs
 {
     [ProlongExpirationTime]
     public class JobBase
     {
-        protected LoggerConfiguration LoggerConfiguration;
+        protected Logger Logger { get; set; }
 
-        public JobBase(LoggerConfiguration loggerConfiguration)
+        protected void SetupLogging(PerformContext context)
         {
-            LoggerConfiguration = loggerConfiguration;
+            Logger = LoggingConfiguration.Configuration
+                .WriteTo.HangfireConsoleSink(context)
+                .CreateLogger();
         }
     }
 }

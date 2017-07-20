@@ -33,7 +33,9 @@
     <PackageReference Include="Serilog.Sinks.Literate" Version="2.1.0" />
     <PackageReference Include="Serilog.Sinks.Stackify" Version="1.25.4" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
+    <PackageReference Include="SSH.NET" Version="2016.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
+    <PackageReference Include="WindowsAzure.Storage" Version="8.1.4" />
   </ItemGroup>
   
   <ItemGroup>

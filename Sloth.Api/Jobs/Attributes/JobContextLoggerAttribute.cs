@@ -1,12 +1,11 @@
-﻿using System;
-using Hangfire.Client;
+﻿using Hangfire.Client;
 using Hangfire.Common;
 using Hangfire.Logging;
 using Hangfire.Server;
 using Hangfire.States;
 using Hangfire.Storage;
 
-namespace Sloth.Jobs.HangfireServer.Logging
+namespace Sloth.Api.Jobs.Attributes
 {
     public class JobContextLoggerAttribute : JobFilterAttribute,
         IClientFilter, IServerFilter, IElectStateFilter, IApplyStateFilter
