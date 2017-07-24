@@ -49,6 +49,8 @@ namespace Sloth.Api.Jobs
 
                     // fetch report
                     var report = await client.GetPaymentBatchDetailReport(yesterday);
+
+                    log.Information("Report found with {count} records.", new { count = report.Batches.Batch.Length });
                 }
             }
             catch (Exception ex)
