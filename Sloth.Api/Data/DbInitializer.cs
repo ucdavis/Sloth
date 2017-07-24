@@ -19,17 +19,25 @@ namespace Sloth.Api.Data
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
-            if (!context.Users.Any())
-            {
-                CreateUsers(context);
-            }
-
-            if (!context.Transactions.Any())
-            {
-                CreateTransactions(context);
-            }
+            CreateUsers(context);
+            CreateTransactions(context);
+            CreateIntegrations(context);
 
             context.SaveChanges();
+        }
+
+        private static void CreateUsers(SlothDbContext context)
+        {
+            var users = new[]
+            {
+                new User()
+                {
+                    Username = "jpknoll",
+                    Email = "jpknoll@ucdavis.edu",
+                    Keys = new[] {new ApiKey() { Id = "TestKey123", Issued = DateTime.UtcNow }}
+                },
+            };
+            context.Users.AddRange(users);
         }
 
         private static void CreateTransactions(SlothDbContext context)
@@ -78,18 +86,19 @@ namespace Sloth.Api.Data
             context.Transactions.AddRange(transactions);
         }
 
-        private static void CreateUsers(SlothDbContext context)
+        private static void CreateIntegrations(SlothDbContext context)
         {
-            var users = new[]
+            var integrations = new[]
             {
-                new User()
+                new Integration()
                 {
-                    Username = "jpknoll",
-                    Email = "jpknoll@ucdavis.edu",
-                    Keys = new[] {new ApiKey() { Id = "TestKey123", Issued = DateTime.UtcNow }}
+                    MerchantId = "ucdavis_jpknoll",
+                    ReportUsername = "report_sloth",
+                    ReportPasswordKey = "Report-Test-1",
+                    Type = Integration.IntegrationType.CyberSource
                 },
             };
-            context.Users.AddRange(users);
+            context.Integrations.AddRange(integrations);
         }
     }
 }
