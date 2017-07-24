@@ -12,6 +12,8 @@ namespace Sloth.Core
 
         public DbSet<ApiKey> ApiKeys { get; set; }
 
+        public DbSet<Integration> Integrations { get; set; }
+
         public DbSet<Scrubber> Scrubbers { get; set; }
 
         public DbSet<Transaction> Transactions { get; set; }
