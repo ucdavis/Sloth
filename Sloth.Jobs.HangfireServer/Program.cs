@@ -92,6 +92,7 @@ namespace Sloth.Jobs.HangfireServer
 
             // add infrastructure services
             services.AddTransient<IKfsScrubberService, KfsScrubberService>();
+            services.AddTransient<ISecretsService, SecretsService>();
             services.AddTransient<IStorageService, StorageService>();
 
             // add jobs

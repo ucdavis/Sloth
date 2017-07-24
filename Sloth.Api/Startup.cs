@@ -57,6 +57,7 @@ namespace Sloth.Api
             
             // add infrastructure services
             services.AddSingleton<IKfsScrubberService, KfsScrubberService>();
+            services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
             // add database connection
