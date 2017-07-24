@@ -8,6 +8,11 @@
         public const string Minutely = "* * * * *";
 
         /// <summary>
+        /// Every Hour
+        /// </summary>
+        public const string Hourly = "0 * * * *";
+
+        /// <summary>
         /// Each Night
         /// </summary>
         public const string Nightly = "0 23 * * *";
