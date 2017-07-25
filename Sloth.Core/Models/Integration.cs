@@ -14,6 +14,8 @@ namespace Sloth.Core.Models
 
         public string ReportPasswordKey { get; set; }
 
+        public string DefaultAccount { get; set; }
+
         public enum IntegrationType
         {
             CyberSource
