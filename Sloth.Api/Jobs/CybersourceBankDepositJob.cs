@@ -74,7 +74,7 @@ namespace Sloth.Api.Jobs
                             Account        = _cybersourceSettings.ClearingAccount,
                             Direction      = Transfer.CreditDebit.Debit,
                             Amount         = deposit.Amount,
-                            TrackingNumber = deposit.MerchantReferenceNumber
+                            TrackingNumber = deposit.MerchantReferenceNumber,
                         };
                         transaction.Transfers.Add(clearing);
 
@@ -86,6 +86,25 @@ namespace Sloth.Api.Jobs
                             TrackingNumber = deposit.MerchantReferenceNumber
                         };
                         transaction.Transfers.Add(holding);
+
+                        // then from holding to the default account
+                        var holding2 = new Transfer()
+                        {
+                            Account        = _cybersourceSettings.HoldingAccount,
+                            Direction      = Transfer.CreditDebit.Debit,
+                            Amount         = deposit.Amount,
+                            TrackingNumber = deposit.MerchantReferenceNumber
+                        };
+                        transaction.Transfers.Add(holding2);
+
+                        var final = new Transfer()
+                        {
+                            Account        = integration.DefaultAccount,
+                            Direction      = Transfer.CreditDebit.Credit,
+                            Amount         = deposit.Amount,
+                            TrackingNumber = deposit.MerchantReferenceNumber
+                        };
+                        transaction.Transfers.Add(final);
 
                         _context.Transactions.Add(transaction);
                     }
