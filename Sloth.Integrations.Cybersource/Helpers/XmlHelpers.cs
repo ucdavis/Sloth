@@ -8,7 +8,7 @@ namespace Sloth.Integrations.Cybersource.Helpers
         public static string RemoveAllNamespaces(string xml)
         {
             const string pattern = "\\s+xmlns\\s*(:\\w)?\\s*=\\s*\\\"(?<url>[^\\\"]*)\\\"";
-            return Regex.Replace(xml, pattern, "");
+            return Regex.Replace(xml, pattern, " ");
         }
     }
 }
