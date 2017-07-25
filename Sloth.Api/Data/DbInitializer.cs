@@ -93,7 +93,7 @@ namespace Sloth.Api.Data
                 new Integration()
                 {
                     MerchantId = "ucdavis_jpknoll",
-                    ReportUsername = "report_sloth",
+                    ReportUsername = "sloth_report",
                     ReportPasswordKey = "Report-Test-1",
                     Type = Integration.IntegrationType.CyberSource
                 },
