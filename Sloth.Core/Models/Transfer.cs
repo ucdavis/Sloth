@@ -105,7 +105,7 @@ namespace Sloth.Core.Models
         /// Debit or Credit Code associated with the transaction.
         /// </summary>
         [Required]
-        public string DebitCredit { get; set; }
+        public CreditDebit Direction { get; set; }
 
         /// <summary>
         /// Primarily used in Decision Support reporting for additional transaction identification.
@@ -172,5 +172,18 @@ namespace Sloth.Core.Models
         [MinLength(1)]
         [MaxLength(8)]
         public string ReferenceId { get; set; }
+
+        public enum CreditDebit
+        {
+            /// <summary>
+            /// Add money to an account
+            /// </summary>
+            Credit,
+
+            /// <summary>
+            /// Remove money from an account
+            /// </summary>
+            Debit
+        }
     }
 }
