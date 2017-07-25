@@ -63,6 +63,10 @@ namespace Sloth.Api.Jobs
         public class CybersourceSettings
         {
             public string ReportUrl { get; set; }
+
+            public string ClearingAccount { get; set; }
+
+            public string HoldingAccount { get; set; }
         }
     }
 }
