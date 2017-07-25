@@ -13,7 +13,7 @@ namespace Sloth.Integrations.Cybersource.Clients
 {
     public class ReportClient
     {
-        private readonly string _baseUri;
+        private readonly Uri _baseUri;
         private readonly string _merchantId;
         private readonly string _username;
         private readonly string _password;
@@ -21,7 +21,11 @@ namespace Sloth.Integrations.Cybersource.Clients
 
         public ReportClient(string baseUri, string merchantId, string username, string password)
         {
-            _baseUri = baseUri;
+            if (!Uri.TryCreate(baseUri, UriKind.Absolute, out _baseUri))
+            {
+                throw new ArgumentException("Base url should be a valid URI", nameof(baseUri));
+            }
+
             _merchantId = merchantId;
             _username = username;
             _password = password;
@@ -40,7 +44,7 @@ namespace Sloth.Integrations.Cybersource.Clients
         private async Task<string> GetClientApiReport(string reportName, DateTime date)
         {
             // build uri
-            var uri = $"{_baseUri}/DownloadReport/{date:yyyy}/{date:MM}/{date:dd}/{_merchantId}/{reportName}.xml";
+            var uri = $"DownloadReport/{date:yyyy}/{date:MM}/{date:dd}/{_merchantId}/{reportName}.xml";
             var client = GetHttpClient();
             var response = await client.GetAsync(uri);
 
@@ -71,6 +75,7 @@ namespace Sloth.Integrations.Cybersource.Clients
             //specify to use TLS 1.2 as default connection
             //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
 
+            client.BaseAddress = _baseUri;
             client.DefaultRequestHeaders.Authorization = GetCredentials();
             client.Timeout = new TimeSpan(0, 0, 0, 10);
 
@@ -88,7 +93,7 @@ namespace Sloth.Integrations.Cybersource.Clients
             var password = _password;
             var credentials = new AuthenticationHeaderValue("Basic",
                 Convert.ToBase64String(Encoding.ASCII.GetBytes(
-                    String.Format("{0}:{1}", username, password))));
+                    $"{username}:{password}")));
 
             return credentials;
         }
