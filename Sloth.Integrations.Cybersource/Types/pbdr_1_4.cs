@@ -2,451 +2,119 @@
 
 namespace Sloth.Integrations.Cybersource {
     
-    
-    
     [XmlType(AnonymousType=true)]
     [XmlRoot(IsNullable=false)]
-    public class Report {
-        
-        private Batches batchesField;
-        
-        private string nameField;
-        
-        private string versionField;
-        
-        private string merchantIDField;
-        
-        private string reportStartDateField;
-        
-        private string reportEndDateField;
-        
-        
-        public Batches Batches {
-            get {
-                return batchesField;
-            }
-            set {
-                batchesField = value;
-            }
-        }
-        
-        
+    public class Report
+    {
+        public Batches Batches { get; set; }
+
         [XmlAttribute()]
-        public string Name {
-            get {
-                return nameField;
-            }
-            set {
-                nameField = value;
-            }
-        }
-        
-        
+        public string Name { get; set; }
+
         [XmlAttribute(DataType="NMTOKEN")]
-        public string Version {
-            get {
-                return versionField;
-            }
-            set {
-                versionField = value;
-            }
-        }
-        
-        
+        public string Version { get; set; }
+
+        [XmlAttribute("MerchantID")]
+        public string MerchantId { get; set; }
+
         [XmlAttribute()]
-        public string MerchantID {
-            get {
-                return merchantIDField;
-            }
-            set {
-                merchantIDField = value;
-            }
-        }
-        
-        
+        public string ReportStartDate { get; set; }
+
         [XmlAttribute()]
-        public string ReportStartDate {
-            get {
-                return reportStartDateField;
-            }
-            set {
-                reportStartDateField = value;
-            }
-        }
-        
-        
-        [XmlAttribute()]
-        public string ReportEndDate {
-            get {
-                return reportEndDateField;
-            }
-            set {
-                reportEndDateField = value;
-            }
-        }
+        public string ReportEndDate { get; set; }
     }
     
+    [XmlType(AnonymousType=true)]
+    [XmlRoot(IsNullable=false)]
+    public class Batches
+    {
+        [XmlElement("Batch")]
+        public Batch[] Batch { get; set; }
+    }
     
+    [XmlType(AnonymousType=true)]
+    [XmlRoot(IsNullable=false)]
+    public class Batch
+    {
+        public Requests Requests { get; set; }
+
+        [XmlAttribute("BatchID")]
+        public string BatchId { get; set; }
+
+        [XmlAttribute()]
+        public string BatchDate { get; set; }
+    }
+    
+    [XmlType(AnonymousType=true)]
+    [XmlRoot(IsNullable=false)]
+    public class Requests
+    {
+        [XmlElement("Request")]
+        public Request[] Request { get; set; }
+    }
+    
+    [XmlType(AnonymousType=true)]
+    [XmlRoot(IsNullable=false)]
+    public class Request
+    {
+        public string TransactionReferenceNumber { get; set; }
+
+        public string TransactionId { get; set; }
+
+        public string PaymentMethod { get; set; }
+
+        public string CurrencyCode { get; set; }
+
+        public string CustomerId { get; set; }
+
+        public decimal Amount { get; set; }
+
+        public LineItems LineItems { get; set; }
+
+        public string Application { get; set; }
+
+        public string WalletType { get; set; }
+
+        public Channel Channel { get; set; }
+
+        public string ProcessorTID { get; set; }
+
+        public string NetworkTransactionID { get; set; }
+
+        public string EffectiveDate { get; set; }
+
+        [XmlAttribute()]
+        public string RequestID { get; set; }
+
+        [XmlAttribute()]
+        public string MerchantReferenceNumber { get; set; }
+    }
+    
+    [XmlType(AnonymousType=true)]
+    [XmlRoot(IsNullable=false)]
+    public class LineItems
+    {
+        [XmlElement("LineItem")]
+        public LineItem[] LineItem { get; set; }
+    }
+    
+    [XmlType(AnonymousType=true)]
+    [XmlRoot(IsNullable=false)]
+    public class LineItem
+    {
+        public string InvoiceNumber { get; set; }
+
+        [XmlAttribute()]
+        public string Number { get; set; }
+    }
     
     
     [XmlType(AnonymousType=true)]
     [XmlRoot(IsNullable=false)]
-    public class Batches {
-        
-        private Batch[] batchField;
-        
-        
-        [XmlElementAttribute("Batch")]
-        public Batch[] Batch {
-            get {
-                return batchField;
-            }
-            set {
-                batchField = value;
-            }
-        }
-    }
-    
-    
-    
-    
-    [XmlType(AnonymousType=true)]
-    [XmlRoot(IsNullable=false)]
-    public class Batch {
-        
-        private Requests requestsField;
-        
-        private string batchIDField;
-        
-        private string batchDateField;
-        
-        
-        public Requests Requests {
-            get {
-                return requestsField;
-            }
-            set {
-                requestsField = value;
-            }
-        }
-        
-        
-        [XmlAttribute()]
-        public string BatchID {
-            get {
-                return batchIDField;
-            }
-            set {
-                batchIDField = value;
-            }
-        }
-        
-        
-        [XmlAttribute()]
-        public string BatchDate {
-            get {
-                return batchDateField;
-            }
-            set {
-                batchDateField = value;
-            }
-        }
-    }
-    
-    
-    
-    
-    [XmlType(AnonymousType=true)]
-    [XmlRoot(IsNullable=false)]
-    public class Requests {
-        
-        private Request[] requestField;
-        
-        
-        [XmlElementAttribute("Request")]
-        public Request[] Request {
-            get {
-                return requestField;
-            }
-            set {
-                requestField = value;
-            }
-        }
-    }
-    
-    
-    
-    
-    [XmlType(AnonymousType=true)]
-    [XmlRoot(IsNullable=false)]
-    public class Request {
-        
-        private string transactionReferenceNumberField;
-        
-        private string transactionIdField;
-        
-        private string paymentMethodField;
-        
-        private string currencyCodeField;
-        
-        private string customerIdField;
-        
-        private string amountField;
-        
-        private LineItems lineItemsField;
-        
-        private string applicationField;
-        
-        private string walletTypeField;
-        
-        private Channel channelField;
-        
-        private string processorTIDField;
-        
-        private string networkTransactionIDField;
-        
-        private string effectiveDateField;
-        
-        private string requestIDField;
-        
-        private string merchantReferenceNumberField;
-        
-        
-        public string TransactionReferenceNumber {
-            get {
-                return transactionReferenceNumberField;
-            }
-            set {
-                transactionReferenceNumberField = value;
-            }
-        }
-        
-        
-        public string TransactionId {
-            get {
-                return transactionIdField;
-            }
-            set {
-                transactionIdField = value;
-            }
-        }
-        
-        
-        public string PaymentMethod {
-            get {
-                return paymentMethodField;
-            }
-            set {
-                paymentMethodField = value;
-            }
-        }
-        
-        
-        public string CurrencyCode {
-            get {
-                return currencyCodeField;
-            }
-            set {
-                currencyCodeField = value;
-            }
-        }
-        
-        
-        public string CustomerId {
-            get {
-                return customerIdField;
-            }
-            set {
-                customerIdField = value;
-            }
-        }
-        
-        
-        public string Amount {
-            get {
-                return amountField;
-            }
-            set {
-                amountField = value;
-            }
-        }
-        
-        
-        public LineItems LineItems {
-            get {
-                return lineItemsField;
-            }
-            set {
-                lineItemsField = value;
-            }
-        }
-        
-        
-        public string Application {
-            get {
-                return applicationField;
-            }
-            set {
-                applicationField = value;
-            }
-        }
-        
-        
-        public string WalletType {
-            get {
-                return walletTypeField;
-            }
-            set {
-                walletTypeField = value;
-            }
-        }
-        
-        
-        public Channel Channel {
-            get {
-                return channelField;
-            }
-            set {
-                channelField = value;
-            }
-        }
-        
-        
-        public string ProcessorTID {
-            get {
-                return processorTIDField;
-            }
-            set {
-                processorTIDField = value;
-            }
-        }
-        
-        
-        public string NetworkTransactionID {
-            get {
-                return networkTransactionIDField;
-            }
-            set {
-                networkTransactionIDField = value;
-            }
-        }
-        
-        
-        public string EffectiveDate {
-            get {
-                return effectiveDateField;
-            }
-            set {
-                effectiveDateField = value;
-            }
-        }
-        
-        
-        [XmlAttribute()]
-        public string RequestID {
-            get {
-                return requestIDField;
-            }
-            set {
-                requestIDField = value;
-            }
-        }
-        
-        
-        [XmlAttribute()]
-        public string MerchantReferenceNumber {
-            get {
-                return merchantReferenceNumberField;
-            }
-            set {
-                merchantReferenceNumberField = value;
-            }
-        }
-    }
-    
-    
-    
-    
-    [XmlType(AnonymousType=true)]
-    [XmlRoot(IsNullable=false)]
-    public class LineItems {
-        
-        private LineItem[] lineItemField;
-        
-        
-        [XmlElementAttribute("LineItem")]
-        public LineItem[] LineItem {
-            get {
-                return lineItemField;
-            }
-            set {
-                lineItemField = value;
-            }
-        }
-    }
-    
-    
-    
-    
-    [XmlType(AnonymousType=true)]
-    [XmlRoot(IsNullable=false)]
-    public class LineItem {
-        
-        private string invoiceNumberField;
-        
-        private string numberField;
-        
-        
-        public string InvoiceNumber {
-            get {
-                return invoiceNumberField;
-            }
-            set {
-                invoiceNumberField = value;
-            }
-        }
-        
-        
-        [XmlAttribute()]
-        public string Number {
-            get {
-                return numberField;
-            }
-            set {
-                numberField = value;
-            }
-        }
-    }
-    
-    
-    
-    
-    [XmlType(AnonymousType=true)]
-    [XmlRoot(IsNullable=false)]
-    public class Channel {
-        
-        private string typeField;
-        
-        private string subTypeField;
-        
-        
-        public string Type {
-            get {
-                return typeField;
-            }
-            set {
-                typeField = value;
-            }
-        }
-        
-        
-        public string SubType {
-            get {
-                return subTypeField;
-            }
-            set {
-                subTypeField = value;
-            }
-        }
+    public class Channel
+    {
+        public string Type { get; set; }
+
+        public string SubType { get; set; }
     }
 }
