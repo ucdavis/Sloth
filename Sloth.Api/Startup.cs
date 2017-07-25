@@ -173,6 +173,7 @@ namespace Sloth.Api
             // add recurring jobs
             GlobalConfiguration.Configuration
                 .UseRecurringJob(typeof(Heartbeat))
+                .UseRecurringJob(typeof(CybersourceBankDepositJob))
                 .UseRecurringJob(typeof(UploadScrubberJob));
 
             // add hangfire dashboard
