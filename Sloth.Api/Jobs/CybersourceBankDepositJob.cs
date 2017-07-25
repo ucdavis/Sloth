@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire.RecurringJobExtensions;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Sloth.Api.Services;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Integrations.Cybersource;
 using Sloth.Integrations.Cybersource.Clients;
 
 namespace Sloth.Api.Jobs
@@ -49,8 +51,47 @@ namespace Sloth.Api.Jobs
 
                     // fetch report
                     var report = await client.GetPaymentBatchDetailReport(yesterday);
+                    var count = report.Batches?.Batch?.Length ?? 0;
 
-                    log.Information("Report found with {count} records.", new { count = report.Batches?.Batch?.Length ?? 0 });
+                    log.Information("Report found with {count} records.", new { count });
+                    if (count < 1)
+                    {
+                        continue;
+                    }
+
+                    // iterate over deposits
+                    foreach (var deposit in report.Batches?.Batch?.SelectMany(b => b.Requests?.Request) ?? new List<Request>())
+                    {
+                        // create transaction per deposit item,
+                        // moving monies from clearing to holding account
+                        var transaction = new Transaction()
+                        {
+                            Status = TransactionStatus.Scheduled
+                        };
+
+                        var clearing = new Transfer()
+                        {
+                            Account        = _cybersourceSettings.ClearingAccount,
+                            Direction      = Transfer.CreditDebit.Debit,
+                            Amount         = deposit.Amount,
+                            TrackingNumber = deposit.MerchantReferenceNumber
+                        };
+                        transaction.Transfers.Add(clearing);
+
+                        var holding = new Transfer()
+                        {
+                            Account        = _cybersourceSettings.HoldingAccount,
+                            Direction      = Transfer.CreditDebit.Credit,
+                            Amount         = deposit.Amount,
+                            TrackingNumber = deposit.MerchantReferenceNumber
+                        };
+                        transaction.Transfers.Add(holding);
+
+                        _context.Transactions.Add(transaction);
+                    }
+
+                    // push changes for this integration
+                    _context.SaveChanges();
                 }
             }
             catch (Exception ex)
