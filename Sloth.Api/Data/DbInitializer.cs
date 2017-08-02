@@ -48,7 +48,7 @@ namespace Sloth.Api.Data
                 {
                     Creator = context.Users.FirstOrDefault(u => u.Username == "jpknoll"),
                     Status = TransactionStatus.Scheduled,
-                    TrackingNumber = "TESTTHIS1",
+                    KfsTrackingNumber = "TESTTHIS1",
                     Transfers = new []
                     {
                         new Transfer()
