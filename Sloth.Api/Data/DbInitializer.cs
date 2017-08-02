@@ -46,38 +46,33 @@ namespace Sloth.Api.Data
             {
                 new Transaction()
                 {
-                    Creator = context.Users.FirstOrDefault(u => u.Username == "jpknoll"),
-                    Status = TransactionStatus.Scheduled,
-                    KfsTrackingNumber = "TESTTHIS1",
+                    Creator                 = context.Users.FirstOrDefault(u => u.Username == "jpknoll"),
+                    Status                  = TransactionStatus.Scheduled,
+                    MerchantTrackingNumber  = "ORDER-10",
+                    ProcessorTrackingNumber = "123456",
+                    KfsTrackingNumber       = "TESTTHIS1",
+                    TransactionDate         = DateTime.Today.AddDays(-1),
+                    OriginCode              = "SL",
+                    DocumentNumber          = "ADOCUMENT1",
                     Transfers = new []
                     {
                         new Transfer()
                         {
-                            Amount = 100,
-                            Chart = 3,
-                            Account = "6620001",
-                            ObjectCode = "7259",
-                            BalanceType = "AC",
-                            DocType = "GLJV",
-                            OriginCode = "92",
-                            DocumentNumber = "ADOCUMENT1",
+                            Amount      = 100,
+                            Chart       = 3,
+                            Account     = "6620001",
+                            ObjectCode  = "7259",
                             Description = "Some useful description",
-                            TransactionDate = DateTime.Today.AddDays(-1),
-                            Direction = Transfer.CreditDebit.Debit,
+                            Direction   = Transfer.CreditDebit.Debit,
                         },
                         new Transfer()
                         {
-                            Amount = 100,
-                            Chart = 3,
-                            Account = "1010280",
-                            ObjectCode = "0299",
-                            BalanceType = "AC",
-                            DocType = "GLJV",
-                            OriginCode = "92",
-                            DocumentNumber = "ADOCUMENT1",
+                            Amount      = 100,
+                            Chart       = 3,
+                            Account     = "1010280",
+                            ObjectCode  = "0299",
                             Description = "Test Clearing",
-                            TransactionDate = DateTime.Today.AddDays(-1),
-                            Direction = Transfer.CreditDebit.Credit,
+                            Direction   = Transfer.CreditDebit.Credit,
                         },
                     }
                 }

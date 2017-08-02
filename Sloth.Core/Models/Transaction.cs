@@ -27,6 +27,25 @@ namespace Sloth.Core.Models
         /// </summary>
         public string ProcessorTrackingNumber { get; set; }
 
+        /// <summary>
+        /// Unique feed origination identifier given to the Feed System.
+        /// The origination code is validated in during file receipt and in the processing.
+        /// </summary>
+        [MinLength(2)]
+        [MaxLength(2)]
+        [Required]
+        public string OriginCode { get; set; }
+
+        /// <summary>
+        /// Unique identifier for a set of related transactions per origination code.
+        /// A file can have multiple document numbers but the file must balance by document number(aka net zero) and by total amount.Debits = Credits
+        /// Once a document number posts to the general ledger then it cannot be used again.
+        /// </summary>
+        [MinLength(1)]
+        [MaxLength(14)]
+        [RegularExpression("[A-Z0-9]*")]
+        [Required]
+        public string DocumentNumber { get; set; }
 
         /// <summary>
         /// Primarily used in Decision Support reporting for additional transaction identification.
@@ -35,6 +54,12 @@ namespace Sloth.Core.Models
         [MinLength(1)]
         [MaxLength(10)]
         public string KfsTrackingNumber { get; set; }
+
+        /// <summary>
+        /// Date the transaction occurred.
+        /// </summary>
+        [Required]
+        public DateTime TransactionDate { get; set; }
 
         public IList<Transfer> Transfers { get; set; }
 

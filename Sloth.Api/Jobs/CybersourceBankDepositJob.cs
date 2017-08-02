@@ -103,15 +103,21 @@ namespace Sloth.Api.Jobs
                         Status                  = TransactionStatus.Scheduled,
                         KfsTrackingNumber       = kfsTrackingNumber,
                         MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
-                        ProcessorTrackingNumber = deposit.RequestID
+                        ProcessorTrackingNumber = deposit.RequestID,
+                        OriginCode              = "SL",
+                        DocumentNumber          = "ADOCUMENT1",
+                        TransactionDate         = yesterday
                     };
 
                     // move money out of clearing
                     var clearing = new Transfer()
                     {
+                        Chart          = 3,
                         Account        = _cybersourceSettings.ClearingAccount,
                         Direction      = Transfer.CreditDebit.Debit,
                         Amount         = deposit.Amount,
+                        Description    = "Deposit",
+                        ObjectCode     = "ABCD",
                     };
                     transaction.Transfers.Add(clearing);
 
@@ -121,6 +127,8 @@ namespace Sloth.Api.Jobs
                         Account        = _cybersourceSettings.HoldingAccount,
                         Direction      = Transfer.CreditDebit.Credit,
                         Amount         = deposit.Amount,
+                        Description    = "Deposit",
+                        ObjectCode     = "ABCD",
                     };
                     transaction.Transfers.Add(holding);
 
@@ -130,6 +138,8 @@ namespace Sloth.Api.Jobs
                         Account        = _cybersourceSettings.HoldingAccount,
                         Direction      = Transfer.CreditDebit.Debit,
                         Amount         = deposit.Amount,
+                        Description    = "Deposit",
+                        ObjectCode     = "ABCD",
                     };
                     transaction.Transfers.Add(holding2);
 
@@ -139,6 +149,8 @@ namespace Sloth.Api.Jobs
                         Account        = integration.DefaultAccount,
                         Direction      = Transfer.CreditDebit.Credit,
                         Amount         = deposit.Amount,
+                        Description    = "Deposit",
+                        ObjectCode     = "ABCD",
                     };
                     transaction.Transfers.Add(final);
 
