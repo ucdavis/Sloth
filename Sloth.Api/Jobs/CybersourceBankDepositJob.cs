@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire.RecurringJobExtensions;
 using Hangfire.Server;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Sloth.Api.Services;
 using Sloth.Core;
@@ -38,7 +39,9 @@ namespace Sloth.Api.Jobs
 
             try
             {
-                var integrations = _context.Integrations.Where(i => i.Type == Integration.IntegrationType.CyberSource);
+                var integrations = _context.Integrations
+                    .Where(i => i.Type == Integration.IntegrationType.CyberSource)
+                    .ToList();
 
                 foreach (var integration in integrations)
                 {
@@ -57,6 +60,7 @@ namespace Sloth.Api.Jobs
             var log = Logger.ForContext("date", yesterday)
                             .ForContext("integration", integration.Id);
 
+            var tran = await _context.Database.BeginTransactionAsync();
             try
             {
                 // fetch password secret
@@ -81,7 +85,7 @@ namespace Sloth.Api.Jobs
                 foreach (var deposit in report.Batches?.Batch?.SelectMany(b => b.Requests?.Request) ?? new List<Request>())
                 {
                     // look for existing transaction
-                    var transaction = _context.Transactions.FirstOrDefault(t => t.TrackingNumber == deposit.MerchantReferenceNumber);
+                    var transaction = _context.Transactions.FirstOrDefault(t => t.ProcessorTrackingNumber == deposit.RequestID);
                     if (transaction != null)
                     {
                         log.ForContext("tracking_number", deposit.MerchantReferenceNumber).Information("Transaction already exists.");
@@ -92,10 +96,14 @@ namespace Sloth.Api.Jobs
 
                     // create transaction per deposit item,
                     // moving monies from clearing to holding then final acocunt
+                    var kfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
+
                     transaction = new Transaction()
                     {
-                        Status = TransactionStatus.Scheduled,
-                        TrackingNumber = deposit.MerchantReferenceNumber,
+                        Status                  = TransactionStatus.Scheduled,
+                        KfsTrackingNumber       = kfsTrackingNumber,
+                        MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
+                        ProcessorTrackingNumber = deposit.RequestID
                     };
 
                     // move money out of clearing
@@ -134,16 +142,20 @@ namespace Sloth.Api.Jobs
                     };
                     transaction.Transfers.Add(final);
 
+                    var errors = _context.ValidateModel(transaction);
+
                     _context.Transactions.Add(transaction);
                 }
-
+                
                 // push changes for this integration
                 var inserted = _context.SaveChanges();
+                tran.Commit();
                 log.Information("{count} records created.", new { count = inserted });
             }
             catch (Exception ex)
             {
                 log.Error(ex, ex.Message);
+                tran.Rollback();
             }
         }
 
