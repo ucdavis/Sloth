@@ -48,6 +48,7 @@ namespace Sloth.Api.Data
                 {
                     Creator = context.Users.FirstOrDefault(u => u.Username == "jpknoll"),
                     Status = TransactionStatus.Scheduled,
+                    TrackingNumber = "TESTTHIS1",
                     Transfers = new []
                     {
                         new Transfer()
@@ -62,8 +63,7 @@ namespace Sloth.Api.Data
                             DocumentNumber = "ADOCUMENT1",
                             Description = "Some useful description",
                             TransactionDate = DateTime.Today.AddDays(-1),
-                            DebitCredit = "D",
-                            TrackingNumber = "TESTTHIS1"
+                            Direction = Transfer.CreditDebit.Debit,
                         },
                         new Transfer()
                         {
@@ -77,8 +77,7 @@ namespace Sloth.Api.Data
                             DocumentNumber = "ADOCUMENT1",
                             Description = "Test Clearing",
                             TransactionDate = DateTime.Today.AddDays(-1),
-                            DebitCredit = "C",
-                            TrackingNumber = "*CLEARING*"
+                            Direction = Transfer.CreditDebit.Credit,
                         },
                     }
                 }

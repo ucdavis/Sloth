@@ -17,6 +17,14 @@ namespace Sloth.Core.Models
 
         public TransactionStatus Status { get; set; }
 
+        /// <summary>
+        /// Primarily used in Decision Support reporting for additional transaction identification.
+        /// Equivalent to the KFS Organization Document Number.
+        /// </summary>
+        [MinLength(1)]
+        [MaxLength(10)]
+        public string TrackingNumber { get; set; }
+
         [MinLength(2)]
         public IList<Transfer> Transfers { get; set; }
 

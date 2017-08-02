@@ -7,6 +7,8 @@ namespace Sloth.Core.Models
     {
         public string Id { get; set; }
 
+        public Transaction Transaction { get; set; }
+
         /// <summary>
         /// Dollar amount associated with the transaction
         /// </summary>
@@ -107,13 +109,6 @@ namespace Sloth.Core.Models
         [Required]
         public CreditDebit Direction { get; set; }
 
-        /// <summary>
-        /// Primarily used in Decision Support reporting for additional transaction identification.
-        /// Equivalent to the KFS Organization Document Number.
-        /// </summary>
-        [MinLength(1)]
-        [MaxLength(10)]
-        public string TrackingNumber { get; set; }
 
         /// <summary>
         /// Date the transaction occurred.
