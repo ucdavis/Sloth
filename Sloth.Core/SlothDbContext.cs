@@ -38,18 +38,20 @@ namespace Sloth.Core
                 await conn.OpenAsync();
             }
 
-            var cmd = conn.CreateCommand();
-            cmd.CommandText = sql;
-            if (transaction != null)
+            using (var cmd = conn.CreateCommand())
             {
-                cmd.Transaction = transaction;
+                cmd.CommandText = sql;
+                if (transaction != null)
+                {
+                    cmd.Transaction = transaction;
+                }
+
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    await reader.ReadAsync();
+                    return reader.GetInt64(0).ToString("D10");
+                }
             }
-
-            var result = await cmd.ExecuteReaderAsync();
-            await result.ReadAsync();
-            var i = result.GetInt64(0).ToString("D10");
-
-            return i;
         }
 
         public IEnumerable<ValidationResult> ValidateModel(object model)
