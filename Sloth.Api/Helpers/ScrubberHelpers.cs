@@ -56,7 +56,7 @@ namespace Sloth.Api.Helpers
         {
             return new EntryWithDetail()
             {
-                TrackingNumber = transfer.Transaction.TrackingNumber
+                TrackingNumber = transfer.Transaction.KfsTrackingNumber
             };
         }
     }
