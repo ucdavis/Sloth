@@ -80,11 +80,22 @@ namespace Sloth.Api.Jobs
                 // iterate over deposits
                 foreach (var deposit in report.Batches?.Batch?.SelectMany(b => b.Requests?.Request) ?? new List<Request>())
                 {
+                    // look for existing transaction
+                    var transaction = _context.Transactions.FirstOrDefault(t => t.TrackingNumber == deposit.MerchantReferenceNumber);
+                    if (transaction != null)
+                    {
+                        log.ForContext("tracking_number", deposit.MerchantReferenceNumber).Information("Transaction already exists.");
+                        continue;
+                    }
+
+                    log.ForContext("tracking_number", deposit.MerchantReferenceNumber).Information("Creating transaction");
+
                     // create transaction per deposit item,
                     // moving monies from clearing to holding then final acocunt
-                    var transaction = new Transaction()
+                    transaction = new Transaction()
                     {
-                        Status = TransactionStatus.Scheduled
+                        Status = TransactionStatus.Scheduled,
+                        TrackingNumber = deposit.MerchantReferenceNumber,
                     };
 
                     // move money out of clearing
@@ -93,7 +104,6 @@ namespace Sloth.Api.Jobs
                         Account        = _cybersourceSettings.ClearingAccount,
                         Direction      = Transfer.CreditDebit.Debit,
                         Amount         = deposit.Amount,
-                        TrackingNumber = deposit.MerchantReferenceNumber,
                     };
                     transaction.Transfers.Add(clearing);
 
@@ -103,7 +113,6 @@ namespace Sloth.Api.Jobs
                         Account        = _cybersourceSettings.HoldingAccount,
                         Direction      = Transfer.CreditDebit.Credit,
                         Amount         = deposit.Amount,
-                        TrackingNumber = deposit.MerchantReferenceNumber
                     };
                     transaction.Transfers.Add(holding);
 
@@ -113,7 +122,6 @@ namespace Sloth.Api.Jobs
                         Account        = _cybersourceSettings.HoldingAccount,
                         Direction      = Transfer.CreditDebit.Debit,
                         Amount         = deposit.Amount,
-                        TrackingNumber = deposit.MerchantReferenceNumber
                     };
                     transaction.Transfers.Add(holding2);
 
@@ -123,7 +131,6 @@ namespace Sloth.Api.Jobs
                         Account        = integration.DefaultAccount,
                         Direction      = Transfer.CreditDebit.Credit,
                         Amount         = deposit.Amount,
-                        TrackingNumber = deposit.MerchantReferenceNumber
                     };
                     transaction.Transfers.Add(final);
 
@@ -131,7 +138,8 @@ namespace Sloth.Api.Jobs
                 }
 
                 // push changes for this integration
-                _context.SaveChanges();
+                var inserted = _context.SaveChanges();
+                log.Information("{count} records created.", new { count = inserted });
             }
             catch (Exception ex)
             {
