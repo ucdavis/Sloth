@@ -10,9 +10,7 @@ namespace Sloth.Api.Jobs
         {
             SetupLogging(context);
 
-            Logger
-                .ForContext("jobId", context.BackgroundJob.Id)
-                .Information("Tick");
+            Logger.Information("Tick");
         }
     }
 }
