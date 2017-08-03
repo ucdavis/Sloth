@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire.RecurringJobExtensions;
@@ -27,6 +28,19 @@ namespace Sloth.Api.Jobs
 
             _cybersourceSettings = new CybersourceSettings();
             configuration.GetSection("Cybersource").Bind(_cybersourceSettings);
+
+            // validate options
+            if (string.IsNullOrWhiteSpace(_cybersourceSettings.ClearingAccount) ||
+                _cybersourceSettings.ClearingAccount.Length > 7)
+            {
+                throw new ConfigurationErrorsException("ClearingAccount must be non-null and less than 7 characters.");
+            }
+
+            if (string.IsNullOrWhiteSpace(_cybersourceSettings.HoldingAccount) ||
+                _cybersourceSettings.ClearingAccount.Length > 7)
+            {
+                throw new ConfigurationErrorsException("HoldingAccount must be non-null and less than 7 characters.");
+            }
         }
 
         [RecurringJob(CronStrings.Hourly, RecurringJobId = "cybersource-bank-deposit")]
