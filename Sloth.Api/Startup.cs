@@ -57,6 +57,7 @@ namespace Sloth.Api
             
             // add infrastructure services
             services.AddSingleton<IKfsScrubberService, KfsScrubberService>();
+            services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
             // add database connection
@@ -172,6 +173,7 @@ namespace Sloth.Api
             // add recurring jobs
             GlobalConfiguration.Configuration
                 .UseRecurringJob(typeof(Heartbeat))
+                .UseRecurringJob(typeof(CybersourceBankDepositJob))
                 .UseRecurringJob(typeof(UploadScrubberJob));
 
             // add hangfire dashboard

@@ -35,7 +35,7 @@ namespace Sloth.Api.Helpers
                 Entries = transfers.Select(ToEntry).ToList(),
                 Trailer = new Trailer()
                 {
-                    TotalAmount = transfers.Where(t => t.DebitCredit == "C").Sum(t => t.Amount),
+                    TotalAmount = transfers.Where(t => t.Direction == Transfer.CreditDebit.Credit).Sum(t => t.Amount),
                     TotalRecords = transfers.Count
                 }
             };
@@ -56,7 +56,7 @@ namespace Sloth.Api.Helpers
         {
             return new EntryWithDetail()
             {
-
+                TrackingNumber = transfer.Transaction.KfsTrackingNumber
             };
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System;
 using Hangfire.Server;
-using Serilog.Core;
+using Serilog;
 using Sloth.Api.Jobs.Attributes;
 using Sloth.Api.Logging;
 
@@ -9,13 +9,14 @@ namespace Sloth.Api.Jobs
     [ProlongExpirationTime]
     public class JobBase
     {
-        protected Logger Logger { get; set; }
+        protected ILogger Logger { get; set; }
 
-        protected void SetupLogging(PerformContext context)
+        protected virtual void SetupLogging(PerformContext context)
         {
             Logger = LoggingConfiguration.Configuration
                 .WriteTo.HangfireConsoleSink(context)
-                .CreateLogger();
+                .CreateLogger()
+                .ForContext("jobId", context.BackgroundJob.Id);
         }
     }
 }

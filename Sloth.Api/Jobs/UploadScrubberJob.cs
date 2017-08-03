@@ -27,7 +27,7 @@ namespace Sloth.Api.Jobs
         {
             SetupLogging(context);
 
-            var log = Logger.ForContext("jobId", context.BackgroundJob.Id);
+            var log = Logger;
 
             try
             {
@@ -36,6 +36,12 @@ namespace Sloth.Api.Jobs
                     .Where(t => t.Status == TransactionStatus.Scheduled)
                     .Include(t => t.Transfers)
                     .ToList();
+
+                if (!transactions.Any())
+                {
+                    log.Information("No scheduled transactions found.");
+                    return;
+                }
 
                 // create scrubber
                 log.Information("Creating Scrubber for {count} transactions.", transactions.Count);
