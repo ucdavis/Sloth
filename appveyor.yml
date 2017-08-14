@@ -37,7 +37,7 @@ deploy:
 - provider: NuGet
   server: https://scruffy.caes.ucdavis.edu/nuget/packages
   api_key:
-    secure: 1hsYGsL3yZ8BwgerEIpOo3+P5nfg3usv3ADOwxdEhkA=
+    secure: eq+xgeyNzzar8kL7vAobzU06RSbnw8Hbw3wgFDgYTeo=
   skip_symbols: true
   on:
     branch: master
