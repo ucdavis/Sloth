@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 
@@ -18,75 +17,13 @@ namespace Sloth.Api.Data
         public static void Initialize(SlothDbContext context)
         {
             context.Database.EnsureDeleted();
-            context.Database.Migrate();
+            context.Database.EnsureCreated();
 
-            if (!context.Users.Any())
-            {
-                CreateUsers(context);
-            }
-
-            if (!context.Scrubbers.Any())
-            {
-                CreateScrubbers(context);
-            }
+            CreateUsers(context);
+            CreateTransactions(context);
+            CreateIntegrations(context);
 
             context.SaveChanges();
-        }
-
-        private static void CreateScrubbers(SlothDbContext context)
-        {
-            var scrubbers = new[]
-            {
-                new Scrubber()
-                {
-                    Chart = "3",
-                    OrganizationCode = "ACCT",
-                    BatchDate = DateTime.Today,
-                    BatchSequenceNumber = 1,
-                    Transactions = new[]
-                    {
-                        new Transaction()
-                        {
-                            Creator = context.Users.FirstOrDefault(u => u.Username == "jpknoll"),
-                            Status = TransactionStatus.Scheduled,
-                            Transfers = new []
-                            {
-                                new Transfer()
-                                {
-                                    Amount = 100,
-                                    Chart = 3,
-                                    Account = "6620001",
-                                    ObjectCode = "7259",
-                                    BalanceType = "AC",
-                                    DocType = "GLJV",
-                                    OriginCode = "92",
-                                    DocumentNumber = "ADOCUMENT1",
-                                    Description = "Some useful description",
-                                    TransactionDate = DateTime.Today.AddDays(-1),
-                                    DebitCredit = "D",
-                                    TrackingNumber = "TESTTHIS1"
-                                },
-                                new Transfer()
-                                {
-                                    Amount = 100,
-                                    Chart = 3,
-                                    Account = "1010280",
-                                    ObjectCode = "0299",
-                                    BalanceType = "AC",
-                                    DocType = "GLJV",
-                                    OriginCode = "92",
-                                    DocumentNumber = "ADOCUMENT1",
-                                    Description = "Test Clearing",
-                                    TransactionDate = DateTime.Today.AddDays(-1),
-                                    DebitCredit = "C",
-                                    TrackingNumber = "*CLEARING*"
-                                },
-                            }
-                        }
-                    }
-                },
-            };
-            context.Scrubbers.AddRange(scrubbers);
         }
 
         private static void CreateUsers(SlothDbContext context)
@@ -101,6 +38,62 @@ namespace Sloth.Api.Data
                 },
             };
             context.Users.AddRange(users);
+        }
+
+        private static void CreateTransactions(SlothDbContext context)
+        {
+            var transactions = new[]
+            {
+                new Transaction()
+                {
+                    Creator                 = context.Users.FirstOrDefault(u => u.Username == "jpknoll"),
+                    Status                  = TransactionStatus.Scheduled,
+                    MerchantTrackingNumber  = "ORDER-10",
+                    ProcessorTrackingNumber = "123456",
+                    KfsTrackingNumber       = "TESTTHIS1",
+                    TransactionDate         = DateTime.Today.AddDays(-1),
+                    OriginCode              = "SL",
+                    DocumentNumber          = "ADOCUMENT1",
+                    Transfers = new []
+                    {
+                        new Transfer()
+                        {
+                            Amount      = 100,
+                            Chart       = 3,
+                            Account     = "6620001",
+                            ObjectCode  = "7259",
+                            Description = "Some useful description",
+                            Direction   = Transfer.CreditDebit.Debit,
+                        },
+                        new Transfer()
+                        {
+                            Amount      = 100,
+                            Chart       = 3,
+                            Account     = "1010280",
+                            ObjectCode  = "0299",
+                            Description = "Test Clearing",
+                            Direction   = Transfer.CreditDebit.Credit,
+                        },
+                    }
+                }
+            };
+            context.Transactions.AddRange(transactions);
+        }
+
+        private static void CreateIntegrations(SlothDbContext context)
+        {
+            var integrations = new[]
+            {
+                new Integration()
+                {
+                    MerchantId = "ucdavis_jpknoll",
+                    ReportUsername = "sloth_report",
+                    ReportPasswordKey = "Report-Test-1",
+                    DefaultAccount = "DEFAULT",
+                    Type = Integration.IntegrationType.CyberSource
+                },
+            };
+            context.Integrations.AddRange(integrations);
         }
     }
 }

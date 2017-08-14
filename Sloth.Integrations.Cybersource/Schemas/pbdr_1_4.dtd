@@ -1,0 +1,34 @@
+<!ELEMENT Report (Batches)>
+<!ATTLIST Report Name CDATA #REQUIRED
+                 Version NMTOKEN #REQUIRED
+                 xmlns CDATA #REQUIRED
+                 MerchantID CDATA #REQUIRED
+                 ReportStartDate CDATA #REQUIRED
+                 ReportEndDate CDATA #REQUIRED>
+<!ELEMENT Batches (Batch)*>
+<!ELEMENT Batch (Requests)>
+<!ATTLIST Batch BatchID CDATA #REQUIRED
+                BatchDate CDATA #REQUIRED>
+<!ELEMENT Requests (Request)*>
+<!ELEMENT Request (TransactionReferenceNumber, TransactionId, PaymentMethod, CurrencyCode, CustomerId?, Amount, LineItems?, Application, WalletType?, Channel?, ProcessorTID?, NetworkTransactionID?, EffectiveDate?)>
+<!ATTLIST Request RequestID CDATA #REQUIRED
+                  MerchantReferenceNumber CDATA #REQUIRED>
+<!ELEMENT TransactionReferenceNumber (#PCDATA)>
+<!ELEMENT TransactionId (#PCDATA)>
+<!ELEMENT PaymentMethod (#PCDATA)>
+<!ELEMENT CurrencyCode (#PCDATA)>
+<!ELEMENT CustomerId (#PCDATA)>
+<!ELEMENT Amount (#PCDATA)>
+<!ELEMENT LineItems (LineItem)*>
+<!ELEMENT LineItem (InvoiceNumber)>
+<!ATTLIST LineItem Number CDATA #REQUIRED>
+<!ELEMENT InvoiceNumber (#PCDATA)>
+<!ELEMENT Application (#PCDATA)>
+<!ELEMENT WalletType (#PCDATA)>
+<!ELEMENT Channel (Type, SubType)>
+<!ELEMENT Type (#PCDATA)>
+<!ELEMENT SubType (#PCDATA)>
+<!ELEMENT ProcessorTID (#PCDATA)>
+<!ELEMENT NetworkTransactionID (#PCDATA)>
+<!ELEMENT EffectiveDate (#PCDATA)>
+

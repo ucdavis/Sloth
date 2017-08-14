@@ -13,6 +13,7 @@ namespace Sloth.Core.Models
 
         public string Id { get; set; }
 
+        public string Uri { get; set; }
 
         /// <summary>
         /// Chart of Accounts Code associated with Org Code
