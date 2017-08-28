@@ -10,8 +10,7 @@ branches:
 image: Visual Studio 2017
 
 install:
-- cmd: appveyor-retry dotnet restore
-- cmd: echo %APPVEYOR_REPO_COMMIT_MESSAGE% > commit.txt
+- ps: appveyor-retry dotnet restore
 
 cache:
 - '%USERPROFILE%\.nuget\packages -> **\*.csproj'
@@ -21,10 +20,16 @@ before_build:
     $path = (Get-Item .\Sloth.Api\Sloth.Api.csproj).FullName
     $csproj = [xml](Get-Content $path)
     $csproj.Project.PropertyGroup.Version = $Env:APPVEYOR_BUILD_VERSION
+    $csproj.Project.PropertyGroup.PackageReleaseNotes = $Env:APPVEYOR_REPO_COMMIT_MESSAGE
     $csproj.Save($path)
 
 build_script:
-- cmd: msbuild /t:Build /p:Configuration=%configuration%;RunOctoPack=true;PackageVersion=%APPVEYOR_BUILD_VERSION%;OctoPackReleaesNotesFile=..\commit.txt
+- ps: dotnet build --configuration %configuration%
+
+after_build:
+- ps: |
+  dotnet publish .\Sloth.Api\ --output .\publish --configuration %configuration%
+  octo pack --id Sloth.Api --version %APPVEYOR_BUILD_VERSION% --basepath .\publish\
 
 test_script:
 - ps: dotnet test .\Sloth.Test\Sloth.Test.csproj
