@@ -16,7 +16,7 @@ cache:
 - '%USERPROFILE%\.nuget\packages -> **\*.csproj'
 
 build_script:
-- ps: dotnet build --configuration %configuration%
+- ps: dotnet build --configuration $Env:configuration
 
 after_build:
 - ps: |
