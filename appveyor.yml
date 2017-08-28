@@ -31,7 +31,7 @@ test_script:
 - ps: dotnet test .\Sloth.Test\Sloth.Test.csproj
 
 artifacts:
-- path: artifacts\*.nupkg'
+- path: artifacts\**\*.nupkg
   name: nugetweb
 
 deploy:
