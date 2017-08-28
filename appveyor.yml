@@ -10,9 +10,13 @@ branches:
 image: Visual Studio 2017
 
 install:
-- ps: appveyor-retry dotnet restore
+- ps: |
+  appveyor-retry choco install octopustools
+  appveyor-retry dotnet restore
 
 cache:
+- C:\ProgramData\chocolatey\bin -> appveyor.yml
+- C:\ProgramData\chocolatey\lib -> appveyor.yml
 - '%USERPROFILE%\.nuget\packages -> **\*.csproj'
 
 build_script:
