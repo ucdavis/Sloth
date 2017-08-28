@@ -24,7 +24,7 @@ build_script:
 
 after_build:
 - ps: |
-    dotnet publish .\Sloth.Api\ --output .\publish --configuration $Env:configuration
+    dotnet publish .\Sloth.Api\ --output ..\publish --configuration $Env:configuration
     octo pack --id Sloth.Api --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\publish\ --outFolder .\artifacts\
 
 test_script:
