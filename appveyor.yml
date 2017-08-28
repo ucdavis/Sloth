@@ -10,27 +10,28 @@ branches:
 image: Visual Studio 2017
 
 install:
-- cmd: appveyor-retry dotnet restore
-- cmd: echo %APPVEYOR_REPO_COMMIT_MESSAGE% > commit.txt
+- ps: |
+    appveyor-retry choco install octopustools
+    appveyor-retry dotnet restore
 
 cache:
+- C:\ProgramData\chocolatey\bin -> appveyor.yml
+- C:\ProgramData\chocolatey\lib -> appveyor.yml
 - '%USERPROFILE%\.nuget\packages -> **\*.csproj'
 
-before_build:
-- ps: |
-    $path = (Get-Item .\Sloth.Api\Sloth.Api.csproj).FullName
-    $csproj = [xml](Get-Content $path)
-    $csproj.Project.PropertyGroup.Version = $Env:APPVEYOR_BUILD_VERSION
-    $csproj.Save($path)
-
 build_script:
-- cmd: msbuild /t:Build /p:Configuration=%configuration%;RunOctoPack=true;PackageVersion=%APPVEYOR_BUILD_VERSION%;OctoPackReleaesNotesFile=..\commit.txt
+- ps: dotnet build --configuration $Env:configuration
+
+after_build:
+- ps: |
+    dotnet publish .\Sloth.Api\ --output ..\publish --configuration $Env:configuration
+    octo pack --id Sloth.Api --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\publish\ --outFolder .\artifacts\
 
 test_script:
 - ps: dotnet test .\Sloth.Test\Sloth.Test.csproj
 
 artifacts:
-- path: '**/bin/**/Sloth.*.nupkg'
+- path: artifacts\*.nupkg'
   name: nugetweb
 
 deploy:
