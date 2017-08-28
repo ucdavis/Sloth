@@ -62,4 +62,9 @@
     </ItemGroup>
   </Target>
 
+  <Target Name="CreateLogFolder" AfterTargets="AfterPublish">
+    <MakeDir Directories="$(PublishDir)logs" Condition="!Exists('$(PublishDir)logs')" />
+    <Touch Files="$(PublishDir)logs\empty" AlwaysCreate="true" />
+  </Target>
+
 </Project>
