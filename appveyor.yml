@@ -15,27 +15,19 @@ install:
 cache:
 - '%USERPROFILE%\.nuget\packages -> **\*.csproj'
 
-before_build:
-- ps: |
-    $path = (Get-Item .\Sloth.Api\Sloth.Api.csproj).FullName
-    $csproj = [xml](Get-Content $path)
-    $csproj.Project.PropertyGroup.Version = $Env:APPVEYOR_BUILD_VERSION
-    $csproj.Project.PropertyGroup.PackageReleaseNotes = $Env:APPVEYOR_REPO_COMMIT_MESSAGE
-    $csproj.Save($path)
-
 build_script:
 - ps: dotnet build --configuration %configuration%
 
 after_build:
 - ps: |
-  dotnet publish .\Sloth.Api\ --output .\publish --configuration %configuration%
-  octo pack --id Sloth.Api --version %APPVEYOR_BUILD_VERSION% --basepath .\publish\
+    dotnet publish .\Sloth.Api\ --output .\publish --configuration $Env:configuration
+    octo pack --id Sloth.Api --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\publish\ --outFolder .\artifacts\
 
 test_script:
 - ps: dotnet test .\Sloth.Test\Sloth.Test.csproj
 
 artifacts:
-- path: '**/bin/**/Sloth.*.nupkg'
+- path: .\artifacts\Sloth.*.nupkg'
   name: nugetweb
 
 deploy:
