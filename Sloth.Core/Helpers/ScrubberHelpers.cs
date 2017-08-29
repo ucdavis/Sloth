@@ -1,4 +1,3 @@
-﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -8,7 +7,7 @@ using Sloth.Core.Models;
 using Sloth.Xml;
 using Sloth.Xml.Types;
 
-namespace Sloth.Api.Helpers
+namespace Sloth.Core.Helpers
 {
     public static class ScrubberHelpers
     {

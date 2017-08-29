@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using Hangfire.Common;
 using Hangfire.States;
 using Hangfire.Storage;
 
-namespace Sloth.Api.Jobs.Attributes
+namespace Sloth.Jobs.Jobs.Attributes
 {
     public class ProlongExpirationTimeAttribute : JobFilterAttribute, IApplyStateFilter
     {

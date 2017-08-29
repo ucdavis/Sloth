@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Hangfire.Console;
 using Hangfire.Server;
 using Serilog;
@@ -6,7 +6,7 @@ using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Sloth.Api.Jobs
+namespace Sloth.Jobs.Jobs
 {
     internal class HangfireConsoleSink : ILogEventSink
     {

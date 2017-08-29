@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using Hangfire;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Sloth.Api.Jobs
+namespace Sloth.Jobs.Jobs
 {
     public class ServiceActivator : JobActivator
     {

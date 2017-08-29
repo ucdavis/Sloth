@@ -1,10 +1,9 @@
-﻿using System;
 using Hangfire.Server;
 using Serilog;
-using Sloth.Api.Jobs.Attributes;
+using Sloth.Jobs.Jobs.Attributes;
 using Sloth.Jobs.Logging;
 
-namespace Sloth.Api.Jobs
+namespace Sloth.Jobs.Jobs
 {
     [ProlongExpirationTime]
     public class JobBase

@@ -1,7 +1,7 @@
-﻿using Hangfire.RecurringJobExtensions;
+using Hangfire.RecurringJobExtensions;
 using Hangfire.Server;
 
-namespace Sloth.Api.Jobs
+namespace Sloth.Jobs.Jobs
 {
     public class Heartbeat : JobBase
     {

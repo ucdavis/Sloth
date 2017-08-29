@@ -2,10 +2,13 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+using Renci.SshNet;
+using Serilog;
+using Sloth.Core.Helpers;
 using Sloth.Core.Models;
+using Sloth.Core.Services;
 
-namespace Sloth.Core.Services
+namespace Sloth.Jobs.Services
 {
     public interface IKfsScrubberService
     {

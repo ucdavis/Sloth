@@ -1,4 +1,4 @@
-﻿namespace Sloth.Api.Jobs
+namespace Sloth.Jobs.Jobs
 {
     internal class CronStrings
     {

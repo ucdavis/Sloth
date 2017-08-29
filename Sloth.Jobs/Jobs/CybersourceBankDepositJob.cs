@@ -13,7 +13,7 @@ using Sloth.Core.Services;
 using Sloth.Integrations.Cybersource;
 using Sloth.Integrations.Cybersource.Clients;
 
-namespace Sloth.Api.Jobs
+namespace Sloth.Jobs.Jobs
 {
     public class CybersourceBankDepositJob : JobBase
     {

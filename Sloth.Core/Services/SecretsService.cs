@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Azure.KeyVault;
+using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace Sloth.Core.Services
 {
@@ -14,10 +15,9 @@ namespace Sloth.Core.Services
         private readonly KeyVaultClient _vault;
         private readonly SecretServiceSettings _settings;
 
-        public SecretsService(IConfiguration configuration)
+        public SecretsService(SecretServiceSettings settings)
         {
-            _settings = new SecretServiceSettings();
-            configuration.GetSection("KeyVaultService").Bind(_settings);
+            _settings = settings;
 
             _vault = new KeyVaultClient(async (authority, resource, scope) =>
             {
@@ -42,7 +42,7 @@ namespace Sloth.Core.Services
         }
     }
 
-    internal class SecretServiceSettings
+    public class SecretServiceSettings
     {
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }

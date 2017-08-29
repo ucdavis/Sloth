@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Hangfire;
-using Hangfire.Console;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -55,7 +54,6 @@ namespace Sloth.Api
             services.AddTransient(_ => LoggingConfiguration.Configuration);
             
             // add infrastructure services
-            services.AddSingleton<IKfsScrubberService, KfsScrubberService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
@@ -167,15 +165,9 @@ namespace Sloth.Api
                 DbInitializer.Initialize(context);
             }
 
-            ConfigureHangfire(app, env);
-        }
-
-        private void ConfigureHangfire(IApplicationBuilder app, IHostingEnvironment env)
-        {
             // setup hangfire storage
             GlobalConfiguration.Configuration
                 .UseSerilogLogProvider()
-                .UseConsole()
                 .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
         }
     }

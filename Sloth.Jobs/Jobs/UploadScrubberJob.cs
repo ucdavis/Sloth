@@ -6,9 +6,9 @@ using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
-using Sloth.Core.Services;
+using Sloth.Jobs.Services;
 
-namespace Sloth.Api.Jobs
+namespace Sloth.Jobs.Jobs
 {
     public class UploadScrubberJob : JobBase
     {
