@@ -1,7 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Hangfire;
 using Hangfire.Console;
-using Hangfire.RecurringJobExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,11 +15,11 @@ using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Api.Data;
 using Sloth.Api.Identity;
-using Sloth.Api.Jobs;
 using Sloth.Api.Logging;
 using Sloth.Api.Services;
 using Sloth.Api.Swagger;
 using Sloth.Core;
+using Sloth.Core.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Sloth.Api
@@ -31,8 +31,7 @@ namespace Sloth.Api
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsDevelopment())
             {
@@ -82,6 +81,15 @@ namespace Sloth.Api
             
             // add authentication handlers
             services.AddSingleton<IAuthorizationHandler, ApiKeyHandler>();
+
+            // add identity
+            services.AddIdentity<User, Role>()
+                .AddEntityFrameworkStores<SlothDbContext, Guid>()
+                .AddDefaultTokenProviders();
+
+            services.Configure<IdentityOptions>(o =>
+            {
+            });
 
             // add swagger/swashbuckler
             services.AddSwaggerGen(c =>
@@ -169,24 +177,6 @@ namespace Sloth.Api
                 .UseSerilogLogProvider()
                 .UseConsole()
                 .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
-
-            // add recurring jobs
-            GlobalConfiguration.Configuration
-                .UseRecurringJob(typeof(Heartbeat))
-                .UseRecurringJob(typeof(CybersourceBankDepositJob))
-                .UseRecurringJob(typeof(UploadScrubberJob));
-
-            // add hangfire dashboard
-            app.UseHangfireDashboard();
-            //"/hangfire", new DashboardOptions()
-            //{
-            //    Authorization = new[] { new LocalRequestsOnlyAuthorizationFilter(), }
-            //});
-
-            if (env.IsDevelopment())
-            {
-                app.UseHangfireServer();
-            }
         }
     }
 }
