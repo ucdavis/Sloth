@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Test", "Sloth.Test\Sl
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Integrations.Cybersource", "Sloth.Integrations.Cybersource\Sloth.Integrations.Cybersource.csproj", "{D08B9958-DBB7-4AEB-884B-604126EF2E5C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.HangfireServer", "Sloth.Jobs.HangfireServer\Sloth.Jobs.HangfireServer.csproj", "{9AE0B09E-0997-4321-9E20-F845EA73C720}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs", "Sloth.Jobs\Sloth.Jobs.csproj", "{F3A76C67-5817-483E-A0DB-262F7CC5E685}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +47,10 @@ Global
 		{D08B9958-DBB7-4AEB-884B-604126EF2E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D08B9958-DBB7-4AEB-884B-604126EF2E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D08B9958-DBB7-4AEB-884B-604126EF2E5C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9AE0B09E-0997-4321-9E20-F845EA73C720}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9AE0B09E-0997-4321-9E20-F845EA73C720}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9AE0B09E-0997-4321-9E20-F845EA73C720}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9AE0B09E-0997-4321-9E20-F845EA73C720}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
