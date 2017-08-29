@@ -2,7 +2,7 @@
 using Hangfire.Server;
 using Serilog;
 using Sloth.Api.Jobs.Attributes;
-using Sloth.Api.Logging;
+using Sloth.Jobs.Logging;
 
 namespace Sloth.Api.Jobs
 {
