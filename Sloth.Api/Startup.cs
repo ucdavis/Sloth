@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using Hangfire;
 using Hangfire.Console;
@@ -16,10 +16,10 @@ using Serilog;
 using Sloth.Api.Data;
 using Sloth.Api.Identity;
 using Sloth.Api.Logging;
-using Sloth.Api.Services;
 using Sloth.Api.Swagger;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Services;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Sloth.Api

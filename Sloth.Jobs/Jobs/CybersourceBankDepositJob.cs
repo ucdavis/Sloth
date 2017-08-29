@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
@@ -7,9 +7,9 @@ using Hangfire.RecurringJobExtensions;
 using Hangfire.Server;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
-using Sloth.Api.Services;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Services;
 using Sloth.Integrations.Cybersource;
 using Sloth.Integrations.Cybersource.Clients;
 
