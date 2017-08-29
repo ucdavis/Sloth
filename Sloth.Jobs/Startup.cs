@@ -1,4 +1,3 @@
-using System;
 using System.Security.Claims;
 using AspNetCore.Security.CAS;
 using Hangfire;
@@ -6,19 +5,17 @@ using Hangfire.Console;
 using Hangfire.RecurringJobExtensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sloth.Core;
+using Sloth.Core.Models;
 using Sloth.Core.Services;
-using Sloth.Jobs.Data;
 using Sloth.Jobs.Filters;
 using Sloth.Jobs.Jobs;
 using Sloth.Jobs.Jobs.Attributes;
 using Sloth.Jobs.Logging;
-using Sloth.Jobs.Models;
 using Sloth.Jobs.Services;
 
 namespace Sloth.Jobs
@@ -56,8 +53,8 @@ namespace Sloth.Jobs
             services.AddDbContext<SlothDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
+            services.AddIdentity<User, Role>()
+                .AddEntityFrameworkStores<SlothDbContext>()
                 .AddDefaultTokenProviders();
 
             services.AddMvc();
