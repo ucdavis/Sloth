@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
-    public class User : IdentityUser<Guid>
+    public class User : IdentityUser
     {
         public User()
         {

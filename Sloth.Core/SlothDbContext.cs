@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Data;
@@ -11,7 +11,7 @@ using Sloth.Core.Models;
 
 namespace Sloth.Core
 {
-    public class SlothDbContext : IdentityDbContext<User, Role, Guid>
+    public class SlothDbContext : IdentityDbContext<User>
     {
         public SlothDbContext(DbContextOptions options) : base(options)
         {
