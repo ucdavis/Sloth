@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 
@@ -17,10 +18,10 @@ namespace Sloth.Core.Services
     {
         private readonly CloudStorageAccount _account;
 
-        public StorageService(StorageServiceOptions options)
+        public StorageService(IOptions<StorageServiceOptions> options)
         {
             // parse connection string
-            var connectionString = options.ConnectionString;
+            var connectionString = options.Value.ConnectionString;
             _account = CloudStorageAccount.Parse(connectionString);
         }
 

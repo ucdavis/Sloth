@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 
 namespace Sloth.Core.Services
@@ -13,16 +14,16 @@ namespace Sloth.Core.Services
     public class SecretsService : ISecretsService
     {
         private readonly KeyVaultClient _vault;
-        private readonly SecretServiceSettings _settings;
+        private readonly SecretServiceOptions _options;
 
-        public SecretsService(SecretServiceSettings settings)
+        public SecretsService(IOptions<SecretServiceOptions> options)
         {
-            _settings = settings;
+            _options = options.Value;
 
             _vault = new KeyVaultClient(async (authority, resource, scope) =>
             {
                 var authContext = new AuthenticationContext(authority);
-                var credential = new ClientCredential(_settings.ClientId, _settings.ClientSecret);
+                var credential = new ClientCredential(_options.ClientId, _options.ClientSecret);
                 var token = await authContext.AcquireTokenAsync(resource, credential);
 
                 return token.AccessToken;
@@ -32,17 +33,17 @@ namespace Sloth.Core.Services
 
         public async Task<string> GetSecret(string name)
         {
-            var result = await _vault.GetSecretAsync(_settings.Url, name);
+            var result = await _vault.GetSecretAsync(_options.Url, name);
             return result.Value;
         }
 
         public async Task UpdateSecret(string name, string value)
         {
-            await _vault.SetSecretAsync(_settings.Url, name, value);
+            await _vault.SetSecretAsync(_options.Url, name, value);
         }
     }
 
-    public class SecretServiceSettings
+    public class SecretServiceOptions
     {
         public string ClientId { get; set; }
         public string ClientSecret { get; set; }

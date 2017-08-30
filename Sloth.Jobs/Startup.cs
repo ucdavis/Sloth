@@ -1,3 +1,4 @@
+using System;
 using System.Security.Claims;
 using AspNetCore.Security.CAS;
 using Hangfire;
@@ -43,8 +44,12 @@ namespace Sloth.Jobs
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // add root configuration
+            // add configurations
             services.AddSingleton<IConfiguration>(Configuration);
+            services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
+            services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
+            services.Configure<SecretServiceOptions>(Configuration.GetSection("KeyVaultService"));
+            services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
             // add logger configuration
             services.AddTransient(_ => LoggingConfiguration.Configuration);
@@ -54,10 +59,14 @@ namespace Sloth.Jobs
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<User, Role>()
-                .AddEntityFrameworkStores<SlothDbContext>()
+                .AddEntityFrameworkStores<SlothDbContext, Guid>()
                 .AddDefaultTokenProviders();
 
+            services.Configure<IdentityOptions>(o => { });
+
             services.AddMvc();
+
+            services.AddHangfire(c => { });
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();
@@ -88,9 +97,7 @@ namespace Sloth.Jobs
 
             app.UseStaticFiles();
 
-            app.UseIdentity();
-
-            // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
+            ConfigureAuthentication(app);
 
             app.UseMvc(routes =>
             {
@@ -98,8 +105,6 @@ namespace Sloth.Jobs
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            ConfigureAuthentication(app);
 
             ConfigureHangfire(app, env);
         }

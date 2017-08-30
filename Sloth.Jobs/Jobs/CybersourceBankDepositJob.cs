@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Hangfire.RecurringJobExtensions;
 using Hangfire.Server;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
@@ -19,25 +19,24 @@ namespace Sloth.Jobs.Jobs
     {
         private readonly SlothDbContext _context;
         private readonly ISecretsService _secretsService;
-        private readonly CybersourceSettings _cybersourceSettings;
+        private readonly CybersourceOptions _cybersourceOptions;
 
-        public CybersourceBankDepositJob(SlothDbContext context, IConfiguration configuration, ISecretsService secretsService)
+        public CybersourceBankDepositJob(IOptions<CybersourceOptions> options, SlothDbContext context, ISecretsService secretsService)
         {
             _context = context;
             _secretsService = secretsService;
 
-            _cybersourceSettings = new CybersourceSettings();
-            configuration.GetSection("Cybersource").Bind(_cybersourceSettings);
+            _cybersourceOptions = options.Value;
 
             // validate options
-            if (string.IsNullOrWhiteSpace(_cybersourceSettings.ClearingAccount) ||
-                _cybersourceSettings.ClearingAccount.Length > 7)
+            if (string.IsNullOrWhiteSpace(_cybersourceOptions.ClearingAccount) ||
+                _cybersourceOptions.ClearingAccount.Length > 7)
             {
                 throw new ConfigurationErrorsException("ClearingAccount must be non-null and less than 7 characters.");
             }
 
-            if (string.IsNullOrWhiteSpace(_cybersourceSettings.HoldingAccount) ||
-                _cybersourceSettings.ClearingAccount.Length > 7)
+            if (string.IsNullOrWhiteSpace(_cybersourceOptions.HoldingAccount) ||
+                _cybersourceOptions.ClearingAccount.Length > 7)
             {
                 throw new ConfigurationErrorsException("HoldingAccount must be non-null and less than 7 characters.");
             }
@@ -81,7 +80,7 @@ namespace Sloth.Jobs.Jobs
                 var password = await _secretsService.GetSecret(integration.ReportPasswordKey);
 
                 // create client
-                var client = new ReportClient(_cybersourceSettings.ReportUrl, integration.MerchantId, integration.ReportUsername,
+                var client = new ReportClient(_cybersourceOptions.ReportUrl, integration.MerchantId, integration.ReportUsername,
                     password);
 
                 // fetch report
@@ -127,7 +126,7 @@ namespace Sloth.Jobs.Jobs
                     var clearing = new Transfer()
                     {
                         Chart          = 3,
-                        Account        = _cybersourceSettings.ClearingAccount,
+                        Account        = _cybersourceOptions.ClearingAccount,
                         Direction      = Transfer.CreditDebit.Debit,
                         Amount         = deposit.Amount,
                         Description    = "Deposit",
@@ -138,7 +137,7 @@ namespace Sloth.Jobs.Jobs
                     // move money into holding
                     var holding = new Transfer()
                     {
-                        Account        = _cybersourceSettings.HoldingAccount,
+                        Account        = _cybersourceOptions.HoldingAccount,
                         Direction      = Transfer.CreditDebit.Credit,
                         Amount         = deposit.Amount,
                         Description    = "Deposit",
@@ -149,7 +148,7 @@ namespace Sloth.Jobs.Jobs
                     // then back out of holding
                     var holding2 = new Transfer()
                     {
-                        Account        = _cybersourceSettings.HoldingAccount,
+                        Account        = _cybersourceOptions.HoldingAccount,
                         Direction      = Transfer.CreditDebit.Debit,
                         Amount         = deposit.Amount,
                         Description    = "Deposit",
@@ -184,14 +183,14 @@ namespace Sloth.Jobs.Jobs
                 tran.Rollback();
             }
         }
+    }
 
-        public class CybersourceSettings
-        {
-            public string ReportUrl { get; set; }
+    public class CybersourceOptions
+    {
+        public string ReportUrl { get; set; }
 
-            public string ClearingAccount { get; set; }
+        public string ClearingAccount { get; set; }
 
-            public string HoldingAccount { get; set; }
-        }
+        public string HoldingAccount { get; set; }
     }
 }

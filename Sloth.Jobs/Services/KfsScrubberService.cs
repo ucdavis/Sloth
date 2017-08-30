@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Serilog;
 using Sloth.Core.Helpers;
@@ -25,18 +25,15 @@ namespace Sloth.Jobs.Services
 
         private readonly string _storageContainer;
 
-        public KfsScrubberService(IConfiguration configuration, IStorageService storageService)
+        public KfsScrubberService(IOptions<KfsOptions> options, IStorageService storageService)
         {
             _storageService = storageService;
 
-            var kfsOptions = new KfsOptions();
-            configuration.GetSection("Kfs").Bind(kfsOptions);
+            _host = options.Value.Host;
+            _username = options.Value.Username;
+            _password = options.Value.Password;
 
-            _host = kfsOptions.Host;
-            _username = kfsOptions.Username;
-            _password = kfsOptions.Password;
-
-            _storageContainer = kfsOptions.ScrubberBlobContainer;
+            _storageContainer = options.Value.ScrubberBlobContainer;
         }
 
         public async Task<Uri> UploadScrubber(Scrubber scrubber, string filename, ILogger logger = null)
@@ -77,7 +74,7 @@ namespace Sloth.Jobs.Services
         }
     }
 
-    internal class KfsOptions
+    public class KfsOptions
     {
         public string Host { get; set; }
         public string Username { get; set; }
