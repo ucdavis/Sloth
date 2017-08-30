@@ -80,15 +80,6 @@ namespace Sloth.Api
             // add authentication handlers
             services.AddSingleton<IAuthorizationHandler, ApiKeyHandler>();
 
-            // add identity
-            services.AddIdentity<User, Role>()
-                .AddEntityFrameworkStores<SlothDbContext, Guid>()
-                .AddDefaultTokenProviders();
-
-            services.Configure<IdentityOptions>(o =>
-            {
-            });
-
             // add swagger/swashbuckler
             services.AddSwaggerGen(c =>
             {
