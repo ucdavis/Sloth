@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Sloth.Jobs.Data.Migrations
+namespace Sloth.Core.Migrations
 {
     public partial class CreateIdentitySchema : Migration
     {
