@@ -1,7 +1,6 @@
-﻿using System.IO;
+using System;
+using System.IO;
 using Hangfire;
-using Hangfire.Console;
-using Hangfire.RecurringJobExtensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -15,11 +14,11 @@ using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Api.Data;
 using Sloth.Api.Identity;
-using Sloth.Api.Jobs;
 using Sloth.Api.Logging;
-using Sloth.Api.Services;
 using Sloth.Api.Swagger;
 using Sloth.Core;
+using Sloth.Core.Models;
+using Sloth.Core.Services;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Sloth.Api
@@ -31,8 +30,7 @@ namespace Sloth.Api
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
             if (env.IsDevelopment())
             {
@@ -56,7 +54,6 @@ namespace Sloth.Api
             services.AddTransient(_ => LoggingConfiguration.Configuration);
             
             // add infrastructure services
-            services.AddSingleton<IKfsScrubberService, KfsScrubberService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
@@ -159,34 +156,10 @@ namespace Sloth.Api
                 DbInitializer.Initialize(context);
             }
 
-            ConfigureHangfire(app, env);
-        }
-
-        private void ConfigureHangfire(IApplicationBuilder app, IHostingEnvironment env)
-        {
             // setup hangfire storage
             GlobalConfiguration.Configuration
                 .UseSerilogLogProvider()
-                .UseConsole()
                 .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
-
-            // add recurring jobs
-            GlobalConfiguration.Configuration
-                .UseRecurringJob(typeof(Heartbeat))
-                .UseRecurringJob(typeof(CybersourceBankDepositJob))
-                .UseRecurringJob(typeof(UploadScrubberJob));
-
-            // add hangfire dashboard
-            app.UseHangfireDashboard();
-            //"/hangfire", new DashboardOptions()
-            //{
-            //    Authorization = new[] { new LocalRequestsOnlyAuthorizationFilter(), }
-            //});
-
-            if (env.IsDevelopment())
-            {
-                app.UseHangfireServer();
-            }
         }
     }
 }

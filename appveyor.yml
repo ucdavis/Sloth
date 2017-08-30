@@ -1,4 +1,4 @@
-﻿version: 1.0.0.{build}
+version: 1.0.0.{build}
 
 environment:
   configuration: Release
@@ -24,8 +24,11 @@ build_script:
 
 after_build:
 - ps: |
-    dotnet publish .\Sloth.Api\ --output ..\publish --configuration $Env:configuration
-    octo pack --id Sloth.Api --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\publish\ --outFolder .\artifacts\
+    dotnet publish .\Sloth.Api\ --output .\publish --configuration $Env:configuration
+    octo pack --id Sloth.Api --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\Sloth.Api\publish\ --outFolder .\artifacts\
+
+    dotnet publish .\Sloth.Jobs\ --output .\publish --configuration $Env:configuration
+    octo pack --id Sloth.Jobs --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\Sloth.Jobs\publish\ --outFolder .\artifacts\
 
 test_script:
 - ps: dotnet test .\Sloth.Test\Sloth.Test.csproj

@@ -32,7 +32,7 @@ namespace Sloth.Api.Data
             {
                 new User()
                 {
-                    Username = "jpknoll",
+                    UserName = "jpknoll",
                     Email = "jpknoll@ucdavis.edu",
                     Keys = new[] {new ApiKey() { Id = "TestKey123", Issued = DateTime.UtcNow }}
                 },
@@ -46,7 +46,7 @@ namespace Sloth.Api.Data
             {
                 new Transaction()
                 {
-                    Creator                 = context.Users.FirstOrDefault(u => u.Username == "jpknoll"),
+                    Creator                 = context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
                     Status                  = TransactionStatus.Scheduled,
                     MerchantTrackingNumber  = "ORDER-10",
                     ProcessorTrackingNumber = "123456",
