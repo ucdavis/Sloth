@@ -60,7 +60,7 @@ namespace Sloth.Jobs
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<SlothDbContext, Guid>()
+                .AddEntityFrameworkStores<SlothDbContext>()
                 .AddDefaultTokenProviders();
 
             services.Configure<IdentityOptions>(o => { });
