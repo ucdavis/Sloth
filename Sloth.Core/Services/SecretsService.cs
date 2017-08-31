@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
+using Sloth.Core.Configuration;
 
 namespace Sloth.Core.Services
 {
@@ -14,9 +15,9 @@ namespace Sloth.Core.Services
     public class SecretsService : ISecretsService
     {
         private readonly KeyVaultClient _vault;
-        private readonly SecretServiceOptions _options;
+        private readonly AzureOptions _options;
 
-        public SecretsService(IOptions<SecretServiceOptions> options)
+        public SecretsService(IOptions<AzureOptions> options)
         {
             _options = options.Value;
 
@@ -33,20 +34,13 @@ namespace Sloth.Core.Services
 
         public async Task<string> GetSecret(string name)
         {
-            var result = await _vault.GetSecretAsync(_options.Url, name);
+            var result = await _vault.GetSecretAsync(_options.KeyVaultUrl, name);
             return result.Value;
         }
 
         public async Task UpdateSecret(string name, string value)
         {
-            await _vault.SetSecretAsync(_options.Url, name, value);
+            await _vault.SetSecretAsync(_options.KeyVaultUrl, name, value);
         }
-    }
-
-    public class SecretServiceOptions
-    {
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
-        public string Url { get; set; }
     }
 }
