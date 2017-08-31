@@ -130,19 +130,19 @@ namespace Sloth.Jobs
 
                         var kerb = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                        //// look up user info and add as claims
-                        //var user = await app.ApplicationServices.GetService<IDirectorySearchService>().GetByKerb(kerb);
+                        // look up user info and add as claims
+                        var user = await app.ApplicationServices.GetService<IDirectorySearchService>().GetByKerb(kerb);
 
-                        //if (user != null)
-                        //{
-                        //    identity.AddClaim(new Claim(ClaimTypes.Email, user.Mail));
-                        //    identity.AddClaim(new Claim(ClaimTypes.GivenName, user.GivenName));
-                        //    identity.AddClaim(new Claim(ClaimTypes.Surname, user.Surname));
+                        if (user != null)
+                        {
+                            identity.AddClaim(new Claim(ClaimTypes.Email, user.Mail));
+                            identity.AddClaim(new Claim(ClaimTypes.GivenName, user.GivenName));
+                            identity.AddClaim(new Claim(ClaimTypes.Surname, user.Surname));
 
-                        //    // Cas already adds a name param but it's a duplicate of nameIdentifier, so let's replace with something useful
-                        //    identity.RemoveClaim(identity.FindFirst(ClaimTypes.Name));
-                        //    identity.AddClaim(new Claim(ClaimTypes.Name, user.DisplayName));
-                        //}
+                            // Cas already adds a name param but it's a duplicate of nameIdentifier, so let's replace with something useful
+                            identity.RemoveClaim(identity.FindFirst(ClaimTypes.Name));
+                            identity.AddClaim(new Claim(ClaimTypes.Name, user.DisplayName));
+                        }
                     }
                 }
             };
