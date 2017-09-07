@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,6 +54,19 @@ namespace Sloth.Api.Controllers
                 .Include(t => t.Scrubber)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+            return transaction;
+        }
+
+        [HttpGet("processor/{id}")]
+        public async Task<Transaction> GetByProcessorId(string id)
+        {
+            var transaction = await _context.Transactions
+                .Include(t => t.Creator)
+                .Include(t => t.Transfers)
+                .Include(t => t.Scrubber)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.ProcessorTrackingNumber == id);
 
             return transaction;
         }
