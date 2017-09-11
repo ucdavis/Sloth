@@ -1,8 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Serilog;
+using Sloth.Core;
+using Sloth.Core.Services;
+using Sloth.Web.Logging;
 
 namespace Sloth.Web
 {
@@ -18,12 +26,43 @@ namespace Sloth.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            // add root configuration
+            services.AddSingleton<IConfiguration>(Configuration);
+
+            // add logger configuration
+            services.AddTransient(_ => LoggingConfiguration.Configuration);
+
+            // add infrastructure services
+            services.AddSingleton<ISecretsService, SecretsService>();
+            services.AddSingleton<IStorageService, StorageService>();
+
+            // add database connection
+            services.AddDbContext<SlothDbContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            services.AddMvc()
+                .AddJsonOptions(o =>
+                {
+                    o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    o.SerializerSettings.Converters.Add(new StringEnumConverter());
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime)
         {
+            // setup logging
+            LoggingConfiguration.Setup(Configuration);
+
+            loggerFactory.AddSerilog();
+
+            appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
+
+            app.UseMiddleware<CorrelationIdMiddleware>();
+            app.UseMiddleware<LoggingIdentityMiddleware>();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
