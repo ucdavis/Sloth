@@ -8,7 +8,10 @@ module.exports = (env) => {
     const isDevBuild = !(env && env.prod);
     return [{
         stats: { modules: false },
-        entry: { 'main': './ClientApp/boot.tsx' },
+        entry: {
+            'main': './ClientApp/boot.tsx',
+            'vendor': ['event-source-polyfill', 'isomorphic-fetch', 'react', 'react-dom', 'react-router-dom']
+        },
         resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
         output: {
             path: path.join(__dirname, bundleOutputDir),
@@ -24,10 +27,11 @@ module.exports = (env) => {
         },
         plugins: [
             new CheckerPlugin(),
-            new webpack.DllReferencePlugin({
-                context: __dirname,
-                manifest: require('./wwwroot/dist/vendor-manifest.json')
+            new webpack.optimize.CommonsChunkPlugin({
+                name: 'vendor',
+                chunks: ['boot']
             })
+
         ].concat(isDevBuild ? [
             // Plugins that apply in development builds only
             new webpack.SourceMapDevToolPlugin({
