@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -12,7 +12,7 @@ namespace Sloth.Api.Identity
 {
     public class ApiKeyMiddleware
     {
-        private const string HeaderKey = "X-Auth-Token";
+        public const string HeaderKey = "X-Auth-Token";
 
         private readonly RequestDelegate _next;
         private readonly SlothDbContext _dbContext;
