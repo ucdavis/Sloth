@@ -123,7 +123,7 @@ namespace Sloth.Core.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("Sloth.Jobs.Models.ApplicationUser", b =>
+            modelBuilder.Entity("Sloth.Core.Models.User", b =>
                 {
                     b.Property<string>("Id");
 
@@ -182,7 +182,7 @@ namespace Sloth.Core.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Sloth.Jobs.Models.ApplicationUser")
+                    b.HasOne("Sloth.Core.Models.User")
                         .WithMany("Claims")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -190,7 +190,7 @@ namespace Sloth.Core.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.EntityFrameworkCore.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Sloth.Jobs.Models.ApplicationUser")
+                    b.HasOne("Sloth.Core.Models.User")
                         .WithMany("Logins")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
@@ -203,7 +203,7 @@ namespace Sloth.Core.Migrations
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade);
 
-                    b.HasOne("Sloth.Jobs.Models.ApplicationUser")
+                    b.HasOne("Sloth.Core.Models.User")
                         .WithMany("Roles")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade);
