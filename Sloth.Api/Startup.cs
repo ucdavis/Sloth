@@ -110,7 +110,7 @@ namespace Sloth.Api
                 c.AddSecurityDefinition("apiKey", new ApiKeyScheme()
                 {
                     Description = "API Key Authentication",
-                    Name = "Authorization",
+                    Name = ApiKeyMiddleware.HeaderKey,
                     In = "header"
                 });
                 c.OperationFilter<SecurityRequirementsOperationFilter>();

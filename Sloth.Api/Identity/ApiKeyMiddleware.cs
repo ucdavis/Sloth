@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Sloth.Core;
@@ -12,7 +13,7 @@ namespace Sloth.Api.Identity
 {
     public class ApiKeyMiddleware
     {
-        private const string HeaderKey = "X-Auth-Token";
+        public const string HeaderKey = "X-Auth-Token";
 
         private readonly RequestDelegate _next;
         private readonly SlothDbContext _dbContext;
@@ -37,7 +38,7 @@ namespace Sloth.Api.Identity
             var headerValue = context.Request.Headers[HeaderKey].FirstOrDefault();
 
             // lookup apikey from db
-            var apiKey = _dbContext.ApiKeys.Find(headerValue);
+            var apiKey = _dbContext.ApiKeys.Include(a => a.User).FirstOrDefault(a => a.Id == headerValue);
             if (apiKey == null || apiKey.Revoked.HasValue)
             {
                 return _next(context);

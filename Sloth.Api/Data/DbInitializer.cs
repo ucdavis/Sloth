@@ -27,6 +27,8 @@ namespace Sloth.Api.Data
 
         private static void CreateUsers(SlothDbContext context)
         {
+            if (context.Users.Any()) return;
+
             var users = new[]
             {
                 new User()
@@ -41,6 +43,8 @@ namespace Sloth.Api.Data
 
         private static void CreateTransactions(SlothDbContext context)
         {
+            if (context.Transactions.Any()) return;
+
             var transactions = new[]
             {
                 new Transaction()
@@ -81,6 +85,8 @@ namespace Sloth.Api.Data
 
         private static void CreateIntegrations(SlothDbContext context)
         {
+            if (context.Integrations.Any()) return;
+
             var integrations = new[]
             {
                 new Integration()
