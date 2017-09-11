@@ -16,7 +16,8 @@ namespace Sloth.Core.Migrations
                     BatchDate = table.Column<DateTime>(nullable: false),
                     BatchSequenceNumber = table.Column<int>(nullable: false),
                     Chart = table.Column<string>(maxLength: 2, nullable: false),
-                    OrganizationCode = table.Column<string>(maxLength: 4, nullable: false)
+                    OrganizationCode = table.Column<string>(maxLength: 4, nullable: false),
+                    Uri = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -29,8 +30,14 @@ namespace Sloth.Core.Migrations
                 {
                     Id = table.Column<string>(nullable: false),
                     CreatorId = table.Column<string>(nullable: true),
+                    DocumentNumber = table.Column<string>(maxLength: 14, nullable: false),
+                    KfsTrackingNumber = table.Column<string>(maxLength: 10, nullable: false),
+                    MerchantTrackingNumber = table.Column<string>(nullable: false),
+                    OriginCode = table.Column<string>(maxLength: 2, nullable: false),
+                    ProcessorTrackingNumber = table.Column<string>(nullable: false),
                     ScrubberId = table.Column<string>(nullable: true),
-                    Status = table.Column<int>(nullable: false)
+                    Status = table.Column<int>(nullable: false),
+                    TransactionDate = table.Column<DateTime>(nullable: false),
                 },
                 constraints: table =>
                 {
@@ -56,24 +63,18 @@ namespace Sloth.Core.Migrations
                     Id = table.Column<string>(nullable: false),
                     Account = table.Column<string>(maxLength: 7, nullable: false),
                     Amount = table.Column<decimal>(nullable: false),
-                    BalanceType = table.Column<string>(maxLength: 2, nullable: false),
                     Chart = table.Column<int>(maxLength: 2, nullable: false),
-                    DebitCredit = table.Column<string>(nullable: false),
                     Description = table.Column<string>(maxLength: 40, nullable: false),
-                    DocType = table.Column<string>(nullable: false),
-                    DocumentNumber = table.Column<string>(maxLength: 14, nullable: false),
+                    Direction = table.Column<string>(nullable: false),
                     FiscalPeriod = table.Column<int>(nullable: false),
                     FiscalYear = table.Column<int>(nullable: false),
                     ObjectCode = table.Column<string>(maxLength: 4, nullable: false),
                     ObjectType = table.Column<string>(maxLength: 2, nullable: true),
-                    OriginCode = table.Column<string>(maxLength: 2, nullable: false),
                     Project = table.Column<string>(maxLength: 10, nullable: true),
                     ReferenceId = table.Column<string>(maxLength: 8, nullable: true),
                     SequenceNumber = table.Column<int>(nullable: false),
                     SubAccount = table.Column<string>(maxLength: 5, nullable: true),
                     SubObjectCode = table.Column<string>(maxLength: 3, nullable: true),
-                    TrackingNumber = table.Column<string>(maxLength: 10, nullable: true),
-                    TransactionDate = table.Column<DateTime>(nullable: false),
                     TransactionId = table.Column<string>(nullable: true)
                 },
                 constraints: table =>

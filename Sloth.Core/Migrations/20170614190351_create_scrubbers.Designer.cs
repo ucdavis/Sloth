@@ -33,6 +33,8 @@ namespace Sloth.Core.Migrations
                         .IsRequired()
                         .HasMaxLength(4);
 
+                    b.Property<string>("Uri");
+
                     b.HasKey("Id");
 
                     b.ToTable("Scrubbers");
@@ -45,9 +47,26 @@ namespace Sloth.Core.Migrations
 
                     b.Property<string>("CreatorId");
 
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasMaxLength(14);
+
+                    b.Property<string>("KfsTrackingNumber")
+                        .HasMaxLength(10);
+
+                    b.Property<string>("MerchantTrackingNumber");
+
+                    b.Property<string>("OriginCode")
+                        .IsRequired()
+                        .HasMaxLength(2);
+
+                    b.Property<string>("ProcessorTrackingNumber");
+
                     b.Property<string>("ScrubberId");
 
                     b.Property<int>("Status");
+
+                    b.Property<DateTime>("TransactionDate");
 
                     b.HasKey("Id");
 
@@ -69,26 +88,14 @@ namespace Sloth.Core.Migrations
 
                     b.Property<decimal>("Amount");
 
-                    b.Property<string>("BalanceType")
-                        .IsRequired()
-                        .HasMaxLength(2);
-
                     b.Property<int>("Chart")
                         .HasMaxLength(2);
-
-                    b.Property<string>("DebitCredit")
-                        .IsRequired();
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(40);
 
-                    b.Property<string>("DocType")
-                        .IsRequired();
-
-                    b.Property<string>("DocumentNumber")
-                        .IsRequired()
-                        .HasMaxLength(14);
+                    b.Property<int>("Direction");
 
                     b.Property<int>("FiscalPeriod");
 
@@ -99,10 +106,6 @@ namespace Sloth.Core.Migrations
                         .HasMaxLength(4);
 
                     b.Property<string>("ObjectType")
-                        .HasMaxLength(2);
-
-                    b.Property<string>("OriginCode")
-                        .IsRequired()
                         .HasMaxLength(2);
 
                     b.Property<string>("Project")
@@ -118,11 +121,6 @@ namespace Sloth.Core.Migrations
 
                     b.Property<string>("SubObjectCode")
                         .HasMaxLength(3);
-
-                    b.Property<string>("TrackingNumber")
-                        .HasMaxLength(10);
-
-                    b.Property<DateTime>("TransactionDate");
 
                     b.Property<string>("TransactionId");
 
