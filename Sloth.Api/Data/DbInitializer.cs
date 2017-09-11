@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Sloth.Core;
 using Sloth.Core.Models;
@@ -16,7 +16,6 @@ namespace Sloth.Api.Data
         /// <param name="context"></param>
         public static void Initialize(SlothDbContext context)
         {
-            context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
 
             CreateUsers(context);

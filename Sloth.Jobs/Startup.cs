@@ -12,6 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Sloth.Core;
+using Sloth.Core.Configuration;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Jobs.Filters;
@@ -47,9 +48,9 @@ namespace Sloth.Jobs
         {
             // add configurations
             services.AddSingleton<IConfiguration>(Configuration);
+            services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
-            services.Configure<SecretServiceOptions>(Configuration.GetSection("KeyVaultService"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
             // add logger configuration
@@ -74,6 +75,7 @@ namespace Sloth.Jobs
             services.AddTransient<ISmsSender, AuthMessageSender>();
 
             // add infrastructure services
+            services.AddTransient<IDirectorySearchService, DirectorySearchService>();
             services.AddTransient<IKfsScrubberService, KfsScrubberService>();
             services.AddTransient<ISecretsService, SecretsService>();
             services.AddTransient<IStorageService, StorageService>();
@@ -130,19 +132,19 @@ namespace Sloth.Jobs
 
                         var kerb = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-                        //// look up user info and add as claims
-                        //var user = await app.ApplicationServices.GetService<IDirectorySearchService>().GetByKerb(kerb);
+                        // look up user info and add as claims
+                        var user = await app.ApplicationServices.GetService<IDirectorySearchService>().GetByKerb(kerb);
 
-                        //if (user != null)
-                        //{
-                        //    identity.AddClaim(new Claim(ClaimTypes.Email, user.Mail));
-                        //    identity.AddClaim(new Claim(ClaimTypes.GivenName, user.GivenName));
-                        //    identity.AddClaim(new Claim(ClaimTypes.Surname, user.Surname));
+                        if (user != null)
+                        {
+                            identity.AddClaim(new Claim(ClaimTypes.Email, user.Mail));
+                            identity.AddClaim(new Claim(ClaimTypes.GivenName, user.GivenName));
+                            identity.AddClaim(new Claim(ClaimTypes.Surname, user.Surname));
 
-                        //    // Cas already adds a name param but it's a duplicate of nameIdentifier, so let's replace with something useful
-                        //    identity.RemoveClaim(identity.FindFirst(ClaimTypes.Name));
-                        //    identity.AddClaim(new Claim(ClaimTypes.Name, user.DisplayName));
-                        //}
+                            // Cas already adds a name param but it's a duplicate of nameIdentifier, so let's replace with something useful
+                            identity.RemoveClaim(identity.FindFirst(ClaimTypes.Name));
+                            identity.AddClaim(new Claim(ClaimTypes.Name, user.DisplayName));
+                        }
                     }
                 }
             };

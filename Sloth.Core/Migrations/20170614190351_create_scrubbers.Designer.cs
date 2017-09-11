@@ -1,40 +1,20 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
-using Sloth.Core;
-using Sloth.Core.Models;
 
 namespace Sloth.Core.Migrations
 {
     [DbContext(typeof(SlothDbContext))]
-    [Migration("20170614190351_initial")]
-    partial class initial
+    [Migration("20170614190351_create_scrubbers")]
+    partial class create_scrubbers
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2")
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-            modelBuilder.Entity("Sloth.Core.Models.ApiKey", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("Issued");
-
-                    b.Property<DateTime?>("Revoked");
-
-                    b.Property<string>("UserId");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("ApiKeys");
-                });
 
             modelBuilder.Entity("Sloth.Core.Models.Scrubber", b =>
                 {
@@ -53,6 +33,8 @@ namespace Sloth.Core.Migrations
                         .IsRequired()
                         .HasMaxLength(4);
 
+                    b.Property<string>("Uri");
+
                     b.HasKey("Id");
 
                     b.ToTable("Scrubbers");
@@ -65,9 +47,26 @@ namespace Sloth.Core.Migrations
 
                     b.Property<string>("CreatorId");
 
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasMaxLength(14);
+
+                    b.Property<string>("KfsTrackingNumber")
+                        .HasMaxLength(10);
+
+                    b.Property<string>("MerchantTrackingNumber");
+
+                    b.Property<string>("OriginCode")
+                        .IsRequired()
+                        .HasMaxLength(2);
+
+                    b.Property<string>("ProcessorTrackingNumber");
+
                     b.Property<string>("ScrubberId");
 
                     b.Property<int>("Status");
+
+                    b.Property<DateTime>("TransactionDate");
 
                     b.HasKey("Id");
 
@@ -89,26 +88,14 @@ namespace Sloth.Core.Migrations
 
                     b.Property<decimal>("Amount");
 
-                    b.Property<string>("BalanceType")
-                        .IsRequired()
-                        .HasMaxLength(2);
-
                     b.Property<int>("Chart")
                         .HasMaxLength(2);
-
-                    b.Property<string>("DebitCredit")
-                        .IsRequired();
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasMaxLength(40);
 
-                    b.Property<string>("DocType")
-                        .IsRequired();
-
-                    b.Property<string>("DocumentNumber")
-                        .IsRequired()
-                        .HasMaxLength(14);
+                    b.Property<int>("Direction");
 
                     b.Property<int>("FiscalPeriod");
 
@@ -119,10 +106,6 @@ namespace Sloth.Core.Migrations
                         .HasMaxLength(4);
 
                     b.Property<string>("ObjectType")
-                        .HasMaxLength(2);
-
-                    b.Property<string>("OriginCode")
-                        .IsRequired()
                         .HasMaxLength(2);
 
                     b.Property<string>("Project")
@@ -139,11 +122,6 @@ namespace Sloth.Core.Migrations
                     b.Property<string>("SubObjectCode")
                         .HasMaxLength(3);
 
-                    b.Property<string>("TrackingNumber")
-                        .HasMaxLength(10);
-
-                    b.Property<DateTime>("TransactionDate");
-
                     b.Property<string>("TransactionId");
 
                     b.HasKey("Id");
@@ -151,27 +129,6 @@ namespace Sloth.Core.Migrations
                     b.HasIndex("TransactionId");
 
                     b.ToTable("Transfers");
-                });
-
-            modelBuilder.Entity("Sloth.Core.Models.User", b =>
-                {
-                    b.Property<string>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<string>("Email");
-
-                    b.Property<string>("Username");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Sloth.Core.Models.ApiKey", b =>
-                {
-                    b.HasOne("Sloth.Core.Models.User", "User")
-                        .WithMany("Keys")
-                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Sloth.Core.Models.Transaction", b =>
