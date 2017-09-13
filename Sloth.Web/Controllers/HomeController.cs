@@ -4,7 +4,7 @@ using Sloth.Web.Models;
 
 namespace Sloth.Web.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : SuperController
     {
         public IActionResult Index()
         {
