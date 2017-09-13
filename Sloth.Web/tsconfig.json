@@ -7,9 +7,8 @@
     "jsx": "react",
     "sourceMap": true,
     "skipDefaultLibCheck": true,
-    "typings": [
-      "node",
-      "webpack-env"
+    "typeRoots": [
+      "node_modles/@types"
     ]
   },
   "exclude": [
