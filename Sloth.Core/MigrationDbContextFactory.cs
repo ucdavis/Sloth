@@ -1,10 +1,11 @@
 using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
 namespace Sloth.Core
 {
-    internal class MigrationDbContextFactory : IDbContextFactory<SlothDbContext>
+    internal class MigrationDbContextFactory : IDesignTimeDbContextFactory<SlothDbContext>
     {
         public SlothDbContext Create(DbContextFactoryOptions options)
         {
@@ -12,6 +13,11 @@ namespace Sloth.Core
             optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=sloth;Trusted_Connection=True;MultipleActiveResultSets=true");
 
             return new SlothDbContext(optionsBuilder.Options);
+        }
+
+        public SlothDbContext CreateDbContext(string[] args)
+        {
+            throw new NotImplementedException();
         }
     }
 }
