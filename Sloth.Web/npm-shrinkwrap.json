@@ -1,11 +1,17 @@
 {
-  "name": "Sloth_Web",
+  "name": "sloth-web",
   "version": "0.0.0",
   "dependencies": {
     "@types/history": {
       "version": "4.6.0",
       "from": "@types/history@4.6.0",
       "resolved": "https://registry.npmjs.org/@types/history/-/history-4.6.0.tgz",
+      "dev": true
+    },
+    "@types/isomorphic-fetch": {
+      "version": "0.0.34",
+      "from": "https://registry.npmjs.org/@types/isomorphic-fetch/-/isomorphic-fetch-0.0.34.tgz",
+      "resolved": "https://registry.npmjs.org/@types/isomorphic-fetch/-/isomorphic-fetch-0.0.34.tgz",
       "dev": true
     },
     "@types/react": {
@@ -36,12 +42,6 @@
       "version": "4.0.5",
       "from": "@types/react-router-dom@4.0.5",
       "resolved": "https://registry.npmjs.org/@types/react-router-dom/-/react-router-dom-4.0.5.tgz",
-      "dev": true
-    },
-    "@types/webpack-env": {
-      "version": "1.13.0",
-      "from": "@types/webpack-env@1.13.0",
-      "resolved": "https://registry.npmjs.org/@types/webpack-env/-/webpack-env-1.13.0.tgz",
       "dev": true
     },
     "acorn": {
