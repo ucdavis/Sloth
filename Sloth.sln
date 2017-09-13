@@ -21,7 +21,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Integrations.Cybersou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs", "Sloth.Jobs\Sloth.Jobs.csproj", "{F3A76C67-5817-483E-A0DB-262F7CC5E685}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Web", "Sloth.Web\Sloth.Web.csproj", "{AE20B108-8ED0-4F8F-8570-284B70689960}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Web", "Sloth.Web\Sloth.Web.csproj", "{1C25DDA5-6D1B-4DD1-B194-2938503F758E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,10 +53,10 @@ Global
 		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AE20B108-8ED0-4F8F-8570-284B70689960}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AE20B108-8ED0-4F8F-8570-284B70689960}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AE20B108-8ED0-4F8F-8570-284B70689960}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AE20B108-8ED0-4F8F-8570-284B70689960}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
