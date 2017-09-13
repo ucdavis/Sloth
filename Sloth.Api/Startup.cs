@@ -4,6 +4,7 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -63,8 +64,19 @@ namespace Sloth.Api
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            // cors support and policies
+            services.AddCors(o => o.AddPolicy("AllowAnyOrgin",
+                b => b.AllowAnyOrigin()
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+            ));
+
             // add framework services.
             services.AddMvc()
+                .AddMvcOptions(o =>
+                {
+                    o.Filters.Add(new CorsAuthorizationFilterFactory("AllowAnyOrgin"));
+                })
                 .AddJsonOptions(o =>
                 {
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
