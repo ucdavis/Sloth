@@ -18,7 +18,7 @@ namespace Sloth.Api.Controllers
         public TransactionsController(SlothDbContext context, ILoggerFactory loggerFactory)
         {
             _context = context;
-            _logger = loggerFactory.CreateLogger<ScrubbersController>();
+            _logger = loggerFactory.CreateLogger<TransactionsController>();
         }
 
         /// <summary>
