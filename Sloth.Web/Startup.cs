@@ -1,3 +1,6 @@
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.Webpack;
@@ -41,6 +44,27 @@ namespace Sloth.Web
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
+            
+            services.AddAuthentication(options =>
+                {
+                    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    options.DefaultSignInScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                })
+                .AddCookie()
+                .AddOpenIdConnect(options =>
+                {
+                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.GetClaimsFromUserInfoEndpoint = true;
+                    options.ClientId = "c631afcb-0795-4546-844d-9fe7759ae620";
+                    options.Authority = "https://login.microsoftonline.com/ucdavis365.onmicrosoft.com";
+                    options.Events.OnRedirectToIdentityProvider = context =>
+                    {
+                        context.ProtocolMessage.SetParameter("domain_hint", "ucdavis.edu");
+
+                        return Task.FromResult(0);
+                    };
+                });
 
             services.AddMvc()
                 .AddJsonOptions(o =>
@@ -78,6 +102,8 @@ namespace Sloth.Web
             }
 
             app.UseStaticFiles();
+
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
