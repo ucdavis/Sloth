@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Exceptions;
@@ -12,6 +12,7 @@ namespace Sloth.Api.Logging
         public static LoggerConfiguration Configuration => new LoggerConfiguration()
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
+            .WriteTo.LiterateConsole()
             .WriteTo.Stackify();
 
         /// <summary>
