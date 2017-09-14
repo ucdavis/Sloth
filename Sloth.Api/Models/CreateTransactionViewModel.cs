@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Sloth.Core.Models;
+using Sloth.Api.Attributes;
 
 namespace Sloth.Api.Models
 {
@@ -9,7 +9,7 @@ namespace Sloth.Api.Models
     {
         public CreateTransactionViewModel()
         {
-            Transfers = new List<Transfer>();
+            Transfers = new List<CreateTransferViewModel>();
         }
 
         /// <summary>
@@ -28,6 +28,8 @@ namespace Sloth.Api.Models
         [Required]
         public DateTime TransactionDate { get; set; }
 
-        public IList<Transfer> Transfers { get; set; }
+        [ListMinLength(2)]
+        [Required]
+        public IList<CreateTransferViewModel> Transfers { get; set; }
     }
 }
