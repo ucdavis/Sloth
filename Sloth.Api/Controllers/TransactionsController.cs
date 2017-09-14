@@ -85,6 +85,7 @@ namespace Sloth.Api.Controllers
         /// <returns></returns>
         [HttpPost]
         [ProducesResponseType(typeof(Transaction), 200)]
+        [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
         public async Task<IActionResult> Post([FromBody]CreateTransactionViewModel transaction)
         {
             if (!ModelState.IsValid)
