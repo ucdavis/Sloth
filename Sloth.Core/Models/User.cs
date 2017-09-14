@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
 {
@@ -11,6 +12,7 @@ namespace Sloth.Core.Models
             Keys = new List<ApiKey>();
         }
 
+        [JsonIgnore]
         public IList<ApiKey> Keys { get; set; }
     }
 }
