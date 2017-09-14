@@ -89,7 +89,7 @@ namespace Sloth.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return new BadRequestObjectResult(ModelState);
             }
 
             var transactionToCreate = new Transaction
