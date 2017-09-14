@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
 {
@@ -7,6 +8,7 @@ namespace Sloth.Core.Models
     {
         public string Id { get; set; }
 
+        [JsonIgnore]
         public Transaction Transaction { get; set; }
 
         /// <summary>

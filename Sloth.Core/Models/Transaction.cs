@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
 {
@@ -63,6 +64,7 @@ namespace Sloth.Core.Models
 
         public IList<Transfer> Transfers { get; set; }
 
+        [JsonIgnore]
         public Scrubber Scrubber { get; set; }
     }
 
