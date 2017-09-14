@@ -65,6 +65,7 @@ namespace Sloth.Api.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("processor/{id}")]
+        [ProducesResponseType(typeof(Transaction), 200)]
         public async Task<Transaction> GetByProcessorId(string id)
         {
             var transaction = await _context.Transactions
@@ -83,6 +84,7 @@ namespace Sloth.Api.Controllers
         /// <param name="transaction"></param>
         /// <returns></returns>
         [HttpPost]
+        [ProducesResponseType(typeof(Transaction), 200)]
         public async Task<IActionResult> Post([FromBody]CreateTransactionViewModel transaction)
         {
             if (!ModelState.IsValid)
