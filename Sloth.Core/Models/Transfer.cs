@@ -21,7 +21,7 @@ namespace Sloth.Core.Models
         /// <summary>
         /// Chart Code associated with transaction.
         /// </summary>
-        [MaxLength(2)]
+        [Range(1, 99)]
         [Required]
         public int Chart { get; set; }
 
