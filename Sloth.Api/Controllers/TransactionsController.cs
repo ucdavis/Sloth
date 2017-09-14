@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Sloth.Api.Models;
 using Sloth.Core;
 using Sloth.Core.Models;
 
@@ -58,6 +59,11 @@ namespace Sloth.Api.Controllers
             return transaction;
         }
 
+        /// <summary>
+        /// Fetch Transaction by Processor Tracking Number
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("processor/{id}")]
         public async Task<Transaction> GetByProcessorId(string id)
         {
@@ -69,6 +75,33 @@ namespace Sloth.Api.Controllers
                 .FirstOrDefaultAsync(t => t.ProcessorTrackingNumber == id);
 
             return transaction;
+        }
+
+        /// <summary>
+        /// Create a Transaction with a list of Transfers
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public async Task<IActionResult> Post([FromBody]CreateTransactionViewModel transaction)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var transactionToCreate = new Transaction
+            {
+                MerchantTrackingNumber = transaction.MerchantTrackingNumber,
+                ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
+                TransactionDate = transaction.TransactionDate,
+                Transfers = transaction.Transfers
+            };
+
+            _context.Transactions.Add(transactionToCreate);
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(transactionToCreate);
         }
     }
 }
