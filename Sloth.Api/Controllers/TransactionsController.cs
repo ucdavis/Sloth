@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
+using Sloth.Api.Helpers;
 using Sloth.Api.Models;
 using Sloth.Core;
 using Sloth.Core.Models;
@@ -116,10 +118,21 @@ namespace Sloth.Api.Controllers
                 }).ToList()
             };
 
-            _context.Transactions.Add(transactionToCreate);
-            await _context.SaveChangesAsync();
+            // create document number
+            transactionToCreate.DocumentNumber = "sample";
+            transactionToCreate.OriginCode = "SL";
 
-            return new JsonResult(transactionToCreate);
+            using (var tran = _context.Database.BeginTransaction())
+            {
+                // create kfs number
+                transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
+
+                _context.Transactions.Add(transactionToCreate);
+                await _context.SaveChangesAsync();
+                tran.Commit();
+
+                return new JsonResult(transactionToCreate); 
+            }
         }
     }
 }
