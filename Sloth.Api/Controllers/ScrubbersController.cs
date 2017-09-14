@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,21 +46,6 @@ namespace Sloth.Api.Controllers
                 .FindAsync(id);
 
             return scrubber;
-        }
-
-        [HttpPost]
-        public void Post([FromBody]string value)
-        {
-        }
-
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody]string value)
-        {
-        }
-
-        [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
         }
     }
 }
