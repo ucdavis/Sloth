@@ -94,10 +94,25 @@ namespace Sloth.Api.Controllers
 
             var transactionToCreate = new Transaction
             {
-                MerchantTrackingNumber = transaction.MerchantTrackingNumber,
+                MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
-                TransactionDate = transaction.TransactionDate,
-                Transfers = transaction.Transfers
+                TransactionDate         = transaction.TransactionDate,
+                Transfers               = transaction.Transfers.Select(t => new Transfer()
+                {
+                    Account       = t.Account,
+                    Amount        = t.Amount,
+                    Chart         = t.Chart,
+                    Description   = t.Description,
+                    Direction     = t.Direction,
+                    FiscalPeriod  = t.FiscalPeriod ?? DateTime.UtcNow.GetFiscalPeriod(),
+                    FiscalYear    = t.FiscalYear ?? DateTime.UtcNow.GetFinancialYear(),
+                    ObjectCode    = t.ObjectCode,
+                    ObjectType    = t.ObjectType,
+                    Project       = t.Project,
+                    ReferenceId   = t.ReferenceId,
+                    SubAccount    = t.SubAccount,
+                    SubObjectCode = t.SubObjectCode,
+                }).ToList()
             };
 
             _context.Transactions.Add(transactionToCreate);
