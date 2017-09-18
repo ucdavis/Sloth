@@ -18,7 +18,7 @@ namespace Sloth.Api.Models
         /// </summary>
         [MaxLength(1)]
         [Required]
-        public int Chart { get; set; }
+        public string Chart { get; set; }
 
         /// <summary>
         /// Account used in the general ledger to post transactions.
