@@ -62,7 +62,7 @@ namespace Sloth.Api.Data
                         new Transfer()
                         {
                             Amount      = 100,
-                            Chart       = 3,
+                            Chart       = "3",
                             Account     = "6620001",
                             ObjectCode  = "7259",
                             Description = "Some useful description",
@@ -71,7 +71,7 @@ namespace Sloth.Api.Data
                         new Transfer()
                         {
                             Amount      = 100,
-                            Chart       = 3,
+                            Chart       = "3",
                             Account     = "1010280",
                             ObjectCode  = "0299",
                             Description = "Test Clearing",

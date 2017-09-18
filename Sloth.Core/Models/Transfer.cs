@@ -21,9 +21,9 @@ namespace Sloth.Core.Models
         /// <summary>
         /// Chart Code associated with transaction.
         /// </summary>
-        [Range(1, 99)]
+        [MaxLength(1)]
         [Required]
-        public int Chart { get; set; }
+        public string Chart { get; set; }
 
         /// <summary>
         /// Account used in the general ledger to post transactions.
