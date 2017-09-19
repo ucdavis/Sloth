@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
@@ -14,7 +15,11 @@ namespace Sloth.Core.Models
 
         public string Id { get; set; }
 
+        [JsonIgnore]
         public User Creator { get; set; }
+
+        [NotMapped]
+        public string CreatorName => Creator?.UserName;
 
         public TransactionStatus Status { get; set; }
 

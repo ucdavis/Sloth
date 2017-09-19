@@ -81,6 +81,31 @@ namespace Sloth.Api.Controllers
         }
 
         /// <summary>
+        /// Fetch Transactions by KfsKey
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("kfskey/{id}")]
+        [ProducesResponseType(typeof(IList<Transaction>), 200)]
+        public async Task<IList<Transaction>> GetByKfsKey(string id)
+        {
+            if (!string.IsNullOrWhiteSpace(id))
+            {
+                return null;
+            }
+
+            var transactions = await _context.Transactions
+                .Include(t => t.Creator)
+                .Include(t => t.Transfers)
+                .Include(t => t.Scrubber)
+                .Where(t => t.KfsTrackingNumber == id)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return transactions;
+        }
+
+        /// <summary>
         /// Create a Transaction with a list of Transfers
         /// </summary>
         /// <param name="transaction"></param>

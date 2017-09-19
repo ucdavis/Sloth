@@ -15,7 +15,7 @@ namespace Sloth.Core.Migrations
                     Id = table.Column<string>(nullable: false),
                     BatchDate = table.Column<DateTime>(nullable: false),
                     BatchSequenceNumber = table.Column<int>(nullable: false),
-                    Chart = table.Column<string>(maxLength: 2, nullable: false),
+                    Chart = table.Column<string>(maxLength: 1, nullable: false),
                     OrganizationCode = table.Column<string>(maxLength: 4, nullable: false),
                     Uri = table.Column<string>(nullable: false)
                 },
@@ -34,7 +34,7 @@ namespace Sloth.Core.Migrations
                     KfsTrackingNumber = table.Column<string>(maxLength: 10, nullable: false),
                     MerchantTrackingNumber = table.Column<string>(nullable: false),
                     OriginCode = table.Column<string>(maxLength: 2, nullable: false),
-                    ProcessorTrackingNumber = table.Column<string>(nullable: false),
+                    ProcessorTrackingNumber = table.Column<string>(nullable: true),
                     ScrubberId = table.Column<string>(nullable: true),
                     Status = table.Column<int>(nullable: false),
                     TransactionDate = table.Column<DateTime>(nullable: false),
