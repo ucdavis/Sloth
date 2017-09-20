@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -8,7 +8,7 @@ namespace Sloth.Api.Logging
 {
     public class CorrelationIdMiddleware
     {
-        private const string HeaderKey = "X-Correlation-Id";
+        public const string HeaderKey = "X-Correlation-Id";
 
         private readonly RequestDelegate _next;
         private readonly ILogger _logger;
@@ -23,6 +23,9 @@ namespace Sloth.Api.Logging
         {
             // generate new id
             var id = Guid.NewGuid().ToString();
+
+            // add to context items
+            context.Items[HeaderKey] = id;
 
             // append to response header
             context.Response.OnStarting(() =>
