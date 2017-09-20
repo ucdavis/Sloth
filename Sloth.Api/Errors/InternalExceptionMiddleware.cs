@@ -36,10 +36,10 @@ namespace Sloth.Api.Errors
                 httpContext.Response.StatusCode = 500;
                 httpContext.Response.ContentType = "application/json";
 
-                var response = JsonConvert.SerializeObject(new
+                var response = JsonConvert.SerializeObject(new InternalExceptionResponse()
                 {
-                    correlationId = httpContext.Items[CorrelationIdMiddleware.HeaderKey],
-                    message = ex.Message
+                    CorrelationId = httpContext.Items[CorrelationIdMiddleware.HeaderKey].ToString(),
+                    Message = ex.Message
                 });
                 await httpContext.Response.WriteAsync(response);
             }
