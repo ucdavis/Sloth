@@ -63,7 +63,7 @@ namespace Sloth.Core.Migrations
                     Id = table.Column<string>(nullable: false),
                     Account = table.Column<string>(maxLength: 7, nullable: false),
                     Amount = table.Column<decimal>(nullable: false),
-                    Chart = table.Column<int>(maxLength: 2, nullable: false),
+                    Chart = table.Column<string>(maxLength: 1, nullable: false),
                     Description = table.Column<string>(maxLength: 40, nullable: false),
                     Direction = table.Column<string>(nullable: false),
                     FiscalPeriod = table.Column<int>(nullable: false),
