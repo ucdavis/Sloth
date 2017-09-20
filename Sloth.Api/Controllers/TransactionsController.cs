@@ -89,9 +89,9 @@ namespace Sloth.Api.Controllers
         [ProducesResponseType(typeof(IList<Transaction>), 200)]
         public async Task<IList<Transaction>> GetByKfsKey(string id)
         {
-            if (!string.IsNullOrWhiteSpace(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
-                return null;
+                return new List<Transaction>();
             }
 
             var transactions = await _context.Transactions
