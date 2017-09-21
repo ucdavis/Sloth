@@ -1,4 +1,7 @@
-﻿body {
+@import "custom";
+@import "~bootstrap/scss/bootstrap.scss";
+
+body {
     padding-top: 50px;
     padding-bottom: 20px;
 }
