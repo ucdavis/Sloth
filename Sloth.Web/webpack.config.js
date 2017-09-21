@@ -18,7 +18,6 @@ module.exports = (env) => {
         entry: {
             'boot': './ClientApp/boot.tsx',
             'react': ['event-source-polyfill', 'isomorphic-fetch', 'react', 'react-dom', 'react-router-dom'],
-            'runtime': [],
             'site': './wwwroot/js/site.js'
         },
         resolve: {
@@ -32,13 +31,39 @@ module.exports = (env) => {
         module: {
             rules: [
                 { test: /\.tsx?$/, include: /ClientApp/, use: 'awesome-typescript-loader?silent=true' },
-                { test: /\.css$/, use: isDevBuild ? ['style-loader', 'css-loader'] : ExtractTextPlugin.extract({ use: 'css-loader?minimize' }) },
-                { test: /\.scss$/, use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'] },
+                {
+                  test: /\.css$/,
+                  use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [{
+                      loader: 'css-loader',
+                      options: {
+                        minimize: !isDevBuild
+                      }
+                    }]
+                  })
+                },
+                {
+                  test: /\.scss$/,
+                  use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [{
+                      loader: 'css-loader',
+                      options: {
+                        minimize: !isDevBuild
+                      }
+                    }, 'postcss-loader', 'sass-loader']
+                  })
+                },
                 { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
             ]
         },
         plugins: [
             new CheckerPlugin(),
+            new ExtractTextPlugin({
+              disable: isDevBuild,
+              filename: 'site.css'
+            }),
             new webpack.optimize.CommonsChunkPlugin({
                 name: ['react', 'runtime'],
                 minChunks: Infinity
@@ -51,7 +76,6 @@ module.exports = (env) => {
                 };
               })
             )
-
         ].concat(isDevBuild ? [
             // Plugins that apply in development builds only
             new webpack.SourceMapDevToolPlugin({
@@ -61,7 +85,6 @@ module.exports = (env) => {
         ] : [
             // Plugins that apply in production builds only
             new webpack.optimize.UglifyJsPlugin(),
-            new ExtractTextPlugin('site.css')
         ])
     }];
 };
