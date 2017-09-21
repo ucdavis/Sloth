@@ -14,6 +14,7 @@
     "@types/webpack-env": "^1.13.1",
     "aspnet-webpack": "^2.0.1",
     "aspnet-webpack-react": "^3.0.0",
+    "autoprefixer": "https://registry.npmjs.org/autoprefixer/-/autoprefixer-6.7.7.tgz",
     "awesome-typescript-loader": "3.2.1",
     "bootstrap": "3.3.7",
     "css-loader": "0.28.4",
@@ -23,14 +24,23 @@
     "isomorphic-fetch": "2.2.1",
     "jquery": "3.2.1",
     "json-loader": "0.5.4",
+    "node-sass": "^4.5.3",
+    "postcss-loader": "^2.0.6",
+    "precss": "^2.0.0",
     "react": "15.6.1",
     "react-dom": "15.6.1",
     "react-hot-loader": "3.0.0-beta.7",
     "react-router-dom": "4.1.1",
+    "sass-loader": "^6.0.6",
     "style-loader": "0.18.2",
     "typescript": "2.4.1",
     "url-loader": "0.5.9",
     "webpack": "2.5.1",
     "webpack-hot-middleware": "2.18.2"
+  },
+  "dependencies": {
+    "bootstrap": "^4.0.0-beta",
+    "jquery": "https://registry.npmjs.org/jquery/-/jquery-3.2.1.tgz",
+    "popper.js": "^1.12.5"
   }
 }
