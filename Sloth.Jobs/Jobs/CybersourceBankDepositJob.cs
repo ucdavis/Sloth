@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Hangfire.RecurringJobExtensions;
 using Hangfire.Server;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Sloth.Core;
 using Sloth.Core.Models;
@@ -31,13 +32,13 @@ namespace Sloth.Jobs.Jobs
             if (string.IsNullOrWhiteSpace(_cybersourceOptions.ClearingAccount) ||
                 _cybersourceOptions.ClearingAccount.Length > 7)
             {
-                throw new ConfigurationErrorsException("ClearingAccount must be non-null and less than 7 characters.");
+                throw new ArgumentException("ClearingAccount must be non-null and less than 7 characters.");
             }
 
             if (string.IsNullOrWhiteSpace(_cybersourceOptions.HoldingAccount) ||
                 _cybersourceOptions.ClearingAccount.Length > 7)
             {
-                throw new ConfigurationErrorsException("HoldingAccount must be non-null and less than 7 characters.");
+                throw new ArgumentException("HoldingAccount must be non-null and less than 7 characters.");
             }
         }
 
@@ -124,7 +125,7 @@ namespace Sloth.Jobs.Jobs
                     // move money out of clearing
                     var clearing = new Transfer()
                     {
-                        Chart          = 3,
+                        Chart          = "3",
                         Account        = _cybersourceOptions.ClearingAccount,
                         Direction      = Transfer.CreditDebit.Debit,
                         Amount         = deposit.Amount,

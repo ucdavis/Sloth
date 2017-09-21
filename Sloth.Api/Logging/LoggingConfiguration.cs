@@ -12,6 +12,7 @@ namespace Sloth.Api.Logging
         public static LoggerConfiguration Configuration => new LoggerConfiguration()
             .Enrich.FromLogContext()
             .Enrich.WithExceptionDetails()
+            .WriteTo.LiterateConsole()
             .WriteTo.Stackify();
 
         /// <summary>
