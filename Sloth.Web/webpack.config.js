@@ -2,17 +2,28 @@ const path = require('path');
 const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CheckerPlugin = require('awesome-typescript-loader').CheckerPlugin;
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const bundleOutputDir = './wwwroot/dist';
+
+assets = [
+  'jquery/dist/jquery.js',
+  'bootstrap/dist/js/bootstrap.js',
+  'popper.js/dist/umd/popper.js',
+];
 
 module.exports = (env) => {
     const isDevBuild = !(env && env.prod);
     return [{
         stats: { modules: false },
         entry: {
-            'main': './ClientApp/boot.tsx',
-            'vendor': ['event-source-polyfill', 'isomorphic-fetch', 'react', 'react-dom', 'react-router-dom']
+            'boot': './ClientApp/boot.tsx',
+            'react': ['event-source-polyfill', 'isomorphic-fetch', 'react', 'react-dom', 'react-router-dom'],
+            'runtime': [],
+            'site': './wwwroot/js/site.js'
         },
-        resolve: { extensions: ['.js', '.jsx', '.ts', '.tsx'] },
+        resolve: {
+            extensions: ['.js', '.jsx', '.ts', '.tsx'],
+       },
         output: {
             path: path.join(__dirname, bundleOutputDir),
             filename: '[name].js',
@@ -22,15 +33,24 @@ module.exports = (env) => {
             rules: [
                 { test: /\.tsx?$/, include: /ClientApp/, use: 'awesome-typescript-loader?silent=true' },
                 { test: /\.css$/, use: isDevBuild ? ['style-loader', 'css-loader'] : ExtractTextPlugin.extract({ use: 'css-loader?minimize' }) },
+                { test: /\.scss$/, use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'] },
                 { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
             ]
         },
         plugins: [
             new CheckerPlugin(),
             new webpack.optimize.CommonsChunkPlugin({
-                name: 'vendor',
-                chunks: ['boot']
-            })
+                name: ['react', 'runtime'],
+                minChunks: Infinity
+            }),
+            new CopyWebpackPlugin(
+              assets.map(a => {
+                return {
+                  from: path.resolve(__dirname, `./node_modules/${a}`),
+                  to: path.resolve(__dirname, './wwwroot/lib')
+                };
+              })
+            )
 
         ].concat(isDevBuild ? [
             // Plugins that apply in development builds only

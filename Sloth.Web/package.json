@@ -17,6 +17,7 @@
     "autoprefixer": "https://registry.npmjs.org/autoprefixer/-/autoprefixer-6.7.7.tgz",
     "awesome-typescript-loader": "3.2.1",
     "bootstrap": "3.3.7",
+    "copy-webpack-plugin": "^4.0.1",
     "css-loader": "0.28.4",
     "event-source-polyfill": "0.0.9",
     "extract-text-webpack-plugin": "2.1.2",
