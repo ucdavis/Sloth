@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.16
+VisualStudioVersion = 15.0.26730.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Core", "Sloth.Core\Sloth.Core.csproj", "{B2E2E365-565E-4A58-AFF2-EA468C89DE6B}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Integrations.Cybersource", "Sloth.Integrations.Cybersource\Sloth.Integrations.Cybersource.csproj", "{D08B9958-DBB7-4AEB-884B-604126EF2E5C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs", "Sloth.Jobs\Sloth.Jobs.csproj", "{F3A76C67-5817-483E-A0DB-262F7CC5E685}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Web", "Sloth.Web\Sloth.Web.csproj", "{1C25DDA5-6D1B-4DD1-B194-2938503F758E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,8 +53,15 @@ Global
 		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3A76C67-5817-483E-A0DB-262F7CC5E685}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {24A52AFC-C6F1-46E3-B01C-59D9D1977B9F}
 	EndGlobalSection
 EndGlobal

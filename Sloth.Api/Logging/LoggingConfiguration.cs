@@ -27,9 +27,9 @@ namespace Sloth.Api.Logging
             // configure stackify
             var stackifyOptions = new StackifyOptions();
             configuration.GetSection("Stackify").Bind(stackifyOptions);
-            StackifyLib.Logger.GlobalApiKey = stackifyOptions.ApiKey;
-            StackifyLib.Logger.GlobalAppName = stackifyOptions.AppName;
-            StackifyLib.Logger.GlobalEnvironment = stackifyOptions.Environment;
+            StackifyLib.Config.ApiKey = stackifyOptions.ApiKey;
+            StackifyLib.Config.AppName = stackifyOptions.AppName;
+            StackifyLib.Config.Environment = stackifyOptions.Environment;
 
             // create global logger
             Log.Logger = Configuration

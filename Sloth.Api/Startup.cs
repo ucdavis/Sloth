@@ -4,11 +4,11 @@ using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
@@ -26,24 +26,12 @@ namespace Sloth.Api
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsDevelopment())
-            {
-                builder.AddUserSecrets<Startup>();
-            }
-
-            builder.AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -64,8 +52,19 @@ namespace Sloth.Api
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            // cors support and policies
+            services.AddCors(o => o.AddPolicy("AllowAnyOrgin",
+                b => b.AllowAnyOrigin()
+                      .AllowAnyHeader()
+                      .AllowAnyMethod()
+            ));
+
             // add framework services.
             services.AddMvc()
+                .AddMvcOptions(o =>
+                {
+                    o.Filters.Add(new CorsAuthorizationFilterFactory("AllowAnyOrgin"));
+                })
                 .AddJsonOptions(o =>
                 {
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -104,8 +103,8 @@ namespace Sloth.Api
                         { "ProjectUrl", "https://www.github.com/ucdavis/sloth" }
                     }
                 });
-
-                var xmlFilePath = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "Sloth.Api.xml");
+                
+                var xmlFilePath = Path.Combine(AppContext.BaseDirectory, "Sloth.Api.xml");
                 c.IncludeXmlComments(xmlFilePath);
 
                 c.AddSecurityDefinition("apiKey", new ApiKeyScheme()
@@ -164,7 +163,6 @@ namespace Sloth.Api
 
             // setup hangfire storage
             GlobalConfiguration.Configuration
-                .UseSerilogLogProvider()
                 .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
         }
     }

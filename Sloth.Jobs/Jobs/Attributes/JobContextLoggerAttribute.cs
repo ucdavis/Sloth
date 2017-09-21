@@ -10,7 +10,7 @@ namespace Sloth.Jobs.Jobs.Attributes
     public class JobContextLoggerAttribute : JobFilterAttribute,
         IClientFilter, IServerFilter, IElectStateFilter, IApplyStateFilter
     {
-        private static readonly ILog Logger = LogProvider.GetCurrentClassLogger();
+        private static readonly ILog Logger = LogProvider.GetLogger(typeof(Job));
 
         public void OnCreating(CreatingContext context)
         {

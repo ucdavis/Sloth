@@ -1,24 +1,26 @@
 using System;
+using System.IO;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
 namespace Sloth.Core
 {
-    internal class MigrationDbContextFactory : IDbContextFactory<SlothDbContext>
+    internal class MigrationDbContextFactory : IDesignTimeDbContextFactory<SlothDbContext>
     {
-        public SlothDbContext Create(DbContextFactoryOptions options)
+        public SlothDbContext CreateDbContext(string[] args)
         {
-            return Create(
-                options.ContentRootPath,
-                options.EnvironmentName);
+            return CreateDbContext(
+                Directory.GetCurrentDirectory(),
+                Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT")
+            );
         }
 
-        private SlothDbContext Create(string basePath, string environmentName)
+        private SlothDbContext CreateDbContext(string basePath, string environmentName)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.json", true)
                 .AddJsonFile($"appsettings.{environmentName}.json", true)
                 .AddEnvironmentVariables();
 
@@ -32,10 +34,10 @@ namespace Sloth.Core
                 "Could not find a connection string named 'DefaultConnection'.");
             }
 
-            return Create(connstr);
+            return CreateDbContext(connstr);
         }
 
-        private SlothDbContext Create(string connectionString)
+        private SlothDbContext CreateDbContext(string connectionString)
         {
             if (string.IsNullOrEmpty(connectionString))
                 throw new ArgumentException(

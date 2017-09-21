@@ -1,16 +1,19 @@
 using System;
 using System.Security.Claims;
-using AspNetCore.Security.CAS;
+using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Console;
 using Hangfire.RecurringJobExtensions;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Models;
@@ -25,23 +28,12 @@ namespace Sloth.Jobs
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsDevelopment())
-            {
-                builder.AddUserSecrets<Startup>();
-            }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -60,11 +52,33 @@ namespace Sloth.Jobs
             services.AddDbContext<SlothDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<SlothDbContext>()
-                .AddDefaultTokenProviders();
+            services.AddAuthentication(options =>
+            {
+                options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
+            })
+                .AddCookie()
+                .AddOpenIdConnect(options =>
+                {
+                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.GetClaimsFromUserInfoEndpoint = true;
+                    options.ClientId = "c631afcb-0795-4546-844d-9fe7759ae620";
+                    options.Authority = "https://login.microsoftonline.com/ucdavis365.onmicrosoft.com";
+                    options.Events.OnRedirectToIdentityProvider = context =>
+                    {
+                        context.ProtocolMessage.SetParameter("domain_hint", "ucdavis.edu");
 
-            services.Configure<IdentityOptions>(o => { });
+                        return Task.FromResult(0);
+                    };
+                });
+
+            services.AddMvc()
+                .AddJsonOptions(o =>
+                {
+                    o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    o.SerializerSettings.Converters.Add(new StringEnumConverter());
+                });
 
             services.AddMvc();
 
@@ -100,7 +114,7 @@ namespace Sloth.Jobs
 
             app.UseStaticFiles();
 
-            ConfigureAuthentication(app);
+            app.UseAuthentication();
 
             app.UseMvc(routes =>
             {
@@ -112,50 +126,10 @@ namespace Sloth.Jobs
             ConfigureHangfire(app, env);
         }
 
-        private void ConfigureAuthentication(IApplicationBuilder app)
-        {
-            app.UseIdentity();
-
-            // Add external authentication middleware below. To configure them please see https://go.microsoft.com/fwlink/?LinkID=532715
-            var casOptions = new CasOptions
-            {
-                CasServerUrlBase = "https://cas.ucdavis.edu/cas/",
-                Events = new CasEvents
-                {
-                    OnCreatingTicket = async ctx =>
-                    {
-                        var identity = ctx.Principal.Identity as ClaimsIdentity;
-                        if (identity == null)
-                        {
-                            return;
-                        }
-
-                        var kerb = identity.FindFirst(ClaimTypes.NameIdentifier).Value;
-
-                        // look up user info and add as claims
-                        var user = await app.ApplicationServices.GetService<IDirectorySearchService>().GetByKerb(kerb);
-
-                        if (user != null)
-                        {
-                            identity.AddClaim(new Claim(ClaimTypes.Email, user.Mail));
-                            identity.AddClaim(new Claim(ClaimTypes.GivenName, user.GivenName));
-                            identity.AddClaim(new Claim(ClaimTypes.Surname, user.Surname));
-
-                            // Cas already adds a name param but it's a duplicate of nameIdentifier, so let's replace with something useful
-                            identity.RemoveClaim(identity.FindFirst(ClaimTypes.Name));
-                            identity.AddClaim(new Claim(ClaimTypes.Name, user.DisplayName));
-                        }
-                    }
-                }
-            };
-            app.UseCasAuthentication(casOptions);
-        }
-
         private void ConfigureHangfire(IApplicationBuilder app, IHostingEnvironment env)
         {
             // setup hangfire storage
             GlobalConfiguration.Configuration
-                .UseSerilogLogProvider()
                 .UseConsole()
                 .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
 
