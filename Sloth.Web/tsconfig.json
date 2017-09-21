@@ -7,6 +7,10 @@
     "jsx": "react",
     "sourceMap": true,
     "skipDefaultLibCheck": true,
+    "types": [
+      "node",
+      "webpack-env"
+    ],
     "typeRoots": [
       "node_modles/@types"
     ]
