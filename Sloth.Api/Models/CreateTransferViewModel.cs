@@ -1,16 +1,11 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+using Sloth.Core.Models;
 
-namespace Sloth.Core.Models
+namespace Sloth.Api.Models
 {
-    public class Transfer
+    public class CreateTransferViewModel
     {
-        public string Id { get; set; }
-
-        [JsonIgnore]
-        public Transaction Transaction { get; set; }
-
         /// <summary>
         /// Dollar amount associated with the transaction
         /// </summary>
@@ -70,13 +65,6 @@ namespace Sloth.Core.Models
         public string ObjectType { get; set; }
 
         /// <summary>
-        /// A sequential number for a transaction in document number set.
-        /// The system will auto-assign if not provided.
-        /// </summary>
-        [Range(1, 99999)]
-        public int SequenceNumber { get; set; }
-
-        /// <summary>
         /// A brief description of the specific transaction. Displays in reporting.
         /// PCI, HIPPA, FERPA and PII information is prohibited.
         /// </summary>
@@ -88,7 +76,7 @@ namespace Sloth.Core.Models
         /// Debit or Credit Code associated with the transaction.
         /// </summary>
         [Required]
-        public CreditDebit Direction { get; set; }
+        public Transfer.CreditDebit Direction { get; set; }
 
         /// <summary>
         /// Fiscal Year in which the feed will post.
@@ -96,7 +84,7 @@ namespace Sloth.Core.Models
         /// Entries will default during general ledger processing based on run date.
         /// </summary>
         [Range(2017, 2099)]
-        public int FiscalYear { get; set; }
+        public int? FiscalYear { get; set; }
 
         /// <summary>
         /// Fiscal Year in which the feed will post to the General Ledger.
@@ -108,7 +96,7 @@ namespace Sloth.Core.Models
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>
         [Range(1, 12)]
-        public int FiscalPeriod { get; set; }
+        public int? FiscalPeriod { get; set; }
 
         /// <summary>
         /// Project is an optional accounting unit attribute that allows assignment of an identifier
@@ -126,18 +114,5 @@ namespace Sloth.Core.Models
         [MinLength(1)]
         [MaxLength(8)]
         public string ReferenceId { get; set; }
-
-        public enum CreditDebit
-        {
-            /// <summary>
-            /// Add money to an account
-            /// </summary>
-            Credit,
-
-            /// <summary>
-            /// Remove money from an account
-            /// </summary>
-            Debit
-        }
     }
 }

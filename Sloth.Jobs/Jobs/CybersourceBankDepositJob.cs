@@ -125,7 +125,7 @@ namespace Sloth.Jobs.Jobs
                     // move money out of clearing
                     var clearing = new Transfer()
                     {
-                        Chart          = 3,
+                        Chart          = "3",
                         Account        = _cybersourceOptions.ClearingAccount,
                         Direction      = Transfer.CreditDebit.Debit,
                         Amount         = deposit.Amount,

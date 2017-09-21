@@ -14,6 +14,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Api.Data;
+using Sloth.Api.Errors;
 using Sloth.Api.Identity;
 using Sloth.Api.Logging;
 using Sloth.Api.Swagger;
@@ -150,6 +151,11 @@ namespace Sloth.Api
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<ApiKeyMiddleware>();
             app.UseMiddleware<LoggingIdentityMiddleware>();
+
+            if (env.IsDevelopment())
+            {
+                app.UseInternalExceptionMiddleware();
+            }
 
             app.UseMvc();
 
