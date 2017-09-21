@@ -9,6 +9,9 @@ assets = [
   'jquery/dist/jquery.js',
   'bootstrap/dist/js/bootstrap.js',
   'popper.js/dist/umd/popper.js',
+  'datatables.net/js/jquery.datatables.js',
+  'datatables.net-bs/js/datatables.bootstrap.js',
+  'datatables.net-bs/css/datatables.bootstrap.css',
 ];
 
 module.exports = (env) => {
@@ -18,6 +21,7 @@ module.exports = (env) => {
         entry: {
             'boot': './ClientApp/boot.tsx',
             'react': ['event-source-polyfill', 'isomorphic-fetch', 'react', 'react-dom', 'react-router-dom'],
+            'runtime': [],
             'site': './wwwroot/js/site.js'
         },
         resolve: {
