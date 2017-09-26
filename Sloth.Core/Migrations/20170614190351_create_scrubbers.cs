@@ -45,7 +45,7 @@ namespace Sloth.Core.Migrations
                     table.ForeignKey(
                         name: "FK_Transactions_Users_CreatorId",
                         column: x => x.CreatorId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
