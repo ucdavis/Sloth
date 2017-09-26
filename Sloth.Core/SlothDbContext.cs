@@ -5,13 +5,12 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core.Models;
 
 namespace Sloth.Core
 {
-    public class SlothDbContext : IdentityDbContext<User>
+    public class SlothDbContext : DbContext
     {
         public SlothDbContext(DbContextOptions options) : base(options)
         {
@@ -26,6 +25,10 @@ namespace Sloth.Core
         public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<Transfer> Transfers { get; set; }
+
+        public DbSet<User> Users { get; set; }
+
+        public DbSet<Team> Teams { get; set; }
 
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
@@ -73,6 +76,9 @@ namespace Sloth.Core
                 .HasMax(9_999_999_999)
                 .IncrementsBy(1)
                 .IsCyclic();
+
+            UserRole.OnModelCreating(modelBuilder);
+            UserTeam.OnModelCreating(modelBuilder);
         }
     }
 }
