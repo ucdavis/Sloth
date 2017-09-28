@@ -1,9 +1,8 @@
 using System;
 using System.Linq;
-using Sloth.Core;
 using Sloth.Core.Models;
 
-namespace Sloth.Api.Data
+namespace Sloth.Core.Data
 {
     /// <summary>
     /// Creates sample data for development environments
