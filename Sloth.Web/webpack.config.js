@@ -21,7 +21,7 @@ module.exports = (env) => {
         entry: {
             'boot': './ClientApp/boot.tsx',
             'react': ['event-source-polyfill', 'isomorphic-fetch', 'react', 'react-dom', 'react-router-dom'],
-            'runtime': [],
+            'runtime': './wwwroot/js/common.js',
             'site': './wwwroot/js/site.js'
         },
         resolve: {
