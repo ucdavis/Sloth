@@ -28,6 +28,8 @@ namespace Sloth.Core
 
         public DbSet<User> Users { get; set; }
 
+        public DbSet<Role> Roles { get; set; }
+
         public DbSet<Team> Teams { get; set; }
 
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)

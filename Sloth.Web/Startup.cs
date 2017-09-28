@@ -50,8 +50,9 @@ namespace Sloth.Web
 
             services.AddIdentity<User, Role>()
                 .AddUserStore<UserStore>()
-                .AddUserManager<AspNetUserManager<User>>();
-
+                .AddUserManager<UserManager<User>>()
+                .AddRoleStore<RoleStore>()
+                .AddRoleManager<RoleManager<Role>>();
 
             services.AddAuthentication(options =>
                 {
