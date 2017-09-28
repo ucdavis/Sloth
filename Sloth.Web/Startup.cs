@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,8 +13,10 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Core;
+using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Web.Logging;
+using UserStore = Sloth.Web.Identity.UserStore;
 
 namespace Sloth.Web
 {
@@ -44,7 +47,12 @@ namespace Sloth.Web
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
-            
+
+            services.AddIdentity<User, Role>()
+                .AddUserStore<UserStore>()
+                .AddUserManager<AspNetUserManager<User>>();
+
+
             services.AddAuthentication(options =>
                 {
                     options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
