@@ -1,15 +1,15 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 
 namespace Sloth.Web.Identity
 {
-    public class UserStore : IUserStore<User>
+    public class UserStore : IUserStore<User>, IUserEmailStore<User>
     {
         private readonly SlothDbContext _context;
 
@@ -22,6 +22,7 @@ namespace Sloth.Web.Identity
         {
         }
 
+        #region IUserStore
         public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
         {
             return Task.FromResult(user.Id);
@@ -72,12 +73,52 @@ namespace Sloth.Web.Identity
 
         public Task<User> FindByIdAsync(string userId, CancellationToken cancellationToken)
         {
-            return _context.Users.FindAsync(new {Id = userId}, cancellationToken);
+            return _context.Users.FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
         }
 
         public Task<User> FindByNameAsync(string normalizedUserName, CancellationToken cancellationToken)
         {
-            return _context.Users.FindAsync(new {UserName = normalizedUserName}, cancellationToken);
+            return _context.Users.FirstOrDefaultAsync(u => u.UserName == normalizedUserName, cancellationToken);
         }
+        #endregion
+
+        #region IUserEmailStore
+        public Task SetEmailAsync(User user, string email, CancellationToken cancellationToken)
+        {
+            user.Email = email;
+            return Task.CompletedTask;
+        }
+
+        public Task<string> GetEmailAsync(User user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.Email);
+        }
+
+        public Task<bool> GetEmailConfirmedAsync(User user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(true);
+        }
+
+        public Task SetEmailConfirmedAsync(User user, bool confirmed, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task<User> FindByEmailAsync(string normalizedEmail, CancellationToken cancellationToken)
+        {
+            return _context.Users.FirstOrDefaultAsync(u => u.Email == normalizedEmail , cancellationToken);
+        }
+
+        public Task<string> GetNormalizedEmailAsync(User user, CancellationToken cancellationToken)
+        {
+            return Task.FromResult(user.Email);
+        }
+
+        public Task SetNormalizedEmailAsync(User user, string normalizedEmail, CancellationToken cancellationToken)
+        {
+            user.Email = normalizedEmail;
+            return Task.CompletedTask;
+        }
+        #endregion
     }
 }
