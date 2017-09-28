@@ -82,11 +82,12 @@ namespace Sloth.Web
                 {
                     options.LoginPath = "/Account/Login";
                 })
-                .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, "CAS", options =>
+                .AddOpenIdConnect("UCDavis", options =>
                 {
                     options.GetClaimsFromUserInfoEndpoint = true;
                     options.ClientId = "c631afcb-0795-4546-844d-9fe7759ae620";
                     options.Authority = "https://login.microsoftonline.com/ucdavis365.onmicrosoft.com";
+                    options.Scope.Add("email");
                     options.Events.OnRedirectToIdentityProvider = context =>
                     {
                         context.ProtocolMessage.SetParameter("domain_hint", "ucdavis.edu");
