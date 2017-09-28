@@ -20,7 +20,6 @@ namespace Sloth.Web.Identity
 
         public void Dispose()
         {
-            throw new NotImplementedException();
         }
 
         public Task<string> GetUserIdAsync(User user, CancellationToken cancellationToken)
