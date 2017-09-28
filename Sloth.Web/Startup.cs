@@ -15,6 +15,7 @@ using Serilog;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
+using Sloth.Web.Identity;
 using Sloth.Web.Logging;
 using UserStore = Sloth.Web.Identity.UserStore;
 
@@ -56,14 +57,14 @@ namespace Sloth.Web
 
             services.AddAuthentication(options =>
                 {
-                    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                    options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
-                .AddCookie()
-                .AddOpenIdConnect(options =>
+                .AddCookie(options =>
                 {
-                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.LoginPath = "/Account/Login";
+                })
+                .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, "CAS", options =>
+                {
                     options.GetClaimsFromUserInfoEndpoint = true;
                     options.ClientId = "c631afcb-0795-4546-844d-9fe7759ae620";
                     options.Authority = "https://login.microsoftonline.com/ucdavis365.onmicrosoft.com";
