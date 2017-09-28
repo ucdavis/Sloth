@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Sloth.Core.Models;
+using Sloth.Core.Services;
 
 namespace Sloth.Web.Controllers
 {
@@ -16,11 +17,13 @@ namespace Sloth.Web.Controllers
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
+        private readonly IDirectorySearchService _directorySearchService;
 
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager)
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, IDirectorySearchService directorySearchService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _directorySearchService = directorySearchService;
         }
 
         [HttpGet]
@@ -33,9 +36,10 @@ namespace Sloth.Web.Controllers
             ViewData["ReturnUrl"] = returnUrl;
 
             // Request a redirect to the external login provider.
+            var provider = "UCDavis";
             var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(OpenIdConnectDefaults.AuthenticationScheme, redirectUrl);
-            return Challenge(properties, OpenIdConnectDefaults.AuthenticationScheme);
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return Challenge(properties, provider);
         }
 
         [HttpGet]
@@ -51,6 +55,11 @@ namespace Sloth.Web.Controllers
             if (info == null)
             {
                 return RedirectToAction(nameof(Login));
+            }
+
+            if (info.LoginProvider.Equals("UCDavis"))
+            {
+                await ProcessUCDavisInfo(info);
             }
 
             // Find user
@@ -71,6 +80,32 @@ namespace Sloth.Web.Controllers
             // Sign in new user
             await _signInManager.SignInAsync(user, isPersistent: false);
             return RedirectToLocal(returnUrl);
+        }
+
+        private async Task ProcessUCDavisInfo(ExternalLoginInfo info)
+        {
+            // email comes across in both name claim and upn
+            var email = info.Principal.FindFirstValue(ClaimTypes.Upn);
+
+            var ucdUser = await _directorySearchService.GetByEmailAsync(email);
+            if (ucdUser == null) return;
+
+            // TODO: see if we need to modify claims like this
+            var identity = (ClaimsIdentity) info.Principal.Identity;
+
+            // Should we bother replacing via directory service?
+            identity.AddClaim(new Claim(ClaimTypes.Email, ucdUser.Mail));
+            identity.AddClaim(new Claim(ClaimTypes.GivenName, ucdUser.GivenName));
+            identity.AddClaim(new Claim(ClaimTypes.Surname, ucdUser.Surname));
+
+            // name from Azure comes back w/ email, so replace w/ display name
+            identity.RemoveClaim(identity.FindFirst(ClaimTypes.NameIdentifier));
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, ucdUser.Kerberos));
+            info.ProviderKey = ucdUser.Kerberos;
+
+            // name from Azure comes back w/ email, so replace w/ display name
+            identity.RemoveClaim(identity.FindFirst(ClaimTypes.Name));
+            identity.AddClaim(new Claim(ClaimTypes.Name, identity.FindFirst("name").Value));
         }
 
         private IActionResult RedirectToLocal(string returnUrl)
