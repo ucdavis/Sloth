@@ -9,6 +9,7 @@ assets = [
   'jquery/dist/jquery.js',
   'bootstrap/dist/js/bootstrap.js',
   'popper.js/dist/umd/popper.js',
+  'font-awesome/css/font-awesome.css',
   'datatables.net/js/jquery.datatables.js',
   'datatables.net-bs/js/datatables.bootstrap.js',
   'datatables.net-bs/css/datatables.bootstrap.css',
@@ -79,6 +80,14 @@ module.exports = (env) => {
                   to: path.resolve(__dirname, './wwwroot/lib')
                 };
               })
+            ),
+            new CopyWebpackPlugin(
+              [{
+                //context: __dirname,
+                from: path.resolve(__dirname, './node_modules/font-awesome/fonts/*'),
+                to: path.resolve(__dirname, './wwwroot/fonts'),
+                flatten: true,
+              }]
             )
         ].concat(isDevBuild ? [
             // Plugins that apply in development builds only

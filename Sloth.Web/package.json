@@ -41,6 +41,7 @@
     "bootstrap": "^4.0.0-beta",
     "datatables.net": "^1.10.16",
     "datatables.net-bs": "^1.10.16",
+    "font-awesome": "^4.7.0",
     "jquery": "https://registry.npmjs.org/jquery/-/jquery-3.2.1.tgz",
     "popper.js": "^1.12.5"
   }
