@@ -12,13 +12,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
-using Sloth.Api.Data;
 using Sloth.Api.Errors;
 using Sloth.Api.Identity;
 using Sloth.Api.Logging;
 using Sloth.Api.Swagger;
 using Sloth.Core;
-using Sloth.Core.Models;
+using Sloth.Core.Data;
 using Sloth.Core.Services;
 using Swashbuckle.AspNetCore.Swagger;
 

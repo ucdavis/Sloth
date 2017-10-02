@@ -23,7 +23,7 @@ namespace Sloth.Core.Migrations
                     table.ForeignKey(
                         name: "FK_ApiKeys_Users_UserId",
                         column: x => x.UserId,
-                        principalTable: "AspNetUsers",
+                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });

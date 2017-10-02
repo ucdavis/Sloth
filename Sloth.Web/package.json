@@ -16,14 +16,12 @@
     "aspnet-webpack-react": "^3.0.0",
     "autoprefixer": "https://registry.npmjs.org/autoprefixer/-/autoprefixer-6.7.7.tgz",
     "awesome-typescript-loader": "3.2.1",
-    "bootstrap": "3.3.7",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "0.28.4",
     "event-source-polyfill": "0.0.9",
     "extract-text-webpack-plugin": "2.1.2",
     "file-loader": "0.11.2",
     "isomorphic-fetch": "2.2.1",
-    "jquery": "3.2.1",
     "json-loader": "0.5.4",
     "node-sass": "^4.5.3",
     "postcss-loader": "^2.0.6",
@@ -41,6 +39,8 @@
   },
   "dependencies": {
     "bootstrap": "^4.0.0-beta",
+    "datatables.net": "^1.10.16",
+    "datatables.net-bs": "^1.10.16",
     "jquery": "https://registry.npmjs.org/jquery/-/jquery-3.2.1.tgz",
     "popper.js": "^1.12.5"
   }

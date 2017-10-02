@@ -8,6 +8,8 @@
     <environment exclude="Development">
         <link rel="stylesheet" href="~/dist/site.min.css"/>
     </environment>
+
+    @RenderSection("AdditionalStyles", required: false)
 </head>
 <body>
     <nav class="navbar navbar-inverse fixed-top navbar-expand-md">
@@ -38,7 +40,7 @@
     <script src="~/lib/jquery.js"></script>
     <script src="~/lib/popper.js"></script>
     <script src="~/lib/bootstrap.js"></script>
-    <script src="~/dist/vendor.js"></script>
+    <script src="~/dist/runtime.js"></script>
     <script src="~/dist/site.js"></script>
 </environment>
     <environment exclude="Development">
@@ -57,6 +59,6 @@
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment>
 
-    @RenderSection("Scripts", required: false)
+    @RenderSection("AdditionalScripts", required: false)
 </body>
 </html>

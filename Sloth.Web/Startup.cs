@@ -1,8 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -12,16 +12,35 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Core;
+using Sloth.Core.Configuration;
+using Sloth.Core.Data;
+using Sloth.Core.Models;
 using Sloth.Core.Services;
+using Sloth.Web.Identity;
 using Sloth.Web.Logging;
 
 namespace Sloth.Web
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+
+        public Startup(IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+
+            if (env.IsDevelopment())
+            {
+                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
+                builder.AddUserSecrets<Startup>();
+            }
+
+            builder.AddEnvironmentVariables();
+            Configuration = builder.Build();
+
+            StackifyLib.Config.Environment = env.EnvironmentName;
         }
 
         public IConfiguration Configuration { get; }
@@ -30,12 +49,16 @@ namespace Sloth.Web
         public void ConfigureServices(IServiceCollection services)
         {
             // add root configuration
-            services.AddSingleton<IConfiguration>(Configuration);
+            services.AddSingleton(Configuration);
 
+            // add various options
+            services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
+            
             // add logger configuration
             services.AddTransient(_ => LoggingConfiguration.Configuration);
 
             // add infrastructure services
+            services.AddSingleton<IDirectorySearchService, DirectorySearchService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
@@ -44,20 +67,27 @@ namespace Sloth.Web
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
-            
+
+            services.AddIdentity<User, Role>()
+                .AddUserStore<UserStore>()
+                .AddUserManager<UserManager<User>>()
+                .AddRoleStore<RoleStore>()
+                .AddRoleManager<RoleManager<Role>>();
+
             services.AddAuthentication(options =>
                 {
-                    options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                    options.DefaultSignInScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                    options.DefaultAuthenticateScheme = OpenIdConnectDefaults.AuthenticationScheme;
+                    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                 })
-                .AddCookie()
-                .AddOpenIdConnect(options =>
+                .AddCookie(options =>
                 {
-                    options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                    options.LoginPath = "/Account/Login";
+                })
+                .AddOpenIdConnect("UCDavis", options =>
+                {
                     options.GetClaimsFromUserInfoEndpoint = true;
                     options.ClientId = "c631afcb-0795-4546-844d-9fe7759ae620";
                     options.Authority = "https://login.microsoftonline.com/ucdavis365.onmicrosoft.com";
+                    options.Scope.Add("email");
                     options.Events.OnRedirectToIdentityProvider = context =>
                     {
                         context.ProtocolMessage.SetParameter("domain_hint", "ucdavis.edu");
@@ -75,7 +105,12 @@ namespace Sloth.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory, IApplicationLifetime appLifetime)
+        public void Configure(
+            IApplicationBuilder app,
+            IHostingEnvironment env,
+            ILoggerFactory loggerFactory,
+            IApplicationLifetime appLifetime,
+            SlothDbContext context)
         {
             // setup logging
             LoggingConfiguration.Setup(Configuration);
@@ -96,6 +131,8 @@ namespace Sloth.Web
                     HotModuleReplacement = true,
                     ReactHotModuleReplacement = true
                 });
+
+                DbInitializer.Initialize(context);
             }
             else
             {
