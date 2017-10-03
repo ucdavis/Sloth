@@ -10,7 +10,7 @@ namespace Sloth.Core.Models
     {
         public User()
         {
-            Keys = new List<ApiKey>();
+            ApiKeys = new List<ApiKey>();
         }
 
         [Key]
@@ -27,7 +27,7 @@ namespace Sloth.Core.Models
         public IList<UserTeam> UserTeams { get; set; }
 
         [JsonIgnore]
-        public IList<ApiKey> Keys { get; set; }
+        public IList<ApiKey> ApiKeys { get; set; }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {

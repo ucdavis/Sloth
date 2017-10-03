@@ -239,7 +239,7 @@ namespace Sloth.Core.Migrations
             modelBuilder.Entity("Sloth.Core.Models.ApiKey", b =>
                 {
                     b.HasOne("Sloth.Core.Models.User", "User")
-                        .WithMany("Keys")
+                        .WithMany("ApiKeys")
                         .HasForeignKey("UserId");
                 });
 
