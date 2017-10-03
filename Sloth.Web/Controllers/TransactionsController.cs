@@ -24,5 +24,16 @@ namespace Sloth.Web.Controllers
 
             return View(transactions);
         }
+
+        public async Task<IActionResult> Details(string id)
+        {
+            var transaction = await _context.Transactions
+                .Include(t => t.Scrubber)
+                .Include(t => t.Transfers)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            return View(transaction);
+        }
     }
 }
