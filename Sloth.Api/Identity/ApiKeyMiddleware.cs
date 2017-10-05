@@ -38,7 +38,7 @@ namespace Sloth.Api.Identity
             var headerValue = context.Request.Headers[HeaderKey].FirstOrDefault();
 
             // lookup apikey from db
-            var apiKey = _dbContext.ApiKeys.Include(a => a.User).FirstOrDefault(a => a.Id == headerValue);
+            var apiKey = _dbContext.ApiKeys.Include(a => a.User).FirstOrDefault(a => a.Key == headerValue);
             if (apiKey == null || apiKey.Revoked.HasValue)
             {
                 return _next(context);

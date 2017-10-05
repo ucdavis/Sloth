@@ -109,6 +109,8 @@ namespace Sloth.Core.Migrations
                     b.Property<string>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<string>("Key");
+
                     b.Property<DateTime>("Issued");
 
                     b.Property<DateTime?>("Revoked");
@@ -116,6 +118,8 @@ namespace Sloth.Core.Migrations
                     b.Property<string>("UserId");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Key");
 
                     b.HasIndex("UserId");
 

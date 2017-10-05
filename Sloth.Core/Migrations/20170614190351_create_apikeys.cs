@@ -13,6 +13,7 @@ namespace Sloth.Core.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(nullable: false),
+                    Key = table.Column<string>(nullable: false),
                     Issued = table.Column<DateTime>(nullable: false),
                     Revoked = table.Column<DateTime>(nullable: true),
                     UserId = table.Column<string>(nullable: true)
@@ -26,12 +27,19 @@ namespace Sloth.Core.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                    table.UniqueConstraint("UK_ApiKeys_Key", x => x.Key);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ApiKeys_UserId",
                 table: "ApiKeys",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApiKeys_Key",
+                table: "ApiKeys",
+                column: "Key",
+                unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

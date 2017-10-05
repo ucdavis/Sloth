@@ -34,7 +34,11 @@ namespace Sloth.Core.Data
                 {
                     UserName = "jpknoll",
                     Email = "jpknoll@ucdavis.edu",
-                    ApiKeys = new[] {new ApiKey() { Id = "TestKey123", Issued = DateTime.UtcNow }}
+                    ApiKeys = new[] {new ApiKey()
+                    {
+                        Key = "TestKey123",
+                        Issued = DateTime.UtcNow
+                    }}
                 },
             };
             context.Users.AddRange(users);
