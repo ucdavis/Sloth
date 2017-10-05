@@ -7,9 +7,9 @@ using Sloth.Core.Models;
 using Sloth.Xml;
 using Sloth.Xml.Types;
 
-namespace Sloth.Core.Helpers
+namespace Sloth.Core.Extensions
 {
-    public static class ScrubberHelpers
+    public static class ScrubberExtensions
     {
         public static string ToXml(this Scrubber scrubber)
         {
