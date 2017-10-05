@@ -9,6 +9,7 @@ assets = [
   'jquery/dist/jquery.js',
   'bootstrap/dist/js/bootstrap.js',
   'popper.js/dist/umd/popper.js',
+  'moment/min/moment.min.js',
   'font-awesome/css/font-awesome.css',
   'datatables.net/js/jquery.datatables.js',
   'datatables.net-bs/js/datatables.bootstrap.js',
