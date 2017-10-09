@@ -108,6 +108,7 @@ namespace Sloth.Web.Controllers
             identity.AddClaim(new Claim(ClaimTypes.Name, identity.FindFirst("name").Value));
         }
 
+        [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
