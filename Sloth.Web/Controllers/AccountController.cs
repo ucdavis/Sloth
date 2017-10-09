@@ -108,6 +108,15 @@ namespace Sloth.Web.Controllers
             identity.AddClaim(new Claim(ClaimTypes.Name, identity.FindFirst("name").Value));
         }
 
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+
+            var provider = "UCDavis";
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, Url.Action("Index", "Home"));
+            return SignOut(properties, provider);
+        }
+
         private IActionResult RedirectToLocal(string returnUrl)
         {
             if (Url.IsLocalUrl(returnUrl))
