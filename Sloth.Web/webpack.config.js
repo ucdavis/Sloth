@@ -12,8 +12,8 @@ assets = [
   'moment/min/moment.min.js',
   'font-awesome/css/font-awesome.css',
   'datatables.net/js/jquery.datatables.js',
-  'datatables.net-bs/js/datatables.bootstrap.js',
-  'datatables.net-bs/css/datatables.bootstrap.css',
+  'datatables.net-bs4/js/datatables.bootstrap4.js',
+  'datatables.net-bs4/css/datatables.bootstrap4.css',
 ];
 
 module.exports = (env) => {
