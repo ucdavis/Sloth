@@ -6,21 +6,21 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-
-  <style>
-    .nav-login {
-      position: relative;
-    }
-  </style>
-  <form class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
-    <div class="nav-login">
-      <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">@UserManager.GetUserName(User)</a>
-      <div class="dropdown-menu">
-        <a class="dropdown-item" href="@Url.Action("Manage", "Users")">Manage</a>
-          <button type="submit" class="btn btn-link navbar-btn navbar-link">Log out</button>
+    <form class="form-inline" asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+      <div class="nav-login">
+        <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">@UserManager.GetUserName(User)</a>
+        <div class="dropdown-menu">
+          <a class="dropdown-item" href="@Url.Action("Manage", "Users")">
+            <i class="fa fa-fw fa-user"></i>
+            Manage
+          </a>
+          <button type="submit" class="dropdown-item">
+            <i class="fa fa-fw fa-sign-out"></i>
+            Log out
+          </button>
+        </div>
       </div>
-    </div>
-  </form>
+    </form>
 }
 else
 {
