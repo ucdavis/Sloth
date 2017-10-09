@@ -43,7 +43,8 @@
     "datatables.net-bs": "^1.10.16",
     "datatables.net-bs4": "^1.10.16",
     "font-awesome": "^4.7.0",
-    "jquery": "https://registry.npmjs.org/jquery/-/jquery-3.2.1.tgz",
+    "jquery": "^3.2.1",
+    "moment": "^2.18.1",
     "popper.js": "^1.12.5"
   }
 }
