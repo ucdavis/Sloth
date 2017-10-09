@@ -56,9 +56,21 @@ module.exports = (env) => {
                     use: [{
                       loader: 'css-loader',
                       options: {
-                        minimize: !isDevBuild
+                        importLoaders: 1,
+                        minimize: !isDevBuild,
+                        sourceMap: isDevBuild,
                       }
-                    }, 'postcss-loader', 'sass-loader']
+                    }, {
+                      loader: 'postcss-loader',
+                      options: {
+                        sourceMap: true,
+                      }
+                    }, {
+                      loader: 'sass-loader',
+                      options: {
+                        sourceMap: true,
+                      }
+                    }]
                   })
                 },
                 { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
