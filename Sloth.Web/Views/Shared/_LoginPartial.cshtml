@@ -4,11 +4,18 @@
 @inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
+@{
+  var user = await UserManager.GetUserAsync(User);
+}
+
 @if (SignInManager.IsSignedIn(User))
 {
     <form class="form-inline" asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
       <div class="nav-login">
-        <a class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">@UserManager.GetUserName(User)</a>
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+          <img class="profile-pic" src="https://www.gravatar.com/avatar/@(user.EmailHash)?s=40" alt="profile pic" />
+          @user.UserName
+        </a>
         <div class="dropdown-menu">
           <a class="dropdown-item" href="@Url.Action("Manage", "Users")">
             <i class="fa fa-fw fa-user"></i>
