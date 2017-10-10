@@ -5,7 +5,7 @@
 }
 
 @section AdditionalStyles {
-    @*<link rel="stylesheet" href="~/lib/datatables.bootstrap.css" />*@
+    <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
 }
 
 <h2>@ViewBag.Title</h2>
@@ -37,8 +37,8 @@
 
 @section AdditionalScripts {
     <script src="~/lib/jquery.datatables.js"></script>
-    @*<script src="~/lib/datatables.bootstrap.js"></script>*@
+    <script src="~/lib/datatables.bootstrap4.js"></script>
     <script>
-        $('#transactions').dataTable();
+        $('#transfers').dataTable();
     </script>
 }
