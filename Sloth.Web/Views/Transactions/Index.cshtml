@@ -10,31 +10,7 @@
 
 <h2>@ViewBag.Title</h2>
 
-<table id="transactions" class="table table-bordered">
-    <thead>
-    <tr>
-        <th>@Html.DisplayNameFor(x => x.Id)</th>
-        <th>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</th>
-        <th>@Html.DisplayNameFor(x => x.DocumentNumber)</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var t in Model)
-    {
-        <tr>
-            <th scope="row">@t.Id</th>
-            <td>@t.KfsTrackingNumber</td>
-            <td>@t.DocumentNumber</td>
-            <td>
-                <a class="btn btn-primary btn-sm" href="@Url.Action("Details", new { id = t.Id })">
-                    <div class="fa fa-arrow-right"></div>
-                </a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+@Html.Partial("_TransactionsTable", Model)
 
 
 @section AdditionalScripts {
