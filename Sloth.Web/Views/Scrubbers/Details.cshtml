@@ -1,0 +1,22 @@
+@model Sloth.Core.Models.Scrubber
+
+@{
+    ViewBag.Title = "Scrubber Details";
+}
+
+@section AdditionalStyles {
+  <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
+}
+
+<h2>@ViewBag.Title</h2>
+
+@Html.Partial("_TransactionsTable", Model.Transactions)
+
+
+@section AdditionalScripts {
+    <script src="~/lib/jquery.datatables.js"></script>
+    <script src="~/lib/datatables.bootstrap4.js"></script>
+    <script>
+        $('#transactions').dataTable();
+    </script>
+}
