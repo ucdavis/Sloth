@@ -1,38 +1,55 @@
 @import "custom";
 @import "~bootstrap/scss/bootstrap.scss";
 
+html, body {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
 body {
-    padding-top: 50px;
-    padding-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar {
+    padding: 1rem;
+}
+
+.navbar-brand {
+    padding: 0;
+}
+
+.navbar-brand img {
+    height: 40px;
+    width: 40px;
+}
+
+.nav-login {
+    position: relative;
+}
+
+.profile-pic {
+    padding-right: 1rem;
 }
 
 /* Wrapping element */
 /* Set some basic padding to keep content from hitting the edges */
 .body-content {
-    padding-left: 15px;
-    padding-right: 15px;
+    flex-grow: 1;
+    padding: 1rem;
 }
 
-/* Carousel */
-.carousel-caption p {
-    font-size: 20px;
-    line-height: 1.4;
+footer {
 }
 
-/* Make .svg files in the carousel display properly in older browsers */
-.carousel-inner .item img[src$=".svg"] {
-    width: 100%;
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
 }
 
-/* QR code generator */
-#qrCode {
-    margin: 15px;
-}
-
-/* Hide/rearrange for smaller screens */
-@media screen and (max-width: 767px) {
-    /* Hide captions */
-    .carousel-caption {
-        display: none;
-    }
+div.dataTables_wrapper {
+    padding-left: 0;
+    padding-right: 0;
 }

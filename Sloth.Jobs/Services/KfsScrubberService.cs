@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Serilog;
-using Sloth.Core.Helpers;
+using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
 

@@ -1,16 +1,16 @@
-@model IEnumerable<Sloth.Core.Models.Transaction>
+@model Sloth.Core.Models.Scrubber
 
 @{
-    ViewBag.Title = "Transactions";
+    ViewBag.Title = "Scrubber Details";
 }
 
 @section AdditionalStyles {
-    <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
+  <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
 }
 
 <h2>@ViewBag.Title</h2>
 
-@Html.Partial("_TransactionsTable", Model)
+@Html.Partial("_TransactionsTable", Model.Transactions)
 
 
 @section AdditionalScripts {

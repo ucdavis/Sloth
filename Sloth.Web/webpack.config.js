@@ -9,9 +9,11 @@ assets = [
   'jquery/dist/jquery.js',
   'bootstrap/dist/js/bootstrap.js',
   'popper.js/dist/umd/popper.js',
+  'moment/min/moment.min.js',
+  'font-awesome/css/font-awesome.css',
   'datatables.net/js/jquery.datatables.js',
-  'datatables.net-bs/js/datatables.bootstrap.js',
-  'datatables.net-bs/css/datatables.bootstrap.css',
+  'datatables.net-bs4/js/datatables.bootstrap4.js',
+  'datatables.net-bs4/css/datatables.bootstrap4.css',
 ];
 
 module.exports = (env) => {
@@ -54,9 +56,21 @@ module.exports = (env) => {
                     use: [{
                       loader: 'css-loader',
                       options: {
-                        minimize: !isDevBuild
+                        importLoaders: 1,
+                        minimize: !isDevBuild,
+                        sourceMap: isDevBuild,
                       }
-                    }, 'postcss-loader', 'sass-loader']
+                    }, {
+                      loader: 'postcss-loader',
+                      options: {
+                        sourceMap: true,
+                      }
+                    }, {
+                      loader: 'sass-loader',
+                      options: {
+                        sourceMap: true,
+                      }
+                    }]
                   })
                 },
                 { test: /\.(png|jpg|jpeg|gif|svg)$/, use: 'url-loader?limit=25000' }
@@ -79,6 +93,14 @@ module.exports = (env) => {
                   to: path.resolve(__dirname, './wwwroot/lib')
                 };
               })
+            ),
+            new CopyWebpackPlugin(
+              [{
+                //context: __dirname,
+                from: path.resolve(__dirname, './node_modules/font-awesome/fonts/*'),
+                to: path.resolve(__dirname, './wwwroot/fonts'),
+                flatten: true,
+              }]
             )
         ].concat(isDevBuild ? [
             // Plugins that apply in development builds only

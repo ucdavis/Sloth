@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.12
+VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Core", "Sloth.Core\Sloth.Core.csproj", "{B2E2E365-565E-4A58-AFF2-EA468C89DE6B}"
 EndProject
@@ -13,6 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Root", "Root", "{8A3F61DD-F
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		appveyor.yml = appveyor.yml
+		README.md = README.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Test", "Sloth.Test\Sloth.Test.csproj", "{F453C2E7-D80C-49E8-9416-1F930C3C0AAC}"
@@ -21,7 +22,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Integrations.Cybersou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs", "Sloth.Jobs\Sloth.Jobs.csproj", "{F3A76C67-5817-483E-A0DB-262F7CC5E685}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Web", "Sloth.Web\Sloth.Web.csproj", "{1C25DDA5-6D1B-4DD1-B194-2938503F758E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Web", "Sloth.Web\Sloth.Web.csproj", "{1C25DDA5-6D1B-4DD1-B194-2938503F758E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

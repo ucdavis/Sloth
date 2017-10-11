@@ -79,6 +79,7 @@ namespace Sloth.Core
                 .IncrementsBy(1)
                 .IsCyclic();
 
+            ApiKey.OnModelCreating(modelBuilder);
             UserRole.OnModelCreating(modelBuilder);
             UserTeam.OnModelCreating(modelBuilder);
         }

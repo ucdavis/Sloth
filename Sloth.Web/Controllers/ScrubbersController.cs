@@ -6,34 +6,32 @@ using Sloth.Core;
 
 namespace Sloth.Web.Controllers
 {
-    public class TransactionsController : SuperController
+    public class ScrubbersController : SuperController
     {
         private readonly SlothDbContext _context;
 
-        public TransactionsController(SlothDbContext context)
+        public ScrubbersController(SlothDbContext context)
         {
             _context = context;
         }
 
-        // GET: /<controller>/
         public async Task<IActionResult> Index()
         {
-            var transactions = await _context.Transactions
+            var scrubbers = await _context.Scrubbers
                 .AsNoTracking()
                 .ToListAsync();
 
-            return View(transactions);
+            return View(scrubbers);
         }
 
         public async Task<IActionResult> Details(string id)
         {
-            var transaction = await _context.Transactions
-                .Include(t => t.Scrubber)
-                .Include(t => t.Transfers)
+            var scrubber = await _context.Scrubbers
+                .Include(t => t.Transactions)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            return View(transaction);
+            return View(scrubber);
         }
     }
 }

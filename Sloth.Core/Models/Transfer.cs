@@ -127,6 +127,28 @@ namespace Sloth.Core.Models
         [MaxLength(8)]
         public string ReferenceId { get; set; }
 
+        #region Helpers
+        public string FullAccountToString()
+        {
+            var result = Chart + "-" + Account;
+            if (!string.IsNullOrEmpty(SubAccount))
+            {
+                result += "-" + SubAccount;
+            }
+            return result;
+        }
+
+        public string FullObjectToString()
+        {
+            var result = ObjectCode;
+            if (!string.IsNullOrEmpty(SubObjectCode))
+            {
+                result += "-" + SubObjectCode;
+            }
+            return result;
+        }
+        #endregion
+
         public enum CreditDebit
         {
             /// <summary>
