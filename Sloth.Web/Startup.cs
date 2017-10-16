@@ -39,8 +39,6 @@ namespace Sloth.Web
 
             builder.AddEnvironmentVariables();
             Configuration = builder.Build();
-
-            StackifyLib.Config.Environment = env.EnvironmentName;
         }
 
         public IConfiguration Configuration { get; }
