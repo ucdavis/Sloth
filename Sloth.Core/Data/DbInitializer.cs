@@ -15,13 +15,46 @@ namespace Sloth.Core.Data
         /// <param name="context"></param>
         public static void Initialize(SlothDbContext context)
         {
-            context.Database.EnsureCreated();
-
+            CreateRoles(context);
+            CreateTeams(context);
             CreateUsers(context);
+
             CreateTransactions(context);
             CreateIntegrations(context);
 
             context.SaveChanges();
+        }
+
+        private static void CreateRoles(SlothDbContext context)
+        {
+            if (!context.Roles.Any(r => r.Name == "SuperUser"))
+            {
+                var superuser = new Role()
+                {
+                    Name = "SuperUser"
+                };
+                context.Roles.Add(superuser);
+            }
+
+            if (!context.Roles.Any(r => r.Name == "Admin"))
+            {
+                var admin = new Role()
+                {
+                    Name = "Admin"
+                };
+                context.Roles.Add(admin);
+            }
+        }
+
+        private static void CreateTeams(SlothDbContext context)
+        {
+            if (!context.Roles.Any(t => t.Name == "Anlab"))
+            {
+                var anlab = new Team()
+                {
+                    Name = "Anlab"
+                };
+            }
         }
 
         private static void CreateUsers(SlothDbContext context)
@@ -38,7 +71,22 @@ namespace Sloth.Core.Data
                     {
                         Key = "TestKey123",
                         Issued = DateTime.UtcNow
-                    }}
+                    }},
+                    Roles = new []
+                    {
+                        new UserRole()
+                        {
+                            Role = context.Roles.FirstOrDefault(r => r.Name == "SuperUser")
+                        }, 
+                    },
+                    UserTeamRoles = new []
+                    {
+                        new UserTeamRole()
+                        {
+                            Team = context.Teams.FirstOrDefault(t => t.Name == "Anlab"),
+                            Role = context.Roles.FirstOrDefault(r => r.Name == "Admin"),
+                        }, 
+                    }
                 },
             };
             context.Users.AddRange(users);
