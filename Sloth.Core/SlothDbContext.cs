@@ -80,8 +80,11 @@ namespace Sloth.Core
                 .IsCyclic();
 
             ApiKey.OnModelCreating(modelBuilder);
+            User.OnModelCreating(modelBuilder);
+            Team.OnModelCreating(modelBuilder);
+            Role.OnModelCreating(modelBuilder);
             UserRole.OnModelCreating(modelBuilder);
-            UserTeam.OnModelCreating(modelBuilder);
+            UserTeamRole.OnModelCreating(modelBuilder);
         }
     }
 }
