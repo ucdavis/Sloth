@@ -13,8 +13,8 @@ namespace Sloth.Core.Migrations
                 name: "Integrations",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    TeamId = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    TeamId = table.Column<string>(type: "nvarchar(36)", nullable: false),
                     DefaultAccount = table.Column<string>(nullable: true),
                     MerchantId = table.Column<string>(nullable: true),
                     ReportPasswordKey = table.Column<string>(nullable: true),

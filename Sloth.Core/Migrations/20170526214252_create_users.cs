@@ -13,7 +13,7 @@ namespace Sloth.Core.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
                     Email = table.Column<string>(maxLength: 256, nullable: true),
                     UserName = table.Column<string>(maxLength: 256, nullable: true)
                 },
@@ -26,8 +26,8 @@ namespace Sloth.Core.Migrations
                 name: "Roles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -39,8 +39,8 @@ namespace Sloth.Core.Migrations
                 name: "Teams",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -52,8 +52,8 @@ namespace Sloth.Core.Migrations
                 name: "UserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(36)", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -76,9 +76,9 @@ namespace Sloth.Core.Migrations
                 name: "UserTeamRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    TeamId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    TeamId = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    RoleId = table.Column<string>(type: "nvarchar(36)", nullable: false),
                 },
                 constraints: table =>
                 {
