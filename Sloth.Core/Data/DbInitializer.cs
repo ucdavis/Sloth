@@ -18,11 +18,8 @@ namespace Sloth.Core.Data
             CreateRoles(context);
             CreateTeams(context);
             CreateUsers(context);
-
             CreateTransactions(context);
             CreateIntegrations(context);
-
-            context.SaveChanges();
         }
 
         private static void CreateRoles(SlothDbContext context)
@@ -44,17 +41,20 @@ namespace Sloth.Core.Data
                 };
                 context.Roles.Add(admin);
             }
+            context.SaveChanges();
         }
 
         private static void CreateTeams(SlothDbContext context)
         {
-            if (!context.Roles.Any(t => t.Name == "Anlab"))
+            if (!context.Teams.Any(t => t.Name == "John's Team"))
             {
                 var anlab = new Team()
                 {
-                    Name = "Anlab"
+                    Name = "John's Team"
                 };
+                context.Teams.Add(anlab);
             }
+            context.SaveChanges();
         }
 
         private static void CreateUsers(SlothDbContext context)
@@ -83,13 +83,14 @@ namespace Sloth.Core.Data
                     {
                         new UserTeamRole()
                         {
-                            Team = context.Teams.FirstOrDefault(t => t.Name == "Anlab"),
+                            Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
                             Role = context.Roles.FirstOrDefault(r => r.Name == "Admin"),
                         }, 
                     }
                 },
             };
             context.Users.AddRange(users);
+            context.SaveChanges();
         }
 
         private static void CreateTransactions(SlothDbContext context)
@@ -132,6 +133,7 @@ namespace Sloth.Core.Data
                 }
             };
             context.Transactions.AddRange(transactions);
+            context.SaveChanges();
         }
 
         private static void CreateIntegrations(SlothDbContext context)
@@ -142,6 +144,7 @@ namespace Sloth.Core.Data
             {
                 new Integration()
                 {
+                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
                     MerchantId = "ucdavis_jpknoll",
                     ReportUsername = "sloth_report",
                     ReportPasswordKey = "Report-Test-1",
@@ -150,6 +153,7 @@ namespace Sloth.Core.Data
                 },
             };
             context.Integrations.AddRange(integrations);
+            context.SaveChanges();
         }
     }
 }
