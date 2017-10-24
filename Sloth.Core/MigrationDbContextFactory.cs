@@ -20,7 +20,7 @@ namespace Sloth.Core
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(basePath)
-                .AddJsonFile("appsettings.json", true)
+                .AddJsonFile("appsettings.migration.json", true)
                 .AddJsonFile($"appsettings.{environmentName}.json", true)
                 .AddEnvironmentVariables();
 
