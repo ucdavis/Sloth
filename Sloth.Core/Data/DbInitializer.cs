@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Sloth.Core.Models;
+using Sloth.Core.Resources;
 
 namespace Sloth.Core.Data
 {
@@ -24,22 +25,15 @@ namespace Sloth.Core.Data
 
         private static void CreateRoles(SlothDbContext context)
         {
-            if (!context.Roles.Any(r => r.Name == "SuperUser"))
+            // add all roles to db
+            foreach (var role in Roles.GetAllRoles())
             {
-                var superuser = new Role()
-                {
-                    Name = "SuperUser"
-                };
-                context.Roles.Add(superuser);
-            }
+                if (context.Roles.Any(r => r.Name == role)) continue;
 
-            if (!context.Roles.Any(r => r.Name == "Admin"))
-            {
-                var admin = new Role()
+                context.Roles.Add(new Role()
                 {
-                    Name = "Admin"
-                };
-                context.Roles.Add(admin);
+                    Name = role
+                });
             }
             context.SaveChanges();
         }
