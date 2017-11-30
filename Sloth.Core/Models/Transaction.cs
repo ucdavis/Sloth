@@ -21,7 +21,7 @@ namespace Sloth.Core.Models
         [NotMapped]
         public string CreatorName => Creator?.UserName;
 
-        public TransactionStatus Status { get; set; }
+        public string Status { get; set; }
 
         /// <summary>
         /// Tracking Number created by the merchant accountant
@@ -71,12 +71,5 @@ namespace Sloth.Core.Models
 
         [JsonIgnore]
         public Scrubber Scrubber { get; set; }
-    }
-
-    public enum TransactionStatus
-    {
-        Scheduled,
-        Completed,
-        Cancelled
     }
 }

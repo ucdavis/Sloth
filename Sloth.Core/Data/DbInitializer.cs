@@ -96,7 +96,7 @@ namespace Sloth.Core.Data
                 new Transaction()
                 {
                     Creator                 = context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
-                    Status                  = TransactionStatus.Scheduled,
+                    Status                  = TransactionStatuses.Scheduled,
                     MerchantTrackingNumber  = "ORDER-10",
                     ProcessorTrackingNumber = "123456",
                     KfsTrackingNumber       = "TESTTHIS1",
