@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Core", "Sloth.Core\Sloth.Core.csproj", "{B2E2E365-565E-4A58-AFF2-EA468C89DE6B}"
 EndProject
@@ -23,6 +23,8 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs", "Sloth.Jobs\Sloth.Jobs.csproj", "{F3A76C67-5817-483E-A0DB-262F7CC5E685}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Web", "Sloth.Web\Sloth.Web.csproj", "{1C25DDA5-6D1B-4DD1-B194-2938503F758E}"
+EndProject
+Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "Sloth.Sql", "Sloth.Sql\Sloth.Sql.sqlproj", "{89F7C7D5-6BAA-48EC-9FE7-97D88EE4F20D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +60,12 @@ Global
 		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1C25DDA5-6D1B-4DD1-B194-2938503F758E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89F7C7D5-6BAA-48EC-9FE7-97D88EE4F20D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{89F7C7D5-6BAA-48EC-9FE7-97D88EE4F20D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{89F7C7D5-6BAA-48EC-9FE7-97D88EE4F20D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{89F7C7D5-6BAA-48EC-9FE7-97D88EE4F20D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{89F7C7D5-6BAA-48EC-9FE7-97D88EE4F20D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{89F7C7D5-6BAA-48EC-9FE7-97D88EE4F20D}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
