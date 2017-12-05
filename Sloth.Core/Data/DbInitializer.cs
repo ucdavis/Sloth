@@ -70,7 +70,7 @@ namespace Sloth.Core.Data
                     {
                         new UserRole()
                         {
-                            Role = context.Roles.FirstOrDefault(r => r.Name == "SuperUser")
+                            Role = context.Roles.FirstOrDefault(r => r.Name == Roles.SystemAdmin)
                         }, 
                     },
                     UserTeamRoles = new []
@@ -78,7 +78,7 @@ namespace Sloth.Core.Data
                         new UserTeamRole()
                         {
                             Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
-                            Role = context.Roles.FirstOrDefault(r => r.Name == "Admin"),
+                            Role = context.Roles.FirstOrDefault(r => r.Name == Roles.Admin),
                         }, 
                     }
                 },
