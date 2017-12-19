@@ -6,6 +6,7 @@ using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Resources;
 using Sloth.Jobs.Services;
 
 namespace Sloth.Jobs.Jobs
@@ -33,7 +34,7 @@ namespace Sloth.Jobs.Jobs
             {
                 // fetch all staged transactions
                 var transactions = _context.Transactions
-                    .Where(t => t.Status == TransactionStatus.Scheduled)
+                    .Where(t => t.Status == TransactionStatuses.Scheduled)
                     .Include(t => t.Transfers)
                     .ToList();
 
