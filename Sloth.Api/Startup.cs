@@ -55,9 +55,6 @@ namespace Sloth.Api
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
-            // add logger configuration
-            services.AddTransient(_ => LoggingConfiguration.Configuration);
-            
             // add infrastructure services
             services.AddSingleton<IKfsService, KfsService>();
             services.AddSingleton<ISecretsService, SecretsService>();
