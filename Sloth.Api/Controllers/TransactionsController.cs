@@ -127,7 +127,7 @@ namespace Sloth.Api.Controllers
             // validate accounts
             foreach (var t in transaction.Transfers)
             {
-                if (await _kfsService.IsAccountValid(t.Chart, t.Account))
+                if (!await _kfsService.IsAccountValid(t.Chart, t.Account))
                 {
                     return new BadRequestObjectResult(new
                     {
