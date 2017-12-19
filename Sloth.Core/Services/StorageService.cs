@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
+using Sloth.Core.Configuration;
 
 namespace Sloth.Core.Services
 {
@@ -57,10 +58,5 @@ namespace Sloth.Core.Services
             return container;
         }
 
-    }
-
-    public class StorageServiceOptions
-    {
-        public string ConnectionString { get; set; }
     }
 }
