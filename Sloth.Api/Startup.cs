@@ -11,12 +11,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using Sloth.Api.Errors;
 using Sloth.Api.Identity;
 using Sloth.Api.Logging;
 using Sloth.Api.Swagger;
 using Sloth.Core;
+using Sloth.Core.Configuration;
 using Sloth.Core.Data;
 using Sloth.Core.Services;
 using Swashbuckle.AspNetCore.Swagger;
@@ -47,13 +49,17 @@ namespace Sloth.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // add root configuration
+            // add configuration
             services.AddSingleton(Configuration);
+            services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
+            services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
+            services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
             // add logger configuration
             services.AddTransient(_ => LoggingConfiguration.Configuration);
             
             // add infrastructure services
+            services.AddSingleton<IKfsService, KfsService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
@@ -78,6 +84,7 @@ namespace Sloth.Api
                 })
                 .AddJsonOptions(o =>
                 {
+                    o.SerializerSettings.Formatting = Formatting.Indented;
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                     o.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
