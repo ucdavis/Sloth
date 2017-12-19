@@ -14,6 +14,10 @@ install:
     appveyor-retry choco install octopustools
     appveyor-retry dotnet restore
 
+    appveyor-retry nuget install Microsoft.data.tools.msbuild -ExcludeVersion -OutputDirectory C:\ssdt
+    setx SQLDBExtensionsRefPath C:\ssdt\Microsoft.Data.Tools.Msbuild\lib\net40 /M
+    setx SSDTPath C:\ssdt\Microsoft.Data.Tools.Msbuild\lib\net40 /M
+
 cache:
 - C:\ProgramData\chocolatey\bin -> appveyor.yml
 - C:\ProgramData\chocolatey\lib -> appveyor.yml
