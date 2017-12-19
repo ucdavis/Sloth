@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Integrations.Cybersource;
 using Sloth.Integrations.Cybersource.Clients;
@@ -113,7 +114,7 @@ namespace Sloth.Jobs.Jobs
 
                     transaction = new Transaction()
                     {
-                        Status                  = TransactionStatus.Scheduled,
+                        Status                  = TransactionStatuses.Scheduled,
                         KfsTrackingNumber       = kfsTrackingNumber,
                         MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
                         ProcessorTrackingNumber = deposit.RequestID,

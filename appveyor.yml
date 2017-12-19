@@ -20,7 +20,9 @@ cache:
 - '%USERPROFILE%\.nuget\packages -> **\*.csproj'
 
 build_script:
-- ps: dotnet build --configuration $Env:configuration
+- ps: |
+    dotnet build .\Sloth.Api\ --configuration $Env:configuration
+    dotnet build .\Sloth.Jobs\ --configuration $Env:configuration
 
 after_build:
 - ps: |
