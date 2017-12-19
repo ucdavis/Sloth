@@ -35,7 +35,7 @@ namespace Sloth.Core.Services
 
             using (var client = GetHttpClient())
             {
-                var response = await client.GetAsync($"/fau/account/{chart}/{account}");
+                var response = await client.GetAsync($"fau/account/{chart}/{account}");
                 return await response.GetContentOrNullAsync<Account>();
             }
         }
@@ -47,7 +47,7 @@ namespace Sloth.Core.Services
 
             using (var client = GetHttpClient())
             {
-                var response = await client.GetAsync($"/fau/account/{chart}/{account}/isvalid");
+                var response = await client.GetAsync($"fau/account/{chart}/{account}/isvalid");
                 return await response.GetContentOrNullAsync<bool>();
             }
         }
