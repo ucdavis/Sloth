@@ -23,6 +23,7 @@ using Sloth.Jobs.Jobs;
 using Sloth.Jobs.Jobs.Attributes;
 using Sloth.Jobs.Logging;
 using Sloth.Jobs.Services;
+using KfsOptions = Sloth.Jobs.Services.KfsOptions;
 
 namespace Sloth.Jobs
 {
