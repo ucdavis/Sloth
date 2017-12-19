@@ -11,17 +11,20 @@ using Sloth.Api.Models;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
+using Sloth.Core.Services;
 
 namespace Sloth.Api.Controllers
 {
     public class TransactionsController : SuperController
     {
         private readonly SlothDbContext _context;
+        private readonly IKfsService _kfsService;
         private readonly ILogger _logger;
 
-        public TransactionsController(SlothDbContext context, ILoggerFactory loggerFactory)
+        public TransactionsController(SlothDbContext context, ILoggerFactory loggerFactory, IKfsService kfsService)
         {
             _context = context;
+            _kfsService = kfsService;
             _logger = loggerFactory.CreateLogger<TransactionsController>();
         }
 
@@ -119,6 +122,20 @@ namespace Sloth.Api.Controllers
             if (!ModelState.IsValid)
             {
                 return new BadRequestObjectResult(ModelState);
+            }
+
+            // validate accounts
+            foreach (var t in transaction.Transfers)
+            {
+                if (await _kfsService.IsAccountValid(t.Chart, t.Account))
+                {
+                    return new BadRequestObjectResult(new
+                    {
+                        Message = "Invalid Chart/Account",
+                        Chart = t.Chart,
+                        Account = t.Account
+                    });
+                }
             }
 
             var transactionToCreate = new Transaction
