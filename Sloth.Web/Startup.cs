@@ -52,9 +52,6 @@ namespace Sloth.Web
             // add various options
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             
-            // add logger configuration
-            services.AddTransient(_ => LoggingConfiguration.Configuration);
-
             // add infrastructure services
             services.AddSingleton<IDirectorySearchService, DirectorySearchService>();
             services.AddSingleton<ISecretsService, SecretsService>();

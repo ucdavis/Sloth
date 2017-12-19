@@ -9,10 +9,13 @@ namespace Sloth.Core.Models
         [Key]
         public string Id { get; set; }
 
+        public string Name { get; set; }
+
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Team>()
-                .ToTable("Teams");
+                .ToTable("Teams")
+                .HasIndex(t => t.Name).IsUnique();
         }
     }
 }

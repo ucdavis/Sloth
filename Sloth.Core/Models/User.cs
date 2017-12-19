@@ -50,10 +50,10 @@ namespace Sloth.Core.Models
         }
 
         [JsonIgnore]
-        public IList<UserRole> UserRoles { get; set; }
+        public IList<UserRole> Roles { get; set; }
 
         [JsonIgnore]
-        public IList<UserTeam> UserTeams { get; set; }
+        public IList<UserTeamRole> UserTeamRoles { get; set; }
 
         [JsonIgnore]
         public IList<ApiKey> ApiKeys { get; set; }

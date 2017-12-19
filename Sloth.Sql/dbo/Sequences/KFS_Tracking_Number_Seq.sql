@@ -1,0 +1,7 @@
+﻿CREATE SEQUENCE [dbo].[KFS_Tracking_Number_Seq]
+    AS BIGINT
+    INCREMENT BY 1
+    MINVALUE 1
+    MAXVALUE 9999999999
+    CYCLE;
+

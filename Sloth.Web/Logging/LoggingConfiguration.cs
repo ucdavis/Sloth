@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Exceptions;
+using Serilog.Sinks.MSSqlServer;
 
 namespace Sloth.Web.Logging
 {
@@ -9,10 +13,7 @@ namespace Sloth.Web.Logging
     {
         private static bool _loggingSetup;
 
-        public static LoggerConfiguration Configuration => new LoggerConfiguration()
-            .Enrich.FromLogContext()
-            .Enrich.WithExceptionDetails()
-            .WriteTo.Stackify();
+        private static LoggerConfiguration _loggerConfiguration;
 
         /// <summary>
         /// Configure Application Logging
@@ -23,19 +24,70 @@ namespace Sloth.Web.Logging
 
             if (_loggingSetup) return; //only setup logging once
 
-            // configure stackify
+            if (true)
+            {
+                Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
+            }
+
+            // standard logger
+            _loggerConfiguration = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .Enrich.WithExceptionDetails()
+                .Enrich.WithProperty("Source", "Sloth.Web");
+
+            // various sinks
+            ConfigureSqlLogging(configuration);
+
+            ConfigureStackifyLogging(configuration);
+
+            // create global logger
+            Log.Logger = _loggerConfiguration.CreateLogger();
+
+            _loggingSetup = true;
+        }
+
+        private static void ConfigureStackifyLogging(IConfiguration configuration)
+        {
             var stackifyOptions = new StackifyOptions();
             configuration.GetSection("Stackify").Bind(stackifyOptions);
             StackifyLib.Config.ApiKey = stackifyOptions.ApiKey;
             StackifyLib.Config.AppName = stackifyOptions.AppName;
             StackifyLib.Config.Environment = stackifyOptions.Environment;
 
-            // create global logger
-            Log.Logger = Configuration
-                .CreateLogger();
-
-            _loggingSetup = true;
+            _loggerConfiguration = _loggerConfiguration.WriteTo.Stackify();
         }
+
+        private static void ConfigureSqlLogging(IConfiguration configuration)
+        {
+            var columnOptions = new ColumnOptions();
+
+            // xml column
+            columnOptions.Store.Remove(StandardColumn.Properties);
+
+            // json column
+            columnOptions.Store.Add(StandardColumn.LogEvent);
+            columnOptions.LogEvent.ExcludeAdditionalProperties = true;
+
+            // special columns for indexing
+            columnOptions.AdditionalDataColumns = new List<DataColumn>()
+            {
+                new DataColumn {ColumnName = "Source", AllowDBNull = true, DataType = typeof(string), MaxLength = 128},
+                new DataColumn {ColumnName = "CorrelationId", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
+            };
+
+            _loggerConfiguration = _loggerConfiguration
+                .WriteTo.MSSqlServer(
+                    connectionString: configuration.GetConnectionString("DefaultConnection"),
+                    tableName: "Logs",
+                    columnOptions: columnOptions
+                );
+        }
+    }
+
+    public class SqlLogOptions
+    {
+        public string ConnectionString { get; set; }
+        public string TableName { get; set; }
     }
 
     public class StackifyOptions

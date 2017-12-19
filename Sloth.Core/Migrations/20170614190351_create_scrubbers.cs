@@ -12,7 +12,7 @@ namespace Sloth.Core.Migrations
                 name: "Scrubbers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
                     BatchDate = table.Column<DateTime>(nullable: false),
                     BatchSequenceNumber = table.Column<int>(nullable: false),
                     Chart = table.Column<string>(maxLength: 1, nullable: false),
@@ -28,14 +28,14 @@ namespace Sloth.Core.Migrations
                 name: "Transactions",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    CreatorId = table.Column<string>(nullable: true),
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    CreatorId = table.Column<string>(type: "nvarchar(36)", nullable: true),
                     DocumentNumber = table.Column<string>(maxLength: 14, nullable: false),
                     KfsTrackingNumber = table.Column<string>(maxLength: 10, nullable: false),
                     MerchantTrackingNumber = table.Column<string>(nullable: false),
                     OriginCode = table.Column<string>(maxLength: 2, nullable: false),
                     ProcessorTrackingNumber = table.Column<string>(nullable: true),
-                    ScrubberId = table.Column<string>(nullable: true),
+                    ScrubberId = table.Column<string>(type: "nvarchar(36)", nullable: true),
                     Status = table.Column<int>(nullable: false),
                     TransactionDate = table.Column<DateTime>(nullable: false),
                 },
@@ -60,7 +60,7 @@ namespace Sloth.Core.Migrations
                 name: "Transfers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
                     Account = table.Column<string>(maxLength: 7, nullable: false),
                     Amount = table.Column<decimal>(nullable: false),
                     Chart = table.Column<string>(maxLength: 1, nullable: false),
@@ -75,7 +75,7 @@ namespace Sloth.Core.Migrations
                     SequenceNumber = table.Column<int>(nullable: false),
                     SubAccount = table.Column<string>(maxLength: 5, nullable: true),
                     SubObjectCode = table.Column<string>(maxLength: 3, nullable: true),
-                    TransactionId = table.Column<string>(nullable: true)
+                    TransactionId = table.Column<string>(type: "nvarchar(36)", nullable: true)
                 },
                 constraints: table =>
                 {

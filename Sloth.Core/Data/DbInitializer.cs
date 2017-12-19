@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Sloth.Core.Models;
+using Sloth.Core.Resources;
 
 namespace Sloth.Core.Data
 {
@@ -15,12 +16,38 @@ namespace Sloth.Core.Data
         /// <param name="context"></param>
         public static void Initialize(SlothDbContext context)
         {
-            context.Database.EnsureCreated();
-
+            CreateRoles(context);
+            CreateTeams(context);
             CreateUsers(context);
             CreateTransactions(context);
             CreateIntegrations(context);
+        }
 
+        private static void CreateRoles(SlothDbContext context)
+        {
+            // add all roles to db
+            foreach (var role in Roles.GetAllRoles())
+            {
+                if (context.Roles.Any(r => r.Name == role)) continue;
+
+                context.Roles.Add(new Role()
+                {
+                    Name = role
+                });
+            }
+            context.SaveChanges();
+        }
+
+        private static void CreateTeams(SlothDbContext context)
+        {
+            if (!context.Teams.Any(t => t.Name == "John's Team"))
+            {
+                var anlab = new Team()
+                {
+                    Name = "John's Team"
+                };
+                context.Teams.Add(anlab);
+            }
             context.SaveChanges();
         }
 
@@ -38,10 +65,26 @@ namespace Sloth.Core.Data
                     {
                         Key = "TestKey123",
                         Issued = DateTime.UtcNow
-                    }}
+                    }},
+                    Roles = new []
+                    {
+                        new UserRole()
+                        {
+                            Role = context.Roles.FirstOrDefault(r => r.Name == Roles.SystemAdmin)
+                        }, 
+                    },
+                    UserTeamRoles = new []
+                    {
+                        new UserTeamRole()
+                        {
+                            Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
+                            Role = context.Roles.FirstOrDefault(r => r.Name == Roles.Admin),
+                        }, 
+                    }
                 },
             };
             context.Users.AddRange(users);
+            context.SaveChanges();
         }
 
         private static void CreateTransactions(SlothDbContext context)
@@ -53,7 +96,7 @@ namespace Sloth.Core.Data
                 new Transaction()
                 {
                     Creator                 = context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
-                    Status                  = TransactionStatus.Scheduled,
+                    Status                  = TransactionStatuses.Scheduled,
                     MerchantTrackingNumber  = "ORDER-10",
                     ProcessorTrackingNumber = "123456",
                     KfsTrackingNumber       = "TESTTHIS1",
@@ -84,6 +127,7 @@ namespace Sloth.Core.Data
                 }
             };
             context.Transactions.AddRange(transactions);
+            context.SaveChanges();
         }
 
         private static void CreateIntegrations(SlothDbContext context)
@@ -94,6 +138,7 @@ namespace Sloth.Core.Data
             {
                 new Integration()
                 {
+                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
                     MerchantId = "ucdavis_jpknoll",
                     ReportUsername = "sloth_report",
                     ReportPasswordKey = "Report-Test-1",
@@ -102,6 +147,7 @@ namespace Sloth.Core.Data
                 },
             };
             context.Integrations.AddRange(integrations);
+            context.SaveChanges();
         }
     }
 }

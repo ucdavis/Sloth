@@ -10,6 +10,7 @@ using Sloth.Api.Helpers;
 using Sloth.Api.Models;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Resources;
 
 namespace Sloth.Api.Controllers
 {
@@ -146,6 +147,15 @@ namespace Sloth.Api.Controllers
             // create document number
             transactionToCreate.DocumentNumber = "sample";
             transactionToCreate.OriginCode = "SL";
+
+            if (transaction.AutoApprove)
+            {
+                transactionToCreate.Status = TransactionStatuses.Scheduled;
+            }
+            else
+            {
+                transactionToCreate.Status = TransactionStatuses.PendingApproval;
+            }
 
             using (var tran = _context.Database.BeginTransaction())
             {

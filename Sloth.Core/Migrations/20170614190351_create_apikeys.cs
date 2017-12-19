@@ -12,11 +12,11 @@ namespace Sloth.Core.Migrations
                 name: "ApiKeys",
                 columns: table => new
                 {
-                    Id = table.Column<string>(nullable: false),
-                    Key = table.Column<string>(nullable: false),
+                    Id = table.Column<string>(type: "nvarchar(36)", nullable: false),
+                    Key = table.Column<string>(type: "nvarchar(36)", nullable: false),
                     Issued = table.Column<DateTime>(nullable: false),
                     Revoked = table.Column<DateTime>(nullable: true),
-                    UserId = table.Column<string>(nullable: true)
+                    UserId = table.Column<string>(type: "nvarchar(36)", nullable: true)
                 },
                 constraints: table =>
                 {

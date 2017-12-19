@@ -9,8 +9,14 @@ namespace Sloth.Api.Models
     {
         public CreateTransactionViewModel()
         {
+            AutoApprove = false;
             Transfers = new List<CreateTransferViewModel>();
         }
+
+        /// <summary>
+        /// Auto approve this transaction for upload to KFS
+        /// </summary>
+        public bool AutoApprove { get; set; }
 
         /// <summary>
         /// Tracking Number created by the merchant accountant
