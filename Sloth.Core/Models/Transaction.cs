@@ -33,6 +33,8 @@ namespace Sloth.Core.Models
         [NotMapped]
         public string SourceType => Source?.Type;
 
+
+
         /// <summary>
         /// Tracking Number created by the merchant accountant
         /// </summary>
@@ -47,10 +49,8 @@ namespace Sloth.Core.Models
         /// Unique feed origination identifier given to the Feed System.
         /// The origination code is validated in during file receipt and in the processing.
         /// </summary>
-        [MinLength(2)]
-        [MaxLength(2)]
-        [Required]
-        public string OriginCode { get; set; }
+        [NotMapped]
+        public string OriginCode => Source?.OriginCode;
 
         /// <summary>
         /// Unique identifier for a set of related transactions per origination code.
@@ -67,9 +67,8 @@ namespace Sloth.Core.Models
         /// Financial System document type associated with the feed.
         /// Feed systems will be authorized to use a specific value based on transactions.
         /// </summary>
-        [MaxLength(4)]
-        [Required]
-        public string DocumentType { get; set; }
+        [NotMapped]
+        public string DocumentType => Source?.DocumentType;
 
         /// <summary>
         /// Primarily used in Decision Support reporting for additional transaction identification.
