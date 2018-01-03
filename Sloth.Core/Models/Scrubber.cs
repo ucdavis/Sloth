@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -41,6 +41,14 @@ namespace Sloth.Core.Models
         [Range(1, 999999)]
         [Required]
         public int BatchSequenceNumber { get; set; }
+
+        [MaxLength(2)]
+        [Required]
+        public string OriginCode { get; set; }
+
+        [MaxLength(4)]
+        [Required]
+        public string DocumentType { get; set; }
 
         /// <summary>
         /// </summary>

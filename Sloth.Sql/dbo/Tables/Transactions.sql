@@ -5,6 +5,7 @@ CREATE TABLE [dbo].[Transactions] (
     [KfsTrackingNumber]       NVARCHAR (10)  NOT NULL,
     [MerchantTrackingNumber]  NVARCHAR (MAX) NOT NULL,
     [OriginCode]              NVARCHAR (2)   NOT NULL,
+    [DocumentType]            NVARCHAR (4)   NOT NULL, 
     [ProcessorTrackingNumber] NVARCHAR (MAX) NULL,
     [ScrubberId]              NVARCHAR (36)  NULL,
     [Status]                  NVARCHAR (36)  NOT NULL,
