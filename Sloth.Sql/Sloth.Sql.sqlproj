@@ -77,6 +77,7 @@
     <Build Include="dbo\Tables\Integrations.sql" />
     <Build Include="dbo\Tables\ApiKeys.sql" />
     <Build Include="dbo\Sequences\KFS_Tracking_Number_Seq.sql" />
+    <Build Include="dbo\Tables\Logs.sql" />
     <Build Include="dbo\Tables\Sources.sql" />
   </ItemGroup>
 </Project>
