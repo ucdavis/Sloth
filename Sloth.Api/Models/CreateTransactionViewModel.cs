@@ -34,6 +34,20 @@ namespace Sloth.Api.Models
         [Required]
         public DateTime TransactionDate { get; set; }
 
+        /// <summary>
+        /// Source of the transactions
+        /// e.g. CyberSource
+        /// </summary>
+        [Required]
+        public string Source { get; set; }
+
+        /// <summary>
+        /// Type of the transactions by their source
+        /// e.g. Income
+        /// </summary>
+        [Required]
+        public string SourceType { get; set; }
+
         [ListMinLength(2)]
         [Required]
         public IList<CreateTransferViewModel> Transfers { get; set; }

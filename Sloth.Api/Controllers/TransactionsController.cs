@@ -138,10 +138,32 @@ namespace Sloth.Api.Controllers
                 }
             }
 
+            // find source
+            var source = await _context.Sources.FirstOrDefaultAsync(s =>
+                string.Equals(s.Name, transaction.Source, StringComparison.InvariantCultureIgnoreCase)
+                && string.Equals(s.Type, transaction.SourceType, StringComparison.InvariantCultureIgnoreCase));
+
+            if (source == null)
+            {
+                return new BadRequestObjectResult(new
+                {
+                    Message = "Source not found",
+                    Source = transaction.Source,
+                    Type = transaction.SourceType
+                });
+            }
+
+            // create document number
+            var documentNumber = "sample";
+
             var transactionToCreate = new Transaction
             {
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
+                Source                  = source,
+                OriginCode              = source.OriginCode,
+                DocumentType            = source.DocumentType,
+                DocumentNumber          = documentNumber,
                 TransactionDate         = transaction.TransactionDate,
                 Transfers               = transaction.Transfers.Select(t => new Transfer()
                 {
@@ -158,12 +180,8 @@ namespace Sloth.Api.Controllers
                     ReferenceId   = t.ReferenceId,
                     SubAccount    = t.SubAccount,
                     SubObjectCode = t.SubObjectCode,
-                }).ToList()
+                }).ToList(),
             };
-
-            // create document number
-            transactionToCreate.DocumentNumber = "sample";
-            transactionToCreate.OriginCode = "SL";
 
             if (transaction.AutoApprove)
             {
