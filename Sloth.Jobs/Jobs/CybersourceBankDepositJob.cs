@@ -22,7 +22,7 @@ namespace Sloth.Jobs.Jobs
         private readonly ISecretsService _secretsService;
         private readonly CybersourceOptions _cybersourceOptions;
 
-        public CybersourceBankDepositJob(IOptions<CybersourceOptions> options, SlothDbContext context, ISecretsService secretsService)
+        public CybersourceBankDepositJob(IOptions<CybersourceOptions> options, SlothDbContext context, ISecretsService secretsService) : base("CybersourceBankDeposit")
         {
             _context = context;
             _secretsService = secretsService;

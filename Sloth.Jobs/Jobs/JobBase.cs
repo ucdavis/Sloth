@@ -8,6 +8,13 @@ namespace Sloth.Jobs.Jobs
     [ProlongExpirationTime]
     public class JobBase
     {
+        private readonly string _jobName;
+
+        public JobBase(string jobName)
+        {
+            _jobName = jobName;
+        }
+
         protected ILogger Logger { get; set; }
 
         protected virtual void SetupLogging(PerformContext context)
@@ -15,7 +22,8 @@ namespace Sloth.Jobs.Jobs
             Logger = LoggingConfiguration.Configuration
                 .WriteTo.HangfireConsoleSink(context)
                 .CreateLogger()
-                .ForContext("jobId", context.BackgroundJob.Id);
+                .ForContext("jobId", context.BackgroundJob.Id)
+                .ForContext("jobName", _jobName);
         }
     }
 }
