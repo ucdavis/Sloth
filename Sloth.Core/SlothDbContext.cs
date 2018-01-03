@@ -22,6 +22,8 @@ namespace Sloth.Core
 
         public DbSet<Scrubber> Scrubbers { get; set; }
 
+        public DbSet<Source> Sources { get; set; }
+
         public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<Transfer> Transfers { get; set; }
