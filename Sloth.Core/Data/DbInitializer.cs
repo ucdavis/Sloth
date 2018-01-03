@@ -19,9 +19,9 @@ namespace Sloth.Core.Data
             CreateRoles(context);
             CreateTeams(context);
             CreateUsers(context);
-            CreateTransactions(context);
             CreateIntegrations(context);
             CreateSources(context);
+            CreateTransactions(context);
         }
 
         private static void CreateRoles(SlothDbContext context)
@@ -88,49 +88,6 @@ namespace Sloth.Core.Data
             context.SaveChanges();
         }
 
-        private static void CreateTransactions(SlothDbContext context)
-        {
-            if (context.Transactions.Any()) return;
-
-            var transactions = new[]
-            {
-                new Transaction()
-                {
-                    Creator                 = context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
-                    Status                  = TransactionStatuses.Scheduled,
-                    MerchantTrackingNumber  = "ORDER-10",
-                    ProcessorTrackingNumber = "123456",
-                    KfsTrackingNumber       = "TESTTHIS1",
-                    TransactionDate         = DateTime.Today.AddDays(-1),
-                    OriginCode              = "SL",
-                    DocumentNumber          = "ADOCUMENT1",
-                    Transfers = new []
-                    {
-                        new Transfer()
-                        {
-                            Amount      = 100,
-                            Chart       = "3",
-                            Account     = "6620001",
-                            ObjectCode  = "7259",
-                            Description = "Some useful description",
-                            Direction   = Transfer.CreditDebit.Debit,
-                        },
-                        new Transfer()
-                        {
-                            Amount      = 100,
-                            Chart       = "3",
-                            Account     = "1010280",
-                            ObjectCode  = "0299",
-                            Description = "Test Clearing",
-                            Direction   = Transfer.CreditDebit.Credit,
-                        },
-                    }
-                }
-            };
-            context.Transactions.AddRange(transactions);
-            context.SaveChanges();
-        }
-
         private static void CreateIntegrations(SlothDbContext context)
         {
             if (context.Integrations.Any()) return;
@@ -175,6 +132,49 @@ namespace Sloth.Core.Data
                 }
             };
             context.Sources.AddRange(sources);
+            context.SaveChanges();
+        }
+
+        private static void CreateTransactions(SlothDbContext context)
+        {
+            if (context.Transactions.Any()) return;
+
+            var transactions = new[]
+            {
+                new Transaction()
+                {
+                    Creator                 = context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
+                    Source                  = context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "Recharge"),
+                    Status                  = TransactionStatuses.Scheduled,
+                    MerchantTrackingNumber  = "ORDER-10",
+                    ProcessorTrackingNumber = "123456",
+                    KfsTrackingNumber       = "TESTTHIS1",
+                    TransactionDate         = DateTime.Today.AddDays(-1),
+                    DocumentNumber          = "ADOCUMENT1",
+                    Transfers = new []
+                    {
+                        new Transfer()
+                        {
+                            Amount      = 100,
+                            Chart       = "3",
+                            Account     = "6620001",
+                            ObjectCode  = "7259",
+                            Description = "Some useful description",
+                            Direction   = Transfer.CreditDebit.Debit,
+                        },
+                        new Transfer()
+                        {
+                            Amount      = 100,
+                            Chart       = "3",
+                            Account     = "1010280",
+                            ObjectCode  = "0299",
+                            Description = "Test Clearing",
+                            Direction   = Transfer.CreditDebit.Credit,
+                        },
+                    }
+                }
+            };
+            context.Transactions.AddRange(transactions);
             context.SaveChanges();
         }
     }
