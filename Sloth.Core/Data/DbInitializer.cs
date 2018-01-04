@@ -19,8 +19,9 @@ namespace Sloth.Core.Data
             CreateRoles(context);
             CreateTeams(context);
             CreateUsers(context);
-            CreateTransactions(context);
+            CreateSources(context);
             CreateIntegrations(context);
+            CreateTransactions(context);
         }
 
         private static void CreateRoles(SlothDbContext context)
@@ -87,6 +88,54 @@ namespace Sloth.Core.Data
             context.SaveChanges();
         }
 
+        private static void CreateSources(SlothDbContext context)
+        {
+            if (context.Sources.Any()) return;
+
+            var sources = new[]
+            {
+                new Source
+                {
+                    Name = "ANLAB",
+                    Type = "Recharge",
+                    OriginCode = "AN",
+                    DocumentType = DocumentTypes.GLIB,
+                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team")
+                },
+                new Source
+                {
+                    Name = "ANLAB",
+                    Type = "CyberSource",
+                    OriginCode = "AN",
+                    DocumentType = DocumentTypes.GLJV,
+                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team")
+                }
+            };
+            context.Sources.AddRange(sources);
+            context.SaveChanges();
+        }
+
+        private static void CreateIntegrations(SlothDbContext context)
+        {
+            if (context.Integrations.Any()) return;
+
+            var integrations = new[]
+            {
+                new Integration()
+                {
+                    Team              = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
+                    Source            = context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "CyberSource"),
+                    MerchantId        = "ucdavis_jpknoll",
+                    ReportUsername    = "sloth_report",
+                    ReportPasswordKey = "Report-Test-1",
+                    DefaultAccount    = "DEFAULT",
+                    Type              = IntegrationTypes.CyberSource
+                },
+            };
+            context.Integrations.AddRange(integrations);
+            context.SaveChanges();
+        }
+
         private static void CreateTransactions(SlothDbContext context)
         {
             if (context.Transactions.Any()) return;
@@ -96,12 +145,12 @@ namespace Sloth.Core.Data
                 new Transaction()
                 {
                     Creator                 = context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
+                    Source                  = context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "Recharge"),
                     Status                  = TransactionStatuses.Scheduled,
                     MerchantTrackingNumber  = "ORDER-10",
                     ProcessorTrackingNumber = "123456",
                     KfsTrackingNumber       = "TESTTHIS1",
                     TransactionDate         = DateTime.Today.AddDays(-1),
-                    OriginCode              = "SL",
                     DocumentNumber          = "ADOCUMENT1",
                     Transfers = new []
                     {
@@ -127,26 +176,6 @@ namespace Sloth.Core.Data
                 }
             };
             context.Transactions.AddRange(transactions);
-            context.SaveChanges();
-        }
-
-        private static void CreateIntegrations(SlothDbContext context)
-        {
-            if (context.Integrations.Any()) return;
-
-            var integrations = new[]
-            {
-                new Integration()
-                {
-                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
-                    MerchantId = "ucdavis_jpknoll",
-                    ReportUsername = "sloth_report",
-                    ReportPasswordKey = "Report-Test-1",
-                    DefaultAccount = "DEFAULT",
-                    Type = Integration.IntegrationType.CyberSource
-                },
-            };
-            context.Integrations.AddRange(integrations);
             context.SaveChanges();
         }
     }

@@ -17,7 +17,7 @@ namespace Sloth.Jobs.Jobs
         private readonly IKfsScrubberService _kfsScrubberService;
 
 
-        public UploadScrubberJob(SlothDbContext context, IKfsScrubberService kfsScrubberService)
+        public UploadScrubberJob(SlothDbContext context, IKfsScrubberService kfsScrubberService) : base("UploadScrubber")
         {
             _context = context;
             _kfsScrubberService = kfsScrubberService;
@@ -44,28 +44,38 @@ namespace Sloth.Jobs.Jobs
                     return;
                 }
 
-                // create scrubber
-                log.Information("Creating Scrubber for {count} transactions.", transactions.Count);
-                var scrubber = new Scrubber()
+                // group transactions by origin code and feed
+                var groups = transactions.GroupBy(t => t.Source);
+                foreach (var group in groups)
                 {
-                    Chart               = "3",
-                    OrganizationCode    = "ACCT",
-                    BatchDate           = DateTime.Today,
-                    BatchSequenceNumber = 1,
-                    Transactions        = transactions
-                };
+                    var groupedTransactions = group.ToList();
+
+                    // create scrubber
+                    log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
+                    var scrubber = new Scrubber()
+                    {
+                        Chart               = "3",
+                        OrganizationCode    = "ACCT",
+                        BatchDate           = DateTime.Today,
+                        BatchSequenceNumber = 1,
+                        Transactions        = groupedTransactions
+                    };
+
+                    // create filename
+                    var originCode = group.Key.OriginCode;
+                    var docType = group.Key.DocumentType;
+                    var filename = $"{docType}.{originCode}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
+
+                    // ship scrubber
+                    log.Information("Uploading {filename}", filename);
+                    var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, log);
+                    scrubber.Uri = uri.AbsoluteUri;
+
+                    // persist scrubber uri
+                    _context.Scrubbers.Add(scrubber);
+                }
+
                 
-                // create filename
-                var oc = "SL";
-                var filename = $"journal.{oc}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
-
-                // ship scrubber
-                log.Information("Uploading {filename}", filename);
-                var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, log);
-                scrubber.Uri = uri.AbsoluteUri;
-
-                // persist scrubber uri
-                _context.Scrubbers.Add(scrubber);
                 await _context.SaveChangesAsync();
             }
             catch (Exception ex)

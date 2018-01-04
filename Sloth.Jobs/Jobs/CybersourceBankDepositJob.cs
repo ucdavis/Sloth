@@ -22,7 +22,7 @@ namespace Sloth.Jobs.Jobs
         private readonly ISecretsService _secretsService;
         private readonly CybersourceOptions _cybersourceOptions;
 
-        public CybersourceBankDepositJob(IOptions<CybersourceOptions> options, SlothDbContext context, ISecretsService secretsService)
+        public CybersourceBankDepositJob(IOptions<CybersourceOptions> options, SlothDbContext context, ISecretsService secretsService) : base("CybersourceBankDeposit")
         {
             _context = context;
             _secretsService = secretsService;
@@ -54,7 +54,7 @@ namespace Sloth.Jobs.Jobs
             try
             {
                 var integrations = _context.Integrations
-                    .Where(i => i.Type == Integration.IntegrationType.CyberSource)
+                    .Where(i => i.Type == IntegrationTypes.CyberSource)
                     .ToList();
 
                 foreach (var integration in integrations)
@@ -114,11 +114,11 @@ namespace Sloth.Jobs.Jobs
 
                     transaction = new Transaction()
                     {
+                        Source                  = integration.Source,
                         Status                  = TransactionStatuses.Scheduled,
                         KfsTrackingNumber       = kfsTrackingNumber,
                         MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
                         ProcessorTrackingNumber = deposit.RequestID,
-                        OriginCode              = "SL",
                         DocumentNumber          = "ADOCUMENT1",
                         TransactionDate         = yesterday
                     };

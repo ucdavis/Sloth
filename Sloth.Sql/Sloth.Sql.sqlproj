@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Compare\SqlSchemaCompare_localhost.scmp" />
+    <None Include="Compare\SqlSchemaCompare_test.scmp" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\UserTeamRoles.sql" />
@@ -77,5 +78,7 @@
     <Build Include="dbo\Tables\Integrations.sql" />
     <Build Include="dbo\Tables\ApiKeys.sql" />
     <Build Include="dbo\Sequences\KFS_Tracking_Number_Seq.sql" />
+    <Build Include="dbo\Tables\Logs.sql" />
+    <Build Include="dbo\Tables\Sources.sql" />
   </ItemGroup>
 </Project>
