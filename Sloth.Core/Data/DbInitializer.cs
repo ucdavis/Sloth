@@ -19,8 +19,8 @@ namespace Sloth.Core.Data
             CreateRoles(context);
             CreateTeams(context);
             CreateUsers(context);
-            CreateIntegrations(context);
             CreateSources(context);
+            CreateIntegrations(context);
             CreateTransactions(context);
         }
 
@@ -88,6 +88,33 @@ namespace Sloth.Core.Data
             context.SaveChanges();
         }
 
+        private static void CreateSources(SlothDbContext context)
+        {
+            if (context.Sources.Any()) return;
+
+            var sources = new[]
+            {
+                new Source
+                {
+                    Name = "ANLAB",
+                    Type = "Recharge",
+                    OriginCode = "AN",
+                    DocumentType = DocumentTypes.GLIB,
+                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team")
+                },
+                new Source
+                {
+                    Name = "ANLAB",
+                    Type = "CyberSource",
+                    OriginCode = "AN",
+                    DocumentType = DocumentTypes.GLJV,
+                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team")
+                }
+            };
+            context.Sources.AddRange(sources);
+            context.SaveChanges();
+        }
+
         private static void CreateIntegrations(SlothDbContext context)
         {
             if (context.Integrations.Any()) return;
@@ -106,33 +133,6 @@ namespace Sloth.Core.Data
                 },
             };
             context.Integrations.AddRange(integrations);
-            context.SaveChanges();
-        }
-
-        private static void CreateSources(SlothDbContext context)
-        {
-            if (context.Sources.Any()) return;
-
-            var sources = new[]
-            {
-                new Source
-                {
-                    Name = "ANLAB",
-                    Type = "Recharge",
-                    OriginCode = "AN",
-                    DocumentType = DocumentTypes.GLIB,
-                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team")
-                },
-                new Source
-                {
-                    Name = "ANLAB",
-                    Type = "Income",
-                    OriginCode = "AN",
-                    DocumentType = DocumentTypes.GLJV,
-                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team")
-                }
-            };
-            context.Sources.AddRange(sources);
             context.SaveChanges();
         }
 
