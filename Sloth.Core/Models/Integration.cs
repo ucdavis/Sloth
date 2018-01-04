@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sloth.Core.Models
 {
@@ -6,13 +7,14 @@ namespace Sloth.Core.Models
     {
         public string Id { get; set; }
 
-        public string TeamId { get; set; }
-
+        [Required]
         public Team Team { get; set; }
 
-        public IntegrationType Type { get; set; }
         [Required]
         public Source Source { get; set; }
+
+        [Required]
+        public string Type { get; set; }
 
         public string MerchantId { get; set; }
 
@@ -21,10 +23,5 @@ namespace Sloth.Core.Models
         public string ReportPasswordKey { get; set; }
 
         public string DefaultAccount { get; set; }
-
-        public enum IntegrationType
-        {
-            CyberSource
-        }
     }
 }

@@ -96,13 +96,13 @@ namespace Sloth.Core.Data
             {
                 new Integration()
                 {
-                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
-                    MerchantId = "ucdavis_jpknoll",
-                    ReportUsername = "sloth_report",
+                    Team              = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
                     Source            = context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "CyberSource"),
+                    MerchantId        = "ucdavis_jpknoll",
+                    ReportUsername    = "sloth_report",
                     ReportPasswordKey = "Report-Test-1",
-                    DefaultAccount = "DEFAULT",
-                    Type = Integration.IntegrationType.CyberSource
+                    DefaultAccount    = "DEFAULT",
+                    Type              = IntegrationTypes.CyberSource
                 },
             };
             context.Integrations.AddRange(integrations);
