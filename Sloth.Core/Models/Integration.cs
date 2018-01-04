@@ -11,6 +11,8 @@ namespace Sloth.Core.Models
         public Team Team { get; set; }
 
         public IntegrationType Type { get; set; }
+        [Required]
+        public Source Source { get; set; }
 
         public string MerchantId { get; set; }
 

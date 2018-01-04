@@ -114,11 +114,11 @@ namespace Sloth.Jobs.Jobs
 
                     transaction = new Transaction()
                     {
+                        Source                  = integration.Source,
                         Status                  = TransactionStatuses.Scheduled,
                         KfsTrackingNumber       = kfsTrackingNumber,
                         MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
                         ProcessorTrackingNumber = deposit.RequestID,
-                        OriginCode              = "SL",
                         DocumentNumber          = "ADOCUMENT1",
                         TransactionDate         = yesterday
                     };

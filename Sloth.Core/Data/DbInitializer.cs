@@ -99,6 +99,7 @@ namespace Sloth.Core.Data
                     Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
                     MerchantId = "ucdavis_jpknoll",
                     ReportUsername = "sloth_report",
+                    Source            = context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "CyberSource"),
                     ReportPasswordKey = "Report-Test-1",
                     DefaultAccount = "DEFAULT",
                     Type = Integration.IntegrationType.CyberSource
