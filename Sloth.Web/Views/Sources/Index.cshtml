@@ -1,0 +1,29 @@
+@using Sloth.Core.Models
+@model IEnumerable<Source>
+
+@{
+    ViewBag.Title = "Sources";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<table>
+    <thead>
+        <tr>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var source in Model)
+        {
+            <tr>
+                <td>@source.Id</td>
+                <td>@source.Name</td>
+                <td>@source.Type</td>
+                <td>@source.Team.Name</td>
+                <td>@source.OriginCode</td>
+                <td>@source.DocumentType</td>
+            </tr>
+        }
+    </tbody>
+</table>

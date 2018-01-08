@@ -1,0 +1,23 @@
+@using Sloth.Core.Models;
+@model Sloth.Web.Models.CreateSource
+
+@{
+    ViewBag.Title = "Create Source";
+
+    var teams = ViewBag.Teams as IEnumerable<Team>;
+    var teamItems = teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.Id });
+}
+
+<h2>@ViewBag</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.DropDownListFor(x => x.TeamId, teamItems)
+    @Html.EditorFor(x => x.Name)
+    @Html.EditorFor(x => x.Type)
+    @Html.EditorFor(x => x.Description)
+    @Html.EditorFor(x => x.OriginCode)
+    @Html.EditorFor(x => x.DocumentType)
+
+    <input type="submit" value="Create" />
+}
