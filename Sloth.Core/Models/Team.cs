@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
 {
@@ -10,6 +12,9 @@ namespace Sloth.Core.Models
         public string Id { get; set; }
 
         public string Name { get; set; }
+
+        [JsonIgnore]
+        public IList<Integration> Integrations { get; set; }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
