@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Models;
@@ -57,9 +58,6 @@ namespace Sloth.Jobs
             services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
-
-            // add logger configuration
-            services.AddTransient(_ => LoggingConfiguration.Configuration);
 
             // Add framework services.
             services.AddDbContext<SlothDbContext>(options =>
@@ -111,8 +109,10 @@ namespace Sloth.Jobs
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
+            // setup logging
+            LoggingConfiguration.Setup(Configuration);
+
+            loggerFactory.AddSerilog();
 
             if (env.IsDevelopment())
             {
