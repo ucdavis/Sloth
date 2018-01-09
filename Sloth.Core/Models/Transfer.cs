@@ -96,6 +96,7 @@ namespace Sloth.Core.Models
         /// Entries will default during general ledger processing based on run date.
         /// </summary>
         [Range(2017, 2099)]
+        [Required]
         public int FiscalYear { get; set; }
 
         /// <summary>
@@ -108,6 +109,7 @@ namespace Sloth.Core.Models
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>
         [Range(1, 12)]
+        [Required]
         public int FiscalPeriod { get; set; }
 
         /// <summary>
