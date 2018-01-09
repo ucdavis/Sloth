@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire.RecurringJobExtensions;
 using Hangfire.Server;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Sloth.Core;
+using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
@@ -98,6 +100,10 @@ namespace Sloth.Jobs.Jobs
                         return;
                     }
 
+                    // setup values
+                    var fiscalYear = yesterday.FiscalYear();
+                    var fiscalPeriod = yesterday.FiscalPeriod();
+
                     // iterate over deposits
                     foreach (var deposit in report.Batches?.Batch?.SelectMany(b => b.Requests?.Request) ??
                                             new List<Request>())
@@ -121,67 +127,83 @@ namespace Sloth.Jobs.Jobs
 
                         transaction = new Transaction()
                         {
-                            Source = integration.Source,
-                            Status = TransactionStatuses.Scheduled,
-                            KfsTrackingNumber = kfsTrackingNumber,
-                            MerchantTrackingNumber = deposit.MerchantReferenceNumber,
+                            Source                  = integration.Source,
+                            Status                  = TransactionStatuses.Scheduled,
+                            KfsTrackingNumber       = kfsTrackingNumber,
+                            MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber = deposit.RequestID,
-                            DocumentNumber = "ADOCUMENT1",
-                            TransactionDate = yesterday
+                            DocumentNumber          = "ADOCUMENT1",
+                            TransactionDate         = yesterday,
                         };
 
                         // move money out of clearing
                         var clearing = new Transfer()
                         {
-                            Chart = "3",
-                            Account = _cybersourceOptions.ClearingAccount,
-                            Direction = Transfer.CreditDebit.Debit,
-                            Amount = deposit.Amount,
-                            Description = "Deposit",
-                            ObjectCode = "ABCD",
+                            Chart        = "3",
+                            Account      = _cybersourceOptions.ClearingAccount,
+                            Direction    = Transfer.CreditDebit.Debit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
+                            FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(clearing);
 
                         // move money into holding
                         var holding = new Transfer()
                         {
-                            Account = _cybersourceOptions.HoldingAccount,
-                            Direction = Transfer.CreditDebit.Credit,
-                            Amount = deposit.Amount,
-                            Description = "Deposit",
-                            ObjectCode = "ABCD",
+                            Chart        = "3",
+                            Account      = _cybersourceOptions.HoldingAccount,
+                            Direction    = Transfer.CreditDebit.Credit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
+                            FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(holding);
 
                         // then back out of holding
                         var holding2 = new Transfer()
                         {
-                            Account = _cybersourceOptions.HoldingAccount,
-                            Direction = Transfer.CreditDebit.Debit,
-                            Amount = deposit.Amount,
-                            Description = "Deposit",
-                            ObjectCode = "ABCD",
+                            Chart        = "3",
+                            Account      = _cybersourceOptions.HoldingAccount,
+                            Direction    = Transfer.CreditDebit.Debit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
+                            FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(holding2);
 
                         // into the default account
                         var final = new Transfer()
                         {
-                            Account = integration.DefaultAccount,
-                            Direction = Transfer.CreditDebit.Credit,
-                            Amount = deposit.Amount,
-                            Description = "Deposit",
-                            ObjectCode = "ABCD",
+                            Chart        = "3",
+                            Account      = integration.DefaultAccount,
+                            Direction    = Transfer.CreditDebit.Credit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
+                            FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(final);
 
                         var errors = _context.ValidateModel(transaction);
+                        if (errors.Any())
+                        {
+                            log.ForContext("errors", errors).Warning("Validation Errors Detected");
+                            throw new ValidationException();
+                        }
 
                         _context.Transactions.Add(transaction);
                     }
 
                     // push changes for this integration
-                    var inserted = _context.SaveChanges();
+                    var inserted = await _context.SaveChangesAsync();
                     tran.Commit();
                     log.Information("{count} records created.", new {count = inserted});
                 }
