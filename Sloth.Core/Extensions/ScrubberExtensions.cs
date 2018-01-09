@@ -53,9 +53,25 @@ namespace Sloth.Core.Extensions
 
         public static EntryWithDetail ToEntry(this Transfer transfer)
         {
+            var direction = transfer.Direction == Transfer.CreditDebit.Credit
+                ? transactionDebitCreditCode.C
+                : transactionDebitCreditCode.D;
+
             return new EntryWithDetail()
             {
-                TrackingNumber = transfer.Transaction.KfsTrackingNumber
+                OriginCode      = transfer.Transaction.OriginCode,
+                Chart           = transfer.Chart,
+                Account         = transfer.Account,
+                SubAccount      = transfer.SubAccount,
+                ObjectCode      = transfer.ObjectCode,
+                SubObjectCode   = transfer.SubObjectCode,
+                TrackingNumber  = transfer.Transaction.KfsTrackingNumber,
+                Amount          = transfer.Amount,
+                DebitCredit     = direction,
+                FiscalYear      = transfer.FiscalYear,
+                //FiscalPeriod  = transfer.FiscalPeriod,
+                BalanceType     = financialBalanceTypeCode.AC,
+                TransactionDate = transfer.Transaction.TransactionDate
             };
         }
     }
