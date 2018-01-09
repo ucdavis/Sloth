@@ -55,6 +55,7 @@ namespace Sloth.Jobs.Jobs
             {
                 var integrations = _context.Integrations
                     .Where(i => i.Type == IntegrationTypes.CyberSource)
+                    .Include(i => i.Source)
                     .ToList();
 
                 foreach (var integration in integrations)
