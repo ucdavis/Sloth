@@ -77,8 +77,13 @@ namespace Sloth.Jobs.Jobs
 
                     // persist scrubber uri
                     _context.Scrubbers.Add(scrubber);
-                }
 
+                    // update transactions' status
+                    groupedTransactions.ForEach(t =>
+                    {
+                        t.Status = TransactionStatuses.Completed;
+                    });
+                }
                 
                 await _context.SaveChangesAsync();
             }
