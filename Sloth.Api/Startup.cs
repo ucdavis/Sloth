@@ -83,6 +83,7 @@ namespace Sloth.Api
                 {
                     o.SerializerSettings.Formatting = Formatting.Indented;
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    o.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                     o.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
 
