@@ -38,7 +38,7 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ScheduleTransaction(string id, bool update)
+        public async Task<IActionResult> ScheduleTransaction(string id)
         {
             var transaction = await _context.Transactions
                 .Include(t => t.Scrubber)

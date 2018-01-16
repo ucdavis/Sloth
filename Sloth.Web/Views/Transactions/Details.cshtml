@@ -38,7 +38,6 @@
 @if (Model.Status == TransactionStatuses.PendingApproval)
 {
     <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Id" method="post" class="form-horizontal">
-        @Html.Hidden("update", true)
         <button type="submit" class="btn btn-small">Approve</button>
     </form>
 }
