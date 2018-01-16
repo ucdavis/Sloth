@@ -45,6 +45,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Transfers)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
+            //TODO: return error messages and redirect
             if (transaction == null)
             {
                 return NotFound();
