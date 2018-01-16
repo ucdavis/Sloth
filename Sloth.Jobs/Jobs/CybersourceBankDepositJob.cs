@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Hangfire.RecurringJobExtensions;
 using Hangfire.Server;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Sloth.Core;
+using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
@@ -55,6 +57,7 @@ namespace Sloth.Jobs.Jobs
             {
                 var integrations = _context.Integrations
                     .Where(i => i.Type == IntegrationTypes.CyberSource)
+                    .Include(i => i.Source)
                     .ToList();
 
                 foreach (var integration in integrations)
@@ -74,114 +77,141 @@ namespace Sloth.Jobs.Jobs
             var log = Logger.ForContext("date", yesterday)
                             .ForContext("integration", integration.Id);
 
-            var tran = await _context.Database.BeginTransactionAsync();
-            try
+            using (var tran = await _context.Database.BeginTransactionAsync())
             {
-                // fetch password secret
-                var password = await _secretsService.GetSecret(integration.ReportPasswordKey);
-
-                // create client
-                var client = new ReportClient(_cybersourceOptions.ReportUrl, integration.MerchantId, integration.ReportUsername,
-                    password);
-
-                // fetch report
-                var report = await client.GetPaymentBatchDetailReport(yesterday);
-                var count = report.Batches?.Batch?.Length ?? 0;
-
-                log.Information("Report found with {count} records.", new {count});
-
-                if (count < 1)
+                try
                 {
-                    return;
-                }
+                    // fetch password secret
+                    var password = await _secretsService.GetSecret(integration.ReportPasswordKey);
 
-                // iterate over deposits
-                foreach (var deposit in report.Batches?.Batch?.SelectMany(b => b.Requests?.Request) ?? new List<Request>())
-                {
-                    // look for existing transaction
-                    var transaction = _context.Transactions.FirstOrDefault(t => t.ProcessorTrackingNumber == deposit.RequestID);
-                    if (transaction != null)
+                    // create client
+                    var client = new ReportClient(_cybersourceOptions.ReportUrl, integration.MerchantId,
+                        integration.ReportUsername,
+                        password);
+
+                    // fetch report
+                    var report = await client.GetPaymentBatchDetailReport(yesterday);
+                    var count = report.Batches?.Batch?.Length ?? 0;
+
+                    log.Information("Report found with {count} records.", new {count});
+
+                    if (count < 1)
                     {
-                        log.ForContext("tracking_number", deposit.MerchantReferenceNumber).Information("Transaction already exists.");
-                        continue;
+                        return;
                     }
 
-                    log.ForContext("tracking_number", deposit.MerchantReferenceNumber).Information("Creating transaction");
+                    // setup values
+                    var fiscalYear = yesterday.FiscalYear();
+                    var fiscalPeriod = yesterday.FiscalPeriod();
 
-                    // create transaction per deposit item,
-                    // moving monies from clearing to holding then final acocunt
-                    var kfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
-
-                    transaction = new Transaction()
+                    // iterate over deposits
+                    foreach (var deposit in report.Batches?.Batch?.SelectMany(b => b.Requests?.Request) ??
+                                            new List<Request>())
                     {
-                        Source                  = integration.Source,
-                        Status                  = TransactionStatuses.Scheduled,
-                        KfsTrackingNumber       = kfsTrackingNumber,
-                        MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
-                        ProcessorTrackingNumber = deposit.RequestID,
-                        DocumentNumber          = "ADOCUMENT1",
-                        TransactionDate         = yesterday
-                    };
+                        // look for existing transaction
+                        var transaction =
+                            _context.Transactions.FirstOrDefault(t => t.ProcessorTrackingNumber == deposit.RequestID);
+                        if (transaction != null)
+                        {
+                            log.ForContext("tracking_number", deposit.MerchantReferenceNumber)
+                                .Information("Transaction already exists.");
+                            continue;
+                        }
 
-                    // move money out of clearing
-                    var clearing = new Transfer()
-                    {
-                        Chart          = "3",
-                        Account        = _cybersourceOptions.ClearingAccount,
-                        Direction      = Transfer.CreditDebit.Debit,
-                        Amount         = deposit.Amount,
-                        Description    = "Deposit",
-                        ObjectCode     = "ABCD",
-                    };
-                    transaction.Transfers.Add(clearing);
+                        log.ForContext("tracking_number", deposit.MerchantReferenceNumber)
+                            .Information("Creating transaction");
 
-                    // move money into holding
-                    var holding = new Transfer()
-                    {
-                        Account        = _cybersourceOptions.HoldingAccount,
-                        Direction      = Transfer.CreditDebit.Credit,
-                        Amount         = deposit.Amount,
-                        Description    = "Deposit",
-                        ObjectCode     = "ABCD",
-                    };
-                    transaction.Transfers.Add(holding);
+                        // create transaction per deposit item,
+                        // moving monies from clearing to holding then final acocunt
+                        var kfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
 
-                    // then back out of holding
-                    var holding2 = new Transfer()
-                    {
-                        Account        = _cybersourceOptions.HoldingAccount,
-                        Direction      = Transfer.CreditDebit.Debit,
-                        Amount         = deposit.Amount,
-                        Description    = "Deposit",
-                        ObjectCode     = "ABCD",
-                    };
-                    transaction.Transfers.Add(holding2);
+                        transaction = new Transaction()
+                        {
+                            Source                  = integration.Source,
+                            Status                  = TransactionStatuses.Scheduled,
+                            KfsTrackingNumber       = kfsTrackingNumber,
+                            MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
+                            ProcessorTrackingNumber = deposit.RequestID,
+                            DocumentNumber          = "ADOCUMENT1",
+                            TransactionDate         = yesterday,
+                        };
 
-                    // into the default account
-                    var final = new Transfer()
-                    {
-                        Account        = integration.DefaultAccount,
-                        Direction      = Transfer.CreditDebit.Credit,
-                        Amount         = deposit.Amount,
-                        Description    = "Deposit",
-                        ObjectCode     = "ABCD",
-                    };
-                    transaction.Transfers.Add(final);
+                        // move money out of clearing
+                        var clearing = new Transfer()
+                        {
+                            Chart        = "3",
+                            Account      = _cybersourceOptions.ClearingAccount,
+                            Direction    = Transfer.CreditDebit.Debit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
+                            FiscalPeriod = fiscalPeriod,
+                        };
+                        transaction.Transfers.Add(clearing);
 
-                    var errors = _context.ValidateModel(transaction);
+                        // move money into holding
+                        var holding = new Transfer()
+                        {
+                            Chart        = "3",
+                            Account      = _cybersourceOptions.HoldingAccount,
+                            Direction    = Transfer.CreditDebit.Credit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
+                            FiscalPeriod = fiscalPeriod,
+                        };
+                        transaction.Transfers.Add(holding);
 
-                    _context.Transactions.Add(transaction);
+                        // then back out of holding
+                        var holding2 = new Transfer()
+                        {
+                            Chart        = "3",
+                            Account      = _cybersourceOptions.HoldingAccount,
+                            Direction    = Transfer.CreditDebit.Debit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
+                            FiscalPeriod = fiscalPeriod,
+                        };
+                        transaction.Transfers.Add(holding2);
+
+                        // into the default account
+                        var final = new Transfer()
+                        {
+                            Chart        = "3",
+                            Account      = integration.DefaultAccount,
+                            Direction    = Transfer.CreditDebit.Credit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
+                            FiscalPeriod = fiscalPeriod,
+                        };
+                        transaction.Transfers.Add(final);
+
+                        var errors = _context.ValidateModel(transaction);
+                        if (errors.Any())
+                        {
+                            log.ForContext("errors", errors).Warning("Validation Errors Detected");
+                            throw new ValidationException();
+                        }
+
+                        _context.Transactions.Add(transaction);
+                    }
+
+                    // push changes for this integration
+                    var inserted = await _context.SaveChangesAsync();
+                    tran.Commit();
+                    log.Information("{count} records created.", new {count = inserted});
                 }
-                
-                // push changes for this integration
-                var inserted = _context.SaveChanges();
-                tran.Commit();
-                log.Information("{count} records created.", new { count = inserted });
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex, ex.Message);
-                tran.Rollback();
+                catch (Exception ex)
+                {
+                    log.Error(ex, ex.Message);
+                    tran.Rollback();
+                }
             }
         }
     }

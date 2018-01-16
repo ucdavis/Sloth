@@ -13,51 +13,63 @@ namespace Sloth.Jobs.Logging
     {
         private static bool _loggingSetup;
 
-        public static LoggerConfiguration Configuration;
+        private static IConfiguration _configuration;
 
         /// <summary>
-        /// Configure Application Logging
+        /// Configure Global Application Logging
         /// </summary>
         public static void Setup(IConfiguration configuration)
         {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
             if (_loggingSetup) return; //only setup logging once
 
-            if (true)
-            {
-                Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
-            }
+            // save configuration for later calls
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+
+            // create global logger
+            Log.Logger = GetConfiguration().CreateLogger();
+
+            _loggingSetup = true;
+        }
+
+        /// <summary>
+        /// Get another copy of the logger configuration
+        /// </summary>
+        /// <returns></returns>
+        public static LoggerConfiguration GetConfiguration()
+        {
+            if (_configuration == null) throw new InvalidOperationException("Call Setup() before requesting a Logger Configuration");;
 
             // standard logger
-            Configuration = new LoggerConfiguration()
+            var logConfig = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .Enrich.WithExceptionDetails()
                 .Enrich.WithProperty("Source", "Sloth.Jobs");
 
             // various sinks
-            ConfigureSqlLogging(configuration);
+            logConfig = logConfig
+                .WriteToStackifyCustom()
+                .WriteToSqlCustom();
 
-            ConfigureStackifyLogging(configuration);
-
-            // create global logger
-            Log.Logger = Configuration.CreateLogger();
-
-            _loggingSetup = true;
+            return logConfig;
         }
 
-        private static void ConfigureStackifyLogging(IConfiguration configuration)
+        private static LoggerConfiguration WriteToStackifyCustom(this LoggerConfiguration logConfig)
         {
+            if (true)
+            {
+                Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
+            }
+
             var stackifyOptions = new StackifyOptions();
-            configuration.GetSection("Stackify").Bind(stackifyOptions);
+            _configuration.GetSection("Stackify").Bind(stackifyOptions);
             StackifyLib.Config.ApiKey = stackifyOptions.ApiKey;
             StackifyLib.Config.AppName = stackifyOptions.AppName;
             StackifyLib.Config.Environment = stackifyOptions.Environment;
 
-            Configuration = Configuration.WriteTo.Stackify();
+            return logConfig.WriteTo.Stackify();
         }
 
-        private static void ConfigureSqlLogging(IConfiguration configuration)
+        private static LoggerConfiguration WriteToSqlCustom(this LoggerConfiguration logConfig)
         {
             var columnOptions = new ColumnOptions();
 
@@ -77,9 +89,9 @@ namespace Sloth.Jobs.Logging
                 new DataColumn {ColumnName = "JobId", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
             };
 
-            Configuration = Configuration
+            return logConfig
                 .WriteTo.MSSqlServer(
-                    connectionString: configuration.GetConnectionString("DefaultConnection"),
+                    connectionString: _configuration.GetConnectionString("DefaultConnection"),
                     tableName: "Logs",
                     columnOptions: columnOptions
                 );

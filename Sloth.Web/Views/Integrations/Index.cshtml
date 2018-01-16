@@ -1,0 +1,28 @@
+@using Sloth.Core.Models
+@model IEnumerable<Integration>
+
+@{
+    ViewBag.Title = "Integrations";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var integration in Model)
+    {
+        <tr>
+            <td>@integration.Id</td>
+            <td>@integration.Type</td>
+            <td>@integration.Team</td>
+            <td>@integration.MerchantId</td>
+            <td>@integration.DefaultAccount</td>
+        </tr>
+    }
+    </tbody>
+</table>

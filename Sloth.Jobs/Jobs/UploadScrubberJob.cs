@@ -36,6 +36,7 @@ namespace Sloth.Jobs.Jobs
                 var transactions = _context.Transactions
                     .Where(t => t.Status == TransactionStatuses.Scheduled)
                     .Include(t => t.Transfers)
+                    .Include(t => t.Source)
                     .ToList();
 
                 if (!transactions.Any())
@@ -50,6 +51,9 @@ namespace Sloth.Jobs.Jobs
                 {
                     var groupedTransactions = group.ToList();
 
+                    var originCode = group.Key.OriginCode;
+                    var docType = group.Key.DocumentType;
+
                     // create scrubber
                     log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
                     var scrubber = new Scrubber()
@@ -58,12 +62,12 @@ namespace Sloth.Jobs.Jobs
                         OrganizationCode    = "ACCT",
                         BatchDate           = DateTime.Today,
                         BatchSequenceNumber = 1,
-                        Transactions        = groupedTransactions
+                        Transactions        = groupedTransactions,
+                        OriginCode          = originCode,
+                        DocumentType        = docType
                     };
 
                     // create filename
-                    var originCode = group.Key.OriginCode;
-                    var docType = group.Key.DocumentType;
                     var filename = $"{docType}.{originCode}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
 
                     // ship scrubber
@@ -73,8 +77,13 @@ namespace Sloth.Jobs.Jobs
 
                     // persist scrubber uri
                     _context.Scrubbers.Add(scrubber);
-                }
 
+                    // update transactions' status
+                    groupedTransactions.ForEach(t =>
+                    {
+                        t.Status = TransactionStatuses.Completed;
+                    });
+                }
                 
                 await _context.SaveChangesAsync();
             }
