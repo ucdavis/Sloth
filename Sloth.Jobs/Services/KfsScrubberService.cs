@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Serilog;
@@ -18,20 +19,26 @@ namespace Sloth.Jobs.Services
     public class KfsScrubberService : IKfsScrubberService
     {
         private readonly IStorageService _storageService;
+        private readonly ISecretsService _secretsService;
 
         private readonly string _username;
-        private readonly string _password;
         private readonly string _host;
+        private readonly string _passwordKeyName;
+
+        private PrivateKeyFile _privateKey;
+
 
         private readonly string _storageContainer;
 
-        public KfsScrubberService(IOptions<KfsOptions> options, IStorageService storageService)
+        public KfsScrubberService(IOptions<KfsOptions> options, IStorageService storageService, ISecretsService secretsService)
         {
             _storageService = storageService;
+            _secretsService = secretsService;
 
             _host = options.Value.Host;
             _username = options.Value.Username;
-            _password = options.Value.Password;
+
+            _passwordKeyName = options.Value.PrivateFileName;
 
             _storageContainer = options.Value.ScrubberBlobContainer;
         }
@@ -57,20 +64,32 @@ namespace Sloth.Jobs.Services
             scrubber.Uri = uri.AbsoluteUri;
 
             // upload scrubber
-            //using (var client = GetClient())
-            //{
-            //    client.Connect();
+            using (var client = await GetClient())
+            {
+                client.Connect();
 
-            //    ms.Seek(0, SeekOrigin.Begin);
-            //    await Task.Factory.FromAsync(client.BeginUploadFile(ms, filename), client.EndUploadFile);
-            //}
+                ms.Seek(0, SeekOrigin.Begin);
+                await Task.Factory.FromAsync(client.BeginUploadFile(ms, filename), client.EndUploadFile);
+            }
 
             return uri;
         }
 
-        private SftpClient GetClient()
+        private async Task<SftpClient> GetClient()
         {
-            return new SftpClient(_host, 22, _username, _password);
+            var key = await GetPrivateKey();
+            return new SftpClient(_host, 22, _username, key);
+        }
+
+        private async Task<PrivateKeyFile> GetPrivateKey()
+        {
+            if (_privateKey != null)
+                return _privateKey;
+
+            var encoded = await _secretsService.GetSecret(_passwordKeyName);
+            var key = encoded.Base64Decode();
+            _privateKey = new PrivateKeyFile(key.GenerateStreamFromString());
+            return _privateKey;
         }
     }
 
@@ -78,7 +97,7 @@ namespace Sloth.Jobs.Services
     {
         public string Host { get; set; }
         public string Username { get; set; }
-        public string Password { get; set; }
+        public string PrivateFileName { get; set; }
         public string ScrubberBlobContainer { get; set; }
     }
 }
