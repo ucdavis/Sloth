@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Console;
+using Hangfire.Dashboard;
 using Hangfire.RecurringJobExtensions;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -156,7 +157,9 @@ namespace Sloth.Jobs
             app.UseHangfireDashboard(
             "/hangfire", new DashboardOptions()
             {
-                Authorization = new[] { new AdminAuthorizationFilter(), }
+                Authorization = env.IsDevelopment()
+                    ? new[] { new AdminAuthorizationFilter(), }
+                    : new IDashboardAuthorizationFilter[] { }
             });
 
             if (env.IsDevelopment())
