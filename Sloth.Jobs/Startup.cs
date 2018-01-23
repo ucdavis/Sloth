@@ -157,15 +157,12 @@ namespace Sloth.Jobs
             app.UseHangfireDashboard(
             "/hangfire", new DashboardOptions()
             {
-                Authorization = env.IsDevelopment()
+                Authorization = !env.IsDevelopment()
                     ? new[] { new AdminAuthorizationFilter(), }
                     : new IDashboardAuthorizationFilter[] { }
             });
 
-            if (env.IsDevelopment())
-            {
-                app.UseHangfireServer();
-            }
+            app.UseHangfireServer();
         }
     }
 }
