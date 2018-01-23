@@ -162,10 +162,7 @@ namespace Sloth.Jobs
                     : new IDashboardAuthorizationFilter[] { }
             });
 
-            if (env.IsDevelopment())
-            {
-                app.UseHangfireServer();
-            }
+            app.UseHangfireServer();
         }
     }
 }
