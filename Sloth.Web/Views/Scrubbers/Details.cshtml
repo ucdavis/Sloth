@@ -1,21 +1,28 @@
-@model Sloth.Core.Models.Scrubber
+@using Sloth.Core.Extensions;
+@model Sloth.Core.Models.Scrubber;
 
 @{
     ViewBag.Title = "Scrubber Details";
 }
 
 @section AdditionalStyles {
-  <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
+    <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
+    <link href="~/lib/prism.css" rel="stylesheet" />
 }
 
 <h2>@ViewBag.Title</h2>
 
 @Html.Partial("_TransactionsTable", Model.Transactions)
 
+<pre><code class="language-markup">
+@Model.ToXml()
+    </code>
+</pre>
 
 @section AdditionalScripts {
     <script src="~/lib/jquery.datatables.js"></script>
     <script src="~/lib/datatables.bootstrap4.js"></script>
+    <script src="~/lib/prism.js"></script>
     <script>
         $('#transactions').dataTable();
     </script>
