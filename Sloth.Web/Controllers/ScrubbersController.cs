@@ -28,6 +28,7 @@ namespace Sloth.Web.Controllers
         {
             var scrubber = await _context.Scrubbers
                 .Include(t => t.Transactions)
+                .ThenInclude(x => x.Transfers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
