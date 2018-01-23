@@ -24,6 +24,12 @@
     <script src="~/lib/datatables.bootstrap4.js"></script>
     <script src="~/lib/prism.js"></script>
     <script>
-        $('#transactions').dataTable();
-    </script>
+        $('#transactions').dataTable({
+            "columnDefs": [
+                {
+                    "targets": 0,
+                    "visible": false,
+                }
+            ]
+        });    </script>
 }
