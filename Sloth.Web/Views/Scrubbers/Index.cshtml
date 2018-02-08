@@ -10,7 +10,7 @@
 
 <h2>@ViewBag.Title</h2>
 
-<table id="scrubbers" class="table table-bordered">
+<table id="scrubbers" class="table table-bordered" style="width:100%">
     <thead>
     <tr>
         <th>@Html.DisplayNameFor(x => x.Id)</th>
@@ -26,7 +26,7 @@
             <th scope="row">@t.Id</th>
             <td>@t.OrganizationCode</td>
             <td>@t.BatchDate</td>
-            <td>
+            <td style="width:10%">
                 <a class="btn btn-primary btn-sm" href="@Url.Action("Details", new { id = t.Id })">
                     <div class="fa fa-arrow-right"></div>
                 </a>

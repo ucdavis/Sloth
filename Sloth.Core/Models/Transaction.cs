@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace Sloth.Core.Models
 {
@@ -38,11 +39,13 @@ namespace Sloth.Core.Models
         /// <summary>
         /// Tracking Number created by the merchant accountant
         /// </summary>
+        [DisplayName("Merchant Tracking Number")]
         public string MerchantTrackingNumber { get; set; }
 
         /// <summary>
         /// Tracking Number created by the payment processor
         /// </summary>
+        [DisplayName("Processor Tracking Number")]
         public string ProcessorTrackingNumber { get; set; }
 
         /// <summary>
@@ -61,6 +64,7 @@ namespace Sloth.Core.Models
         [MaxLength(14)]
         [RegularExpression("[A-Z0-9]*")]
         [Required]
+        [DisplayName("Document Number")]
         public string DocumentNumber { get; set; }
 
         /// <summary>
@@ -76,12 +80,14 @@ namespace Sloth.Core.Models
         /// </summary>
         [MinLength(1)]
         [MaxLength(10)]
+        [DisplayName("Kfs Tracking Number")]  
         public string KfsTrackingNumber { get; set; }
 
         /// <summary>
         /// Date the transaction occurred.
         /// </summary>
         [Required]
+        [DisplayName("Transaction Date")]
         public DateTime TransactionDate { get; set; }
 
         public IList<Transfer> Transfers { get; set; }
