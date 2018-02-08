@@ -250,3 +250,5 @@ _Pvt_Extensions
 
 # VS SQL Project files
 *.jfm
+
+keys/
