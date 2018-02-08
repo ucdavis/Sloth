@@ -21,7 +21,7 @@ module.exports = (env) => {
     return [{
         stats: { modules: false },
         entry: {
-            'boot': './ClientApp/boot.tsx',
+            //'boot': './ClientApp/boot.tsx',
             'react': ['event-source-polyfill', 'isomorphic-fetch', 'react', 'react-dom', 'react-router-dom'],
             'runtime': './wwwroot/js/common.js',
             'site': './wwwroot/js/site.js'
