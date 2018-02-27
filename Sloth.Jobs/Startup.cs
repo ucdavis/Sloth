@@ -64,6 +64,7 @@ namespace Sloth.Jobs
             services.AddDbContext<SlothDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
+            var clientId = Configuration.GetValue<string>("Azure:ClientId");
             services.AddAuthentication(options =>
             {
                 options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
@@ -75,7 +76,7 @@ namespace Sloth.Jobs
                 {
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.GetClaimsFromUserInfoEndpoint = true;
-                    options.ClientId = "c631afcb-0795-4546-844d-9fe7759ae620";
+                    options.ClientId = clientId;
                     options.Authority = "https://login.microsoftonline.com/ucdavis365.onmicrosoft.com";
                     options.Events.OnRedirectToIdentityProvider = context =>
                     {

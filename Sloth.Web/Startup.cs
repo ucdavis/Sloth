@@ -69,6 +69,7 @@ namespace Sloth.Web
                 .AddRoleStore<RoleStore>()
                 .AddRoleManager<RoleManager<Role>>();
 
+            var clientId = Configuration.GetValue<string>("Azure:ClientId");
             services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -80,7 +81,7 @@ namespace Sloth.Web
                 .AddOpenIdConnect("UCDavis", options =>
                 {
                     options.GetClaimsFromUserInfoEndpoint = true;
-                    options.ClientId = "c631afcb-0795-4546-844d-9fe7759ae620";
+                    options.ClientId = clientId;
                     options.Authority = "https://login.microsoftonline.com/ucdavis365.onmicrosoft.com";
                     options.Scope.Add("email");
                     options.Events.OnRedirectToIdentityProvider = context =>
