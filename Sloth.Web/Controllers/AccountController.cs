@@ -63,6 +63,7 @@ namespace Sloth.Web.Controllers
             }
 
             // Find user
+            var username = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
             var user = await _userManager.FindByEmailAsync(email);
 
@@ -74,7 +75,11 @@ namespace Sloth.Web.Controllers
             }
 
             // If the user does not have an account, create an account
-            user = new User { Email = email };
+            user = new User
+            {
+                UserName = username,
+                Email = email,
+            };
             await _userManager.CreateAsync(user);
 
             // Sign in new user
