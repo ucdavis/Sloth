@@ -57,6 +57,7 @@ namespace Sloth.Jobs
             services.AddSingleton(Configuration);
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
+            services.Configure<IamDirectorySearchServiceOptions>(Configuration.GetSection("IAM"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
@@ -102,7 +103,7 @@ namespace Sloth.Jobs
             services.AddTransient<ISmsSender, AuthMessageSender>();
 
             // add infrastructure services
-            services.AddTransient<IDirectorySearchService, DirectorySearchService>();
+            services.AddTransient<IDirectorySearchService, IamDirectorySearchService>();
             services.AddTransient<IKfsScrubberService, KfsScrubberService>();
             services.AddTransient<ISecretsService, SecretsService>();
             services.AddTransient<IStorageService, StorageService>();

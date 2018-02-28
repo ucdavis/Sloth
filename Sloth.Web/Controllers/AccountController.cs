@@ -87,14 +87,14 @@ namespace Sloth.Web.Controllers
             // email comes across in both name claim and upn
             var email = info.Principal.FindFirstValue(ClaimTypes.Upn);
 
-            var ucdUser = await _directorySearchService.GetByEmailAsync(email);
+            var ucdUser = await _directorySearchService.GetByEmail(email);
             if (ucdUser == null) return;
 
             // TODO: see if we need to modify claims like this
             var identity = (ClaimsIdentity) info.Principal.Identity;
 
             // Should we bother replacing via directory service?
-            identity.AddClaim(new Claim(ClaimTypes.Email, ucdUser.Mail));
+            identity.AddClaim(new Claim(ClaimTypes.Email, ucdUser.Email));
             identity.AddClaim(new Claim(ClaimTypes.GivenName, ucdUser.GivenName));
             identity.AddClaim(new Claim(ClaimTypes.Surname, ucdUser.Surname));
 

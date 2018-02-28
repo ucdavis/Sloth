@@ -51,9 +51,10 @@ namespace Sloth.Web
 
             // add various options
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
-            
+            services.Configure<IamDirectorySearchServiceOptions>(Configuration.GetSection("IAM"));
+
             // add infrastructure services
-            services.AddSingleton<IDirectorySearchService, DirectorySearchService>();
+            services.AddSingleton<IDirectorySearchService, IamDirectorySearchService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
