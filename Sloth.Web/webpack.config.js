@@ -80,7 +80,7 @@ module.exports = (env) => {
             new CheckerPlugin(),
             new ExtractTextPlugin({
               disable: isDevBuild,
-              filename: 'site.css'
+              filename: isDevBuild ? 'site.css' : 'site.min.css',
             }),
             new webpack.optimize.CommonsChunkPlugin({
                 name: ['react', 'runtime'],
