@@ -65,6 +65,7 @@
   <ItemGroup>
     <None Include="Compare\SqlSchemaCompare_localhost.scmp" />
     <None Include="Compare\SqlSchemaCompare_test.scmp" />
+    <None Include="Compare\SqlSchemaCompare_production.scmp" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\UserTeamRoles.sql" />
