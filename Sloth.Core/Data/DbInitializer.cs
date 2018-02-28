@@ -11,7 +11,7 @@ namespace Sloth.Core.Data
     public static class DbInitializer
     {
         /// <summary>
-        /// Create sample data
+        /// Create starter data
         /// </summary>
         /// <param name="context"></param>
         public static void Initialize(SlothDbContext context)
@@ -20,11 +20,9 @@ namespace Sloth.Core.Data
             CreateTeams(context);
             CreateUsers(context);
             CreateSources(context);
-            CreateIntegrations(context);
-            CreateTransactions(context);
         }
 
-        private static void CreateRoles(SlothDbContext context)
+        public static void CreateRoles(SlothDbContext context)
         {
             // add all roles to db
             foreach (var role in Roles.GetAllRoles())
@@ -39,20 +37,20 @@ namespace Sloth.Core.Data
             context.SaveChanges();
         }
 
-        private static void CreateTeams(SlothDbContext context)
+        public static void CreateTeams(SlothDbContext context)
         {
-            if (!context.Teams.Any(t => t.Name == "John's Team"))
+            if (!context.Teams.Any(t => t.Name == "ANLAB"))
             {
                 var anlab = new Team()
                 {
-                    Name = "John's Team"
+                    Name = "ANLAB"
                 };
                 context.Teams.Add(anlab);
             }
             context.SaveChanges();
         }
 
-        private static void CreateUsers(SlothDbContext context)
+        public static void CreateUsers(SlothDbContext context)
         {
             if (context.Users.Any()) return;
 
@@ -64,7 +62,7 @@ namespace Sloth.Core.Data
                     Email = "jpknoll@ucdavis.edu",
                     ApiKeys = new[] {new ApiKey()
                     {
-                        Key = "TestKey123",
+                        Key = Guid.NewGuid().ToString(),
                         Issued = DateTime.UtcNow
                     }},
                     Roles = new []
@@ -78,7 +76,7 @@ namespace Sloth.Core.Data
                     {
                         new UserTeamRole()
                         {
-                            Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
+                            Team = context.Teams.FirstOrDefault(t => t.Name == "ANLAB"),
                             Role = context.Roles.FirstOrDefault(r => r.Name == Roles.Admin),
                         }, 
                     }
@@ -88,7 +86,7 @@ namespace Sloth.Core.Data
             context.SaveChanges();
         }
 
-        private static void CreateSources(SlothDbContext context)
+        public static void CreateSources(SlothDbContext context)
         {
             if (context.Sources.Any()) return;
 
@@ -100,7 +98,7 @@ namespace Sloth.Core.Data
                     Type = "Recharge",
                     OriginCode = "AN",
                     DocumentType = DocumentTypes.GLIB,
-                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team")
+                    Team = context.Teams.FirstOrDefault(t => t.Name == "ANLAB")
                 },
                 new Source
                 {
@@ -108,14 +106,14 @@ namespace Sloth.Core.Data
                     Type = "CyberSource",
                     OriginCode = "AN",
                     DocumentType = DocumentTypes.GLJV,
-                    Team = context.Teams.FirstOrDefault(t => t.Name == "John's Team")
+                    Team = context.Teams.FirstOrDefault(t => t.Name == "ANLAB")
                 }
             };
             context.Sources.AddRange(sources);
             context.SaveChanges();
         }
 
-        private static void CreateIntegrations(SlothDbContext context)
+        public static void CreateTestIntegrations(SlothDbContext context)
         {
             if (context.Integrations.Any()) return;
 
@@ -123,7 +121,7 @@ namespace Sloth.Core.Data
             {
                 new Integration()
                 {
-                    Team              = context.Teams.FirstOrDefault(t => t.Name == "John's Team"),
+                    Team              = context.Teams.FirstOrDefault(t => t.Name == "ANLAB"),
                     Source            = context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "CyberSource"),
                     MerchantId        = "ucdavis_jpknoll",
                     ReportUsername    = "sloth_report",
@@ -136,7 +134,7 @@ namespace Sloth.Core.Data
             context.SaveChanges();
         }
 
-        private static void CreateTransactions(SlothDbContext context)
+        public static void CreateTestTransactions(SlothDbContext context)
         {
             if (context.Transactions.Any()) return;
 

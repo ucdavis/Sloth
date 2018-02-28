@@ -119,6 +119,9 @@ namespace Sloth.Web
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<LoggingIdentityMiddleware>();
 
+            // create starter data
+            DbInitializer.Initialize(context);
+
             if (env.IsDevelopment())
             {
                 app.UseBrowserLink();
@@ -129,7 +132,8 @@ namespace Sloth.Web
                     ReactHotModuleReplacement = true
                 });
 
-                DbInitializer.Initialize(context);
+                DbInitializer.CreateTestIntegrations(context);
+                DbInitializer.CreateTestTransactions(context);
             }
             else
             {
