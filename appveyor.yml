@@ -12,7 +12,9 @@ image: Visual Studio 2017
 install:
 - ps: |
     appveyor-retry choco install octopustools
-    appveyor-retry dotnet restore
+    appveyor-retry dotnet restore .\Sloth.Api\
+    appveyor-retry dotnet restore .\Sloth.Jobs\
+    appveyor-retry dotnet restore .\Sloth.Web\
 
 cache:
 - C:\ProgramData\chocolatey\bin -> appveyor.yml
