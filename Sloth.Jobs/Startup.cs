@@ -25,6 +25,7 @@ using Sloth.Jobs.Jobs;
 using Sloth.Jobs.Jobs.Attributes;
 using Sloth.Jobs.Logging;
 using Sloth.Jobs.Services;
+using StackifyLib;
 using KfsOptions = Sloth.Jobs.Services.KfsOptions;
 
 namespace Sloth.Jobs
@@ -48,7 +49,7 @@ namespace Sloth.Jobs
             Configuration = builder.Build();
         }
 
-        public IConfiguration Configuration { get; }
+        public IConfigurationRoot Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -113,6 +114,7 @@ namespace Sloth.Jobs
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // setup logging
+            Configuration.ConfigureStackifyLogging();
             LoggingConfiguration.Setup(Configuration);
 
             loggerFactory.AddSerilog();

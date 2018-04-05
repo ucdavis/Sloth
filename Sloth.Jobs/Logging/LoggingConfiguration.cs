@@ -60,12 +60,6 @@ namespace Sloth.Jobs.Logging
                 Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
             }
 
-            var stackifyOptions = new StackifyOptions();
-            _configuration.GetSection("Stackify").Bind(stackifyOptions);
-            StackifyLib.Config.ApiKey = stackifyOptions.ApiKey;
-            StackifyLib.Config.AppName = stackifyOptions.AppName;
-            StackifyLib.Config.Environment = stackifyOptions.Environment;
-
             return logConfig.WriteTo.Stackify();
         }
 
