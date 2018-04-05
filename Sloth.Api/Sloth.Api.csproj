@@ -32,6 +32,7 @@
     <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="5.1.0-dev-00174" />
     <PackageReference Include="Serilog.Sinks.Stackify" Version="2.0.2" />
     <PackageReference Include="Serilog.Sinks.Trace" Version="2.1.0" />
+    <PackageReference Include="StackifyLib" Version="2.1.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="1.0.0" />
   </ItemGroup>
 

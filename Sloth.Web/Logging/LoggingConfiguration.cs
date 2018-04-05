@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.MSSqlServer;
+using StackifyLib;
 
 namespace Sloth.Web.Logging
 {
@@ -18,7 +19,7 @@ namespace Sloth.Web.Logging
         /// <summary>
         /// Configure Application Logging
         /// </summary>
-        public static void Setup(IConfiguration configuration)
+        public static void Setup(IConfigurationRoot configuration)
         {
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
 
@@ -46,14 +47,9 @@ namespace Sloth.Web.Logging
             _loggingSetup = true;
         }
 
-        private static void ConfigureStackifyLogging(IConfiguration configuration)
+        private static void ConfigureStackifyLogging(IConfigurationRoot configuration)
         {
-            var stackifyOptions = new StackifyOptions();
-            configuration.GetSection("Stackify").Bind(stackifyOptions);
-            StackifyLib.Config.ApiKey = stackifyOptions.ApiKey;
-            StackifyLib.Config.AppName = stackifyOptions.AppName;
-            StackifyLib.Config.Environment = stackifyOptions.Environment;
-
+            configuration.ConfigureStackifyLogging();
             _loggerConfiguration = _loggerConfiguration.WriteTo.Stackify();
         }
 
