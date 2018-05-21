@@ -66,11 +66,9 @@ namespace Sloth.Jobs.Logging
 
         private static LoggerConfiguration WriteToStackifyCustom(this LoggerConfiguration logConfig)
         {
-            _configuration.ConfigureStackifyLogging();
-
-            if (true)
+            if (!_loggingSetup)
             {
-                Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
+                _configuration.ConfigureStackifyLogging();
             }
 
             return logConfig.WriteTo.Stackify();
