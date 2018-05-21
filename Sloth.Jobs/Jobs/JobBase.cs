@@ -19,7 +19,7 @@ namespace Sloth.Jobs.Jobs
 
         protected virtual void SetupLogging(PerformContext context)
         {
-            Logger = LoggingConfiguration.GetConfiguration()
+            Logger = LoggingConfiguration.GetAuditConfiguration()
                 .WriteTo.HangfireConsoleSink(context)
                 .CreateLogger()
                 .ForContext("jobId", context.BackgroundJob.Id)

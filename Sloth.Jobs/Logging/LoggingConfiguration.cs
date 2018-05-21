@@ -27,14 +27,14 @@ namespace Sloth.Jobs.Logging
             // save configuration for later calls
             _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
 
-            // create global logger
+            // create global logger with standard configuration
             Log.Logger = GetConfiguration().CreateLogger();
 
             _loggingSetup = true;
         }
 
         /// <summary>
-        /// Get another copy of the logger configuration
+        /// Get a logger configuration that logs to stackify
         /// </summary>
         /// <returns></returns>
         public static LoggerConfiguration GetConfiguration()
@@ -49,10 +49,19 @@ namespace Sloth.Jobs.Logging
 
             // various sinks
             logConfig = logConfig
-                .WriteToStackifyCustom()
-                .WriteToSqlCustom();
+                .WriteToStackifyCustom();
 
             return logConfig;
+        }
+
+        /// <summary>
+        /// Get a logger configuration that logs to both stackify and sql
+        /// </summary>
+        /// <returns></returns>
+        public static LoggerConfiguration GetAuditConfiguration()
+        {
+            return GetConfiguration()
+                .WriteToSqlCustom();
         }
 
         private static LoggerConfiguration WriteToStackifyCustom(this LoggerConfiguration logConfig)
