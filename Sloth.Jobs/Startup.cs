@@ -1,5 +1,4 @@
 using System;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using Hangfire;
 using Hangfire.Console;
@@ -18,14 +17,12 @@ using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
-using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Jobs.Filters;
 using Sloth.Jobs.Jobs;
 using Sloth.Jobs.Jobs.Attributes;
 using Sloth.Jobs.Logging;
 using Sloth.Jobs.Services;
-using StackifyLib;
 using KfsOptions = Sloth.Jobs.Services.KfsOptions;
 
 namespace Sloth.Jobs
@@ -99,10 +96,6 @@ namespace Sloth.Jobs
 
             services.AddHangfire(c => { });
 
-            // Add application services.
-            services.AddTransient<IEmailSender, AuthMessageSender>();
-            services.AddTransient<ISmsSender, AuthMessageSender>();
-
             // add infrastructure services
             services.AddTransient<IDirectorySearchService, IamDirectorySearchService>();
             services.AddTransient<IKfsScrubberService, KfsScrubberService>();
@@ -114,14 +107,12 @@ namespace Sloth.Jobs
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             // setup logging
-            Configuration.ConfigureStackifyLogging();
             LoggingConfiguration.Setup(Configuration);
-
-            loggerFactory.AddSerilog();
 
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                loggerFactory.AddSerilog();
             }
             else
             {
