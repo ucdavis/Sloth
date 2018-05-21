@@ -151,7 +151,6 @@ namespace Sloth.Jobs
 
             // add recurring jobs
             GlobalConfiguration.Configuration
-                .UseRecurringJob(typeof(Heartbeat))
                 .UseRecurringJob(typeof(CybersourceBankDepositJob))
                 .UseRecurringJob(typeof(UploadScrubberJob));
 
