@@ -6,7 +6,7 @@ using Serilog.Configuration;
 using Serilog.Core;
 using Serilog.Events;
 
-namespace Sloth.Jobs.Jobs
+namespace Sloth.Jobs.Logging
 {
     internal class HangfireConsoleSink : ILogEventSink
     {
