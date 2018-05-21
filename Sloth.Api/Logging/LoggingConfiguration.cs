@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.MSSqlServer;
 using StackifyLib;
@@ -14,47 +14,66 @@ namespace Sloth.Api.Logging
     {
         private static bool _loggingSetup;
 
-        private static LoggerConfiguration _loggerConfiguration;
+        private static IConfigurationRoot _configuration;
 
         /// <summary>
         /// Configure Application Logging
         /// </summary>
         public static void Setup(IConfigurationRoot configuration)
         {
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
             if (_loggingSetup) return; //only setup logging once
 
-            if (true)
-            {
-                Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
-            }
+            // save configuration for later calls
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+
+            // create global logger with standard configuration
+            Log.Logger = GetConfiguration().CreateLogger();
+
+            _loggingSetup = true;
+        }
+
+        /// <summary>
+        /// Get a logger configuration that logs to stackify
+        /// </summary>
+        /// <returns></returns>
+        public static LoggerConfiguration GetConfiguration()
+        {
+            if (_configuration == null) throw new InvalidOperationException("Call Setup() before requesting a Logger Configuration"); ;
 
             // standard logger
-            _loggerConfiguration = new LoggerConfiguration()
+            var logConfig = new LoggerConfiguration()
                 .Enrich.FromLogContext()
                 .Enrich.WithExceptionDetails()
                 .Enrich.WithProperty("Source", "Sloth.Api");
 
             // various sinks
-            ConfigureSqlLogging(configuration);
+            logConfig = logConfig
+                .WriteToStackifyCustom();
 
-            ConfigureStackifyLogging(configuration);
-
-            // create global logger
-            Log.Logger = _loggerConfiguration.CreateLogger();
-
-            _loggingSetup = true;
+            return logConfig;
         }
 
-        private static void ConfigureStackifyLogging(IConfigurationRoot configuration)
+        /// <summary>
+        /// Get a logger configuration that logs to both stackify and sql
+        /// </summary>
+        /// <returns></returns>
+        public static LoggerConfiguration GetAuditConfiguration()
         {
-            configuration.ConfigureStackifyLogging();
-            
-            _loggerConfiguration = _loggerConfiguration.WriteTo.Stackify();
+            return GetConfiguration()
+                .WriteToSqlCustom();
         }
 
-        private static void ConfigureSqlLogging(IConfiguration configuration)
+        private static LoggerConfiguration WriteToStackifyCustom(this LoggerConfiguration logConfig)
+        {
+            if (!_loggingSetup)
+            {
+                _configuration.ConfigureStackifyLogging();
+            }
+
+            return logConfig.WriteTo.Stackify();
+        }
+
+        private static LoggerConfiguration WriteToSqlCustom(this LoggerConfiguration logConfig)
         {
             var columnOptions = new ColumnOptions();
 
@@ -72,10 +91,11 @@ namespace Sloth.Api.Logging
                 new DataColumn {ColumnName = "CorrelationId", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
             };
 
-            _loggerConfiguration = _loggerConfiguration
+            return logConfig
                 .WriteTo.MSSqlServer(
-                    connectionString: configuration.GetConnectionString("DefaultConnection"),
+                    connectionString: _configuration.GetConnectionString("DefaultConnection"),
                     tableName: "Logs",
+                    restrictedToMinimumLevel: LogEventLevel.Information,
                     columnOptions: columnOptions
                 );
         }
