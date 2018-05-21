@@ -4,8 +4,10 @@ using System.Data;
 using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.MSSqlServer;
+using StackifyLib;
 
 namespace Sloth.Jobs.Logging
 {
@@ -13,12 +15,12 @@ namespace Sloth.Jobs.Logging
     {
         private static bool _loggingSetup;
 
-        private static IConfiguration _configuration;
+        private static IConfigurationRoot _configuration;
 
         /// <summary>
         /// Configure Global Application Logging
         /// </summary>
-        public static void Setup(IConfiguration configuration)
+        public static void Setup(IConfigurationRoot configuration)
         {
             if (_loggingSetup) return; //only setup logging once
 
@@ -55,6 +57,8 @@ namespace Sloth.Jobs.Logging
 
         private static LoggerConfiguration WriteToStackifyCustom(this LoggerConfiguration logConfig)
         {
+            _configuration.ConfigureStackifyLogging();
+
             if (true)
             {
                 Serilog.Debugging.SelfLog.Enable(msg => Debug.WriteLine(msg));
@@ -87,6 +91,7 @@ namespace Sloth.Jobs.Logging
                 .WriteTo.MSSqlServer(
                     connectionString: _configuration.GetConnectionString("DefaultConnection"),
                     tableName: "Logs",
+                    restrictedToMinimumLevel: LogEventLevel.Information,
                     columnOptions: columnOptions
                 );
         }

@@ -23,7 +23,6 @@ namespace Sloth.Web
 {
     public class Startup
     {
-
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
@@ -112,8 +111,6 @@ namespace Sloth.Web
             // setup logging
             LoggingConfiguration.Setup(Configuration);
 
-            loggerFactory.AddSerilog();
-
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
             app.UseMiddleware<CorrelationIdMiddleware>();
@@ -124,6 +121,8 @@ namespace Sloth.Web
 
             if (env.IsDevelopment())
             {
+                loggerFactory.AddSerilog();
+
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
