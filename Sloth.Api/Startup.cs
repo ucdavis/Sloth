@@ -15,6 +15,7 @@ using Serilog;
 using Sloth.Api.Errors;
 using Sloth.Api.Identity;
 using Sloth.Api.Logging;
+using Sloth.Api.Models;
 using Sloth.Api.Swagger;
 using Sloth.Core;
 using Sloth.Core.Configuration;
@@ -50,6 +51,7 @@ namespace Sloth.Api
         {
             // add configuration
             services.AddSingleton(Configuration);
+            services.Configure<AppSettings>(Configuration);
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
@@ -169,10 +171,14 @@ namespace Sloth.Api
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sloth API v1");
             });
 
-            // possibly reset db
+            // create starter data
+            var dbInitializer = new DbInitializer(context);
+            dbInitializer.Initialize();
+
             if (env.IsDevelopment())
             {
-                DbInitializer.Initialize(context);
+                dbInitializer.CreateTestIntegrations();
+                dbInitializer.CreateTestTransactions();
             }
 
             // setup hangfire storage

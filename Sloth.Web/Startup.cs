@@ -18,6 +18,7 @@ using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Logging;
+using Sloth.Web.Models;
 
 namespace Sloth.Web
 {
@@ -49,6 +50,7 @@ namespace Sloth.Web
             services.AddSingleton(Configuration);
 
             // add various options
+            services.Configure<AppSettings>(Configuration);
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<IamDirectorySearchServiceOptions>(Configuration.GetSection("IAM"));
 
@@ -105,8 +107,7 @@ namespace Sloth.Web
             IApplicationBuilder app,
             IHostingEnvironment env,
             ILoggerFactory loggerFactory,
-            IApplicationLifetime appLifetime,
-            SlothDbContext context)
+            IApplicationLifetime appLifetime)
         {
             // setup logging
             LoggingConfiguration.Setup(Configuration);
@@ -115,9 +116,6 @@ namespace Sloth.Web
 
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<LoggingIdentityMiddleware>();
-
-            // create starter data
-            DbInitializer.Initialize(context);
 
             if (env.IsDevelopment())
             {
@@ -129,9 +127,6 @@ namespace Sloth.Web
                 {
                     HotModuleReplacement = true,
                 });
-
-                DbInitializer.CreateTestIntegrations(context);
-                DbInitializer.CreateTestTransactions(context);
             }
             else
             {
