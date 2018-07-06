@@ -1,0 +1,44 @@
+@model IEnumerable<Sloth.Core.Models.Team>
+
+@{
+    ViewBag.Title = "Teams";
+}
+
+@section AdditionalStyles
+{
+    @Html.Partial("_DataTableStylePartial")
+}
+
+<h2>Teams</h2>
+
+<table id="teamsTable" class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var team in Model)
+        {
+            <tr>
+                <td>@team.Name</td>
+                <td><a href="@Url.Action("Details", new { id = team.Id })" class="btn btn-primary">Manage</a></td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section AdditionalScripts
+{
+    @Html.Partial("_DataTableScriptsPartial")
+    <script>
+        $('#teamsTable').DataTable({
+            columnDefs: [
+                {
+                    targets: -1,
+                    orderable: false,
+                }]
+        });
+    </script>
+}

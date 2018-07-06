@@ -1,0 +1,81 @@
+@model Sloth.Core.Models.Team
+
+@{
+    ViewBag.Title = "Team";
+}
+
+@section AdditionalStyles
+{
+    @Html.Partial("_DataTableStylePartial")
+}
+
+
+
+
+<h2>Team</h2>
+
+<hr />
+
+<h3>Users</h3>
+<table id="usersTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var userRole in Model.UserTeamRoles)
+        {
+            <tr>
+                <td>@userRole.User.UserName</td>
+                <td>@userRole.Role.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<div class="row mb-1">
+    <div class="col">
+        <h3>Integrations</h3>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <a href="@Url.Action("Create", "Integrations")" class="btn btn-primary">Create</a>
+    </div>
+</div>
+
+<table id="integrationsTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Merchant</th>
+            <th>Default Account</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var integration in Model.Integrations)
+        {
+            <tr>
+                <td>@integration.Type</td>
+                <td>@integration.Team.Name</td>
+                <td>@integration.MerchantId</td>
+                <td>@integration.DefaultAccount</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section AdditionalScripts
+{
+    @Html.Partial("_DataTableScriptsPartial")
+    <script>
+        $('#usersTable').DataTable({
+        });
+
+        $('#integrationsTable').DataTable({
+        });
+    </script>
+}
