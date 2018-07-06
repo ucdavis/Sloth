@@ -128,7 +128,6 @@ namespace Sloth.Web
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
                     HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true
                 });
 
                 DbInitializer.CreateTestIntegrations(context);
