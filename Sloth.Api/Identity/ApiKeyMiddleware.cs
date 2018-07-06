@@ -38,7 +38,10 @@ namespace Sloth.Api.Identity
             var headerValue = context.Request.Headers[HeaderKey].FirstOrDefault();
 
             // lookup apikey from db
-            var apiKey = _dbContext.ApiKeys.Include(a => a.User).FirstOrDefault(a => a.Key == headerValue);
+            var apiKey = _dbContext.ApiKeys
+                .Include(a => a.Team)
+                .FirstOrDefault(a => a.Key == headerValue);
+
             if (apiKey == null || apiKey.Revoked.HasValue)
             {
                 return _next(context);
@@ -46,7 +49,7 @@ namespace Sloth.Api.Identity
 
             context.User.AddIdentity(new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Name, apiKey.User.UserName)
+                new Claim(ClaimTypes.Name, apiKey.Team.Name)
             }));
 
             return _next(context);

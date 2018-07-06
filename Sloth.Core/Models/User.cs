@@ -10,11 +10,6 @@ namespace Sloth.Core.Models
 {
     public class User
     {
-        public User()
-        {
-            ApiKeys = new List<ApiKey>();
-        }
-
         [Key]
         public string Id { get; set; }
 
@@ -55,13 +50,8 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         public IList<UserTeamRole> UserTeamRoles { get; set; }
 
-        [JsonIgnore]
-        public IList<ApiKey> ApiKeys { get; set; }
-
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<User>()
-                .ToTable("Users");
         }
     }
 }
