@@ -15,6 +15,7 @@ namespace Sloth.Core.Models
         public Role Role { get; set; }
 
         public string TeamId { get; set; }
+
         public Team Team { get; set; }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)

@@ -18,7 +18,7 @@ namespace Sloth.Core.Models
         {
             modelBuilder.Entity<UserRole>()
                 .ToTable("UserRoles")
-                .HasKey(t => new {t.UserId, t.RoleId});
+                .HasKey(t => new { t.UserId, t.RoleId});
         }
     }
 }

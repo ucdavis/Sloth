@@ -87,6 +87,8 @@ namespace Sloth.Core
             Role.OnModelCreating(modelBuilder);
             UserRole.OnModelCreating(modelBuilder);
             UserTeamRole.OnModelCreating(modelBuilder);
+            Source.OnModelCreating(modelBuilder);
+            Integration.OnModelCreating(modelBuilder);
         }
     }
 }
