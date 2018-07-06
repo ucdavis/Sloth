@@ -16,6 +16,8 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         public IList<Integration> Integrations { get; set; }
 
+        public IList<UserTeamRole> UserTeamRoles { get; set; }
+
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Team>()
