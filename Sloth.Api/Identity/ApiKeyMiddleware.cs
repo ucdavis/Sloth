@@ -16,19 +16,17 @@ namespace Sloth.Api.Identity
         public const string HeaderKey = "X-Auth-Token";
 
         private readonly RequestDelegate _next;
-        private readonly SlothDbContext _dbContext;
         private readonly ApiKeyProviderOptions _options;
         private ILogger _logger;
 
-        public ApiKeyMiddleware(RequestDelegate next, IOptions<ApiKeyProviderOptions> options, ILoggerFactory loggerFactory, SlothDbContext dbContext)
+        public ApiKeyMiddleware(RequestDelegate next, IOptions<ApiKeyProviderOptions> options, ILoggerFactory loggerFactory)
         {
             _next = next;
-            _dbContext = dbContext;
             _options = options.Value;
             _logger = loggerFactory.CreateLogger<ApiKeyMiddleware>();
         }
 
-        public Task Invoke(HttpContext context)
+        public Task Invoke(HttpContext context, SlothDbContext dbContext)
         {
             // check for header
             if (!context.Request.Headers.ContainsKey(HeaderKey))
@@ -38,7 +36,7 @@ namespace Sloth.Api.Identity
             var headerValue = context.Request.Headers[HeaderKey].FirstOrDefault();
 
             // lookup apikey from db
-            var apiKey = _dbContext.ApiKeys
+            var apiKey = dbContext.ApiKeys
                 .Include(a => a.Team)
                 .FirstOrDefault(a => a.Key == headerValue);
 
