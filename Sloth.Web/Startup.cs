@@ -13,7 +13,6 @@ using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
-using Sloth.Core.Data;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;

@@ -142,8 +142,7 @@ namespace Sloth.Api
             IApplicationBuilder app,
             IHostingEnvironment env,
             ILoggerFactory loggerFactory,
-            IApplicationLifetime appLifetime,
-            SlothDbContext context)
+            IApplicationLifetime appLifetime)
         {
             // setup logging
             LoggingConfiguration.Setup(Configuration);
@@ -170,16 +169,6 @@ namespace Sloth.Api
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sloth API v1");
             });
-
-            // create starter data
-            var dbInitializer = new DbInitializer(context);
-            dbInitializer.Initialize();
-
-            if (env.IsDevelopment())
-            {
-                dbInitializer.CreateTestIntegrations();
-                dbInitializer.CreateTestTransactions();
-            }
 
             // setup hangfire storage
             GlobalConfiguration.Configuration
