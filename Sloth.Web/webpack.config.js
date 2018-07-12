@@ -9,7 +9,6 @@ module.exports = (env) => {
         stats: { modules: false },
         entry: {
           site: './wwwroot/js/site.js',
-          style: './wwwroot/scss/site.scss',
         },
         resolve: {
             extensions: ['.js', '.jsx'],
