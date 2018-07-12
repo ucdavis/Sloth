@@ -1,14 +1,13 @@
 @using Microsoft.AspNetCore.Identity
 @using Sloth.Core.Models;
 
-@inject SignInManager<User> SignInManager
 @inject UserManager<User> UserManager
 
 @{
   var user = await UserManager.GetUserAsync(User);
 }
 
-@if (SignInManager.IsSignedIn(User))
+@if (User.Identity.IsAuthenticated && user != null)
 {
     <form class="form-inline" asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
       <div class="nav-login">

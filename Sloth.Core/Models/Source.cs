@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
@@ -40,5 +41,10 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         [Required]
         public Team Team { get; set; }
+
+        public static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            
+        }
     }
 }

@@ -13,7 +13,7 @@ namespace Sloth.Core.Models
 
         public string Id { get; set; }
         public string Key { get; set; }
-        public User User { get; set; }
+        public Team Team { get; set; }
         public DateTime Issued { get; set; }
         public DateTime? Revoked { get; set; }
 

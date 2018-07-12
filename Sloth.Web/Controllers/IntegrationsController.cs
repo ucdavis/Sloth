@@ -27,24 +27,6 @@ namespace Sloth.Web.Controllers
         } 
 
         [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            // fetch user from db
-            var userId = _userManager.GetUserId(User);
-            var user = await _context.Users
-                .Include(u => u.UserTeamRoles)
-                    .ThenInclude(r => r.Team)
-                        .ThenInclude(t => t.Integrations)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-            // select associated integrations
-            var teams = user.UserTeamRoles.Select(r => r.Team).Distinct();
-            var integrations = teams.SelectMany(t => t.Integrations).Distinct();
-
-            return View(integrations);
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Create()
         {
             ViewBag.Teams = await GetUsersAdminTeams();
@@ -94,7 +76,7 @@ namespace Sloth.Web.Controllers
             _context.Integrations.Add(target);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Details", "Teams", new { id = team.Id });
         }
 
         private async Task<IEnumerable<Team>> GetUsersAdminTeams()

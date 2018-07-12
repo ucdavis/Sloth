@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 
@@ -8,51 +9,68 @@ namespace Sloth.Core.Data
     /// <summary>
     /// Creates sample data for development environments
     /// </summary>
-    public static class DbInitializer
+    public class DbInitializer
     {
+        private readonly SlothDbContext _context;
+
+        public DbInitializer(SlothDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task Recreate()
+        {
+            await _context.Database.EnsureDeletedAsync();
+            await _context.Database.EnsureCreatedAsync();
+        }
+
         /// <summary>
         /// Create starter data
         /// </summary>
-        /// <param name="context"></param>
-        public static void Initialize(SlothDbContext context)
+        public void Initialize()
         {
-            CreateRoles(context);
-            CreateTeams(context);
-            CreateUsers(context);
-            CreateSources(context);
+            CreateRoles();
+            CreateTeams();
+            CreateUsers();
+            CreateSources();
         }
 
-        public static void CreateRoles(SlothDbContext context)
+        public void CreateRoles()
         {
             // add all roles to db
             foreach (var role in Roles.GetAllRoles())
             {
-                if (context.Roles.Any(r => r.Name == role)) continue;
+                if (_context.Roles.Any(r => r.Name == role)) continue;
 
-                context.Roles.Add(new Role()
+                _context.Roles.Add(new Role()
                 {
                     Name = role
                 });
             }
-            context.SaveChanges();
+            _context.SaveChanges();
         }
 
-        public static void CreateTeams(SlothDbContext context)
+        public void CreateTeams()
         {
-            if (!context.Teams.Any(t => t.Name == "ANLAB"))
+            if (!_context.Teams.Any(t => t.Name == "ANLAB"))
             {
                 var anlab = new Team()
                 {
-                    Name = "ANLAB"
+                    Name = "ANLAB",
+                    ApiKeys = new[] {new ApiKey()
+                    {
+                        Key = Guid.NewGuid().ToString(),
+                        Issued = DateTime.UtcNow
+                    }},
                 };
-                context.Teams.Add(anlab);
+                _context.Teams.Add(anlab);
             }
-            context.SaveChanges();
+            _context.SaveChanges();
         }
 
-        public static void CreateUsers(SlothDbContext context)
+        public void CreateUsers()
         {
-            if (context.Users.Any()) return;
+            if (_context.Users.Any()) return;
 
             var users = new[]
             {
@@ -60,35 +78,30 @@ namespace Sloth.Core.Data
                 {
                     UserName = "jpknoll",
                     Email = "jpknoll@ucdavis.edu",
-                    ApiKeys = new[] {new ApiKey()
-                    {
-                        Key = Guid.NewGuid().ToString(),
-                        Issued = DateTime.UtcNow
-                    }},
                     Roles = new []
                     {
                         new UserRole()
                         {
-                            Role = context.Roles.FirstOrDefault(r => r.Name == Roles.SystemAdmin)
+                            Role = _context.Roles.FirstOrDefault(r => r.Name == Roles.SystemAdmin)
                         }, 
                     },
                     UserTeamRoles = new []
                     {
                         new UserTeamRole()
                         {
-                            Team = context.Teams.FirstOrDefault(t => t.Name == "ANLAB"),
-                            Role = context.Roles.FirstOrDefault(r => r.Name == Roles.Admin),
+                            Team = _context.Teams.FirstOrDefault(t => t.Name == "ANLAB"),
+                            Role = _context.Roles.FirstOrDefault(r => r.Name == Roles.Admin),
                         }, 
                     }
                 },
             };
-            context.Users.AddRange(users);
-            context.SaveChanges();
+            _context.Users.AddRange(users);
+            _context.SaveChanges();
         }
 
-        public static void CreateSources(SlothDbContext context)
+        public void CreateSources()
         {
-            if (context.Sources.Any()) return;
+            if (_context.Sources.Any()) return;
 
             var sources = new[]
             {
@@ -98,7 +111,7 @@ namespace Sloth.Core.Data
                     Type = "Recharge",
                     OriginCode = "AN",
                     DocumentType = DocumentTypes.GLIB,
-                    Team = context.Teams.FirstOrDefault(t => t.Name == "ANLAB")
+                    Team = _context.Teams.FirstOrDefault(t => t.Name == "ANLAB")
                 },
                 new Source
                 {
@@ -106,23 +119,23 @@ namespace Sloth.Core.Data
                     Type = "CyberSource",
                     OriginCode = "AN",
                     DocumentType = DocumentTypes.GLJV,
-                    Team = context.Teams.FirstOrDefault(t => t.Name == "ANLAB")
+                    Team = _context.Teams.FirstOrDefault(t => t.Name == "ANLAB")
                 }
             };
-            context.Sources.AddRange(sources);
-            context.SaveChanges();
+            _context.Sources.AddRange(sources);
+            _context.SaveChanges();
         }
 
-        public static void CreateTestIntegrations(SlothDbContext context)
+        public void CreateTestIntegrations()
         {
-            if (context.Integrations.Any()) return;
+            if (_context.Integrations.Any()) return;
 
             var integrations = new[]
             {
                 new Integration()
                 {
-                    Team              = context.Teams.FirstOrDefault(t => t.Name == "ANLAB"),
-                    Source            = context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "CyberSource"),
+                    Team              = _context.Teams.FirstOrDefault(t => t.Name == "ANLAB"),
+                    Source            = _context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "CyberSource"),
                     MerchantId        = "ucdavis_jpknoll",
                     ReportUsername    = "sloth_report",
                     ReportPasswordKey = "Report-Test-1",
@@ -130,20 +143,20 @@ namespace Sloth.Core.Data
                     Type              = IntegrationTypes.CyberSource
                 },
             };
-            context.Integrations.AddRange(integrations);
-            context.SaveChanges();
+            _context.Integrations.AddRange(integrations);
+            _context.SaveChanges();
         }
 
-        public static void CreateTestTransactions(SlothDbContext context)
+        public void CreateTestTransactions()
         {
-            if (context.Transactions.Any()) return;
+            if (_context.Transactions.Any()) return;
 
             var transactions = new[]
             {
                 new Transaction()
                 {
-                    Creator                 = context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
-                    Source                  = context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "Recharge"),
+                    Creator                 = _context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
+                    Source                  = _context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "Recharge"),
                     Status                  = TransactionStatuses.Scheduled,
                     MerchantTrackingNumber  = "ORDER-10",
                     ProcessorTrackingNumber = "123456",
@@ -173,8 +186,8 @@ namespace Sloth.Core.Data
                     }
                 }
             };
-            context.Transactions.AddRange(transactions);
-            context.SaveChanges();
+            _context.Transactions.AddRange(transactions);
+            _context.SaveChanges();
         }
     }
 }

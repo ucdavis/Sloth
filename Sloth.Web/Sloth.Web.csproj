@@ -40,6 +40,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\css\" />
+    <Folder Include="wwwroot\dist\" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

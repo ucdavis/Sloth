@@ -1,0 +1,237 @@
+@using Sloth.Core.Extensions
+@model Sloth.Core.Models.Team
+
+@{
+    ViewBag.Title = "Team";
+}
+
+@section AdditionalStyles
+{
+    @Html.Partial("_DataTableStylePartial")
+
+    <style>
+        .masked-key {
+            display: inline;
+            font-family: monospace;
+        }
+    </style>
+}
+
+
+<h2>Team</h2>
+
+
+<hr />
+
+<h3>Users</h3>
+<table id="usersTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Role</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var userRole in Model.UserTeamRoles)
+        {
+            <tr>
+                <td>@userRole.User.UserName</td>
+                <td>@userRole.Role.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<div class="row mb-1">
+    <div class="col">
+        <h3>Integrations</h3>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <a href="@Url.Action("Create", "Integrations")" class="btn btn-primary">Create</a>
+    </div>
+</div>
+
+<table id="integrationsTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Name</th>
+            <th>Merchant</th>
+            <th>Default Account</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var integration in Model.Integrations)
+        {
+            <tr>
+                <td>@integration.Type</td>
+                <td>@integration.Team.Name</td>
+                <td>@integration.MerchantId</td>
+                <td>@integration.DefaultAccount</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<div class="row mb-1">
+    <div class="col">
+        <h3>API Keys</h3>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#create-key-modal">
+            Create new Api Key
+        </button>
+    </div>
+</div>
+
+<table id="apiKeysTable" class="table table-bordered table-condensed table-hover">
+    <thead>
+        <tr>
+            <th>Key</th>
+            <th>Issued</th>
+            <th>Revoke ?</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var k in Model.ApiKeys)
+        {
+            var rowClass = "";
+            if (k.Revoked.HasValue)
+            {
+                rowClass = "revoked";
+            }
+            <tr class="@rowClass">
+                <td nowrap>
+                    <span class="masked-key">
+                        <i class="fa fa-lock"></i> @k.MaskedKey()
+                    </span>
+                </td>
+                <td>@k.Issued.ToPacificTime().ToString("g")</td>
+                <td>
+                    @if (k.Revoked.HasValue)
+                    {
+                        @k.Revoked.Value.ToPacificTime().ToString("g")
+                    }
+                    else
+                    {
+                        <button class="btn btn-danger" data-toggle="modal" data-target="#revoke-key-modal" data-id="@k.Id" data-key="@k.MaskedKey()">
+                            Revoke Key
+                        </button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div id="create-key-modal" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Api Key?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="create-key-action" class="btn btn-primary">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="revoke-key-modal" class="modal fade" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to revoke key:</p>
+                <span id="revoke-key-modal-key"></span>
+                <form id="revoke-key-modal-form">
+                    <input type="hidden" id="revoke-key-modal-id" name="id" />
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="revoke-key-action" class="btn btn-danger">Revoke Key</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section AdditionalScripts
+{
+    @Html.Partial("_DataTableScriptsPartial")
+
+    <script>
+        $('#usersTable').DataTable({
+        });
+
+        $('#integrationsTable').DataTable({
+        });
+
+        var apiKeysTable = $('#apiKeysTable').DataTable({
+        });
+
+        var team = @Json.Serialize(Model);
+        var createKeyUrl = '@Url.Action("CreateNewApiKey")';
+        $('#create-key-action').click(function() {
+                $.post(createKeyUrl, { teamId: team.id })
+                    .done(function (result) {
+                        // create revoke button
+                        var $button = $('<button></button>')
+                            .addClass('btn btn-danger')
+                            .attr('data-toggle', 'modal')
+                            .attr('data-target', '#revoke-key-modal')
+                            .attr('data-id', result.id)
+                            .attr('data-key', result.key)
+                            .text('Revoke Key');
+
+                        // create new row in table
+                        apiKeysTable.row.add([
+                            result.key,
+                            result.issued,
+                            $('<div>').append($button).html(),
+                        ]).draw();
+
+                        $('#create-key-modal').modal('hide');
+                    });
+        });
+
+        $('#revoke-key-modal').on('show.bs.modal', function (event) {
+            // button that triggered the modal
+            var button = $(event.relatedTarget);
+
+            // populate targets
+            var id = button.data('id');
+            $('#revoke-key-modal-id').val(id);
+
+            var key = button.data('key');
+            $('#revoke-key-modal-key').text(key);
+        });
+
+        var revokeKeyUrl = '@Url.Action("RevokeApiKey")';
+        $('#revoke-key-action').click(function () {
+            var id = $('#revoke-key-modal-id').val();
+            $.post(revokeKeyUrl, { id, teamId: team.id })
+                .done(function (result) {
+                    // success, reload page
+                    location.reload();
+                });
+        });
+
+        
+    </script>
+
+    
+}

@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
@@ -23,5 +24,18 @@ namespace Sloth.Core.Models
         public string ReportPasswordKey { get; set; }
 
         public string DefaultAccount { get; set; }
+
+        protected internal static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Integration>()
+                .HasOne(i => i.Team)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Integration>()
+                .HasOne(i => i.Source)
+                .WithMany()
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }
