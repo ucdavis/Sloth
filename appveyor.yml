@@ -37,10 +37,11 @@ after_build:
     dotnet publish .\Sloth.Web\ --output .\publish --configuration $Env:configuration
     octo pack --id Sloth.Web --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\Sloth.Web\publish\ --outFolder .\artifacts\
 
-    dotnet pack .\Sloth.Jobs.CyberSource.BankReconcile\ --no-build --output ..\artifacts /p:PackageVersion=$Env:APPVEYOR_BUILD_VERSION
+    dotnet publish .\Sloth.Jobs.CyberSource.BankReconcile\ --output .\publish --configuration $Env:configuration
+    octo pack --id Sloth.Jobs.CyberSource.BankReconcile --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\Sloth.Jobs.CyberSource.BankReconcile\publish\ --outFolder .\artifacts\
 
-    dotnet pack .\Sloth.Jobs.Kfs.ScrubberUpload\ --no-build --output ..\artifacts /p:PackageVersion=$Env:APPVEYOR_BUILD_VERSION
-
+    dotnet publish .\Sloth.Jobs.Kfs.ScrubberUpload\ --output .\publish --configuration $Env:configuration
+    octo pack --id Sloth.Jobs.Kfs.ScrubberUpload --version $Env:APPVEYOR_BUILD_VERSION --releaseNotes $Env:APPVEYOR_REPO_COMMIT_MESSAGE --basepath .\Sloth.Jobs.Kfs.ScrubberUpload\publish\ --outFolder .\artifacts\
 
 test_script:
 - ps: dotnet test .\Sloth.Test\Sloth.Test.csproj
