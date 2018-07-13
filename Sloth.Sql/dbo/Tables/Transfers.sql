@@ -1,5 +1,5 @@
 ﻿CREATE TABLE [dbo].[Transfers] (
-    [Id]             NVARCHAR (36)   NOT NULL,
+    [Id]             NVARCHAR (450)  NOT NULL,
     [Account]        NVARCHAR (7)    NOT NULL,
     [Amount]         DECIMAL (18, 2) NOT NULL,
     [Chart]          NVARCHAR (1)    NOT NULL,
@@ -14,10 +14,12 @@
     [SequenceNumber] INT             NOT NULL,
     [SubAccount]     NVARCHAR (5)    NULL,
     [SubObjectCode]  NVARCHAR (3)    NULL,
-    [TransactionId]  NVARCHAR (36)   NULL,
+    [TransactionId]  NVARCHAR (450)  NULL,
     CONSTRAINT [PK_Transfers] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Transfers_Transactions_TransactionId] FOREIGN KEY ([TransactionId]) REFERENCES [dbo].[Transactions] ([Id])
 );
+
+
 
 
 GO

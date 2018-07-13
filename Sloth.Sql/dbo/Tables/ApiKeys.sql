@@ -1,21 +1,24 @@
-﻿CREATE TABLE [dbo].[ApiKeys] (
-    [Id]      NVARCHAR (36) NOT NULL,
-    [Key]     NVARCHAR (36) NOT NULL,
-    [Issued]  DATETIME2 (7) NOT NULL,
-    [Revoked] DATETIME2 (7) NULL,
-    [UserId]  NVARCHAR (36) NULL,
+CREATE TABLE [dbo].[ApiKeys] (
+    [Id]      NVARCHAR (450) NOT NULL,
+    [Issued]  DATETIME2 (7)  NOT NULL,
+    [Key]     NVARCHAR (450) NULL,
+    [Revoked] DATETIME2 (7)  NULL,
+    [TeamId]  NVARCHAR (450) NULL,
     CONSTRAINT [PK_ApiKeys] PRIMARY KEY CLUSTERED ([Id] ASC),
-    CONSTRAINT [FK_ApiKeys_Users_UserId] FOREIGN KEY ([UserId]) REFERENCES [dbo].[Users] ([Id]),
-    CONSTRAINT [UK_ApiKeys_Key] UNIQUE NONCLUSTERED ([Key] ASC)
+    CONSTRAINT [FK_ApiKeys_Teams_TeamId] FOREIGN KEY ([TeamId]) REFERENCES [dbo].[Teams] ([Id])
 );
+
+
 
 
 GO
 CREATE UNIQUE NONCLUSTERED INDEX [IX_ApiKeys_Key]
-    ON [dbo].[ApiKeys]([Key] ASC);
+    ON [dbo].[ApiKeys]([Key] ASC) WHERE ([Key] IS NOT NULL);
+
+
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_ApiKeys_UserId]
-    ON [dbo].[ApiKeys]([UserId] ASC);
+CREATE NONCLUSTERED INDEX [IX_ApiKeys_TeamId]
+    ON [dbo].[ApiKeys]([TeamId] ASC);
 

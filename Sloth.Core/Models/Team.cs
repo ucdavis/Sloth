@@ -8,7 +8,6 @@ namespace Sloth.Core.Models
 {
     public class Team
     {
-        [Key]
         public string Id { get; set; }
 
         public string Name { get; set; }

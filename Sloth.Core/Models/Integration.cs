@@ -29,7 +29,7 @@ namespace Sloth.Core.Models
         {
             modelBuilder.Entity<Integration>()
                 .HasOne(i => i.Team)
-                .WithMany()
+                .WithMany(t => t.Integrations)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Integration>()

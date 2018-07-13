@@ -1,7 +1,9 @@
 ﻿CREATE TABLE [dbo].[Users] (
-    [Id]       NVARCHAR (36)  NOT NULL,
-    [Email]    NVARCHAR (256) NULL,
-    [UserName] NVARCHAR (256) NULL,
+    [Id]       NVARCHAR (450) NOT NULL,
+    [Email]    NVARCHAR (MAX) NULL,
+    [UserName] NVARCHAR (MAX) NULL,
     CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED ([Id] ASC)
 );
+
+
 
