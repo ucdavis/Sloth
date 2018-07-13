@@ -1,35 +1,31 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Hangfire.RecurringJobExtensions;
-using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
-using Sloth.Jobs.Services;
+using Sloth.Jobs.Kfs.ScrubberUpload.Services;
 
-namespace Sloth.Jobs.Jobs
+namespace Sloth.Jobs.Kfs.ScrubberUpload
 {
-    public class UploadScrubberJob : JobBase
+    public class UploadScrubberJob
     {
+        private readonly ILogger _log;
         private readonly SlothDbContext _context;
         private readonly IKfsScrubberService _kfsScrubberService;
 
 
-        public UploadScrubberJob(SlothDbContext context, IKfsScrubberService kfsScrubberService) : base("UploadScrubber")
+        public UploadScrubberJob(ILogger log, SlothDbContext context, IKfsScrubberService kfsScrubberService)
         {
+            _log = log;
             _context = context;
             _kfsScrubberService = kfsScrubberService;
         }
 
-        [RecurringJob(CronStrings.EndOfBusiness, RecurringJobId = "upload-nightly-scrubber")]
-        public async Task UploadScrubber(PerformContext context)
+        public async Task UploadScrubber()
         {
-            SetupLogging(context);
-
-            var log = Logger;
-
             try
             {
                 // fetch all staged transactions
@@ -41,7 +37,7 @@ namespace Sloth.Jobs.Jobs
 
                 if (!transactions.Any())
                 {
-                    log.Information("No scheduled transactions found.");
+                    _log.Information("No scheduled transactions found.");
                     return;
                 }
 
@@ -55,7 +51,7 @@ namespace Sloth.Jobs.Jobs
                     var docType = group.Key.DocumentType;
 
                     // create scrubber
-                    log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
+                    _log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
                     var scrubber = new Scrubber()
                     {
                         Chart               = "3",
@@ -71,8 +67,8 @@ namespace Sloth.Jobs.Jobs
                     var filename = $"{docType}.{originCode}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
 
                     // ship scrubber
-                    log.Information("Uploading {filename}", filename);
-                    var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, log);
+                    _log.Information("Uploading {filename}", filename);
+                    var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, _log);
                     scrubber.Uri = uri.AbsoluteUri;
 
                     // persist scrubber uri
@@ -89,7 +85,7 @@ namespace Sloth.Jobs.Jobs
             }
             catch (Exception ex)
             {
-                log.Error(ex, ex.Message);
+                _log.Error(ex, ex.Message);
                 throw;
             }
         }

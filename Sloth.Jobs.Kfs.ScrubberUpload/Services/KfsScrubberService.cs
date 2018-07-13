@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
 using Serilog;
@@ -9,7 +8,7 @@ using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
 
-namespace Sloth.Jobs.Services
+namespace Sloth.Jobs.Kfs.ScrubberUpload.Services
 {
     public interface IKfsScrubberService
     {

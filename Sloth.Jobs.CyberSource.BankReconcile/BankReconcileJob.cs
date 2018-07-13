@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
-using Hangfire.RecurringJobExtensions;
-using Hangfire.Server;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
+using Serilog;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
@@ -16,42 +15,40 @@ using Sloth.Core.Services;
 using Sloth.Integrations.Cybersource;
 using Sloth.Integrations.Cybersource.Clients;
 
-namespace Sloth.Jobs.Jobs
+namespace Sloth.Jobs.CyberSource.BankReconcile
 {
-    public class CybersourceBankDepositJob : JobBase
+    public class BankReconcileJob
     {
+        private readonly ILogger _log;
         private readonly SlothDbContext _context;
         private readonly ISecretsService _secretsService;
-        private readonly CybersourceOptions _cybersourceOptions;
+        private readonly CybersourceOptions _options;
 
-        public CybersourceBankDepositJob(IOptions<CybersourceOptions> options, SlothDbContext context, ISecretsService secretsService) : base("CybersourceBankDeposit")
+        public BankReconcileJob(ILogger log, SlothDbContext context, ISecretsService secretsService, IOptions<CybersourceOptions> options)
         {
+            _log = log;
             _context = context;
             _secretsService = secretsService;
-
-            _cybersourceOptions = options.Value;
+            _options = options.Value;
 
             // validate options
-            if (string.IsNullOrWhiteSpace(_cybersourceOptions.ClearingAccount) ||
-                _cybersourceOptions.ClearingAccount.Length > 7)
+            if (string.IsNullOrWhiteSpace(_options.ClearingAccount) ||
+                _options.ClearingAccount.Length > 7)
             {
                 throw new ArgumentException("ClearingAccount must be non-null and less than 7 characters.");
             }
 
-            if (string.IsNullOrWhiteSpace(_cybersourceOptions.HoldingAccount) ||
-                _cybersourceOptions.ClearingAccount.Length > 7)
+            if (string.IsNullOrWhiteSpace(_options.HoldingAccount) ||
+                _options.ClearingAccount.Length > 7)
             {
                 throw new ArgumentException("HoldingAccount must be non-null and less than 7 characters.");
             }
         }
 
-        [RecurringJob(CronStrings.Hourly, RecurringJobId = "cybersource-bank-deposit")]
-        public async Task UploadScrubber(PerformContext context)
+        public async Task UploadScrubber()
         {
-            SetupLogging(context);
-
             var yesterday = DateTime.UtcNow.Date.AddDays(-1);
-            var log = Logger.ForContext("date", yesterday);
+            var log = _log.ForContext("date", yesterday);
 
             try
             {
@@ -74,8 +71,8 @@ namespace Sloth.Jobs.Jobs
 
         private async Task ProcessIntegration(Integration integration, DateTime yesterday)
         {
-            var log = Logger.ForContext("date", yesterday)
-                            .ForContext("integration", integration.Id);
+            var log = _log.ForContext("date", yesterday)
+                          .ForContext("integration", integration.Id);
 
             using (var tran = await _context.Database.BeginTransactionAsync())
             {
@@ -85,7 +82,7 @@ namespace Sloth.Jobs.Jobs
                     var password = await _secretsService.GetSecret(integration.ReportPasswordKey);
 
                     // create client
-                    var client = new ReportClient(_cybersourceOptions.ReportUrl, integration.MerchantId,
+                    var client = new ReportClient(_options.ReportUrl, integration.MerchantId,
                         integration.ReportUsername,
                         password);
 
@@ -93,7 +90,7 @@ namespace Sloth.Jobs.Jobs
                     var report = await client.GetPaymentBatchDetailReport(yesterday);
                     var count = report.Batches?.Batch?.Length ?? 0;
 
-                    log.Information("Report found with {count} records.", new {count});
+                    log.Information("Report found with {count} records.", new { count });
 
                     if (count < 1)
                     {
@@ -127,25 +124,25 @@ namespace Sloth.Jobs.Jobs
 
                         transaction = new Transaction()
                         {
-                            Source                  = integration.Source,
-                            Status                  = TransactionStatuses.Scheduled,
-                            KfsTrackingNumber       = kfsTrackingNumber,
-                            MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
+                            Source = integration.Source,
+                            Status = TransactionStatuses.Scheduled,
+                            KfsTrackingNumber = kfsTrackingNumber,
+                            MerchantTrackingNumber = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber = deposit.RequestID,
-                            DocumentNumber          = "ADOCUMENT1",
-                            TransactionDate         = yesterday,
+                            DocumentNumber = "ADOCUMENT1",
+                            TransactionDate = yesterday,
                         };
 
                         // move money out of clearing
                         var clearing = new Transfer()
                         {
-                            Chart        = "3",
-                            Account      = _cybersourceOptions.ClearingAccount,
-                            Direction    = Transfer.CreditDebit.Debit,
-                            Amount       = deposit.Amount,
-                            Description  = "Deposit",
-                            ObjectCode   = "ABCD",
-                            FiscalYear   = fiscalYear,
+                            Chart = "3",
+                            Account = _options.ClearingAccount,
+                            Direction = Transfer.CreditDebit.Debit,
+                            Amount = deposit.Amount,
+                            Description = "Deposit",
+                            ObjectCode = "ABCD",
+                            FiscalYear = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(clearing);
@@ -153,13 +150,13 @@ namespace Sloth.Jobs.Jobs
                         // move money into holding
                         var holding = new Transfer()
                         {
-                            Chart        = "3",
-                            Account      = _cybersourceOptions.HoldingAccount,
-                            Direction    = Transfer.CreditDebit.Credit,
-                            Amount       = deposit.Amount,
-                            Description  = "Deposit",
-                            ObjectCode   = "ABCD",
-                            FiscalYear   = fiscalYear,
+                            Chart = "3",
+                            Account = _options.HoldingAccount,
+                            Direction = Transfer.CreditDebit.Credit,
+                            Amount = deposit.Amount,
+                            Description = "Deposit",
+                            ObjectCode = "ABCD",
+                            FiscalYear = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(holding);
@@ -167,13 +164,13 @@ namespace Sloth.Jobs.Jobs
                         // then back out of holding
                         var holding2 = new Transfer()
                         {
-                            Chart        = "3",
-                            Account      = _cybersourceOptions.HoldingAccount,
-                            Direction    = Transfer.CreditDebit.Debit,
-                            Amount       = deposit.Amount,
-                            Description  = "Deposit",
-                            ObjectCode   = "ABCD",
-                            FiscalYear   = fiscalYear,
+                            Chart = "3",
+                            Account = _options.HoldingAccount,
+                            Direction = Transfer.CreditDebit.Debit,
+                            Amount = deposit.Amount,
+                            Description = "Deposit",
+                            ObjectCode = "ABCD",
+                            FiscalYear = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(holding2);
@@ -181,13 +178,13 @@ namespace Sloth.Jobs.Jobs
                         // into the default account
                         var final = new Transfer()
                         {
-                            Chart        = "3",
-                            Account      = integration.DefaultAccount,
-                            Direction    = Transfer.CreditDebit.Credit,
-                            Amount       = deposit.Amount,
-                            Description  = "Deposit",
-                            ObjectCode   = "ABCD",
-                            FiscalYear   = fiscalYear,
+                            Chart = "3",
+                            Account = integration.DefaultAccount,
+                            Direction = Transfer.CreditDebit.Credit,
+                            Amount = deposit.Amount,
+                            Description = "Deposit",
+                            ObjectCode = "ABCD",
+                            FiscalYear = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(final);
@@ -196,7 +193,7 @@ namespace Sloth.Jobs.Jobs
                         if (errors.Any())
                         {
                             log.ForContext("errors", errors).Warning("Validation Errors Detected");
-                            throw new ValidationException();
+                            throw new Exception("Validation Errors Detected");
                         }
 
                         _context.Transactions.Add(transaction);
@@ -205,7 +202,7 @@ namespace Sloth.Jobs.Jobs
                     // push changes for this integration
                     var inserted = await _context.SaveChangesAsync();
                     tran.Commit();
-                    log.Information("{count} records created.", new {count = inserted});
+                    log.Information("{count} records created.", new { count = inserted });
                 }
                 catch (Exception ex)
                 {
@@ -214,14 +211,5 @@ namespace Sloth.Jobs.Jobs
                 }
             }
         }
-    }
-
-    public class CybersourceOptions
-    {
-        public string ReportUrl { get; set; }
-
-        public string ClearingAccount { get; set; }
-
-        public string HoldingAccount { get; set; }
     }
 }

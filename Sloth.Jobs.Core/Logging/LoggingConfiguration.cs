@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
@@ -9,7 +8,7 @@ using Serilog.Exceptions;
 using Serilog.Sinks.MSSqlServer;
 using StackifyLib;
 
-namespace Sloth.Jobs.Logging
+namespace Sloth.Jobs.Core.Logging
 {
     public static class LoggingConfiguration
     {
