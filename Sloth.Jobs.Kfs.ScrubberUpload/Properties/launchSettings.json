@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Sloth.Jobs.Kfs.ScrubberUpload": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}
