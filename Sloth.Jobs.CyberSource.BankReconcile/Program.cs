@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Sloth.Core;
+using Sloth.Core.Configuration;
 using Sloth.Core.Services;
 using Sloth.Jobs.Core;
 
@@ -12,12 +13,17 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
 {
     public class Program : JobBase
     {
+        private static ILogger _log;
+
         public static void Main(string[] args)
         {
-            var log = Log.ForContext("jobid", Guid.NewGuid());
+            _log = Log.ForContext("jobid", Guid.NewGuid());
 
             var assembyName = typeof(Program).Assembly.GetName();
-            log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
+            _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
+
+            // setup env
+            Configure();
 
             // setup di
             var provider = ConfigureServices();
@@ -34,7 +40,8 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             IServiceCollection services = new ServiceCollection();
 
             // options files
-            services.Configure<CybersourceOptions>(Configuration.GetSection("Sloth"));
+            services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
+            services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
 
             // db service
             services.AddDbContext<SlothDbContext>(options =>
@@ -44,6 +51,8 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             // required services
             services.AddTransient<ISecretsService, SecretsService>();
             services.AddTransient<BankReconcileJob>();
+
+            services.AddSingleton(_log);
 
             return services.BuildServiceProvider();
         }

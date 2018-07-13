@@ -9,7 +9,7 @@ namespace Sloth.Jobs.Core
     {
         public static IConfigurationRoot Configuration { get; set; }
 
-        protected JobBase()
+        protected static void Configure()
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
