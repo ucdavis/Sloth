@@ -29,7 +29,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload.Services
 
         private readonly string _storageContainer;
 
-        public KfsScrubberService(IOptions<KfsOptions> options, IStorageService storageService, ISecretsService secretsService)
+        public KfsScrubberService(IOptions<KfsScrubberOptions> options, IStorageService storageService, ISecretsService secretsService)
         {
             _storageService = storageService;
             _secretsService = secretsService;
@@ -92,7 +92,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload.Services
         }
     }
 
-    public class KfsOptions
+    public class KfsScrubberOptions
     {
         public string Host { get; set; }
         public string Username { get; set; }
