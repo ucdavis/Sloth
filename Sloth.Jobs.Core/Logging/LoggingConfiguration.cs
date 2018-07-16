@@ -29,6 +29,10 @@ namespace Sloth.Jobs.Core.Logging
             // create global logger with standard configuration
             Log.Logger = GetConfiguration().CreateLogger();
 
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) => Log.Fatal(e.ExceptionObject as Exception, e.ExceptionObject.ToString());
+
+            AppDomain.CurrentDomain.ProcessExit += (sender, e) => Log.CloseAndFlush();
+
             _loggingSetup = true;
         }
 
@@ -48,19 +52,10 @@ namespace Sloth.Jobs.Core.Logging
 
             // various sinks
             logConfig = logConfig
-                .WriteToStackifyCustom();
+                .WriteToStackifyCustom()
+                .WriteToSqlCustom();
 
             return logConfig;
-        }
-
-        /// <summary>
-        /// Get a logger configuration that logs to both stackify and sql
-        /// </summary>
-        /// <returns></returns>
-        public static LoggerConfiguration GetAuditConfiguration()
-        {
-            return GetConfiguration()
-                .WriteToSqlCustom();
         }
 
         private static LoggerConfiguration WriteToStackifyCustom(this LoggerConfiguration logConfig)
