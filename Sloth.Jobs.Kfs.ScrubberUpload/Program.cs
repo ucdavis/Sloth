@@ -4,13 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Core;
 using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Services;
 using Sloth.Jobs.Core;
 using Sloth.Jobs.Kfs.ScrubberUpload.Services;
-using KfsOptions = Sloth.Jobs.Kfs.ScrubberUpload.Services.KfsOptions;
 
 namespace Sloth.Jobs.Kfs.ScrubberUpload
 {
@@ -18,15 +16,17 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
     {
         private static ILogger _log;
 
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            _log = Log.ForContext("jobid", Guid.NewGuid());
+            // setup env
+            Configure();
+
+            _log = Log.Logger
+                .ForContext("jobname", "Kfs.ScrubberUpload")
+                .ForContext("jobid", Guid.NewGuid());
 
             var assembyName = typeof(Program).Assembly.GetName();
             _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
-
-            // setup env
-            Configure();
 
             // setup di
             var provider = ConfigureServices();
@@ -44,7 +44,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
 
             // options files
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
-            services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
+            services.Configure<KfsScrubberOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
             // db service

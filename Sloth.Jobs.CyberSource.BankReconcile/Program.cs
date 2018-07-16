@@ -17,13 +17,15 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
 
         public static void Main(string[] args)
         {
-            _log = Log.ForContext("jobid", Guid.NewGuid());
+            // setup env
+            Configure();
+
+            _log = Log.Logger
+                .ForContext("jobname", "CyberSource.BankReconcile")
+                .ForContext("jobid", Guid.NewGuid());
 
             var assembyName = typeof(Program).Assembly.GetName();
             _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
-
-            // setup env
-            Configure();
 
             // setup di
             var provider = ConfigureServices();
