@@ -89,28 +89,24 @@ namespace Sloth.Web.Controllers
 
         private async Task ProcessUCDavisInfo(ExternalLoginInfo info)
         {
-            // email comes across in both name claim and upn
-            var email = info.Principal.FindFirstValue(ClaimTypes.Upn);
+            var kerb = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var ucdUser = await _directorySearchService.GetByEmail(email);
+            var ucdUser = await _directorySearchService.GetByKerberos(kerb);
             if (ucdUser == null) return;
 
-            // TODO: see if we need to modify claims like this
             var identity = (ClaimsIdentity) info.Principal.Identity;
 
-            // Should we bother replacing via directory service?
             identity.AddClaim(new Claim(ClaimTypes.Email, ucdUser.Email));
             identity.AddClaim(new Claim(ClaimTypes.GivenName, ucdUser.GivenName));
             identity.AddClaim(new Claim(ClaimTypes.Surname, ucdUser.Surname));
 
-            // name from Azure comes back w/ email, so replace w/ display name
+            // name and identifier come back as kerb, let's replace them with our found values.
             identity.RemoveClaim(identity.FindFirst(ClaimTypes.NameIdentifier));
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, ucdUser.Kerberos));
             info.ProviderKey = ucdUser.Kerberos;
 
-            // name from Azure comes back w/ email, so replace w/ display name
             identity.RemoveClaim(identity.FindFirst(ClaimTypes.Name));
-            identity.AddClaim(new Claim(ClaimTypes.Name, identity.FindFirst("name").Value));
+            identity.AddClaim(new Claim(ClaimTypes.Name, ucdUser.FullName));
         }
 
         [HttpPost]
