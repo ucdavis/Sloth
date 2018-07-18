@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using AspNetCore.Security.CAS;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -70,7 +71,6 @@ namespace Sloth.Web
                 .AddRoleStore<RoleStore>()
                 .AddRoleManager<RoleManager<Role>>();
 
-            var clientId = Configuration.GetValue<string>("Azure:ClientId");
             services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -79,18 +79,9 @@ namespace Sloth.Web
                 {
                     options.LoginPath = "/Account/Login";
                 })
-                .AddOpenIdConnect("UCDavis", options =>
+                .AddCAS("UCDavis", options =>
                 {
-                    options.GetClaimsFromUserInfoEndpoint = true;
-                    options.ClientId = clientId;
-                    options.Authority = "https://login.microsoftonline.com/ucdavis365.onmicrosoft.com";
-                    options.Scope.Add("email");
-                    options.Events.OnRedirectToIdentityProvider = context =>
-                    {
-                        context.ProtocolMessage.SetParameter("domain_hint", "ucdavis.edu");
-
-                        return Task.FromResult(0);
-                    };
+                    options.CasServerUrlBase = Configuration["CasBaseUrl"];
                 });
 
             services.AddMvc()
