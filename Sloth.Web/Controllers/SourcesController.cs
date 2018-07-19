@@ -1,14 +1,17 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Resources;
 using Sloth.Web.Models;
 
 namespace Sloth.Web.Controllers
 {
+    [Authorize(Roles = Roles.SystemAdmin)]
     public class SourcesController : SuperController
     {
         private readonly SlothDbContext _context;

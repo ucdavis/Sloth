@@ -1,8 +1,12 @@
 @using Sloth.Core.Extensions
+@using Sloth.Core.Models
 @model Sloth.Core.Models.Team
 
 @{
     ViewBag.Title = "Team";
+
+    var roles = (IList<Role>) ViewBag.Roles ;
+    var roleOptions = roles.Select(r => new SelectListItem() {Value = r.Id, Text = r.Name});
 }
 
 @section AdditionalStyles
@@ -23,11 +27,23 @@
 
 <hr />
 
-<h3>Users</h3>
+<div class="row mb-1">
+    <div class="col">
+        <h3>Users</h3>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#add-user-modal">
+            Add User
+        </button>
+    </div>
+</div>
+
 <table id="usersTable" class="table table-bordered">
     <thead>
         <tr>
             <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
             <th>Role</th>
         </tr>
     </thead>
@@ -35,7 +51,9 @@
         @foreach (var userRole in Model.UserTeamRoles)
         {
             <tr>
+                <td>@userRole.User.FullName</td>
                 <td>@userRole.User.UserName</td>
+                <td>@userRole.User.Email</td>
                 <td>@userRole.Role.Name</td>
             </tr>
         }
@@ -49,7 +67,7 @@
         <h3>Integrations</h3>
     </div>
     <div class="col d-flex justify-content-end">
-        <a href="@Url.Action("Create", "Integrations")" class="btn btn-primary">Create</a>
+        <a href="@Url.Action("Create", "Integrations")" class="btn btn-primary">Create Integration</a>
     </div>
 </div>
 
@@ -128,6 +146,53 @@
     </tbody>
 </table>
 
+<div id="add-user-modal" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add User?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label>Role</label>
+                        @Html.DropDownList("Role", roleOptions, new { id = "add-user-modal-role", @class = "form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label>User Search</label>
+                        <div class="input-group">
+                            <input type="text" id="add-user-modal-user-search" class="form-control" placeholder="kerb or email" />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="add-user-modal-user-search-icon">
+                                    <i id="add-user-modal-search-icon-search" class="fa fa-search"></i>
+                                    <i id="add-user-modal-search-icon-spinner" class="fa fa-spinner"></i>
+                                    <i id="add-user-modal-search-icon-warning" class="fa fa-warning text-danger"></i>
+                                    <i id="add-user-modal-search-icon-success" class="fa fa-check text-sucess"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="add-user-modal-user-results">
+                        <label>Results</label>
+                        <input type="hidden" id="add-user-modal-user-id" />
+                        <input type="text" id="add-user-modal-user-name" readonly="readonly" class="form-control mb-2" />
+                        <input type="text" id="add-user-modal-user-username" readonly="readonly" class="form-control mb-2" />
+                        <input type="text" id="add-user-modal-user-email" readonly="readonly" class="form-control mb-2" />
+                        <span class="text" id="add-user-modal-user-warning">User not found in database. User will be created automatically.</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="add-user-action" class="btn btn-primary">Add User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div id="create-key-modal" class="modal fade">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -172,9 +237,11 @@
 @section AdditionalScripts
 {
     @Html.Partial("_DataTableScriptsPartial")
+    <script src="/js/utils/debounce.js"></script>
 
     <script>
-        $('#usersTable').DataTable({
+        // setup tables
+        var usersTable = $('#usersTable').DataTable({
         });
 
         $('#integrationsTable').DataTable({
@@ -183,55 +250,159 @@
         var apiKeysTable = $('#apiKeysTable').DataTable({
         });
 
+        // global models
         var team = @Json.Serialize(Model);
+
+        // find user modal load
+        $('#add-user-modal').on('show.bs.modal', function (event) {
+            var modal = $(event.target);
+
+            // clear form
+            modal.find('form')[0].reset();
+            $('#add-user-modal-user-results').hide();
+        });
+
+        // find user function
+        var findUserUrl = '@Url.Action("FindUser", "Users")';
+        var findUser = debounce(function(query) {
+                $.get(findUserUrl, { query })
+                    .then(function(result) {
+
+                        // save user info to form
+                        var user = result.user;
+                        $('#add-user-modal-user-results').show();
+                        $('#add-user-modal-user-id').val(user.id);
+                        $('#add-user-modal-user-name').val(user.fullname);
+                        $('#add-user-modal-user-username').val(user.username);
+                        $('#add-user-modal-user-email').val(user.email);
+
+                        // set icons/warnings
+                        $('#add-user-modal-search-icon-search').hide();
+                        $('#add-user-modal-search-icon-spinner').hide();
+                        $('#add-user-modal-search-icon-warning').hide();
+                        $('#add-user-modal-search-icon-success').hide();
+                        $('#add-user-modal-user-warning').hide();
+                    });
+            },
+            500,
+            false);
+
+        // on search box change, trigger find function
+        $('#add-user-modal-user-search').keyup(function() {
+            // clear results
+            $('#add-user-modal-user-results').hide();
+
+            // start query
+            var query = $(this).val();
+            findUser(query);
+        });
+
+        // function that can get or create a new db user by their directory information
+        var createUserUrl = '@Url.Action("CreateUserFromDirectory", "Users")';
+        function getOrCreateUserId() {
+            var userId = $('#add-user-modal-user-id').val();
+            if (userId) {
+                return $.when({ id: userId });
+            }
+
+            var username = $('#add-user-modal-user-username').val();
+            return $.post(createUserUrl, { query: username })
+                .done(function(result) { return result.user; });
+        }
+
+        // add user to team
+        var addUserUrl = '@Url.Action("CreateUserRole")';
+        $('#add-user-action').click(function() {
+
+            // lock buttons
+
+            // should we create the user in the db first?
+            getOrCreateUserId()
+                .done(function(user) {
+
+                    // build add request
+                    var roleId = $('#add-user-modal-role').val();
+
+                    var request = {
+                        teamId: team.id,
+                        roleId: roleId,
+                        userId: user.id,
+                    }
+
+                    // send creat
+                    return $.post(addUserUrl, request);
+                })
+                .done(function(result) {
+
+                    // create new row in table
+                    var fullname = $('#add-user-modal-user-name').val();
+                    var username = $('#add-user-modal-user-username').val();
+                    var email = $('#add-user-modal-user-email').val();
+                    var rolename = $('#add-user-modal-role option:selected').text();
+
+                    usersTable.row.add([
+                        fullname,
+                        username,
+                        email,
+                        rolename,
+                    ]).draw();
+
+                    $('#add-user-modal').modal('hide');
+                })
+                .fail(function(err) {
+                    console.error(err);
+                });
+        });
+
         var createKeyUrl = '@Url.Action("CreateNewApiKey")';
         $('#create-key-action').click(function() {
-                $.post(createKeyUrl, { teamId: team.id })
-                    .done(function (result) {
-                        // create revoke button
-                        var $button = $('<button></button>')
-                            .addClass('btn btn-danger')
-                            .attr('data-toggle', 'modal')
-                            .attr('data-target', '#revoke-key-modal')
-                            .attr('data-id', result.id)
-                            .attr('data-key', result.key)
-                            .text('Revoke Key');
+            $.post(createKeyUrl, { teamId: team.id })
+                .done(function(result) {
+                    // create revoke button
+                    var $button = $('<button></button>')
+                        .addClass('btn btn-danger')
+                        .attr('data-toggle', 'modal')
+                        .attr('data-target', '#revoke-key-modal')
+                        .attr('data-id', result.id)
+                        .attr('data-key', result.key)
+                        .text('Revoke Key');
 
-                        // create new row in table
-                        apiKeysTable.row.add([
-                            result.key,
-                            result.issued,
-                            $('<div>').append($button).html(),
-                        ]).draw();
+                    // create new row in table
+                    apiKeysTable.row.add([
+                        result.key,
+                        result.issued,
+                        $('<div>').append($button).html(),
+                    ]).draw();
 
-                        $('#create-key-modal').modal('hide');
-                    });
+                    $('#create-key-modal').modal('hide');
+                });
         });
 
-        $('#revoke-key-modal').on('show.bs.modal', function (event) {
-            // button that triggered the modal
-            var button = $(event.relatedTarget);
+        $('#revoke-key-modal').on('show.bs.modal',
+            function(event) {
+                // button that triggered the modal
+                var button = $(event.relatedTarget);
 
-            // populate targets
-            var id = button.data('id');
-            $('#revoke-key-modal-id').val(id);
+                // populate targets
+                var id = button.data('id');
+                $('#revoke-key-modal-id').val(id);
 
-            var key = button.data('key');
-            $('#revoke-key-modal-key').text(key);
-        });
+                var key = button.data('key');
+                $('#revoke-key-modal-key').text(key);
+            });
 
         var revokeKeyUrl = '@Url.Action("RevokeApiKey")';
-        $('#revoke-key-action').click(function () {
+        $('#revoke-key-action').click(function() {
             var id = $('#revoke-key-modal-id').val();
             $.post(revokeKeyUrl, { id, teamId: team.id })
-                .done(function (result) {
+                .done(function(result) {
                     // success, reload page
                     location.reload();
                 });
         });
 
-        
+
     </script>
 
-    
+
 }

@@ -22,18 +22,27 @@ namespace Sloth.Core.Services
             // find the contact via their email
             var ucdContactResult = await _ietClient.Contacts.Search(ContactSearchField.email, email);
             EnsureResponseSuccess(ucdContactResult);
+            if (ucdContactResult.ResponseData.Results.Length == 0)
+            {
+                return null;
+            }
             var ucdContact = ucdContactResult.ResponseData.Results.First();
 
             // now look up the whole person's record by ID including kerb
-            var ucdKerbResult = await _ietClient.Kerberos.Search(KerberosSearchField.iamId, ucdContact.IamId);
+            var ucdKerbResult = await _ietClient.Kerberos.Get(ucdContact.IamId);
             EnsureResponseSuccess(ucdKerbResult);
-
+            if (ucdKerbResult.ResponseData.Results.Length == 0)
+            {
+                return null;
+            }
             var ucdKerbPerson = ucdKerbResult.ResponseData.Results.Single();
+
             return TransformKerberosResult(ucdKerbPerson, ucdContact);
         }
 
         public async Task<DirectoryUser> GetByKerberos(string kerb)
         {
+            // find the contact via their kerb
             var ucdKerbResult = await _ietClient.Kerberos.Search(KerberosSearchField.userId, kerb);
             EnsureResponseSuccess(ucdKerbResult);
             if (ucdKerbResult.ResponseData.Results.Length == 0)
@@ -45,6 +54,10 @@ namespace Sloth.Core.Services
             // find their email
             var ucdContactResult = await _ietClient.Contacts.Get(ucdKerbPerson.IamId);
             EnsureResponseSuccess(ucdContactResult);
+            if (ucdContactResult.ResponseData.Results.Length == 0)
+            {
+                return null;
+            }
             var ucdContact = ucdContactResult.ResponseData.Results.First();
 
             return TransformKerberosResult(ucdKerbPerson, ucdContact);
