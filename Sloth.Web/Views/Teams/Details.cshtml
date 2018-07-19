@@ -28,6 +28,8 @@
     <thead>
         <tr>
             <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
             <th>Role</th>
         </tr>
     </thead>
@@ -35,7 +37,9 @@
         @foreach (var userRole in Model.UserTeamRoles)
         {
             <tr>
+                <td>@userRole.User.FullName</td>
                 <td>@userRole.User.UserName</td>
+                <td>@userRole.User.Email</td>
                 <td>@userRole.Role.Name</td>
             </tr>
         }

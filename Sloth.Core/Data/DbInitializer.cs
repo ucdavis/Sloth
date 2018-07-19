@@ -78,6 +78,7 @@ namespace Sloth.Core.Data
                 {
                     UserName = "jpknoll",
                     Email = "jpknoll@ucdavis.edu",
+                    FullName = "John Knoll",
                     Roles = new []
                     {
                         new UserRole()
