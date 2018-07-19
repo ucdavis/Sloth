@@ -1,0 +1,16 @@
+@model Sloth.Web.Models.TeamViewModels.CreateTeamViewModel
+
+@{
+    ViewBag.Title = "Create New Team";
+}
+
+<h2>@ViewBag.Title</h2>
+
+<form method="post">
+    <div class="form-group">
+        @Html.LabelFor(x => x.Name)
+        @Html.TextBoxFor(x => x.Name, new { @class="form-control" })
+    </div>
+
+    <input type="submit" value="Create" class="btn btn-primary" />
+</form>

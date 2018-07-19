@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
+using Sloth.Web.Models.TeamViewModels;
 
 namespace Sloth.Web.Controllers
 {
@@ -55,6 +56,32 @@ namespace Sloth.Web.Controllers
             return View(team);
         }
 
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(CreateTeamViewModel model)
+        {
+            // fetch user
+            var user = await _userManager.GetUserAsync(User);
+
+            // fetch admin role
+            var adminRole = await _context.Roles.FirstAsync(r => r.Name == Roles.Admin);
+
+            var team = new Team()
+            {
+                Name = model.Name,
+            };
+            team.AddUserToRole(user, adminRole);
+
+            _context.Teams.Add(team);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = team.Id });
+        }
         [HttpPost]
         public async Task<IActionResult> CreateNewApiKey(string teamId)
         {

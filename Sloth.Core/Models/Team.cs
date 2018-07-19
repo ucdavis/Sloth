@@ -8,9 +8,19 @@ namespace Sloth.Core.Models
 {
     public class Team
     {
+        public Team()
+        {
+            ApiKeys = new List<ApiKey>();
+            Integrations = new List<Integration>();
+            UserTeamRoles = new List<UserTeamRole>();
+        }
+
         public string Id { get; set; }
 
         public string Name { get; set; }
+
+        [JsonIgnore]
+        public IList<ApiKey> ApiKeys { get; set; }
 
         [JsonIgnore]
         public IList<Integration> Integrations { get; set; }
@@ -18,8 +28,15 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         public IList<UserTeamRole> UserTeamRoles { get; set; }
 
-        [JsonIgnore]
-        public IList<ApiKey> ApiKeys { get; set; }
+        public void AddUserToRole(User user, Role role)
+        {
+            UserTeamRoles.Add(new UserTeamRole()
+            {
+                Role = role,
+                User = user,
+                Team = this,
+            });
+        }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
