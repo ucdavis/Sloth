@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
+using Sloth.Core.Resources;
 using Sloth.Web.Models.TeamViewModels;
 
 namespace Sloth.Web.Controllers
@@ -25,14 +26,26 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var userId = _userManager.GetUserId(User);
-            var user = await _context.Users
-                .Include(u => u.UserTeamRoles)
-                    .ThenInclude(r => r.Team)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            IEnumerable<Team> teams;
+            if (User.IsInRole(Roles.SystemAdmin))
+            {
+                // get all teams
+                teams = _context.Teams.ToList();
+            }
+            else
+            {
+                // get user + roles, include their teams
+                var userId = _userManager.GetUserId(User);
+                var user = await _context.Users
+                    .Include(u => u.UserTeamRoles)
+                        .ThenInclude(r => r.Team)
+                    .FirstOrDefaultAsync(u => u.Id == userId);
 
-            // teams
-            var teams = user.UserTeamRoles.Select(r => r.Team);
+                // select all teams that user is on
+                teams = user.UserTeamRoles
+                    .Select(r => r.Team)
+                    .Distinct();
+            }
 
             return View(teams);
         }
@@ -52,6 +65,12 @@ namespace Sloth.Web.Controllers
             {
                 return NotFound();
             }
+
+            // fetch team roles
+            var teamRoles = new[] { Roles.Admin, Roles.Approver };
+            ViewBag.Roles = await _context.Roles
+                .Where(r => teamRoles.Contains(r.Name))
+                .ToListAsync();
 
             return View(team);
         }
@@ -82,6 +101,32 @@ namespace Sloth.Web.Controllers
 
             return RedirectToAction("Details", new { id = team.Id });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateUserRole(string teamId, string userId, string roleId)
+        {
+            // fetch team from db
+            var team = await _context.Teams
+                .Include(t => t.ApiKeys)
+                .FirstOrDefaultAsync(t => t.Id == teamId);
+
+            // find user or create them
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            // find role
+            var role = await _context.Roles
+                .FirstOrDefaultAsync(r => r.Id == roleId);
+
+            team.AddUserToRole(user, role);
+            await _context.SaveChangesAsync();
+
+            return new JsonResult(new
+            {
+                success = true
+            });
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateNewApiKey(string teamId)
         {
