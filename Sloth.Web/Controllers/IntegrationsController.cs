@@ -42,7 +42,7 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateIntegration integration)
+        public async Task<IActionResult> Create(CreateIntegrationViewModel integration)
         {
             // TODO: validate model
             var adminTeams = await GetUsersAdminTeams();
