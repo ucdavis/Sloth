@@ -15,13 +15,8 @@ namespace Sloth.Web.Controllers
 {
     public class TeamsController : SuperController
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SlothDbContext _context;
-
-        public TeamsController(UserManager<User> userManager, SlothDbContext context)
+        public TeamsController(UserManager<User> userManager, SlothDbContext dbContext) : base (userManager, dbContext)
         {
-            _userManager = userManager;
-            _context = context;
         }
 
         public async Task<IActionResult> Index()
@@ -30,13 +25,13 @@ namespace Sloth.Web.Controllers
             if (User.IsInRole(Roles.SystemAdmin))
             {
                 // get all teams
-                teams = _context.Teams.ToList();
+                teams = DbContext.Teams.ToList();
             }
             else
             {
                 // get user + roles, include their teams
-                var userId = _userManager.GetUserId(User);
-                var user = await _context.Users
+                var userId = UserManager.GetUserId(User);
+                var user = await DbContext.Users
                     .Include(u => u.UserTeamRoles)
                         .ThenInclude(r => r.Team)
                     .FirstOrDefaultAsync(u => u.Id == userId);
@@ -52,7 +47,7 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> Details(string id)
         {
-            var team = await _context.Teams
+            var team = await DbContext.Teams
                 .Include(t => t.ApiKeys)
                 .Include(t => t.Integrations)
                 .Include(t => t.UserTeamRoles)
@@ -67,8 +62,8 @@ namespace Sloth.Web.Controllers
             }
 
             // fetch team roles
-            var teamRoles = new[] { Roles.Admin, Roles.Approver };
-            ViewBag.Roles = await _context.Roles
+            var teamRoles = new[] { TeamRole.Admin, TeamRole.Approver };
+            ViewBag.Roles = await DbContext.TeamRoles
                 .Where(r => teamRoles.Contains(r.Name))
                 .ToListAsync();
 
@@ -85,10 +80,10 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Create(CreateTeamViewModel model)
         {
             // fetch user
-            var user = await _userManager.GetUserAsync(User);
+            var user = await UserManager.GetUserAsync(User);
 
             // fetch admin role
-            var adminRole = await _context.Roles.FirstAsync(r => r.Name == Roles.Admin);
+            var adminRole = await DbContext.TeamRoles.FirstAsync(r => r.Name == TeamRole.Admin);
 
             var team = new Team()
             {
@@ -96,8 +91,8 @@ namespace Sloth.Web.Controllers
             };
             team.AddUserToRole(user, adminRole);
 
-            _context.Teams.Add(team);
-            await _context.SaveChangesAsync();
+            DbContext.Teams.Add(team);
+            await DbContext.SaveChangesAsync();
 
             return RedirectToAction("Details", new { id = team.Id });
         }
@@ -106,20 +101,20 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> CreateUserRole(string teamId, string userId, string roleId)
         {
             // fetch team from db
-            var team = await _context.Teams
+            var team = await DbContext.Teams
                 .Include(t => t.ApiKeys)
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
-            // find user or create them
-            var user = await _context.Users
+            // find user
+            var user = await DbContext.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             // find role
-            var role = await _context.Roles
+            var role = await DbContext.TeamRoles
                 .FirstOrDefaultAsync(r => r.Id == roleId);
 
             team.AddUserToRole(user, role);
-            await _context.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             return new JsonResult(new
             {
@@ -131,7 +126,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> CreateNewApiKey(string teamId)
         {
             // fetch team from db
-            var team = await _context.Teams
+            var team = await DbContext.Teams
                 .Include(t => t.ApiKeys)
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
@@ -140,7 +135,7 @@ namespace Sloth.Web.Controllers
 
             // associate key and update db
             team.ApiKeys.Add(apiKey);
-            await _context.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             return new JsonResult(new
             {
@@ -155,7 +150,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> RevokeApiKey(string id, string teamId)
         {
             // fetch team from db
-            var team = await _context.Teams
+            var team = await DbContext.Teams
                 .Include(t => t.ApiKeys)
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
@@ -168,7 +163,7 @@ namespace Sloth.Web.Controllers
 
             // set revoke on key
             apiKey.Revoked = DateTime.UtcNow;
-            await _context.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             return new JsonResult(new
             {
