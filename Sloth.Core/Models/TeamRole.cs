@@ -14,7 +14,6 @@ namespace Sloth.Core.Models
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<TeamRole>()
-                .ToTable("Roles")
                 .HasIndex(r => r.Name).IsUnique();
         }
 
