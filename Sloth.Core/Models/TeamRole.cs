@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
-    public class Role
+    public class TeamRole
     {
         [Key]
         public string Id { get; set; }
@@ -13,9 +13,22 @@ namespace Sloth.Core.Models
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Role>()
+            modelBuilder.Entity<TeamRole>()
                 .ToTable("Roles")
                 .HasIndex(r => r.Name).IsUnique();
+        }
+
+        // Role Codes
+        public const string Admin = "Admin";
+        public const string Approver = "Approver";
+
+        public static string[] GetAllRoles()
+        {
+            return new[]
+            {
+                Admin,
+                Approver,
+            };
         }
     }
 }

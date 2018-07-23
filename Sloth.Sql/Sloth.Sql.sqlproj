@@ -69,7 +69,6 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="dbo\Tables\UserTeamRoles.sql" />
-    <Build Include="dbo\Tables\Users.sql" />
     <Build Include="dbo\Tables\UserRoles.sql" />
     <Build Include="dbo\Tables\Transfers.sql" />
     <Build Include="dbo\Tables\Transactions.sql" />
@@ -81,5 +80,12 @@
     <Build Include="dbo\Sequences\KFS_Tracking_Number_Seq.sql" />
     <Build Include="dbo\Tables\Logs.sql" />
     <Build Include="dbo\Tables\Sources.sql" />
+    <Build Include="dbo\Tables\AspNetUserTokens.sql" />
+    <Build Include="dbo\Tables\AspNetUsers.sql" />
+    <Build Include="dbo\Tables\AspNetUserRoles.sql" />
+    <Build Include="dbo\Tables\AspNetUserLogins.sql" />
+    <Build Include="dbo\Tables\AspNetUserClaims.sql" />
+    <Build Include="dbo\Tables\AspNetRoles.sql" />
+    <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
   </ItemGroup>
 </Project>

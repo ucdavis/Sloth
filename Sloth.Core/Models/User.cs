@@ -1,22 +1,16 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
 {
-    public class User
+    public class User : IdentityUser
     {
-        [Key]
-        public string Id { get; set; }
-
-        public string UserName { get; set; }
-
-        public string Email { get; set; }
-
         public string FullName { get; set; }
 
         [JsonIgnore]
@@ -47,10 +41,17 @@ namespace Sloth.Core.Models
         }
 
         [JsonIgnore]
-        public IList<UserRole> Roles { get; set; }
-
-        [JsonIgnore]
         public IList<UserTeamRole> UserTeamRoles { get; set; }
+
+        public IEnumerable<Team> GetTeams()
+        {
+            return UserTeamRoles.Select(p => p.Team).Distinct();
+        }
+
+        public bool IsTeamAdmin(string teamName)
+        {
+            return UserTeamRoles.Any(a => a.Team.Name == teamName && a.Role.Name == TeamRole.Admin);
+        }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {

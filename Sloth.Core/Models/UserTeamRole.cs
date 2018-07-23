@@ -12,7 +12,7 @@ namespace Sloth.Core.Models
 
         public string RoleId { get; set; }
 
-        public Role Role { get; set; }
+        public TeamRole Role { get; set; }
 
         public string TeamId { get; set; }
 
