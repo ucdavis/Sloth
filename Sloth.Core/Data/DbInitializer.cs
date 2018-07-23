@@ -34,30 +34,38 @@ namespace Sloth.Core.Data
         /// </summary>
         public async Task Initialize()
         {
-            if (_context.Users.Any()) return;
-
             // create identity roles
-            await _roleManager.CreateAsync(new IdentityRole(Roles.SystemAdmin));
+            if (!_context.Roles.Any())
+            {
+                await _roleManager.CreateAsync(new IdentityRole(Roles.SystemAdmin));
+            }
 
             // create team roles
-            _context.TeamRoles.Add(new TeamRole() {Name = TeamRole.Admin});
-            _context.TeamRoles.Add(new TeamRole() {Name = TeamRole.Approver});
-
-            var users = new[]
+            if (!_context.TeamRoles.Any())
             {
-                new User()
+                _context.TeamRoles.Add(new TeamRole() {Name = TeamRole.Admin});
+                _context.TeamRoles.Add(new TeamRole() {Name = TeamRole.Approver});
+            }
+
+            // create system users
+            if (!_context.Users.Any())
+            {
+                var users = new[]
                 {
-                    UserName = "jpknoll",
-                    Email = "jpknoll@ucdavis.edu",
-                    FullName = "John Knoll",
-                    
-                },
-            };
+                    new User()
+                    {
+                        UserName = "jpknoll",
+                        Email = "jpknoll@ucdavis.edu",
+                        FullName = "John Knoll",
 
-            foreach (var user in users)
-            {
-                await _userManager.CreateAsync(user);
-                await _userManager.AddToRoleAsync(user, Roles.SystemAdmin);
+                    },
+                };
+
+                foreach (var user in users)
+                {
+                    await _userManager.CreateAsync(user);
+                    await _userManager.AddToRoleAsync(user, Roles.SystemAdmin);
+                }
             }
 
             _context.SaveChanges();
