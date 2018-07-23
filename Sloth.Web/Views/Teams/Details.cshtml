@@ -5,7 +5,7 @@
 @{
     ViewBag.Title = "Team";
 
-    var roles = (IList<Role>) ViewBag.Roles ;
+    var roles = (IList<TeamRole>) ViewBag.Roles ;
     var roleOptions = roles.Select(r => new SelectListItem() {Value = r.Id, Text = r.Name});
 }
 
@@ -159,7 +159,7 @@
                 <form>
                     <div class="form-group">
                         <label>Role</label>
-                        @Html.DropDownList("Role", roleOptions, new { id = "add-user-modal-role", @class = "form-control" })
+                        @Html.DropDownList("TeamRole", roleOptions, new { id = "add-user-modal-role", @class = "form-control" })
                     </div>
                     <div class="form-group">
                         <label>User Search</label>
@@ -241,14 +241,11 @@
 
     <script>
         // setup tables
-        var usersTable = $('#usersTable').DataTable({
-        });
+        var usersTable = $('#usersTable').DataTable({ });
 
-        $('#integrationsTable').DataTable({
-        });
+        $('#integrationsTable').DataTable({ });
 
-        var apiKeysTable = $('#apiKeysTable').DataTable({
-        });
+        var apiKeysTable = $('#apiKeysTable').DataTable({ });
 
         // global models
         var team = @Json.Serialize(Model);
@@ -307,7 +304,7 @@
 
             var username = $('#add-user-modal-user-username').val();
             return $.post(createUserUrl, { query: username })
-                .done(function(result) { return result.user; });
+                .then(function(result) { return result.user; });
         }
 
         // add user to team
@@ -318,7 +315,7 @@
 
             // should we create the user in the db first?
             getOrCreateUserId()
-                .done(function(user) {
+                .then(function(user) {
 
                     // build add request
                     var roleId = $('#add-user-modal-role').val();
@@ -329,10 +326,10 @@
                         userId: user.id,
                     }
 
-                    // send creat
+                    // send create
                     return $.post(addUserUrl, request);
                 })
-                .done(function(result) {
+                .then(function(result) {
 
                     // create new row in table
                     var fullname = $('#add-user-modal-user-name').val();
@@ -340,6 +337,7 @@
                     var email = $('#add-user-modal-user-email').val();
                     var rolename = $('#add-user-modal-role option:selected').text();
 
+                    var usersTable = $('#usersTable').DataTable();
                     usersTable.row.add([
                         fullname,
                         username,
@@ -368,6 +366,7 @@
                         .text('Revoke Key');
 
                     // create new row in table
+                    var apiKeysTable = $('#apiKeysTable').DataTable();
                     apiKeysTable.row.add([
                         result.key,
                         result.issued,
