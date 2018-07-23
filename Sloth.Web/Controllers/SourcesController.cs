@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
@@ -14,17 +15,15 @@ namespace Sloth.Web.Controllers
     [Authorize(Roles = Roles.SystemAdmin)]
     public class SourcesController : SuperController
     {
-        private readonly SlothDbContext _context;
 
-        public SourcesController(SlothDbContext context)
+        public SourcesController(UserManager<User> userManager, SlothDbContext dbContext) : base(userManager, dbContext)
         {
-            _context = context;
         }
 
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var sources = await _context.Sources
+            var sources = await DbContext.Sources
                 .Include(s => s.Team)
                 .ToListAsync();
 
@@ -34,15 +33,15 @@ namespace Sloth.Web.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            ViewBag.Teams = _context.Teams.ToList();
+            ViewBag.Teams = DbContext.Teams.ToList();
 
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateSource source)
+        public async Task<IActionResult> Create(CreateSourceViewModel source)
         {
-            var team = await _context.Teams.FirstOrDefaultAsync(t => t.Id == source.TeamId);
+            var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == source.TeamId);
             if (team == null)
             {
                 return View();
@@ -57,8 +56,8 @@ namespace Sloth.Web.Controllers
                 DocumentType = source.DocumentType,
                 Team = team
             };
-            _context.Sources.Add(target);
-            await _context.SaveChangesAsync();
+            DbContext.Sources.Add(target);
+            await DbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }

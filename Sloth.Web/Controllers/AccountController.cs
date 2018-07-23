@@ -13,7 +13,7 @@ using Sloth.Core.Services;
 
 namespace Sloth.Web.Controllers
 {
-    public class AccountController : SuperController
+    public class AccountController : Controller
     {
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
