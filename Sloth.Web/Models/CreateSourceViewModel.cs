@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sloth.Web.Models
 {
-    public class CreateSource
+    public class CreateSourceViewModel
     {
         public string Id { get; set; }
 
