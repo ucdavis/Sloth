@@ -1,5 +1,5 @@
 @using Sloth.Core.Models;
-@model Sloth.Web.Models.CreateSource
+@model CreateSourceViewModel
 
 @{
     ViewBag.Title = "Create Source";
@@ -10,14 +10,33 @@
 
 <h2>@ViewBag</h2>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(FormMethod.Post))
 {
-    @Html.DropDownListFor(x => x.TeamId, teamItems)
-    @Html.EditorFor(x => x.Name)
-    @Html.EditorFor(x => x.Type)
-    @Html.EditorFor(x => x.Description)
-    @Html.EditorFor(x => x.OriginCode)
-    @Html.EditorFor(x => x.DocumentType)
-
-    <input type="submit" value="Create" />
+    <div class="form-group">
+        @Html.DisplayNameFor(x => x.TeamId)
+        @Html.DropDownListFor(x => x.TeamId, teamItems, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.DisplayNameFor(x => x.TeamId)
+        @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.DisplayNameFor(x => x.TeamId)
+        @Html.TextBoxFor(x => x.Type, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.DisplayNameFor(x => x.TeamId)
+        @Html.TextBoxFor(x => x.Description, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.DisplayNameFor(x => x.TeamId)
+        @Html.TextBoxFor(x => x.OriginCode, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.DisplayNameFor(x => x.TeamId)
+        @Html.TextBoxFor(x => x.DocumentType, new { @class = "form-control" })
+    </div>
+    <div class="d-flex justify-content-end">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
 }

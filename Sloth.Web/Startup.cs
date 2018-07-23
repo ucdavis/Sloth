@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using AspNetCore.Security.CAS;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -16,7 +15,6 @@ using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
-using Sloth.Web.Identity;
 using Sloth.Web.Logging;
 using Sloth.Web.Models;
 
@@ -65,11 +63,9 @@ namespace Sloth.Web
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            services.AddIdentity<User, Role>()
-                .AddUserStore<UserStore>()
-                .AddUserManager<UserManager<User>>()
-                .AddRoleStore<RoleStore>()
-                .AddRoleManager<RoleManager<Role>>();
+            services.AddIdentity<User, IdentityRole>()
+                .AddEntityFrameworkStores<SlothDbContext>()
+                .AddUserManager<UserManager<User>>();
 
             services.AddAuthentication(options =>
                 {

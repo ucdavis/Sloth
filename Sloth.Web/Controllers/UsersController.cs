@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -12,21 +11,18 @@ namespace Sloth.Web.Controllers
 {
     public class UsersController : SuperController
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SlothDbContext _context;
         private readonly IDirectorySearchService _directorySearchService;
 
-        public UsersController(UserManager<User> userManager, SlothDbContext context, IDirectorySearchService directorySearchService)
+        public UsersController(UserManager<User> userManager, SlothDbContext dbContext, IDirectorySearchService directorySearchService)
+            : base(userManager, dbContext)
         {
-            _userManager = userManager;
-            _context = context;
             _directorySearchService = directorySearchService;
         }
 
         public async Task<IActionResult> Manage()
         {
-            var userId = _userManager.GetUserId(User);
-            var user = await _context.Users
+            var userId = UserManager.GetUserId(User);
+            var user = await DbContext.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             return View(user);
@@ -35,7 +31,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> FindUser(string query)
         {
             // check database first
-            var dbUser = await _context.Users
+            var dbUser = await DbContext.Users
                 .FirstOrDefaultAsync(u => u.UserName == query || u.Email == query);
 
             if (dbUser != null)
@@ -84,7 +80,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> CreateUserFromDirectory(string query)
         {
             // check database first
-            var dbUser = await _context.Users
+            var dbUser = await DbContext.Users
                 .FirstOrDefaultAsync(u => u.UserName == query || u.Email == query);
 
             // user already exists
@@ -125,7 +121,7 @@ namespace Sloth.Web.Controllers
                 Email = directoryUser.Email,
                 FullName = directoryUser.FullName,
             };
-            await _userManager.CreateAsync(user);
+            await UserManager.CreateAsync(user);
 
             return new JsonResult(new
             {

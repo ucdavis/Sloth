@@ -1,25 +1,24 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
+using Sloth.Core.Models;
 using Sloth.Core.Resources;
 
 namespace Sloth.Web.Controllers
 {
     public class TransactionsController : SuperController
     {
-        private readonly SlothDbContext _context;
-
-        public TransactionsController(SlothDbContext context)
+        public TransactionsController(UserManager<User> userManager, SlothDbContext dbContext) : base(userManager, dbContext)
         {
-            _context = context;
         }
 
         // GET: /<controller>/
         public async Task<IActionResult> Index()
         {
-            var transactions = await _context.Transactions
+            var transactions = await DbContext.Transactions
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -28,7 +27,7 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> Details(string id)
         {
-            var transaction = await _context.Transactions
+            var transaction = await DbContext.Transactions
                 .Include(t => t.Scrubber)
                 .Include(t => t.Transfers)
                 .AsNoTracking()
@@ -40,7 +39,7 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ScheduleTransaction(string id)
         {
-            var transaction = await _context.Transactions
+            var transaction = await DbContext.Transactions
                 .Include(t => t.Scrubber)
                 .Include(t => t.Transfers)
                 .FirstOrDefaultAsync(t => t.Id == id);
@@ -58,7 +57,7 @@ namespace Sloth.Web.Controllers
 
             transaction.Status = TransactionStatuses.Scheduled;
 
-            await _context.SaveChangesAsync();
+            await DbContext.SaveChangesAsync();
 
             return RedirectToAction("Index");
         }

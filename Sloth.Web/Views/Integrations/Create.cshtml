@@ -1,5 +1,5 @@
 @using Sloth.Core.Models
-@model Sloth.Web.Models.CreateIntegration
+@model CreateIntegrationViewModel
 
 @{
     ViewBag.Title = "Create Integration";
@@ -16,28 +16,37 @@
 
 <h2>@ViewBag.Title</h2>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm(FormMethod.Post))
 {
-    @Html.LabelFor(x => x.TeamId)
-    @Html.DropDownListFor(x => x.TeamId, teamItems)
-
-    @Html.LabelFor(x => x.SourceId)
-    @Html.DropDownListFor(x => x.SourceId, sourceItems)
-
-    @Html.LabelFor(x => x.Type)
-    @Html.DropDownListFor(x => x.Type, typeItems)
-
-    @Html.LabelFor(x => x.MerchantId)
-    @Html.EditorFor(x => x.MerchantId)
-
-    @Html.LabelFor(x => x.ReportUserName)
-    @Html.EditorFor(x => x.ReportUserName)
-
-    @Html.LabelFor(x => x.ReportPassword)
-    @Html.PasswordFor(x => x.ReportPassword)
-
-    @Html.LabelFor(x => x.DefaultAccount)
-    @Html.EditorFor(x => x.DefaultAccount)
-
-    <input type="submit" value="Create" />
+    <div class="form-group">
+        @Html.LabelFor(x => x.TeamId)
+        @Html.DropDownListFor(x => x.TeamId, teamItems, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.SourceId)
+        @Html.DropDownListFor(x => x.SourceId, sourceItems, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.Type)
+        @Html.DropDownListFor(x => x.Type, typeItems, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.MerchantId)
+        @Html.TextBoxFor(x => x.MerchantId, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.ReportUserName)
+        @Html.TextBoxFor(x => x.ReportUserName, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.ReportPassword)
+        @Html.PasswordFor(x => x.ReportPassword, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.DefaultAccount)
+        @Html.TextBoxFor(x => x.DefaultAccount, new { @class = "form-control" })
+    </div>
+    <div class="d-flex justify-content-end">
+        <input type="submit" value="Create" class="btn btn-primary"/>
+    </div>
 }

@@ -28,7 +28,7 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         public IList<UserTeamRole> UserTeamRoles { get; set; }
 
-        public void AddUserToRole(User user, Role role)
+        public void AddUserToRole(User user, TeamRole role)
         {
             UserTeamRoles.Add(new UserTeamRole()
             {

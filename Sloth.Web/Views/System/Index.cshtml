@@ -1,0 +1,204 @@
+@model Sloth.Web.Models.SystemViewModels.SystemViewModel
+
+@{
+    ViewBag.Title = "System Management";
+}
+
+@section AdditionalStyles {
+    @Html.Partial("_DataTableStylePartial")
+}
+
+<h2>@ViewBag.Title</h2>
+<hr />
+
+<div class="row mb-1">
+    <div class="col">
+        <h3>Admin Users</h3>
+    </div>
+    <div class="col d-flex justify-content-end">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#add-user-modal">
+            Add User
+        </button>
+    </div>
+</div>
+<table id="adminUsers" class="table table-bordered">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Email</th>
+        <th>Role</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var adminUser in Model.AdminUsers)
+    {
+        <tr>
+            <td>@adminUser.FullName</td>
+            <td>@adminUser.UserName</td>
+            <td>@adminUser.Email</td>
+            <td>System Admin</td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<hr />
+
+<div id="add-user-modal" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add User?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label>Role</label>
+                        <input type="text" value="System Admin" class="form-control" />
+                        <input type="hidden" id="add-user-modal-role" value="SystemAdmin" />
+                    </div>
+                    <div class="form-group">
+                        <label>User Search</label>
+                        <div class="input-group">
+                            <input type="text" id="add-user-modal-user-search" class="form-control" placeholder="kerb or email" />
+                            <div class="input-group-append">
+                                <span class="input-group-text" id="add-user-modal-user-search-icon">
+                                    <i id="add-user-modal-search-icon-search" class="fa fa-search"></i>
+                                    <i id="add-user-modal-search-icon-spinner" class="fa fa-spinner"></i>
+                                    <i id="add-user-modal-search-icon-warning" class="fa fa-warning text-danger"></i>
+                                    <i id="add-user-modal-search-icon-success" class="fa fa-check text-sucess"></i>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="add-user-modal-user-results">
+                        <label>Results</label>
+                        <input type="hidden" id="add-user-modal-user-id" />
+                        <input type="text" id="add-user-modal-user-name" readonly="readonly" class="form-control mb-2" />
+                        <input type="text" id="add-user-modal-user-username" readonly="readonly" class="form-control mb-2" />
+                        <input type="text" id="add-user-modal-user-email" readonly="readonly" class="form-control mb-2" />
+                        <span class="text" id="add-user-modal-user-warning">User not found in database. User will be created automatically.</span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="add-user-action" class="btn btn-primary">Add User</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section AdditionalScripts {
+    @Html.Partial("_DataTableScriptsPartial")
+    <script src="/js/utils/debounce.js"></script>
+
+    <script>
+        var adminUsersTable = $('#adminUsers').DataTable({ });
+
+        // find user modal load
+        $('#add-user-modal').on('show.bs.modal', function (event) {
+            var modal = $(event.target);
+
+            // clear form
+            modal.find('form')[0].reset();
+            $('#add-user-modal-user-results').hide();
+        });
+
+        // find user function
+        var findUserUrl = '@Url.Action("FindUser", "Users")';
+        var findUser = debounce(function(query) {
+                $.get(findUserUrl, { query })
+                    .then(function(result) {
+
+                        // save user info to form
+                        var user = result.user;
+                        $('#add-user-modal-user-results').show();
+                        $('#add-user-modal-user-id').val(user.id);
+                        $('#add-user-modal-user-name').val(user.fullname);
+                        $('#add-user-modal-user-username').val(user.username);
+                        $('#add-user-modal-user-email').val(user.email);
+
+                        // set icons/warnings
+                        $('#add-user-modal-search-icon-search').hide();
+                        $('#add-user-modal-search-icon-spinner').hide();
+                        $('#add-user-modal-search-icon-warning').hide();
+                        $('#add-user-modal-search-icon-success').hide();
+                        $('#add-user-modal-user-warning').hide();
+                    });
+            },
+            500,
+            false);
+
+        // on search box change, trigger find function
+        $('#add-user-modal-user-search').keyup(function() {
+            // clear results
+            $('#add-user-modal-user-results').hide();
+
+            // start query
+            var query = $(this).val();
+            findUser(query);
+        });
+
+        // function that can get or create a new db user by their directory information
+        var createUserUrl = '@Url.Action("CreateUserFromDirectory", "Users")';
+        function getOrCreateUserId() {
+            var userId = $('#add-user-modal-user-id').val();
+            if (userId) {
+                return $.when({ id: userId });
+            }
+
+            var username = $('#add-user-modal-user-username').val();
+            return $.post(createUserUrl, { query: username })
+                .then(function(result) { return result.user; });
+        }
+
+        // add user to team
+        var addUserUrl = '@Url.Action("AddUserToRole")';
+        $('#add-user-action').click(function() {
+
+            // lock buttons
+
+            // should we create the user in the db first?
+            getOrCreateUserId()
+                .then(function(user) {
+
+                    // build add request
+                    var role = $('#add-user-modal-role').val();
+                    var request = {
+                        role: role,
+                        userId: user.id,
+                    };
+
+                    // send create
+                    return $.post(addUserUrl, request);
+                })
+                .then(function(result) {
+
+                    // create new row in table
+                    var fullname = $('#add-user-modal-user-name').val();
+                    var username = $('#add-user-modal-user-username').val();
+                    var email = $('#add-user-modal-user-email').val();
+                    var rolename = $('#add-user-modal-role').val();
+
+                    var adminUsersTable = $('#adminUsers').DataTable();
+                    adminUsersTable.row.add([
+                        fullname,
+                        username,
+                        email,
+                        rolename,
+                    ]).draw();
+
+                    $('#add-user-modal').modal('hide');
+                })
+                .fail(function(err) {
+                    console.error(err);
+                });
+        });
+    </script>
+}

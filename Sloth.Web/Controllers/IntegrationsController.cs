@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -15,14 +14,11 @@ namespace Sloth.Web.Controllers
 {
     public class IntegrationsController : SuperController
     {
-        private readonly UserManager<User> _userManager;
-        private readonly SlothDbContext _context;
         private readonly ISecretsService _secretsService;
 
-        public IntegrationsController(UserManager<User> userManager, SlothDbContext context, ISecretsService secretsService)
+        public IntegrationsController(UserManager<User> userManager, SlothDbContext dbContext, ISecretsService secretsService)
+            : base(userManager, dbContext)
         {
-            _userManager = userManager;
-            _context = context;
             _secretsService = secretsService;
         } 
 
@@ -31,7 +27,7 @@ namespace Sloth.Web.Controllers
         {
             ViewBag.Teams = await GetUsersAdminTeams();
 
-            ViewBag.Sources = await _context.Sources.ToListAsync();
+            ViewBag.Sources = await DbContext.Sources.ToListAsync();
 
             ViewBag.Types = new[]
             {
@@ -42,7 +38,7 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateIntegration integration)
+        public async Task<IActionResult> Create(CreateIntegrationViewModel integration)
         {
             // TODO: validate model
             var adminTeams = await GetUsersAdminTeams();
@@ -52,7 +48,7 @@ namespace Sloth.Web.Controllers
                 return View();
             }
 
-            var source = await _context.Sources.FirstOrDefaultAsync(s => s.Id == integration.SourceId);
+            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == integration.SourceId);
             if (source == null)
             {
                 return View();
@@ -73,31 +69,10 @@ namespace Sloth.Web.Controllers
                 ReportUsername    = integration.ReportUserName,
                 ReportPasswordKey = secretId
             };
-            _context.Integrations.Add(target);
-            await _context.SaveChangesAsync();
+            DbContext.Integrations.Add(target);
+            await DbContext.SaveChangesAsync();
 
             return RedirectToAction("Details", "Teams", new { id = team.Id });
-        }
-
-        private async Task<IEnumerable<Team>> GetUsersAdminTeams()
-        {
-            // fetch user from db
-            var userId = _userManager.GetUserId(User);
-            var user = await _context.Users
-                .Include(u => u.UserTeamRoles)
-                .ThenInclude(r => r.Team)
-                .ThenInclude(t => t.Integrations)
-                .FirstOrDefaultAsync(u => u.Id == userId);
-
-            // admin role
-            var admin = await _context.Roles
-                .FirstAsync(r => r.Name == Roles.Admin);
-
-            // select teams where user is an admin
-            var roles = user.UserTeamRoles.Where(r => r.RoleId == admin.Id);
-            var teams = roles.Select(r => r.Team);
-
-            return teams;
         }
     }
 }
