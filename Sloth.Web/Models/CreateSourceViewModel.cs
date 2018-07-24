@@ -24,6 +24,7 @@ namespace Sloth.Web.Models
         [MinLength(2)]
         [MaxLength(2)]
         [Required]
+        [Display(Name = "Origin Code")]
         public string OriginCode { get; set; }
 
         /// <summary>
@@ -33,9 +34,11 @@ namespace Sloth.Web.Models
         [MinLength(4)]
         [MaxLength(4)]
         [Required]
+        [Display(Name = "Document Type")]
         public string DocumentType { get; set; }
 
         [Required]
+        [Display(Name = "Team")]
         public string TeamId { get; set; }
     }
 }
