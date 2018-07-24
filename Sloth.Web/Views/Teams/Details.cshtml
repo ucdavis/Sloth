@@ -31,7 +31,7 @@
     <div class="col">
         <h3>Users</h3>
     </div>
-    <div class="col d-flex justify-content-end">
+    <div class="col d-flex justify-content-end align-items-end">
         <button class="btn btn-primary" data-toggle="modal" data-target="#add-user-modal">
             Add User
         </button>
@@ -66,7 +66,7 @@
     <div class="col">
         <h3>Integrations</h3>
     </div>
-    <div class="col d-flex justify-content-end">
+    <div class="col d-flex justify-content-end align-items-end">
         <a href="@Url.Action("Create", "Integrations")" class="btn btn-primary">Create Integration</a>
     </div>
 </div>
@@ -78,6 +78,7 @@
             <th>Name</th>
             <th>Merchant</th>
             <th>Default Account</th>
+            <th>Holding Account</th>
         </tr>
     </thead>
     <tbody>
@@ -87,7 +88,8 @@
                 <td>@integration.Type</td>
                 <td>@integration.Team.Name</td>
                 <td>@integration.MerchantId</td>
-                <td>@integration.DefaultAccount</td>
+                <td>@integration.ClearingAccount</td>
+                <td>@integration.HoldingAccount</td>
             </tr>
         }
     </tbody>
@@ -99,7 +101,7 @@
     <div class="col">
         <h3>API Keys</h3>
     </div>
-    <div class="col d-flex justify-content-end">
+    <div class="col d-flex justify-content-end align-items-end">
         <button class="btn btn-primary" data-toggle="modal" data-target="#create-key-modal">
             Create new Api Key
         </button>

@@ -111,7 +111,8 @@ namespace Sloth.Core.Data
                     MerchantId        = "ucdavis_jpknoll",
                     ReportUsername    = "sloth_report",
                     ReportPasswordKey = "Report-Test-1",
-                    DefaultAccount    = "DEFAULT",
+                    ClearingAccount   = "DEFAULT",
+                    HoldingAccount    = "DEFAULT",
                     Type              = IntegrationTypes.CyberSource
                 },
             };

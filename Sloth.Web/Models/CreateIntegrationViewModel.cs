@@ -29,7 +29,11 @@ namespace Sloth.Web.Models
         public string ReportPassword { get; set; }
 
         [Required]
-        [Display(Name = "Default Account")]
-        public string DefaultAccount { get; set; }
+        [Display(Name = "Clearing Account")]
+        public string ClearingAccount { get; set; }
+
+        [Required]
+        [Display(Name = "Holding Account")]
+        public string HoldingAccount { get; set; }
     }
 }

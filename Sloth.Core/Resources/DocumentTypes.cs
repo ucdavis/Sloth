@@ -12,5 +12,19 @@ namespace Sloth.Core.Resources
         public static string GLBB = "GLBB";
         public static string GLCB = "GLCB";
         public static string GLDE = "GLDE";
+
+        public static string[] GetAll()
+        {
+            return new[]
+            {
+                GLIB,
+                GLJV,
+                GLCC,
+                GLJB,
+                GLBB,
+                GLCB,
+                GLDE,
+            };
+        }
     }
 }

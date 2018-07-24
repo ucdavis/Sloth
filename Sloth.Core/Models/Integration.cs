@@ -23,7 +23,9 @@ namespace Sloth.Core.Models
 
         public string ReportPasswordKey { get; set; }
 
-        public string DefaultAccount { get; set; }
+        public string ClearingAccount { get; set; }
+
+        public string HoldingAccount { get; set; }
 
         protected internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
