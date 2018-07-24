@@ -55,7 +55,12 @@
     </div>
     <div class="form-group">
         @Html.LabelFor(x => x.HoldingAccount)
-        @Html.TextBoxFor(x => x.HoldingAccount, new { @class = "form-control" })
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">3 - </span>
+            </div>
+            @Html.TextBoxFor(x => x.HoldingAccount, new { @class = "form-control" })
+        </div>
     </div>
     <div class="d-flex justify-content-end align-items-end">
         <input type="submit" value="Create" class="btn btn-primary"/>
