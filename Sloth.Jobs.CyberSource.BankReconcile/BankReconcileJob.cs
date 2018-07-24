@@ -31,18 +31,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             _secretsService = secretsService;
             _options = options.Value;
 
-            // validate options
-            if (string.IsNullOrWhiteSpace(_options.ClearingAccount) ||
-                _options.ClearingAccount.Length > 7)
-            {
-                throw new ArgumentException("ClearingAccount must be non-null and less than 7 characters.");
-            }
-
-            if (string.IsNullOrWhiteSpace(_options.HoldingAccount) ||
-                _options.ClearingAccount.Length > 7)
-            {
-                throw new ArgumentException("HoldingAccount must be non-null and less than 7 characters.");
-            }
+            // TODO validate options
         }
 
         public async Task UploadScrubber()
@@ -119,30 +108,30 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
                             .Information("Creating transaction");
 
                         // create transaction per deposit item,
-                        // moving monies from clearing to holding then final acocunt
+                        // moving monies from clearing to holding
                         var kfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
 
                         transaction = new Transaction()
                         {
-                            Source = integration.Source,
-                            Status = TransactionStatuses.Scheduled,
-                            KfsTrackingNumber = kfsTrackingNumber,
-                            MerchantTrackingNumber = deposit.MerchantReferenceNumber,
+                            Source                  = integration.Source,
+                            Status                  = TransactionStatuses.Scheduled,
+                            KfsTrackingNumber       = kfsTrackingNumber,
+                            MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber = deposit.RequestID,
-                            DocumentNumber = "ADOCUMENT1",
-                            TransactionDate = yesterday,
+                            DocumentNumber          = "ADOCUMENT1",
+                            TransactionDate         = yesterday,
                         };
 
                         // move money out of clearing
                         var clearing = new Transfer()
                         {
-                            Chart = "3",
-                            Account = _options.ClearingAccount,
-                            Direction = Transfer.CreditDebit.Debit,
-                            Amount = deposit.Amount,
-                            Description = "Deposit",
-                            ObjectCode = "ABCD",
-                            FiscalYear = fiscalYear,
+                            Chart        = "3",
+                            Account      = integration.ClearingAccount,
+                            Direction    = Transfer.CreditDebit.Debit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(clearing);
@@ -150,44 +139,16 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
                         // move money into holding
                         var holding = new Transfer()
                         {
-                            Chart = "3",
-                            Account = _options.HoldingAccount,
-                            Direction = Transfer.CreditDebit.Credit,
-                            Amount = deposit.Amount,
-                            Description = "Deposit",
-                            ObjectCode = "ABCD",
-                            FiscalYear = fiscalYear,
+                            Chart        = "3",
+                            Account      = integration.HoldingAccount,
+                            Direction    = Transfer.CreditDebit.Credit,
+                            Amount       = deposit.Amount,
+                            Description  = "Deposit",
+                            ObjectCode   = "ABCD",
+                            FiscalYear   = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(holding);
-
-                        // then back out of holding
-                        var holding2 = new Transfer()
-                        {
-                            Chart = "3",
-                            Account = _options.HoldingAccount,
-                            Direction = Transfer.CreditDebit.Debit,
-                            Amount = deposit.Amount,
-                            Description = "Deposit",
-                            ObjectCode = "ABCD",
-                            FiscalYear = fiscalYear,
-                            FiscalPeriod = fiscalPeriod,
-                        };
-                        transaction.Transfers.Add(holding2);
-
-                        // into the default account
-                        var final = new Transfer()
-                        {
-                            Chart = "3",
-                            Account = integration.DefaultAccount,
-                            Direction = Transfer.CreditDebit.Credit,
-                            Amount = deposit.Amount,
-                            Description = "Deposit",
-                            ObjectCode = "ABCD",
-                            FiscalYear = fiscalYear,
-                            FiscalPeriod = fiscalPeriod,
-                        };
-                        transaction.Transfers.Add(final);
 
                         var errors = _context.ValidateModel(transaction);
                         if (errors.Any())

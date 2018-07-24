@@ -23,9 +23,10 @@ namespace Sloth.Web.Controllers
         } 
 
         [HttpGet]
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(string teamId)
         {
             ViewBag.Teams = await GetUsersAdminTeams();
+            ViewBag.DefaultTeamId = teamId;
 
             ViewBag.Sources = await DbContext.Sources.ToListAsync();
 
@@ -38,17 +39,17 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateIntegrationViewModel integration)
+        public async Task<IActionResult> Create(CreateIntegrationViewModel model)
         {
             // TODO: validate model
             var adminTeams = await GetUsersAdminTeams();
-            var team = adminTeams.FirstOrDefault(t => t.Id == integration.TeamId);
+            var team = adminTeams.FirstOrDefault(t => t.Id == model.TeamId);
             if (team == null)
             {
                 return View();
             }
 
-            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == integration.SourceId);
+            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == model.SourceId);
             if (source == null)
             {
                 return View();
@@ -56,18 +57,20 @@ namespace Sloth.Web.Controllers
 
             // create new secret
             var secretId = Guid.NewGuid().ToString("D");
-            await _secretsService.UpdateSecret(secretId, integration.ReportPassword);
+            await _secretsService.UpdateSecret(secretId, model.ReportPassword);
 
             // create integration
+
             var target = new Integration
             {
-                MerchantId        = integration.MerchantId,
+                MerchantId        = model.MerchantId,
                 Source            = source,
                 Team              = team,
-                Type              = integration.Type,
-                DefaultAccount    = integration.DefaultAccount,
-                ReportUsername    = integration.ReportUserName,
-                ReportPasswordKey = secretId
+                Type              = model.Type,
+                ReportUsername    = model.ReportUserName,
+                ReportPasswordKey = secretId,
+                ClearingAccount   = model.ClearingAccount,
+                HoldingAccount    = model.HoldingAccount,
             };
             DbContext.Integrations.Add(target);
             await DbContext.SaveChangesAsync();

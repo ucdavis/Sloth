@@ -1,6 +1,7 @@
 ﻿CREATE TABLE [dbo].[Integrations] (
     [Id]                NVARCHAR (450) NOT NULL,
-    [DefaultAccount]    NVARCHAR (MAX) NULL,
+    [ClearingAccount]   NVARCHAR (MAX) NULL,
+    [HoldingAccount]    NVARCHAR (MAX) NULL,
     [MerchantId]        NVARCHAR (MAX) NULL,
     [ReportPasswordKey] NVARCHAR (MAX) NULL,
     [ReportUsername]    NVARCHAR (MAX) NULL,
@@ -11,6 +12,8 @@
     CONSTRAINT [FK_Integrations_Sources_SourceId] FOREIGN KEY ([SourceId]) REFERENCES [dbo].[Sources] ([Id]),
     CONSTRAINT [FK_Integrations_Teams_TeamId] FOREIGN KEY ([TeamId]) REFERENCES [dbo].[Teams] ([Id])
 );
+
+
 
 
 
