@@ -5,8 +5,9 @@
     ViewBag.Title = "Scrubber Details";
 }
 
-@section AdditionalStyles {
-    <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
+@section AdditionalStyles
+{
+    @Html.Partial("_DataTableStylePartial")
     <link href="~/css/prism.css" rel="stylesheet" />
 
     <style>
@@ -27,9 +28,9 @@
     </code>
 </pre>
 
-@section AdditionalScripts {
-    <script src="~/lib/jquery.datatables.js"></script>
-    <script src="~/lib/datatables.bootstrap4.js"></script>
+@section AdditionalScripts
+{
+    @Html.Partial("_DataTableScriptsPartial")
     <script src="~/js/prism.js"></script>
     <script>
         $('#transactions').dataTable({
