@@ -44,7 +44,10 @@ namespace Sloth.Core.Models
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+            modelBuilder.Entity<Source>()
+                .HasOne(i => i.Team)
+                .WithMany(t => t.Sources)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

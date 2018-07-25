@@ -5,11 +5,21 @@
     ViewBag.Title = "Sources";
 }
 
+@section AdditionalStyles
+{
+    @Html.Partial("_DataTableStylePartial")
+}
+
 <h2>@ViewBag.Title</h2>
 
-<table>
+<table id="sourcesTable" class="table">
     <thead>
         <tr>
+            <th>Team Name</th>
+            <th>Source Name</th>
+            <th>Type</th>
+            <th>Origin Code</th>
+            <th>Document Type</th>
             <th></th>
         </tr>
     </thead>
@@ -17,13 +27,25 @@
         @foreach (var source in Model)
         {
             <tr>
-                <td>@source.Id</td>
+                <td>@source.Team.Name</td>
                 <td>@source.Name</td>
                 <td>@source.Type</td>
-                <td>@source.Team.Name</td>
                 <td>@source.OriginCode</td>
                 <td>@source.DocumentType</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@source.Id" class="btn btn-primary">Edit</a>
+                </td>
             </tr>
         }
     </tbody>
 </table>
+
+@section AdditionalScripts
+{
+    @Html.Partial("_DataTableScriptsPartial")
+
+    <script>
+        // setup tables
+        var sourcesTable = $('#sourcesTable').DataTable({});
+    </script>
+}

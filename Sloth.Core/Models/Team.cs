@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -24,6 +23,9 @@ namespace Sloth.Core.Models
 
         [JsonIgnore]
         public IList<Integration> Integrations { get; set; }
+
+        [JsonIgnore]
+        public IList<Source> Sources { get; set; }
 
         [JsonIgnore]
         public IList<UserTeamRole> UserTeamRoles { get; set; }

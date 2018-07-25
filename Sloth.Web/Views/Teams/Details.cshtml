@@ -33,7 +33,7 @@
     </div>
     <div class="col d-flex justify-content-end align-items-end">
         <button class="btn btn-primary" data-toggle="modal" data-target="#add-user-modal">
-            Add User
+            Add User <i class="fa fa-fw fa-user"></i>
         </button>
     </div>
 </div>
@@ -64,10 +64,53 @@
 
 <div class="row mb-1">
     <div class="col">
+        <h3>KFS Sources</h3>
+    </div>
+    <div class="col d-flex justify-content-end align-items-end">
+        <a asp-controller="Sources" asp-action="Create" class="btn btn-primary">
+            Create Source <i class="fa fa-fw fa-upload"></i>
+        </a>
+    </div>
+</div>
+
+<table id="sourcesTable" class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Team Name</th>
+            <th>Source Name</th>
+            <th>Type</th>
+            <th>Origin Code</th>
+            <th>Document Type</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var source in Model.Sources)
+        {
+            <tr>
+                <td>@source.Team.Name</td>
+                <td>@source.Name</td>
+                <td>@source.Type</td>
+                <td>@source.OriginCode</td>
+                <td>@source.DocumentType</td>
+                <td class="text-center">
+                    <a asp-controller="Sources" asp-action="Edit" asp-route-id="@source.Id" class="btn btn-primary btn-sm">Edit</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<hr />
+
+<div class="row mb-1">
+    <div class="col">
         <h3>Integrations</h3>
     </div>
     <div class="col d-flex justify-content-end align-items-end">
-        <a href="@Url.Action("Create", "Integrations")" class="btn btn-primary">Create Integration</a>
+        <a asp-controller="Integrations" asp-action="Create" class="btn btn-primary">
+            Create Integration <i class="fa fa-fw fa-plug"></i>
+        </a>
     </div>
 </div>
 
@@ -91,8 +134,10 @@
                 <td>@integration.MerchantId</td>
                 <td>@integration.ClearingAccount</td>
                 <td>@integration.HoldingAccount</td>
-                <td>
-                    <a asp-controller="Integrations" asp-action="Edit" asp-route-id="@integration.Id" class="btn btn-primary">Edit</a>
+                <td class="text-center">
+                    <a asp-controller="Integrations" asp-action="Edit" asp-route-id="@integration.Id" class="btn btn-primary btn-sm">
+                        Edit
+                    </a>
                 </td>
             </tr>
         }
@@ -107,7 +152,7 @@
     </div>
     <div class="col d-flex justify-content-end align-items-end">
         <button class="btn btn-primary" data-toggle="modal" data-target="#create-key-modal">
-            Create new Api Key
+            Create Api Key <i class="fa fa-fw fa-key"></i>
         </button>
     </div>
 </div>
