@@ -13,6 +13,7 @@ using Newtonsoft.Json.Converters;
 using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
+using Sloth.Core.Jobs;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Web.Logging;
@@ -50,12 +51,16 @@ namespace Sloth.Web
             // add various options
             services.Configure<AppSettings>(Configuration);
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
+            services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
             services.Configure<IamDirectorySearchServiceOptions>(Configuration.GetSection("IAM"));
 
             // add infrastructure services
             services.AddSingleton<IDirectorySearchService, IamDirectorySearchService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
+
+            // add jobs services
+            services.AddTransient<CybersourceBankReconcileJob>();
 
             // add database connection
             services.AddDbContext<SlothDbContext>(options =>
