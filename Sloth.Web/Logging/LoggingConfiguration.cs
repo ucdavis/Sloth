@@ -57,7 +57,7 @@ namespace Sloth.Web.Logging
         /// Get a logger configuration that logs to both stackify and sql
         /// </summary>
         /// <returns></returns>
-        public static LoggerConfiguration GetAuditConfiguration()
+        public static LoggerConfiguration GetJobConfiguration()
         {
             return GetConfiguration()
                 .WriteToSqlCustom();
@@ -89,6 +89,8 @@ namespace Sloth.Web.Logging
             {
                 new DataColumn {ColumnName = "Source", AllowDBNull = true, DataType = typeof(string), MaxLength = 128},
                 new DataColumn {ColumnName = "CorrelationId", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
+                new DataColumn {ColumnName = "JobName", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
+                new DataColumn {ColumnName = "JobId", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
             };
 
             return logConfig

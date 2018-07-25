@@ -1,4 +1,4 @@
-namespace Sloth.Jobs.CyberSource.BankReconcile
+namespace Sloth.Core.Configuration
 {
     public class CybersourceOptions
     {

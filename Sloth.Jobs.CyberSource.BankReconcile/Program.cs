@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
+using Sloth.Core.Jobs;
+using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Jobs.Core;
 
@@ -20,21 +22,46 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             // setup env
             Configure();
 
+            // log run
+            var yesterday = DateTime.UtcNow.Date.AddDays(-1);
+            var jobRecord = new CybersourceBankReconcileJobRecord()
+            {
+                Id            = Guid.NewGuid().ToString(),
+                Name          = CybersourceBankReconcileJob.JobName,
+                RanOn         = DateTime.UtcNow,
+                Status        = "Running",
+                ProcessedDate = yesterday,
+            };
+
             _log = Log.Logger
-                .ForContext("jobname", "CyberSource.BankReconcile")
-                .ForContext("jobid", Guid.NewGuid());
+                .ForContext("jobname", jobRecord.Name)
+                .ForContext("jobid", jobRecord.Id);
 
             var assembyName = typeof(Program).Assembly.GetName();
             _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
 
             // setup di
             var provider = ConfigureServices();
+            var dbContext = provider.GetService<SlothDbContext>();
 
-            // create job service
-            var bankReconcileJob = provider.GetService<BankReconcileJob>();
+            // save log to db
+            dbContext.CybersourceBankReconcileJobRecords.Add(jobRecord);
+            dbContext.SaveChanges();
 
-            // call methods
-            Task.Run(() => bankReconcileJob.UploadScrubber()).Wait();
+            try
+            {
+                // create job service
+                var bankReconcileJob = provider.GetService<CybersourceBankReconcileJob>();
+
+                // call methods
+                Task.Run(() => bankReconcileJob.ProcessReconcile(_log, yesterday)).Wait();
+            }
+            finally
+            {
+                // record status
+                jobRecord.Status = "Finished";
+                dbContext.SaveChanges();
+            }
         }
 
         private static ServiceProvider ConfigureServices()
@@ -52,7 +79,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
 
             // required services
             services.AddTransient<ISecretsService, SecretsService>();
-            services.AddTransient<BankReconcileJob>();
+            services.AddTransient<CybersourceBankReconcileJob>();
 
             services.AddSingleton(_log);
 

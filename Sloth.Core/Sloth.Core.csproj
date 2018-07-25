@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Sloth.Integrations.Cybersource\Sloth.Integrations.Cybersource.csproj" />
     <ProjectReference Include="..\Sloth.Xml\Sloth.Xml.csproj" />
   </ItemGroup>
 

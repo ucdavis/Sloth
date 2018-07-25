@@ -33,6 +33,10 @@ namespace Sloth.Core
 
         public DbSet<TeamRole> TeamRoles { get; set; }
 
+        public DbSet<CybersourceBankReconcileJobRecord> CybersourceBankReconcileJobRecords { get; set; }
+
+        public DbSet<LogMessage> Logs { get; set; }
+
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
             const string sql = "SELECT NEXT VALUE FOR KFS_Tracking_Number_Seq AS KfsTrackingNumber";
@@ -87,6 +91,8 @@ namespace Sloth.Core
             UserTeamRole.OnModelCreating(modelBuilder);
             Source.OnModelCreating(modelBuilder);
             Integration.OnModelCreating(modelBuilder);
+            LogMessage.OnModelCreating(modelBuilder);
+            CybersourceBankReconcileJobRecord.OnModelCreating(modelBuilder);
         }
     }
 }

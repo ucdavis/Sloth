@@ -1,0 +1,152 @@
+@model IEnumerable<Sloth.Core.Models.CybersourceBankReconcileJobRecord>
+
+@{
+    ViewData["Title"] = "CybersourceBankReconcile";
+}
+
+@section AdditionalStyles
+{
+    @Html.Partial("_DataTableStylePartial")
+    <link rel="stylesheet" href="~/css/calendar.css" />
+    <style>
+        #recordsTable tr.group {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+    </style>
+}
+
+
+<div class="row mb-2">
+    <div class="col-8">
+        <h2>Cybersource BankReconcile Job Records</h2>
+
+    </div>
+    <div class="col-4 d-flex justify-content-end align-items-end">
+        <button class="btn btn-primary" data-toggle="modal" data-target="#run-job-modal">Run Job</button>
+    </div>
+</div>
+
+<div id="jobsCalendar" class="mb-4"></div>
+
+<table id="recordsTable" class="table table-hover">
+    <thead>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.ProcessedDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.RanOn)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model) {
+        <tr>
+            <td>
+                @item.ProcessedDate.ToString("M/d/yyyy")
+            </td>
+            <td>
+                @item.RanOn
+            </td>
+            <td>
+                @item.Status
+            </td>
+            <td>
+                <a asp-action="CybersourceBankReconcileDetails" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div id="run-job-modal" class="modal fade">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create New Api Key?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="run-job-modal-form" method="post" action="@Url.Action("RunCybersourceBankReconcile")">
+                    <div class="input-group date" data-provide="datepicker" data-date-container="body">
+                        <input name="date" type="text" class="form-control" placeholder="MM/DD/YYYY" />
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fa fa-fw fa-calendar"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" id="run-job-modal-action" class="btn btn-primary">Run Job</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section AdditionalScripts
+{
+    @Html.Partial("_DataTableScriptsPartial")
+    <script src="https://cdn.jsdelivr.net/npm/underscore@1.9.1/underscore-min.js"></script>
+    <script src="~/js/calendar.js"></script>
+    <script>
+        $('#jobsCalendar').calendar({
+            tmpl_path: "/calendar/",
+            events_source: '@Url.Action("CybersourceBankReconcileRecords")',
+            views: {
+                week: {
+                    enable: 0
+                },
+                day: {
+                    enable: 0
+                }
+            }
+        });
+
+        $('#run-job-modal-action').click(function() {
+            $('#run-job-modal-form').submit();
+        });
+
+        var groupColumn = 0;
+        $('#recordsTable').DataTable({
+            columnDefs: [
+                { visible: false, targets: groupColumn },
+                { orderable: false, targets: -1 }],
+            order: [[groupColumn, 'asc']],
+            drawCallback: function(settings) {
+                var api = this.api();
+                var rows = api.rows( {page:'current'} ).nodes();
+                var last = null;
+ 
+                api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
+                    if ( last !== group ) {
+                        $(rows).eq( i ).before(
+                            '<tr class="group"><td colspan="4">Date Processed: '+group+'</td></tr>'
+                        );
+ 
+                        last = group;
+                    }
+                } );
+            }
+        });
+
+        // manage order grouping
+        $('#recordsTable tbody').on( 'click', 'tr.group', function () {
+            var currentOrder = table.order()[0];
+            if ( currentOrder[0] === groupColumn && currentOrder[1] === 'asc' ) {
+                table.order( [ groupColumn, 'desc' ] ).draw();
+            }
+            else {
+                table.order( [ groupColumn, 'asc' ] ).draw();
+            }
+        } );
+    </script>
+}
