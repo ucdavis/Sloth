@@ -75,10 +75,11 @@
     <thead>
         <tr>
             <th>Type</th>
-            <th>Name</th>
+            <th>Team Name</th>
             <th>Merchant</th>
             <th>Default Account</th>
             <th>Holding Account</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -90,6 +91,9 @@
                 <td>@integration.MerchantId</td>
                 <td>@integration.ClearingAccount</td>
                 <td>@integration.HoldingAccount</td>
+                <td>
+                    <a asp-controller="Integrations" asp-action="Edit" asp-route-id="@integration.Id" class="btn btn-primary">Edit</a>
+                </td>
             </tr>
         }
     </tbody>
@@ -245,7 +249,11 @@
         // setup tables
         var usersTable = $('#usersTable').DataTable({ });
 
-        $('#integrationsTable').DataTable({ });
+        $('#integrationsTable').DataTable({
+            columnDefs: [
+                { sortable: false, targets: -1 },
+            ],
+        });
 
         var apiKeysTable = $('#apiKeysTable').DataTable({ });
 
@@ -404,6 +412,4 @@
 
 
     </script>
-
-
 }

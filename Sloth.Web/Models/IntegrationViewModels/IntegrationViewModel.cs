@@ -1,8 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Sloth.Web.Models
+namespace Sloth.Web.Models.IntegrationViewModels
 {
-    public class CreateIntegrationViewModel
+    public class IntegrationViewModel
     {
         [Required]
         [Display(Name = "Team")]
