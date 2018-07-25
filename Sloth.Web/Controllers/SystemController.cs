@@ -33,6 +33,7 @@ namespace Sloth.Web.Controllers
             });
         }
 
+        [HttpPost]
         public async Task<IActionResult> AddUserToRole(string userId, string role)
         {
             // find user
