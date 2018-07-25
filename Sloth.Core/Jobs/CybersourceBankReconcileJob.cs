@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Serilog;
-using Sloth.Core;
+using Sloth.Core.Configuration;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
@@ -15,18 +14,18 @@ using Sloth.Core.Services;
 using Sloth.Integrations.Cybersource;
 using Sloth.Integrations.Cybersource.Clients;
 
-namespace Sloth.Jobs.CyberSource.BankReconcile
+namespace Sloth.Core.Jobs
 {
-    public class BankReconcileJob
+    public class CybersourceBankReconcileJob
     {
-        private readonly ILogger _log;
         private readonly SlothDbContext _context;
         private readonly ISecretsService _secretsService;
         private readonly CybersourceOptions _options;
 
-        public BankReconcileJob(ILogger log, SlothDbContext context, ISecretsService secretsService, IOptions<CybersourceOptions> options)
+        public static string JobName = "Cybersource.BankReconcile";
+
+        public CybersourceBankReconcileJob(SlothDbContext context, ISecretsService secretsService, IOptions<CybersourceOptions> options)
         {
-            _log = log;
             _context = context;
             _secretsService = secretsService;
             _options = options.Value;
@@ -34,10 +33,9 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             // TODO validate options
         }
 
-        public async Task UploadScrubber()
+        public async Task ProcessReconcile(ILogger log, DateTime date)
         {
-            var yesterday = DateTime.UtcNow.Date.AddDays(-1);
-            var log = _log.ForContext("date", yesterday);
+            log = log.ForContext("date", date);
 
             try
             {
@@ -46,9 +44,14 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
                     .Include(i => i.Source)
                     .ToList();
 
+                if (!integrations.Any())
+                {
+                    log.Information("Early exit, no active integrations found.");
+                }
+
                 foreach (var integration in integrations)
                 {
-                    await ProcessIntegration(integration, yesterday);
+                    await ProcessIntegration(log, integration, date);
                 }
             }
             catch (Exception ex)
@@ -58,10 +61,9 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             }
         }
 
-        private async Task ProcessIntegration(Integration integration, DateTime yesterday)
+        private async Task ProcessIntegration(ILogger log, Integration integration, DateTime yesterday)
         {
-            var log = _log.ForContext("date", yesterday)
-                          .ForContext("integration", integration.Id);
+            log = log.ForContext("integration", integration.Id);
 
             using (var tran = await _context.Database.BeginTransactionAsync())
             {
