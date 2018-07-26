@@ -1,3 +1,45 @@
 
 @{
+    ViewBag.Title = "Jobs";
 }
+
+@section AdditionalStyles
+{
+    <style>
+        .job img.card-img-top {
+            max-height: 180px;
+            object-fit: cover;
+        }
+    </style>
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div class="row">
+    <div class="col">
+        <div class="card job">
+            <img class="card-img-top" src="~/images/architecture-business-cabinet-325229.jpg" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a asp-action="KfsScrubberUpload">Kfs Scrubber Upload Job</a>
+                </h5>
+                <p class="card-text">
+                    Runs at end of business. Collects all scheduled transactions and groups them into scrubbers. Uploads scrubbers to KFS service for processing.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card job">
+            <img class="card-img-top" src="~/images/bank-banking-blue-50987.jpg" alt="Card image cap">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <a asp-action="CybersourceBankReconcile">Cybersource Bank Reconcile Job</a>
+                </h5>
+                <p class="card-text">
+                    Runs each hour. Iterates through all Cybersource integrations, collecting bank reconcile reports, and creating transactions from them.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
