@@ -19,6 +19,7 @@ using Sloth.Api.Swagger;
 using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Services;
+using StackifyLib;
 using Swashbuckle.AspNetCore.Swagger;
 
 namespace Sloth.Api
