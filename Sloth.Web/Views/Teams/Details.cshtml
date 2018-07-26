@@ -67,7 +67,7 @@
         <h3>KFS Sources</h3>
     </div>
     <div class="col d-flex justify-content-end align-items-end">
-        <a asp-controller="Sources" asp-action="Create" class="btn btn-primary">
+        <a asp-controller="Sources" asp-action="Create" asp-route-teamid="@Model.Id" class="btn btn-primary">
             Create Source <i class="fa fa-fw fa-upload"></i>
         </a>
     </div>
@@ -108,7 +108,7 @@
         <h3>Integrations</h3>
     </div>
     <div class="col d-flex justify-content-end align-items-end">
-        <a asp-controller="Integrations" asp-action="Create" class="btn btn-primary">
+        <a asp-controller="Integrations" asp-action="Create" asp-route-teamid="@Model.Id" class="btn btn-primary">
             Create Integration <i class="fa fa-fw fa-plug"></i>
         </a>
     </div>
