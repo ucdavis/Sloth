@@ -6,9 +6,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
+using Sloth.Core.Jobs;
+using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Jobs.Core;
-using Sloth.Jobs.Kfs.ScrubberUpload.Services;
 
 namespace Sloth.Jobs.Kfs.ScrubberUpload
 {
@@ -21,21 +22,44 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             // setup env
             Configure();
 
+            // log run
+            var jobRecord = new KfsScrubberUploadJobRecord()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = KfsScrubberUploadJob.JobName,
+                RanOn = DateTime.UtcNow,
+                Status = "Running",
+            };
+
             _log = Log.Logger
-                .ForContext("jobname", "Kfs.ScrubberUpload")
-                .ForContext("jobid", Guid.NewGuid());
+                .ForContext("jobname", jobRecord.Name)
+                .ForContext("jobid", jobRecord.Id);
 
             var assembyName = typeof(Program).Assembly.GetName();
             _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
 
             // setup di
             var provider = ConfigureServices();
+            var dbContext = provider.GetService<SlothDbContext>();
 
-            // create job service
-            var uploadScrubberJob = provider.GetService<UploadScrubberJob>();
+            // save log to db
+            dbContext.KfsScrubberUploadJobRecords.Add(jobRecord);
+            dbContext.SaveChanges();
 
-            // call methods
-            Task.Run(() => uploadScrubberJob.UploadScrubber()).Wait();
+            try
+            {
+                // create job service
+                var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
+
+                // call methods
+                Task.Run(() => uploadScrubberJob.UploadScrubber(_log)).Wait();
+            }
+            finally
+            {
+                // record status
+                jobRecord.Status = "Finished";
+                dbContext.SaveChanges();
+            }
         }
 
         private static ServiceProvider ConfigureServices()
@@ -56,7 +80,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             services.AddTransient<IKfsScrubberService, KfsScrubberService>();
             services.AddTransient<IStorageService, StorageService>();
             services.AddTransient<ISecretsService, SecretsService>();
-            services.AddTransient<UploadScrubberJob>();
+            services.AddTransient<KfsScrubberUploadJob>();
 
             services.AddSingleton(_log);
 

@@ -3,28 +3,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
-using Sloth.Jobs.Kfs.ScrubberUpload.Services;
+using Sloth.Core.Services;
 
-namespace Sloth.Jobs.Kfs.ScrubberUpload
+namespace Sloth.Core.Jobs
 {
-    public class UploadScrubberJob
+    public class KfsScrubberUploadJob
     {
-        private readonly ILogger _log;
         private readonly SlothDbContext _context;
         private readonly IKfsScrubberService _kfsScrubberService;
 
+        public static string JobName = "Kfs.ScrubberUpload";
 
-        public UploadScrubberJob(ILogger log, SlothDbContext context, IKfsScrubberService kfsScrubberService)
+        public KfsScrubberUploadJob(SlothDbContext context, IKfsScrubberService kfsScrubberService)
         {
-            _log = log;
             _context = context;
             _kfsScrubberService = kfsScrubberService;
         }
 
-        public async Task UploadScrubber()
+        public async Task UploadScrubber(ILogger log)
         {
             try
             {
@@ -37,7 +35,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
 
                 if (!transactions.Any())
                 {
-                    _log.Information("No scheduled transactions found.");
+                    log.Information("No scheduled transactions found.");
                     return;
                 }
 
@@ -51,7 +49,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
                     var docType = group.Key.DocumentType;
 
                     // create scrubber
-                    _log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
+                    log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
                     var scrubber = new Scrubber()
                     {
                         Chart               = "3",
@@ -67,8 +65,8 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
                     var filename = $"{docType}.{originCode}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
 
                     // ship scrubber
-                    _log.Information("Uploading {filename}", filename);
-                    var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, _log);
+                    log.Information("Uploading {filename}", filename);
+                    var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, log);
                     scrubber.Uri = uri.AbsoluteUri;
 
                     // persist scrubber uri
@@ -85,7 +83,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             }
             catch (Exception ex)
             {
-                _log.Error(ex, ex.Message);
+                log.Error(ex, ex.Message);
                 throw;
             }
         }

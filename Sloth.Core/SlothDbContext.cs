@@ -35,6 +35,8 @@ namespace Sloth.Core
 
         public DbSet<CybersourceBankReconcileJobRecord> CybersourceBankReconcileJobRecords { get; set; }
 
+        public DbSet<KfsScrubberUploadJobRecord> KfsScrubberUploadJobRecords { get; set; }
+
         public DbSet<LogMessage> Logs { get; set; }
 
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
