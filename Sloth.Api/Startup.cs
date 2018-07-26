@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using Hangfire;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,7 +18,6 @@ using Sloth.Api.Models;
 using Sloth.Api.Swagger;
 using Sloth.Core;
 using Sloth.Core.Configuration;
-using Sloth.Core.Data;
 using Sloth.Core.Services;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -132,9 +130,6 @@ namespace Sloth.Api
                 });
                 c.OperationFilter<SecurityRequirementsOperationFilter>();
             });
-
-            // add hangfire job activator
-            services.AddHangfire(c => { });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -169,10 +164,6 @@ namespace Sloth.Api
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sloth API v1");
             });
-
-            // setup hangfire storage
-            GlobalConfiguration.Configuration
-                .UseSqlServerStorage(Configuration.GetConnectionString("DefaultConnection"));
         }
     }
 }
