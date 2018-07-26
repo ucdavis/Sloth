@@ -6,9 +6,8 @@ using Renci.SshNet;
 using Serilog;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
-using Sloth.Core.Services;
 
-namespace Sloth.Jobs.Kfs.ScrubberUpload.Services
+namespace Sloth.Core.Services
 {
     public interface IKfsScrubberService
     {

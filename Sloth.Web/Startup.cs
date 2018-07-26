@@ -53,14 +53,19 @@ namespace Sloth.Web
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
             services.Configure<IamDirectorySearchServiceOptions>(Configuration.GetSection("IAM"));
+            services.Configure<KfsScrubberOptions>(Configuration.GetSection("Kfs"));
+            services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
+
 
             // add infrastructure services
             services.AddSingleton<IDirectorySearchService, IamDirectorySearchService>();
+            services.AddSingleton<IKfsScrubberService, KfsScrubberService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
             // add jobs services
-            services.AddTransient<CybersourceBankReconcileJob>();
+            services.AddScoped<CybersourceBankReconcileJob>();
+            services.AddScoped<KfsScrubberUploadJob>();
 
             // add database connection
             services.AddDbContext<SlothDbContext>(options =>

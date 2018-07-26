@@ -89,5 +89,6 @@
     <Build Include="dbo\Tables\AspNetRoleClaims.sql" />
     <Build Include="dbo\Tables\TeamRoles.sql" />
     <Build Include="dbo\Tables\CybersourceBankReconcileJobRecords.sql" />
+    <Build Include="dbo\Tables\KfsScrubberUploadJobRecords.sql" />
   </ItemGroup>
 </Project>

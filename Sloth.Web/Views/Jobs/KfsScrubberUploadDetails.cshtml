@@ -1,0 +1,83 @@
+@model Sloth.Core.Models.KfsScrubberUploadJobRecord
+
+@{
+    ViewBag.Title = "Kfs Scrubber Upload Job Details";
+}
+
+@section AdditionalStyles
+{
+    <style>
+        .console {
+            font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+            background-color: #0d3163;
+            color: #ffffff;
+        }
+
+        .console .line {
+            margin: 0;
+            line-height: 1.4em;
+            min-height: 1.4em;
+            font-size: 0.85em;
+            word-break: normal;
+            overflow-wrap: break-word;
+            white-space: pre-wrap;
+            vertical-align: top;
+        }
+
+        .console .line .time {
+            text-align: right;
+        }
+    </style>
+}
+
+<h2>@ViewBag.Title</h2>
+
+<div>
+    <h4>KFS Upload Scrubber Job Record</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Name)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Name)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.RanOn)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.RanOn)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+    </dl>
+</div>
+
+<div class="console">
+    @foreach (var log in Model.Logs.OrderBy(l => l.Id))
+    {
+        var time = log.TimeStamp.UtcDateTime - Model.RanOn;
+        var timeFormatted = $"{time.TotalSeconds:F3}s";
+        if (time < TimeSpan.FromSeconds(1))
+        {
+            timeFormatted = $"{time.TotalMilliseconds:#}ms";
+        }
+
+        <div class="row line">
+            <div class="col-1 time">@(timeFormatted)</div>
+            <div class="col-11 message">@log.Message</div>
+        </div>
+    }
+</div>
+
+<div>
+    <a asp-action="KfsScrubberUpload">Back to List</a>
+</div>
+
+@section AdditionalScripts
+{
+}
