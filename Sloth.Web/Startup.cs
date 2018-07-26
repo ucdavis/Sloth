@@ -18,6 +18,7 @@ using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Web.Logging;
 using Sloth.Web.Models;
+using StackifyLib;
 
 namespace Sloth.Web
 {
@@ -107,6 +108,7 @@ namespace Sloth.Web
         {
             // setup logging
             LoggingConfiguration.Setup(Configuration);
+            app.ConfigureStackifyLogging(Configuration);
             loggerFactory.AddSerilog();
 
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);

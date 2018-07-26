@@ -141,6 +141,8 @@ namespace Sloth.Api
         {
             // setup logging
             LoggingConfiguration.Setup(Configuration);
+            app.ConfigureStackifyLogging(Configuration);
+            loggerFactory.AddSerilog();
 
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
@@ -151,7 +153,6 @@ namespace Sloth.Api
             if (env.IsDevelopment())
             {
                 app.UseInternalExceptionMiddleware();
-                loggerFactory.AddSerilog();
             }
 
             app.UseMvc();
