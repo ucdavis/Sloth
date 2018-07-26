@@ -50,6 +50,7 @@ namespace Sloth.Web.Controllers
             var team = await DbContext.Teams
                 .Include(t => t.ApiKeys)
                 .Include(t => t.Integrations)
+                .Include(t => t.Sources)
                 .Include(t => t.UserTeamRoles)
                     .ThenInclude(r => r.User)
                 .Include(t => t.UserTeamRoles)

@@ -9,6 +9,7 @@ using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Web.Models;
+using Sloth.Web.Models.SourceViewModels;
 
 namespace Sloth.Web.Controllers
 {
@@ -31,32 +32,88 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create(string teamId)
         {
-            ViewBag.Teams = DbContext.Teams.ToList();
+            ViewBag.Teams = await GetUsersAdminTeams();
+            ViewBag.DefaultTeamId = teamId;
 
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(CreateSourceViewModel source)
+        public async Task<IActionResult> Create(CreateSourceViewModel model)
         {
-            var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == source.TeamId);
+            var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == model.TeamId);
             if (team == null)
             {
-                return View();
+                return View(model);
             }
 
-            var target = new Source()
+            var source = new Source()
             {
-                Name = source.Name,
-                Type = source.Type,
-                Description = source.Description,
-                OriginCode = source.OriginCode,
-                DocumentType = source.DocumentType,
-                Team = team
+                Name         = model.Name,
+                Type         = model.Type,
+                Description  = model.Description,
+                OriginCode   = model.OriginCode,
+                DocumentType = model.DocumentType,
+                Team         = team
             };
-            DbContext.Sources.Add(target);
+            DbContext.Sources.Add(source);
+            await DbContext.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
+        {
+            var source = await DbContext.Sources
+                .Include(s => s.Team)
+                .FirstOrDefaultAsync(s => s.Id == id);
+
+            if (source == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Teams = await GetUsersAdminTeams();
+
+            var model = new EditSourceViewModel()
+            {
+                Name         = source.Name,
+                TeamId       = source.Team.Id,
+                Description  = source.Description,
+                DocumentType = source.DocumentType,
+                OriginCode   = source.OriginCode,
+                Type         = source.Type,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(string id, EditSourceViewModel model)
+        {
+            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (source == null)
+            {
+                return NotFound();
+            }
+
+            var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == model.TeamId);
+            if (team == null)
+            {
+                return View(model);
+            }
+
+            source.Name         = model.Name;
+            source.Type         = model.Type;
+            source.Description  = model.Description;
+            source.OriginCode   = model.OriginCode;
+            source.DocumentType = model.DocumentType;
+            source.Team         = team;
+
             await DbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));

@@ -3,7 +3,7 @@
 @{
 }
 
-<table id="transactions" class="table table-bordered" style="width: 100%">
+<table id="transactionsTable" class="table table-bordered" style="width: 100%">
   <thead>
   <tr>
     <th>@Html.DisplayNameFor(x => x.Id)</th>
@@ -28,7 +28,7 @@
       <td>@t.MerchantTrackingNumber</td>
       <td>@t.Status</td>
       <td>
-        <a class="btn btn-primary btn-sm" href="@Url.Action("Details", new { id = t.Id })">
+        <a asp-controller="Transactions" asp-action="Details" asp-route-id="@t.Id" class="btn btn-primary btn-sm">
           <div class="fa fa-arrow-right"></div>
         </a>
       </td>

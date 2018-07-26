@@ -1,14 +1,12 @@
 @using Sloth.Core.Models;
 @using Sloth.Core.Resources
-@model CreateSourceViewModel
+@model Sloth.Web.Models.SourceViewModels.EditSourceViewModel
 
 @{
-    ViewBag.Title = "Create Source";
-
-    var defaultTeamId = ViewBag.DefaultTeamId as string;
+    ViewBag.Title = "Edit Source";
 
     var teams = ViewBag.Teams as IEnumerable<Team>;
-    var teamItems = teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.Id, Selected = t.Id == defaultTeamId });
+    var teamItems = teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.Id });
 
     var documentTypes = DocumentTypes.GetAll().Select(t => new SelectListItem() {Text = t, Value = t});
 }
@@ -42,6 +40,6 @@
         @Html.DropDownListFor(x => x.DocumentType, documentTypes, new { @class = "form-control" })
     </div>
     <div class="d-flex justify-content-end align-items-end">
-        <input type="submit" value="Create" class="btn btn-primary" />
+        <input type="submit" value="Save" class="btn btn-primary" />
     </div>
 }

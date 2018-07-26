@@ -1,9 +1,9 @@
 @using Sloth.Core.Models
 @using Sloth.Web.Models.IntegrationViewModels
-@model Sloth.Web.Models.IntegrationViewModels.CreateIntegrationViewModel
+@model EditIntegrationViewModel
 
 @{
-    ViewBag.Title = "Create Integration";
+    ViewBag.Title = "Edit Integration";
 
     var defaultTeamId = ViewBag.DefaultTeamId as string;
 
@@ -43,7 +43,15 @@
     </div>
     <div class="form-group">
         @Html.LabelFor(x => x.ReportPassword)
-        @Html.PasswordFor(x => x.ReportPassword, new { @class = "form-control" })
+        @Html.HiddenFor(x => x.ReportPasswordDirty, new { id = "report-password-dirty" })
+        <div class="input-group">
+            @Html.PasswordFor(x => x.ReportPassword, new { @class = "form-control", value = "password", id = "report-password-input", @readonly = true })
+            <div class="input-group-append">
+                <div id="report-password-clear" class="btn btn-danger">
+                    <i class="fa fa-edit"></i>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="form-group">
         @Html.LabelFor(x => x.ClearingAccount)
@@ -64,6 +72,54 @@
         </div>
     </div>
     <div class="d-flex justify-content-end align-items-end">
-        <input type="submit" value="Create" class="btn btn-primary"/>
+        <input type="submit" value="Save" class="btn btn-primary"/>
     </div>
+}
+
+@section AdditionalScripts
+{
+    <script>
+        $('#report-password-clear').click(function () {
+            if ($('#report-password-dirty').val() === 'False') {
+                editPassword();
+            } else {
+                uneditPassword();
+            }
+        });
+
+        function editPassword() {
+            // mark dirty
+            $('#report-password-dirty').val('True');
+
+            // make field editable
+            $('#report-password-input')
+                .removeAttr('readonly')
+                .val('')
+                .focus();
+
+            // change button
+            $('#report-password-clear i.fa').addClass('fa-undo').removeClass('fa-edit');
+        }
+
+        function uneditPassword() {
+            // mark clean
+            $('#report-password-dirty').val('False');
+
+            // make field editable
+            $('#report-password-input')
+                .attr('readonly', 'readonly')
+                .val('password');
+
+            // change button
+            $('#report-password-clear i.fa').removeClass('fa-undo').addClass('fa-edit');
+
+        }
+
+        $('#report-password-input').blur(function () {
+            $input = $(this);
+            if (!$input.val()) {
+                uneditPassword();
+            }
+        })
+    </script>
 }

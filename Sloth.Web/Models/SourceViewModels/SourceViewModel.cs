@@ -1,14 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
 
-namespace Sloth.Core.Models
+namespace Sloth.Web.Models.SourceViewModels
 {
-    public class Source
+    public class SourceViewModel
     {
-        public string Id { get; set; }
-
         [MaxLength(50)]
         [Required]
         public string Name { get; set; }
@@ -27,6 +24,7 @@ namespace Sloth.Core.Models
         [MinLength(2)]
         [MaxLength(2)]
         [Required]
+        [Display(Name = "Origin Code")]
         public string OriginCode { get; set; }
 
         /// <summary>
@@ -36,18 +34,11 @@ namespace Sloth.Core.Models
         [MinLength(4)]
         [MaxLength(4)]
         [Required]
+        [Display(Name = "Document Type")]
         public string DocumentType { get; set; }
 
-        [JsonIgnore]
         [Required]
-        public Team Team { get; set; }
-
-        public static void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Source>()
-                .HasOne(i => i.Team)
-                .WithMany(t => t.Sources)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+        [Display(Name = "Team")]
+        public string TeamId { get; set; }
     }
 }
