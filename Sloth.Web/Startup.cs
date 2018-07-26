@@ -107,6 +107,7 @@ namespace Sloth.Web
         {
             // setup logging
             LoggingConfiguration.Setup(Configuration);
+            loggerFactory.AddSerilog();
 
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
@@ -115,8 +116,6 @@ namespace Sloth.Web
 
             if (env.IsDevelopment())
             {
-                loggerFactory.AddSerilog();
-
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
