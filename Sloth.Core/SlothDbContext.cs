@@ -95,6 +95,7 @@ namespace Sloth.Core
             Integration.OnModelCreating(modelBuilder);
             LogMessage.OnModelCreating(modelBuilder);
             CybersourceBankReconcileJobRecord.OnModelCreating(modelBuilder);
+            KfsScrubberUploadJobRecord.OnModelCreating(modelBuilder);
         }
     }
 }
