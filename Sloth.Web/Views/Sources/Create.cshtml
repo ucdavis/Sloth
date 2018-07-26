@@ -5,8 +5,10 @@
 @{
     ViewBag.Title = "Create Source";
 
+    var defaultTeamId = ViewBag.DefaultTeamId as string;
+
     var teams = ViewBag.Teams as IEnumerable<Team>;
-    var teamItems = teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.Id });
+    var teamItems = teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.Id, Selected = t.Id == defaultTeamId });
 
     var documentTypes = DocumentTypes.GetAll().Select(t => new SelectListItem() {Text = t, Value = t});
 }

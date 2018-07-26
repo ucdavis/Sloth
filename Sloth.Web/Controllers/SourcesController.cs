@@ -32,9 +32,10 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create(string teamId)
         {
-            ViewBag.Teams = DbContext.Teams.ToList();
+            ViewBag.Teams = await GetUsersAdminTeams();
+            ViewBag.DefaultTeamId = teamId;
 
             return View();
         }
@@ -45,7 +46,7 @@ namespace Sloth.Web.Controllers
             var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == model.TeamId);
             if (team == null)
             {
-                return View();
+                return View(model);
             }
 
             var source = new Source()
@@ -66,12 +67,16 @@ namespace Sloth.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
-            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == id);
+            var source = await DbContext.Sources
+                .Include(s => s.Team)
+                .FirstOrDefaultAsync(s => s.Id == id);
 
             if (source == null)
             {
                 return NotFound();
             }
+
+            ViewBag.Teams = await GetUsersAdminTeams();
 
             var model = new EditSourceViewModel()
             {
@@ -99,7 +104,7 @@ namespace Sloth.Web.Controllers
             var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == model.TeamId);
             if (team == null)
             {
-                return View();
+                return View(model);
             }
 
             source.Name         = model.Name;
