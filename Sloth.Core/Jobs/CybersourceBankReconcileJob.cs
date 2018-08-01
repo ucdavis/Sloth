@@ -133,7 +133,7 @@ namespace Sloth.Core.Jobs
                             Direction    = Transfer.CreditDebit.Debit,
                             Amount       = deposit.Amount,
                             Description  = "Deposit",
-                            ObjectCode   = ObjectCodes.CreditCardClearing,
+                            ObjectCode   = ObjectCodes.Income,
                             FiscalYear   = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
@@ -147,7 +147,7 @@ namespace Sloth.Core.Jobs
                             Direction    = Transfer.CreditDebit.Credit,
                             Amount       = deposit.Amount,
                             Description  = "Deposit",
-                            ObjectCode   = ObjectCodes.CreditCardHolding,
+                            ObjectCode   = ObjectCodes.Income,
                             FiscalYear   = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
