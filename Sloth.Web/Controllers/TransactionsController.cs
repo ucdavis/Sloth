@@ -29,6 +29,7 @@ namespace Sloth.Web.Controllers
         {
             var transaction = await DbContext.Transactions
                 .Include(t => t.Scrubber)
+                .Include(t => t.Source)
                 .Include(t => t.Transfers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
