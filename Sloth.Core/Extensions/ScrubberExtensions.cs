@@ -5,7 +5,6 @@ using System.Xml;
 using System.Xml.Serialization;
 using Sloth.Core.Models;
 using Sloth.Xml;
-using Sloth.Xml.Types;
 
 namespace Sloth.Core.Extensions
 {
@@ -30,8 +29,9 @@ namespace Sloth.Core.Extensions
                     BatchSequenceNumber = scrubber.BatchSequenceNumber,
                     Chart               = scrubber.Chart,
                     CampusCode          = campusCode.DV,
+                    OrganizationCode    = scrubber.OrganizationCode,
                 },
-                Entries = transfers.Select(ToEntry).ToList(),
+                Entries = transfers.Select(t => t.ToEntry()).ToList(),
                 Trailer = new Trailer()
                 {
                     TotalAmount = transfers.Where(t => t.Direction == Transfer.CreditDebit.Credit).Sum(t => t.Amount),
@@ -49,30 +49,6 @@ namespace Sloth.Core.Extensions
             var xw = XmlWriter.Create(output, xwx);
 
             xs.Serialize(xw, batch);
-        }
-
-        public static EntryWithDetail ToEntry(this Transfer transfer)
-        {
-            var direction = transfer.Direction == Transfer.CreditDebit.Credit
-                ? transactionDebitCreditCode.C
-                : transactionDebitCreditCode.D;
-
-            return new EntryWithDetail()
-            {
-                OriginCode      = transfer.Transaction.OriginCode,
-                Chart           = transfer.Chart,
-                Account         = transfer.Account,
-                SubAccount      = transfer.SubAccount,
-                ObjectCode      = transfer.ObjectCode,
-                SubObjectCode   = transfer.SubObjectCode,
-                TrackingNumber  = transfer.Transaction.KfsTrackingNumber,
-                Amount          = transfer.Amount,
-                DebitCredit     = direction,
-                FiscalYear      = transfer.FiscalYear,
-                //FiscalPeriod  = transfer.FiscalPeriod,
-                BalanceType     = financialBalanceTypeCode.AC,
-                TransactionDate = transfer.Transaction.TransactionDate
-            };
         }
     }
 }
