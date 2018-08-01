@@ -65,6 +65,32 @@ namespace Sloth.Core
             }
         }
 
+        public async Task<string> GetNextDocumentNumber(DbTransaction transaction = null)
+        {
+            const string sql = "SELECT NEXT VALUE FOR Document_Number_Seq AS DocumentNumber";
+
+            var conn = Database.GetDbConnection();
+            if (conn.State != ConnectionState.Open)
+            {
+                await conn.OpenAsync();
+            }
+
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = sql;
+                if (transaction != null)
+                {
+                    cmd.Transaction = transaction;
+                }
+
+                using (var reader = await cmd.ExecuteReaderAsync())
+                {
+                    await reader.ReadAsync();
+                    return reader.GetInt64(0).ToString("D9");
+                }
+            }
+        }
+
         public IEnumerable<ValidationResult> ValidateModel(object model)
         {
             var context = new ValidationContext(model);
