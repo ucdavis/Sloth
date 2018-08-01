@@ -19,13 +19,11 @@ namespace Sloth.Api.Controllers
     {
         private readonly SlothDbContext _context;
         private readonly IKfsService _kfsService;
-        private readonly ILogger _logger;
 
-        public TransactionsController(SlothDbContext context, ILoggerFactory loggerFactory, IKfsService kfsService)
+        public TransactionsController(SlothDbContext context, IKfsService kfsService)
         {
             _context = context;
             _kfsService = kfsService;
-            _logger = loggerFactory.CreateLogger<TransactionsController>();
         }
 
         /// <summary>

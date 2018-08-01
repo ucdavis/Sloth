@@ -112,6 +112,7 @@ namespace Sloth.Core.Jobs
                         // create transaction per deposit item,
                         // moving monies from clearing to holding
                         var kfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
+                        var documentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
 
                         transaction = new Transaction()
                         {
@@ -120,7 +121,7 @@ namespace Sloth.Core.Jobs
                             KfsTrackingNumber       = kfsTrackingNumber,
                             MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber = deposit.RequestID,
-                            DocumentNumber          = "ADOCUMENT1",
+                            DocumentNumber          = documentNumber,
                             TransactionDate         = yesterday,
                         };
 
@@ -132,7 +133,7 @@ namespace Sloth.Core.Jobs
                             Direction    = Transfer.CreditDebit.Debit,
                             Amount       = deposit.Amount,
                             Description  = "Deposit",
-                            ObjectCode   = "ABCD",
+                            ObjectCode   = ObjectCodes.Income,
                             FiscalYear   = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };
@@ -146,7 +147,7 @@ namespace Sloth.Core.Jobs
                             Direction    = Transfer.CreditDebit.Credit,
                             Amount       = deposit.Amount,
                             Description  = "Deposit",
-                            ObjectCode   = "ABCD",
+                            ObjectCode   = ObjectCodes.Income,
                             FiscalYear   = fiscalYear,
                             FiscalPeriod = fiscalPeriod,
                         };

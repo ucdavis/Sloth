@@ -90,5 +90,6 @@
     <Build Include="dbo\Tables\TeamRoles.sql" />
     <Build Include="dbo\Tables\CybersourceBankReconcileJobRecords.sql" />
     <Build Include="dbo\Tables\KfsScrubberUploadJobRecords.sql" />
+    <Build Include="dbo\Sequences\Document_Number_Seq.sql" />
   </ItemGroup>
 </Project>

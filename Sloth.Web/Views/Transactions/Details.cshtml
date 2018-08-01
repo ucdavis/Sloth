@@ -1,3 +1,4 @@
+@using Sloth.Core.Extensions
 @using Sloth.Core.Resources
 @model Sloth.Core.Models.Transaction
 
@@ -6,7 +7,16 @@
 }
 
 @section AdditionalStyles {
-    <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
+    @Html.Partial("_DataTableStylePartial")
+    <link href="~/css/prism.css" rel="stylesheet" />
+
+    <style>
+        pre.code-toolbar > .toolbar a, pre.code-toolbar > .toolbar button, pre.code-toolbar > .toolbar span {
+            color: black;
+            font-size: 16px;
+            background-color: white;
+        }
+    </style>
 }
 
 <h2>@ViewBag.Title</h2>
@@ -76,6 +86,12 @@
     </tbody>
 </table>
 
+<pre>
+<code class="language-markup">
+@Model.ToXml()
+</code>
+</pre>
+
 @if (Model.Status == TransactionStatuses.PendingApproval)
 {
     <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Id" method="post" class="form-horizontal">
@@ -84,8 +100,8 @@
 }
 
 @section AdditionalScripts {
-    <script src="~/lib/jquery.datatables.js"></script>
-    <script src="~/lib/datatables.bootstrap4.js"></script>
+    @Html.Partial("_DataTableScriptsPartial")
+    <script src="~/js/prism.js"></script>
     <script>
         $('#transfers').dataTable( {
             "columnDefs": [
