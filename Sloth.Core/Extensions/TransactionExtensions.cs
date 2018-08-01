@@ -34,6 +34,8 @@ namespace Sloth.Core.Extensions
                 OriginCode = originCode,
                 DocumentType = docType
             };
+
+            scrubber.ToXml(output);
         }
     }
 }
