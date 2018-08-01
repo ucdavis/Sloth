@@ -31,6 +31,7 @@ namespace Sloth.Core.Jobs
                     .Where(t => t.Status == TransactionStatuses.Scheduled)
                     .Include(t => t.Transfers)
                     .Include(t => t.Source)
+                        .ThenInclude(s => s.Team)
                     .ToList();
 
                 if (!transactions.Any())
@@ -43,17 +44,20 @@ namespace Sloth.Core.Jobs
                 var groups = transactions.GroupBy(t => t.Source);
                 foreach (var group in groups)
                 {
+                    var source = group.Key;
                     var groupedTransactions = group.ToList();
 
-                    var originCode = group.Key.OriginCode;
-                    var docType = group.Key.DocumentType;
+                    var chart = source.Chart;
+                    var orgCode = source.OrganizationCode;
+                    var originCode = source.OriginCode;
+                    var docType = source.DocumentType;
 
                     // create scrubber
                     log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
                     var scrubber = new Scrubber()
                     {
-                        Chart               = "3",
-                        OrganizationCode    = "ACCT",
+                        Chart               = chart,
+                        OrganizationCode    = orgCode,
                         BatchDate           = DateTime.Today,
                         BatchSequenceNumber = 1,
                         Transactions        = groupedTransactions,
