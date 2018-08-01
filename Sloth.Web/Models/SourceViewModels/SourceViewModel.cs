@@ -18,6 +18,20 @@ namespace Sloth.Web.Models.SourceViewModels
         public string Description { get; set; }
 
         /// <summary>
+        /// Chart of Accounts Code associated with Org Code
+        /// </summary>
+        [MaxLength(2)]
+        [Required]
+        public string Chart { get; set; }
+
+        /// <summary>
+        /// Financial System Organization responsible for GL Feed.
+        /// </summary>
+        [MaxLength(4)]
+        [Required]
+        public string OrganizationCode { get; set; }
+
+        /// <summary>
         /// Unique feed origination identifier given to the Feed System.
         /// The origination code is validated in during file receipt and in the processing.
         /// </summary>

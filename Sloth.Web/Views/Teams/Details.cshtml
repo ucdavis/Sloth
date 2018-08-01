@@ -73,33 +73,7 @@
     </div>
 </div>
 
-<table id="sourcesTable" class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Team Name</th>
-            <th>Source Name</th>
-            <th>Type</th>
-            <th>Origin Code</th>
-            <th>Document Type</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var source in Model.Sources)
-        {
-            <tr>
-                <td>@source.Team.Name</td>
-                <td>@source.Name</td>
-                <td>@source.Type</td>
-                <td>@source.OriginCode</td>
-                <td>@source.DocumentType</td>
-                <td class="text-center">
-                    <a asp-controller="Sources" asp-action="Edit" asp-route-id="@source.Id" class="btn btn-primary btn-sm">Edit</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@Html.Partial("_SourcesTable", Model.Sources)
 
 <hr />
 
@@ -300,7 +274,13 @@
             ],
         });
 
-        var apiKeysTable = $('#apiKeysTable').DataTable({ });
+        $('#sourcesTable').DataTable({
+            columnDefs: [
+                { sortable: false, targets: -1 },
+            ],
+        });
+
+        var apiKeysTable = $('#apiKeysTable').DataTable({});
 
         // global models
         var team = @Json.Serialize(Model);

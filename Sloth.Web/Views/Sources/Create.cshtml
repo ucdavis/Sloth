@@ -1,6 +1,7 @@
 @using Sloth.Core.Models;
 @using Sloth.Core.Resources
-@model CreateSourceViewModel
+@using Sloth.Web.Models.SourceViewModels
+@model Sloth.Web.Models.SourceViewModels.CreateSourceViewModel
 
 @{
     ViewBag.Title = "Create Source";
@@ -32,6 +33,14 @@
     <div class="form-group">
         @Html.DisplayNameFor(x => x.Description)
         @Html.TextBoxFor(x => x.Description, new { @class = "form-control", placeholder = "ex: External Recharge Income" })
+    </div>
+    <div class="form-group">
+        @Html.DisplayNameFor(x => x.Chart)
+        @Html.TextBoxFor(x => x.Chart, new { @class = "form-control", placeholder = "XX" })
+    </div>
+    <div class="form-group">
+        @Html.DisplayNameFor(x => x.OrganizationCode)
+        @Html.TextBoxFor(x => x.OrganizationCode, new { @class = "form-control", placeholder = "XXXX" })
     </div>
     <div class="form-group">
         @Html.DisplayNameFor(x => x.OriginCode)

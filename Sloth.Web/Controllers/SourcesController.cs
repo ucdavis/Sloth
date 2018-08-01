@@ -51,12 +51,14 @@ namespace Sloth.Web.Controllers
 
             var source = new Source()
             {
-                Name         = model.Name,
-                Type         = model.Type,
-                Description  = model.Description,
-                OriginCode   = model.OriginCode,
-                DocumentType = model.DocumentType,
-                Team         = team
+                Name             = model.Name,
+                Type             = model.Type,
+                Chart            = model.Chart,
+                OrganizationCode = model.OrganizationCode,
+                Description      = model.Description,
+                OriginCode       = model.OriginCode,
+                DocumentType     = model.DocumentType,
+                Team             = team
             };
             DbContext.Sources.Add(source);
             await DbContext.SaveChangesAsync();
@@ -80,12 +82,14 @@ namespace Sloth.Web.Controllers
 
             var model = new EditSourceViewModel()
             {
-                Name         = source.Name,
-                TeamId       = source.Team.Id,
-                Description  = source.Description,
-                DocumentType = source.DocumentType,
-                OriginCode   = source.OriginCode,
-                Type         = source.Type,
+                Name             = source.Name,
+                TeamId           = source.Team.Id,
+                Description      = source.Description,
+                Chart            = source.Chart,
+                OrganizationCode = source.OrganizationCode,
+                DocumentType     = source.DocumentType,
+                OriginCode       = source.OriginCode,
+                Type             = source.Type,
             };
 
             return View(model);
@@ -107,12 +111,14 @@ namespace Sloth.Web.Controllers
                 return View(model);
             }
 
-            source.Name         = model.Name;
-            source.Type         = model.Type;
-            source.Description  = model.Description;
-            source.OriginCode   = model.OriginCode;
-            source.DocumentType = model.DocumentType;
-            source.Team         = team;
+            source.Name             = model.Name;
+            source.Type             = model.Type;
+            source.Description      = model.Description;
+            source.Chart            = model.Chart;
+            source.OrganizationCode = model.OrganizationCode;
+            source.OriginCode       = model.OriginCode;
+            source.DocumentType     = model.DocumentType;
+            source.Team             = team;
 
             await DbContext.SaveChangesAsync();
 
