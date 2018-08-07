@@ -151,15 +151,11 @@ namespace Sloth.Api.Controllers
                 });
             }
 
-            // create document number
-            var documentNumber = "sample";
-
             var transactionToCreate = new Transaction
             {
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
                 Source                  = source,
-                DocumentNumber          = documentNumber,
                 TransactionDate         = transaction.TransactionDate,
                 Transfers               = transaction.Transfers.Select(t => new Transfer()
                 {
@@ -192,6 +188,9 @@ namespace Sloth.Api.Controllers
             {
                 // create kfs number
                 transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
+
+                // create document number
+                transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
 
                 _context.Transactions.Add(transactionToCreate);
                 await _context.SaveChangesAsync();
