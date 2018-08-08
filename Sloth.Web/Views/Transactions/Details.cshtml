@@ -1,10 +1,13 @@
 @using Sloth.Core.Extensions
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
-@model Sloth.Core.Models.Transaction
+@model Transaction
 
 @{
     ViewBag.Title = "Transaction Details";
+
+    Uri merchantUrl;
+    var isUrlValid = Uri.TryCreate(Model.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
 }
 
 @section AdditionalStyles {
@@ -54,6 +57,18 @@
             <strong>@Html.DisplayNameFor(x => x.Status)</strong><br />
             <span>@Model.Status</span>
         </div>
+        @{
+            if (isUrlValid)
+            {
+                <div class="form-group">
+                    <strong>@Html.DisplayNameFor(x => x.MerchantTrackingUrl)</strong><br />
+                    <span>
+                        <a href="@Html.Raw(merchantUrl.ToString())" target="_blank">@merchantUrl.ToString()</a>
+                    </span>
+                </div>
+            }
+        }
+        
     </div>
 </div>
 
