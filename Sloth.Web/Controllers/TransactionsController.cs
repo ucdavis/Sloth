@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -19,6 +20,16 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var transactions = await DbContext.Transactions
+                .AsNoTracking()
+                .ToListAsync();
+
+            return View(transactions);
+        }
+
+        public async Task<IActionResult> NeedApproval()
+        {
+            var transactions = await DbContext.Transactions
+                .Where(t => t.Status == TransactionStatuses.PendingApproval)
                 .AsNoTracking()
                 .ToListAsync();
 

@@ -1,0 +1,26 @@
+@model IEnumerable<Sloth.Core.Models.Transaction>
+
+@{
+    ViewBag.Title = "Transactions Needing Approval";
+}
+
+@section AdditionalStyles {
+    @Html.Partial("_DataTableStylePartial")
+}
+
+<h2>@ViewBag.Title</h2>
+
+@Html.Partial("_TransactionsTable", Model)
+
+
+@section AdditionalScripts {
+    @Html.Partial("_DataTableScriptsPartial")
+    <script>
+        $('#transactionsTable').DataTable({
+            "columnDefs": [
+                { "targets": 0, "visible": false },
+                { "targets": [-1], "orderable": false },
+            ]
+        });
+    </script>
+}
