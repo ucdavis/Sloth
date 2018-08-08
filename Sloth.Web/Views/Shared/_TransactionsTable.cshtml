@@ -1,38 +1,43 @@
+@using Humanizer
+@using Sloth.Core.Resources
 @model IEnumerable<Sloth.Core.Models.Transaction>
 
 @{
 }
 
 <table id="transactionsTable" class="table table-bordered">
-  <thead>
-  <tr>
-    <th>@Html.DisplayNameFor(x => x.Id)</th>
-    <th>@Html.DisplayNameFor(x => x.TransactionDate)</th>
-    <th>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</th>
-    <th>@Html.DisplayNameFor(x => x.DocumentNumber)</th>
-    <th>@Html.DisplayNameFor(x => x.ProcessorTrackingNumber)</th>
-    <th>@Html.DisplayNameFor(x => x.MerchantTrackingNumber)</th>
-    <th>@Html.DisplayNameFor(x => x.Status)</th>
-    <th></th>
-  </tr>
-  </thead>
-  <tbody>
-  @foreach (var t in Model)
-  {
-    <tr>
-      <th scope="row">@t.Id</th>
-      <td>@t.TransactionDate</td>
-      <td>@t.KfsTrackingNumber</td>
-      <td>@t.DocumentNumber</td>
-      <td>@t.ProcessorTrackingNumber</td>
-      <td>@t.MerchantTrackingNumber</td>
-      <td>@t.Status</td>
-      <td>
-        <a asp-controller="Transactions" asp-action="Details" asp-route-id="@t.Id" class="btn btn-primary btn-sm">
-          <div class="fa fa-arrow-right"></div>
-        </a>
-      </td>
-    </tr>
-  }
-  </tbody>
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(x => x.Id)</th>
+            <th>@Html.DisplayNameFor(x => x.TransactionDate)</th>
+            <th>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.DocumentNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.ProcessorTrackingNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.MerchantTrackingNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.Status)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model)
+        {
+            <tr>
+                <th scope="row">@t.Id</th>
+                <td nowrap>@t.TransactionDate</td>
+                <td>@t.KfsTrackingNumber</td>
+                <td>@t.DocumentNumber</td>
+                <td>@t.ProcessorTrackingNumber</td>
+                <td>@t.MerchantTrackingNumber</td>
+                <td class="text-center">
+                    <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize()</span>
+                </td>
+                <td>
+                    <a asp-controller="Transactions" asp-action="Details" asp-route-id="@t.Id" class="btn btn-primary btn-sm" target="_blank">
+                        <i class="fa fa-fw fa-info"></i>
+                        <i class="fa fa-fw fa-external-link"></i>
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
 </table>

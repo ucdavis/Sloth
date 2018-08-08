@@ -1,4 +1,5 @@
 @using Sloth.Core.Extensions
+@using Sloth.Core.Models
 @using Sloth.Core.Resources
 @model Sloth.Core.Models.Transaction
 
@@ -74,8 +75,10 @@
         {
             <tr>
                 <td>@t.Id</td>
-                <td>@t.Amount.ToString("C")</td>
-                <td>@t.Direction</td>
+                <td class="text-right">@t.Amount.ToString("C")</td>
+                <td class="text-center">
+                    <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
+                </td>
                 <td>@t.Description</td>
                 <td style="white-space:nowrap">@t.FullAccountToString()</td>
                 <td>@t.FullObjectToString()</td>
@@ -86,16 +89,25 @@
     </tbody>
 </table>
 
-<pre>
+<div class="card my-3">
+    <div class="card-header d-flex justify-content-between align-items-center cursor-pointer collapsed" type="button" data-toggle="collapse" data-target="#transactionXml">
+        <span>Show XML</span>
+        <i class="fa fa-fw fa-expand"></i>
+    </div>
+    <pre id="transactionXml" class="collapse my-0">
 <code class="language-markup">
 @Model.ToXml()
 </code>
 </pre>
+</div>
+
 
 @if (Model.Status == TransactionStatuses.PendingApproval)
 {
-    <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Id" method="post" class="form-horizontal">
-        <button type="submit" class="btn btn-small">Approve</button>
+    <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Id" method="post">
+        <div class="d-flex justify-content-end align-items-center">
+            <button type="submit" class="btn btn-small btn-primary">Approve</button>
+        </div>
     </form>
 }
 
@@ -103,13 +115,13 @@
     @Html.Partial("_DataTableScriptsPartial")
     <script src="~/js/prism.js"></script>
     <script>
-        $('#transfers').dataTable( {
+        $('#transfers').DataTable( {
             "columnDefs": [
-                {
-                    "targets":  0,
-                    "visible": false,
-                }
-            ]
+                { "targets":  0, "visible": false }
+            ],
+            "paging": false,
+            "info": false,
+            //"searching": false,
         });
     </script>
 }

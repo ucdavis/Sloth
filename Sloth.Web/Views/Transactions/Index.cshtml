@@ -5,7 +5,7 @@
 }
 
 @section AdditionalStyles {
-    <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
+    @Html.Partial("_DataTableStylePartial")
 }
 
 <h2>@ViewBag.Title</h2>
@@ -14,15 +14,13 @@
 
 
 @section AdditionalScripts {
-    <script src="~/lib/jquery.datatables.js"></script>
-    <script src="~/lib/datatables.bootstrap4.js"></script>
+    @Html.Partial("_DataTableScriptsPartial")
     <script>
-        $('#transactions').dataTable({
+        $('#transactionsTable').DataTable({
             "columnDefs": [
-                {
-                    "targets": 0,
-                    "visible": false,
-                }
+                { "targets": 0, "visible": false },
+                { "targets": [-1], "orderable": false },
             ]
-        });    </script>
+        });
+    </script>
 }
