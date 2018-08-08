@@ -50,6 +50,7 @@ namespace Sloth.Core.Models
         [MaxLength(4)]
         [RegularExpression("[A-Z0-9]*")]
         [Required]
+        [Display(Name = "Object Code")]
         public string ObjectCode { get; set; }
 
         /// <summary>
@@ -97,6 +98,7 @@ namespace Sloth.Core.Models
         /// </summary>
         [Range(2017, 2099)]
         [Required]
+        [Display(Name = "Fiscal Year")]
         public int FiscalYear { get; set; }
 
         /// <summary>
@@ -110,6 +112,7 @@ namespace Sloth.Core.Models
         /// </summary>
         [Range(1, 12)]
         [Required]
+        [Display(Name = "Fiscal Period")]
         public int FiscalPeriod { get; set; }
 
         /// <summary>
@@ -162,6 +165,21 @@ namespace Sloth.Core.Models
             /// Remove money from an account
             /// </summary>
             Debit
+        }
+
+        public static string GetDirectionBadgeClass(CreditDebit direction)
+        {
+            switch (direction)
+            {
+                case CreditDebit.Credit:
+                    return "badge-success";
+
+                case CreditDebit.Debit:
+                    return "badge-primary";
+
+                default:
+                    return "badge-secondary";
+            }
         }
     }
 }

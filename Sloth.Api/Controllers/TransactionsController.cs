@@ -155,6 +155,7 @@ namespace Sloth.Api.Controllers
             {
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
+                MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
                 Source                  = source,
                 TransactionDate         = transaction.TransactionDate,
                 Transfers               = transaction.Transfers.Select(t => new Transfer()

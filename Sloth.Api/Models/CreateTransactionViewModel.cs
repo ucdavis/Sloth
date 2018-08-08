@@ -24,6 +24,11 @@ namespace Sloth.Api.Models
         public string MerchantTrackingNumber { get; set; }
 
         /// <summary>
+        ///  URL created by the merchant accountant referring to originating action
+        /// </summary>
+        public string MerchantTrackingUrl { get; set; }
+
+        /// <summary>
         /// Tracking Number created by the payment processor
         /// </summary>
         public string ProcessorTrackingNumber { get; set; }

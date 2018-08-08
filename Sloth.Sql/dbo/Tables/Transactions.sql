@@ -1,4 +1,4 @@
-﻿CREATE TABLE [dbo].[Transactions] (
+CREATE TABLE [dbo].[Transactions] (
     [Id]                      NVARCHAR (450) NOT NULL,
     [CreatorId]               NVARCHAR (450) NULL,
     [DocumentNumber]          NVARCHAR (14)  NOT NULL,
@@ -9,6 +9,7 @@
     [SourceId]                NVARCHAR (450) NOT NULL,
     [Status]                  NVARCHAR (MAX) NULL,
     [TransactionDate]         DATETIME2 (7)  NOT NULL,
+    [MerchantTrackingUrl]     NVARCHAR (MAX) NULL, 
     CONSTRAINT [PK_Transactions] PRIMARY KEY CLUSTERED ([Id] ASC),
     CONSTRAINT [FK_Transactions_AspNetUsers_CreatorId] FOREIGN KEY ([CreatorId]) REFERENCES [dbo].[AspNetUsers] ([Id]),
     CONSTRAINT [FK_Transactions_Scrubbers_ScrubberId] FOREIGN KEY ([ScrubberId]) REFERENCES [dbo].[Scrubbers] ([Id]),

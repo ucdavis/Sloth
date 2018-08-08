@@ -43,6 +43,12 @@ namespace Sloth.Core.Models
         public string MerchantTrackingNumber { get; set; }
 
         /// <summary>
+        /// URL created by the merchant to track back
+        /// </summary>
+        [Display(Name="Merchant Url")]
+        public string MerchantTrackingUrl { get; set; }
+
+        /// <summary>
         /// Tracking Number created by the payment processor
         /// </summary>
         [DisplayName("Processor Tracking Number")]
