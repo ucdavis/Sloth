@@ -21,6 +21,17 @@
 
 <h2>@ViewBag.Title</h2>
 
+<dl class="row">
+    <div class="col>
+        <dt>@Html.DisplayNameFor(x => x.Id)</dt>
+        <dd>@Model.Id</dd>
+    </div>
+    <div class="col>
+        <dt>@Html.DisplayNameFor(x => x.Uri)</dt>
+        <dd>@Model.Uri</dd>
+    </div>
+</dl>
+
 @Html.Partial("_TransactionsTable", Model.Transactions)
 
 <pre>
