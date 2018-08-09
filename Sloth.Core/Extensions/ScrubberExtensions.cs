@@ -19,6 +19,7 @@ namespace Sloth.Core.Extensions
 
         public static void ToXml(this Scrubber scrubber, TextWriter output)
         {
+            var source = scrubber.Source;
             var transfers = scrubber.Transactions.SelectMany(t => t.Transfers).ToList();
 
             var batch = new Batch
@@ -27,9 +28,14 @@ namespace Sloth.Core.Extensions
                 {
                     BatchDate           = scrubber.BatchDate,
                     BatchSequenceNumber = scrubber.BatchSequenceNumber,
-                    Chart               = scrubber.Chart,
+                    Chart               = source.Chart,
                     CampusCode          = campusCode.DV,
-                    OrganizationCode    = scrubber.OrganizationCode,
+                    OrganizationCode    = source.OrganizationCode,
+                    ContactUserId       = source.Team.KfsContactUserId,
+                    ContactEmail        = source.Team.KfsContactEmail,
+                    ContactPhoneNumber  = source.Team.KfsContactPhoneNumber,
+                    MailingAddress      = source.Team.KfsContactMailingAddress,
+                    DepartmentName      = source.Team.KfsContactDepartmentName,
                 },
                 Entries = transfers.Select(t => t.ToEntry()).ToList(),
                 Trailer = new Trailer()

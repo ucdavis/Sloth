@@ -5,13 +5,13 @@ namespace Sloth.Core.Resources
 {
     public class DocumentTypes
     {
-        public static string GLIB = "GLIB";
-        public static string GLJV = "GLJV";
-        public static string GLCC = "GLCC";
-        public static string GLJB = "GLJB";
-        public static string GLBB = "GLBB";
-        public static string GLCB = "GLCB";
-        public static string GLDE = "GLDE";
+        public const string GLIB = "GLIB";
+        public const string GLJV = "GLJV";
+        public const string GLCC = "GLCC";
+        public const string GLJB = "GLJB";
+        public const string GLBB = "GLBB";
+        public const string GLCB = "GLCB";
+        public const string GLDE = "GLDE";
 
         public static string[] GetAll()
         {
@@ -25,6 +25,21 @@ namespace Sloth.Core.Resources
                 GLCB,
                 GLDE,
             };
+        }
+
+        public static string GetDocumentTypeFilePrefix(string documentType)
+        {
+            switch (documentType)
+            {
+                case GLIB:
+                    return "billing";
+
+                case GLJV:
+                    return "journal";
+                
+                default:
+                    return "";
+            }
         }
     }
 }

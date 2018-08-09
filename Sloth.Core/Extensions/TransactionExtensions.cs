@@ -16,23 +16,13 @@ namespace Sloth.Core.Extensions
 
         public static void ToXml(this Transaction transaction, TextWriter output)
         {
-            var source = transaction.Source;
-
-            var chart = source.Chart;
-            var orgCode = source.OrganizationCode;
-            var originCode = source.OriginCode;
-            var docType = source.DocumentType;
-
-            // create scrubber
+            // create fake scrubber to serialize
             var scrubber = new Scrubber()
             {
-                Chart = chart,
-                OrganizationCode = orgCode,
                 BatchDate = DateTime.Today,
                 BatchSequenceNumber = 1,
                 Transactions = new List<Transaction>() { transaction },
-                OriginCode = originCode,
-                DocumentType = docType
+                Source = transaction.Source
             };
 
             scrubber.ToXml(output);
