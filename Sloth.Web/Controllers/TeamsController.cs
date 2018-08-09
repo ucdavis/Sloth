@@ -123,6 +123,7 @@ namespace Sloth.Web.Controllers
             team.KfsContactPhoneNumber    = model.KfsContactPhoneNumber;
             team.KfsContactMailingAddress = model.KfsContactMailingAddress;
 
+            await DbContext.SaveChangesAsync();
             return RedirectToAction("Details", new { id = team.Id });
         }
 
