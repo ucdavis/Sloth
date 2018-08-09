@@ -3,8 +3,7 @@ using System.Threading.Tasks;
 
 namespace Sloth.Web.Models.TeamViewModels
 {
-    public class CreateTeamViewModel
+    public class CreateTeamViewModel : TeamViewModel
     {
-        public string Name { get; set; }
     }
 }

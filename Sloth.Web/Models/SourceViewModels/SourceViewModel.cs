@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace Sloth.Web.Models.SourceViewModels
 {
@@ -54,5 +55,11 @@ namespace Sloth.Web.Models.SourceViewModels
         [Required]
         [Display(Name = "Team")]
         public string TeamId { get; set; }
+
+        [JsonIgnore]
+        public string KfsFtpUsername { get; set; }
+
+        [JsonIgnore]
+        public string KfsFtpPasswordKey { get; set; }
     }
 }

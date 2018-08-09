@@ -21,27 +21,7 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> Index()
         {
-            IEnumerable<Team> teams;
-            if (User.IsInRole(Roles.SystemAdmin))
-            {
-                // get all teams
-                teams = DbContext.Teams.ToList();
-            }
-            else
-            {
-                // get user + roles, include their teams
-                var userId = UserManager.GetUserId(User);
-                var user = await DbContext.Users
-                    .Include(u => u.UserTeamRoles)
-                        .ThenInclude(r => r.Team)
-                    .FirstOrDefaultAsync(u => u.Id == userId);
-
-                // select all teams that user is on
-                teams = user.UserTeamRoles
-                    .Select(r => r.Team)
-                    .Distinct();
-            }
-
+            var teams = await GetUsersAdminTeams();
             return View(teams);
         }
 
@@ -88,12 +68,60 @@ namespace Sloth.Web.Controllers
 
             var team = new Team()
             {
-                Name = model.Name,
+                Name                     = model.Name,
+                KfsContactDepartmentName = model.KfsContactDepartmentName,
+                KfsContactUserId         = model.KfsContactUserId,
+                KfsContactEmail          = model.KfsContactEmail,
+                KfsContactPhoneNumber    = model.KfsContactPhoneNumber,
+                KfsContactMailingAddress = model.KfsContactMailingAddress,
             };
             team.AddUserToRole(user, adminRole);
 
             DbContext.Teams.Add(team);
             await DbContext.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = team.Id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
+        {
+            var teams = await GetUsersAdminTeams();
+            var team = teams.FirstOrDefault(t => t.Id == id);
+            if (team == null)
+            {
+                return NotFound();
+            }
+
+            var model = new EditTeamViewModel()
+            {
+                Name                     = team.Name,
+                KfsContactUserId         = team.KfsContactUserId,
+                KfsContactDepartmentName = team.KfsContactDepartmentName,
+                KfsContactEmail          = team.KfsContactEmail,
+                KfsContactPhoneNumber    = team.KfsContactPhoneNumber,
+                KfsContactMailingAddress = team.KfsContactMailingAddress,
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(string id, EditTeamViewModel model)
+        {
+            var teams = await GetUsersAdminTeams();
+            var team = teams.FirstOrDefault(t => t.Id == id);
+            if (team == null)
+            {
+                return NotFound();
+            }
+
+            team.Name                     = model.Name;
+            team.KfsContactDepartmentName = model.KfsContactDepartmentName;
+            team.KfsContactUserId         = model.KfsContactUserId;
+            team.KfsContactEmail          = model.KfsContactEmail;
+            team.KfsContactPhoneNumber    = model.KfsContactPhoneNumber;
+            team.KfsContactMailingAddress = model.KfsContactMailingAddress;
 
             return RedirectToAction("Details", new { id = team.Id });
         }

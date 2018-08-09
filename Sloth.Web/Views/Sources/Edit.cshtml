@@ -47,7 +47,71 @@
         @Html.DisplayNameFor(x => x.DocumentType)
         @Html.DropDownListFor(x => x.DocumentType, documentTypes, new { @class = "form-control" })
     </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.KfsFtpUsername)
+        @Html.TextBoxFor(x => x.KfsFtpUsername, new { @class = "form-control" })
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(x => x.KfsFtpPasswordKey)
+        @Html.HiddenFor(x => x.KfsFtpPasswordKeyDirty, new { id = "kfs-ftp-password-key-dirty" })
+        <div class="input-group">
+            @Html.PasswordFor(x => x.KfsFtpPasswordKey, new { @class = "form-control", value = "password", id = "kfs-ftp-password-key-input", @readonly = true })
+            <div class="input-group-append">
+                <div id="kfs-ftp-password-key-clear" class="btn btn-danger">
+                    <i class="fa fa-edit"></i>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="d-flex justify-content-end align-items-end">
         <input type="submit" value="Save" class="btn btn-primary" />
     </div>
+}
+
+@section AdditionalScripts
+    {
+    <script>
+        $('#kfs-ftp-password-key-clear').click(function () {
+            if ($('#kfs-ftp-password-key-dirty').val() === 'False') {
+                editPassword();
+            } else {
+                uneditPassword();
+            }
+        });
+
+        function editPassword() {
+            // mark dirty
+            $('#kfs-ftp-password-key-dirty').val('True');
+
+            // make field editable
+            $('#kfs-ftp-password-key-input')
+                .removeAttr('readonly')
+                .val('')
+                .focus();
+
+            // change button
+            $('#kfs-ftp-password-key-clear i.fa').addClass('fa-undo').removeClass('fa-edit');
+        }
+
+        function uneditPassword() {
+            // mark clean
+            $('#kfs-ftp-password-key-dirty').val('False');
+
+            // make field editable
+            $('#kfs-ftp-password-key-input')
+                .attr('readonly', 'readonly')
+                .val('password');
+
+            // change button
+            $('#kfs-ftp-password-key-clear i.fa').removeClass('fa-undo').addClass('fa-edit');
+
+        }
+
+        $('#kfs-ftp-password-key-input').blur(function () {
+            $input = $(this);
+            if (!$input.val()) {
+                uneditPassword();
+            }
+        })
+    </script>
 }
