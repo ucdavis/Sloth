@@ -38,7 +38,7 @@ namespace Sloth.Web.Controllers
                 var userId = UserManager.GetUserId(User);
                 var user = await DbContext.Users
                     .Include(u => u.UserTeamRoles)
-                    .ThenInclude(r => r.Team)
+                        .ThenInclude(r => r.Team)
                     .FirstOrDefaultAsync(u => u.Id == userId);
 
                 // select all teams that user is on
