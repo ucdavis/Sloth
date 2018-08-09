@@ -14,6 +14,7 @@ namespace Sloth.Web.Models.TeamViewModels
         [MinLength(2)]
         [MaxLength(8)]
         [Required]
+        [Display(Name = "KFS Contact Kerberos Id")]
         public string KfsContactUserId { get; set; }
 
         /// <summary>
@@ -24,6 +25,7 @@ namespace Sloth.Web.Models.TeamViewModels
         [MaxLength(40)]
         [EmailAddress]
         [Required]
+        [Display(Name = "KFS Contact Email")]
         public string KfsContactEmail { get; set; }
 
         /// <summary>
@@ -33,6 +35,7 @@ namespace Sloth.Web.Models.TeamViewModels
         [MaxLength(10)]
         [RegularExpression("[0-9]*")]
         [Required]
+        [Display(Name = "KFS Contact Phone Number")]
         public string KfsContactPhoneNumber { get; set; }
 
         /// <summary>
@@ -40,6 +43,7 @@ namespace Sloth.Web.Models.TeamViewModels
         /// </summary>
         [MaxLength(30)]
         [Required]
+        [Display(Name = "KFS Contact Mailing Address")]
         public string KfsContactMailingAddress { get; set; }
 
         /// <summary>
@@ -47,6 +51,7 @@ namespace Sloth.Web.Models.TeamViewModels
         /// </summary>
         [MaxLength(30)]
         [Required]
+        [Display(Name = "KFS Contact Department")]
         public string KfsContactDepartmentName { get; set; }
     }
 }
