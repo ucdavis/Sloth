@@ -5,16 +5,16 @@
 }
 
 @section AdditionalStyles {
-    <link rel="stylesheet" href="~/lib/datatables.bootstrap4.css" />
+    @Html.Partial("_DataTableStylePartial")
 }
 
 <h2>@ViewBag.Title</h2>
 
-<table id="scrubbers" class="table table-bordered" style="width:100%">
+<table id="scrubbersTable" class="table table-bordered" style="width:100%">
     <thead>
     <tr>
         <th>@Html.DisplayNameFor(x => x.Id)</th>
-        <th>@Html.DisplayNameFor(x => x.OrganizationCode)</th>
+        <th>@Html.DisplayNameFor(x => x.Source.OrganizationCode)</th>
         <th>@Html.DisplayNameFor(x => x.BatchDate)</th>
         <th></th>
     </tr>
@@ -24,7 +24,7 @@
     {
         <tr>
             <th scope="row">@t.Id</th>
-            <td>@t.OrganizationCode</td>
+            <td>@t.Source.OrganizationCode</td>
             <td>@t.BatchDate</td>
             <td style="width:10%">
                 <a class="btn btn-primary btn-sm" href="@Url.Action("Details", new { id = t.Id })">
@@ -38,9 +38,8 @@
 
 
 @section AdditionalScripts {
-    <script src="~/lib/jquery.datatables.js"></script>
-    <script src="~/lib/datatables.bootstrap4.js"></script>
+    @Html.Partial("_DataTableScriptsPartial")
     <script>
-        $('#scrubbers').dataTable();
+        $('#scrubbersTable').DataTable({});
     </script>
 }

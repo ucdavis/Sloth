@@ -17,6 +17,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var scrubbers = await DbContext.Scrubbers
+                .Include(s => s.Source)
                 .AsNoTracking()
                 .ToListAsync();
 
