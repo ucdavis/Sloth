@@ -47,30 +47,27 @@ namespace Sloth.Core.Jobs
                     var source = group.Key;
                     var groupedTransactions = group.ToList();
 
-                    var chart = source.Chart;
-                    var orgCode = source.OrganizationCode;
                     var originCode = source.OriginCode;
-                    var docType = source.DocumentType;
 
                     // create scrubber
                     log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
                     var scrubber = new Scrubber()
                     {
-                        Chart               = chart,
-                        OrganizationCode    = orgCode,
                         BatchDate           = DateTime.Today,
                         BatchSequenceNumber = 1,
                         Transactions        = groupedTransactions,
-                        OriginCode          = originCode,
-                        DocumentType        = docType
+                        Source              = source
                     };
 
                     // create filename
-                    var filename = $"{docType}.{originCode}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
+                    var prefix = DocumentTypes.GetDocumentTypeFilePrefix(source.DocumentType);
+                    var filename = $"{prefix}.{originCode}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
 
                     // ship scrubber
                     log.Information("Uploading {filename}", filename);
-                    var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, log);
+                    var username = source.KfsFtpUsername;
+                    var passwordKeyName = source.KfsFtpPasswordKeyName;
+                    var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, username, passwordKeyName, log);
                     scrubber.Uri = uri.AbsoluteUri;
 
                     // persist scrubber uri

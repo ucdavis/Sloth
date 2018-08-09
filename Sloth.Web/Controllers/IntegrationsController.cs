@@ -94,14 +94,14 @@ namespace Sloth.Web.Controllers
 
             var model = new EditIntegrationViewModel()
             {
-                ClearingAccount = integration.ClearingAccount,
-                HoldingAccount = integration.HoldingAccount,
-                MerchantId = integration.MerchantId,
+                ClearingAccount     = integration.ClearingAccount,
+                HoldingAccount      = integration.HoldingAccount,
+                MerchantId          = integration.MerchantId,
                 ReportPasswordDirty = false,
-                SourceId = integration.Source.Id,
-                ReportUserName = integration.ReportUsername,
-                TeamId = integration.Team.Id,
-                Type = integration.Type,
+                SourceId            = integration.Source.Id,
+                ReportUserName      = integration.ReportUsername,
+                TeamId              = integration.Team.Id,
+                Type                = integration.Type,
             };
 
             return View(model);
@@ -110,7 +110,13 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(string id, EditIntegrationViewModel model)
         {
-            // TODO: validate model
+            var integration = await DbContext.Integrations.FirstOrDefaultAsync(i => i.Id == id);
+            if (integration == null)
+            {
+                return NotFound();
+            }
+
+            // validate model
             var adminTeams = await GetUsersAdminTeams();
             var team = adminTeams.FirstOrDefault(t => t.Id == model.TeamId);
             if (team == null)
@@ -129,16 +135,14 @@ namespace Sloth.Web.Controllers
                 return View(model);
             }
 
-            // edit integration
-            var integration = await DbContext.Integrations.FirstOrDefaultAsync(i => i.Id == id);
-
-            integration.MerchantId = model.MerchantId;
-            integration.Source = source;
-            integration.Team = team;
-            integration.Type = model.Type;
-            integration.ReportUsername = model.ReportUserName;
+            // update integration
+            integration.MerchantId      = model.MerchantId;
+            integration.Source          = source;
+            integration.Team            = team;
+            integration.Type            = model.Type;
+            integration.ReportUsername  = model.ReportUserName;
             integration.ClearingAccount = model.ClearingAccount;
-            integration.HoldingAccount = model.HoldingAccount;
+            integration.HoldingAccount  = model.HoldingAccount;
 
             // should we create a new secret?
             if (model.ReportPasswordDirty)

@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
-using Sloth.Web.Models;
+using Sloth.Core.Services;
 using Sloth.Web.Models.SourceViewModels;
 
 namespace Sloth.Web.Controllers
@@ -16,9 +15,11 @@ namespace Sloth.Web.Controllers
     [Authorize(Roles = Roles.SystemAdmin)]
     public class SourcesController : SuperController
     {
+        private readonly ISecretsService _secretsService;
 
-        public SourcesController(UserManager<User> userManager, SlothDbContext dbContext) : base(userManager, dbContext)
+        public SourcesController(UserManager<User> userManager, SlothDbContext dbContext, ISecretsService secretsService) : base(userManager, dbContext)
         {
+            _secretsService = secretsService;
         }
 
         [HttpGet]
@@ -49,16 +50,22 @@ namespace Sloth.Web.Controllers
                 return View(model);
             }
 
+            // create new secret
+            var secretId = Guid.NewGuid().ToString("D");
+            await _secretsService.UpdateSecret(secretId, model.KfsFtpPasswordKey);
+
             var source = new Source()
             {
-                Name             = model.Name,
-                Type             = model.Type,
-                Chart            = model.Chart,
-                OrganizationCode = model.OrganizationCode,
-                Description      = model.Description,
-                OriginCode       = model.OriginCode,
-                DocumentType     = model.DocumentType,
-                Team             = team
+                Name                  = model.Name,
+                Type                  = model.Type,
+                Chart                 = model.Chart,
+                OrganizationCode      = model.OrganizationCode,
+                Description           = model.Description,
+                OriginCode            = model.OriginCode,
+                DocumentType          = model.DocumentType,
+                KfsFtpUsername        = model.KfsFtpUsername,
+                KfsFtpPasswordKeyName = secretId,
+                Team                  = team
             };
             DbContext.Sources.Add(source);
             await DbContext.SaveChangesAsync();
@@ -82,14 +89,16 @@ namespace Sloth.Web.Controllers
 
             var model = new EditSourceViewModel()
             {
-                Name             = source.Name,
-                TeamId           = source.Team.Id,
-                Description      = source.Description,
-                Chart            = source.Chart,
-                OrganizationCode = source.OrganizationCode,
-                DocumentType     = source.DocumentType,
-                OriginCode       = source.OriginCode,
-                Type             = source.Type,
+                Name                   = source.Name,
+                TeamId                 = source.Team.Id,
+                Description            = source.Description,
+                Chart                  = source.Chart,
+                OrganizationCode       = source.OrganizationCode,
+                DocumentType           = source.DocumentType,
+                OriginCode             = source.OriginCode,
+                Type                   = source.Type,
+                KfsFtpUsername         = source.KfsFtpUsername,
+                KfsFtpPasswordKeyDirty = false,
             };
 
             return View(model);
@@ -99,18 +108,24 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Edit(string id, EditSourceViewModel model)
         {
             var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == id);
-
             if (source == null)
             {
                 return NotFound();
             }
 
+            // validate model
             var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == model.TeamId);
             if (team == null)
             {
                 return View(model);
             }
 
+            if (model.KfsFtpPasswordKeyDirty && string.IsNullOrWhiteSpace(model.KfsFtpPasswordKey))
+            {
+                return View(model);
+            }
+
+            // update source
             source.Name             = model.Name;
             source.Type             = model.Type;
             source.Description      = model.Description;
@@ -118,7 +133,16 @@ namespace Sloth.Web.Controllers
             source.OrganizationCode = model.OrganizationCode;
             source.OriginCode       = model.OriginCode;
             source.DocumentType     = model.DocumentType;
+            source.KfsFtpUsername   = model.KfsFtpUsername;
             source.Team             = team;
+
+            // should we create a new secret?
+            if (model.KfsFtpPasswordKeyDirty)
+            {
+                var secretId = Guid.NewGuid().ToString("D");
+                await _secretsService.UpdateSecret(secretId, model.KfsFtpPasswordKey);
+                source.KfsFtpPasswordKeyName = secretId;
+            }
 
             await DbContext.SaveChangesAsync();
 

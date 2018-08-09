@@ -11,7 +11,7 @@ namespace Sloth.Core.Services
 {
     public interface IKfsScrubberService
     {
-        Task<Uri> UploadScrubber(Scrubber scrubber, string filename, ILogger logger = null);
+        Task<Uri> UploadScrubber(Scrubber scrubber, string filename, string username, string passwordKeyName, ILogger logger = null);
     }
 
     public class KfsScrubberService : IKfsScrubberService
@@ -19,13 +19,7 @@ namespace Sloth.Core.Services
         private readonly IStorageService _storageService;
         private readonly ISecretsService _secretsService;
 
-        private readonly string _username;
         private readonly string _host;
-        private readonly string _passwordKeyName;
-
-        private PrivateKeyFile _privateKey;
-
-
         private readonly string _storageContainer;
 
         public KfsScrubberService(IOptions<KfsScrubberOptions> options, IStorageService storageService, ISecretsService secretsService)
@@ -34,14 +28,10 @@ namespace Sloth.Core.Services
             _secretsService = secretsService;
 
             _host = options.Value.Host;
-            _username = options.Value.Username;
-
-            _passwordKeyName = options.Value.PrivateFileName;
-
             _storageContainer = options.Value.ScrubberBlobContainer;
         }
 
-        public async Task<Uri> UploadScrubber(Scrubber scrubber, string filename, ILogger logger = null)
+        public async Task<Uri> UploadScrubber(Scrubber scrubber, string filename, string username, string passwordKeyName, ILogger logger = null)
         {
             if (logger == null)
             {
@@ -62,7 +52,7 @@ namespace Sloth.Core.Services
             scrubber.Uri = uri.AbsoluteUri;
 
             // upload scrubber
-            using (var client = await GetClient())
+            using (var client = await GetClient(username, passwordKeyName))
             {
                 client.Connect();
 
@@ -73,29 +63,23 @@ namespace Sloth.Core.Services
             return uri;
         }
 
-        private async Task<SftpClient> GetClient()
+        private async Task<SftpClient> GetClient(string username, string passwordKeyName)
         {
-            var key = await GetPrivateKey();
-            return new SftpClient(_host, 22, _username, key);
+            var key = await GetPrivateKey(passwordKeyName);
+            return new SftpClient(_host, 22, username, key);
         }
 
-        private async Task<PrivateKeyFile> GetPrivateKey()
+        private async Task<PrivateKeyFile> GetPrivateKey(string passwordKeyName)
         {
-            if (_privateKey != null)
-                return _privateKey;
-
-            var encoded = await _secretsService.GetSecret(_passwordKeyName);
+            var encoded = await _secretsService.GetSecret(passwordKeyName);
             var key = encoded.Base64Decode();
-            _privateKey = new PrivateKeyFile(key.GenerateStreamFromString());
-            return _privateKey;
+            return new PrivateKeyFile(key.GenerateStreamFromString());
         }
     }
 
     public class KfsScrubberOptions
     {
         public string Host { get; set; }
-        public string Username { get; set; }
-        public string PrivateFileName { get; set; }
         public string ScrubberBlobContainer { get; set; }
     }
 }

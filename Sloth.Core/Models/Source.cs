@@ -53,6 +53,12 @@ namespace Sloth.Core.Models
         public string DocumentType { get; set; }
 
         [JsonIgnore]
+        public string KfsFtpUsername { get; set; }
+
+        [JsonIgnore]
+        public string KfsFtpPasswordKeyName { get; set; }
+
+        [JsonIgnore]
         [Required]
         public Team Team { get; set; }
 
