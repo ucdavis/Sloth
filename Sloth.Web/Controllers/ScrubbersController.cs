@@ -30,7 +30,8 @@ namespace Sloth.Web.Controllers
             var scrubber = await DbContext.Scrubbers
                 .Include(s => s.Source)
                     .ThenInclude(s => s.Team)
-                .Include(t => t.Transactions)
+                .Include(s => s.Transactions)
+                    .ThenInclude(t => t.Transfers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
