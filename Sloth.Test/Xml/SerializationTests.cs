@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -57,8 +57,8 @@ namespace Sloth.Test.Xml
             var target = 
                 "<batch xmlns=\"http://www.kuali.org/kfs/gl/collector\">" +
                     "<header></header>" +
-                    "<entry></entry>" +
-                    "<entry></entry>" +
+                    "<glEntry></glEntry>" +
+                    "<glEntry></glEntry>" +
                     "<detail></detail>" +
                     "<entry></entry>" +
                     "<detail></detail>" +
