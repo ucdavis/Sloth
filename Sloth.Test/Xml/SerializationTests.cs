@@ -54,27 +54,18 @@ namespace Sloth.Test.Xml
         [Fact]
         public void TestSimpleDeserialization()
         {
-            var target = 
-                "<batch xmlns=\"http://www.kuali.org/kfs/gl/collector\">" +
-                    "<header></header>" +
-                    "<glEntry></glEntry>" +
-                    "<glEntry></glEntry>" +
-                    "<detail></detail>" +
-                    "<entry></entry>" +
-                    "<detail></detail>" +
-                    "<trailer></trailer>" +
-                "</batch> ";
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
 
-            var ms = new MemoryStream(Encoding.Default.GetBytes(target));
+            var sr = new StreamReader(baseDir + "/Data/sample.xml", Encoding.UTF8);
 
             // act
             var xs = new XmlSerializer(typeof(Batch));
-            var actual = (Batch)xs.Deserialize(ms);
+            var actual = (Batch)xs.Deserialize(sr);
 
             // assert
             Assert.NotNull(actual);
             Assert.NotNull(actual.Header);
-            Assert.Equal(actual.Entries.Count, 3);
+            Assert.Equal(actual.Entries.Count, 13);
             Assert.NotNull(actual.Trailer);
         }
     }
