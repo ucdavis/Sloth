@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Xml;
 using System.Xml.Schema;
@@ -45,7 +45,7 @@ namespace Sloth.Xml
                 {
                     Trailer = DeserializeNode<Trailer>(reader);
                 }
-                else if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals("entry"))
+                else if (reader.NodeType == XmlNodeType.Element && reader.Name.Equals("glEntry"))
                 {
                     var entry = DeserializeNode<EntryWithDetail>(reader);
 
