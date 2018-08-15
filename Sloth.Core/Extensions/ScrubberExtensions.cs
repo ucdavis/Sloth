@@ -45,6 +45,12 @@ namespace Sloth.Core.Extensions
                 }
             };
 
+            // assign sequence numbers
+            for (var i = 0; i < batch.Entries.Count; i++)
+            {
+                batch.Entries[i].SequenceNumber = i + 1;
+            }
+
             var xs = new XmlSerializer(typeof(Batch));
             var xwx = new XmlWriterSettings()
             {
