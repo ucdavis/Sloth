@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Sloth.Core.Models;
 using Sloth.Xml;
 using Sloth.Xml.Types;
@@ -15,51 +13,7 @@ namespace Sloth.Core.Extensions
                 ? transactionDebitCreditCode.C
                 : transactionDebitCreditCode.D;
 
-            var fiscalPeriod = universityFiscalPeriodCode.Item;
-            switch (transfer.FiscalPeriod)
-            {
-                case 1:
-                    fiscalPeriod = universityFiscalPeriodCode.Item01;
-                    break;
-                case 2:
-                    fiscalPeriod = universityFiscalPeriodCode.Item02;
-                    break;
-                case 3:
-                    fiscalPeriod = universityFiscalPeriodCode.Item03;
-                    break;
-                case 4:
-                    fiscalPeriod = universityFiscalPeriodCode.Item04;
-                    break;
-                case 5:
-                    fiscalPeriod = universityFiscalPeriodCode.Item05;
-                    break;
-                case 6:
-                    fiscalPeriod = universityFiscalPeriodCode.Item06;
-                    break;
-                case 7:
-                    fiscalPeriod = universityFiscalPeriodCode.Item07;
-                    break;
-                case 8:
-                    fiscalPeriod = universityFiscalPeriodCode.Item08;
-                    break;
-                case 9:
-                    fiscalPeriod = universityFiscalPeriodCode.Item09;
-                    break;
-                case 10:
-                    fiscalPeriod = universityFiscalPeriodCode.Item10;
-                    break;
-                case 11:
-                    fiscalPeriod = universityFiscalPeriodCode.Item11;
-                    break;
-                case 12:
-                    fiscalPeriod = universityFiscalPeriodCode.Item12;
-                    break;
-                case 13:
-                    fiscalPeriod = universityFiscalPeriodCode.Item13;
-                    break;
-            }
-
-            return new EntryWithDetail()
+            var result = new EntryWithDetail()
             {
                 OriginCode      = transfer.Transaction.OriginCode,
                 Chart           = transfer.Chart,
@@ -67,14 +21,58 @@ namespace Sloth.Core.Extensions
                 SubAccount      = transfer.SubAccount,
                 ObjectCode      = transfer.ObjectCode,
                 SubObjectCode   = transfer.SubObjectCode,
+                DocumentNumber  = transfer.Transaction.DocumentNumber,
                 TrackingNumber  = transfer.Transaction.KfsTrackingNumber,
                 Amount          = transfer.Amount,
                 DebitCredit     = direction,
                 FiscalYear      = transfer.FiscalYear,
-                FiscalPeriod    = fiscalPeriod,
+                SequenceNumber  = transfer.SequenceNumber,
+                Description     = transfer.Description,
                 BalanceType     = financialBalanceTypeCode.AC,
-                TransactionDate = transfer.Transaction.TransactionDate
+                TransactionDate = transfer.Transaction.TransactionDate,
             };
+
+            if (transfer.FiscalPeriod.HasValue)
+            {
+                result.FiscalPeriod = GetFiscalPeriod(transfer.FiscalPeriod.Value);
+            }
+
+            return result;
+        }
+
+        private static universityFiscalPeriodCode GetFiscalPeriod(int fiscalPeriod)
+        {
+            switch (fiscalPeriod)
+            {
+                case 1:
+                    return universityFiscalPeriodCode.Item01;
+                case 2:
+                    return universityFiscalPeriodCode.Item02;
+                case 3:
+                    return universityFiscalPeriodCode.Item03;
+                case 4:
+                    return universityFiscalPeriodCode.Item04;
+                case 5:
+                    return universityFiscalPeriodCode.Item05;
+                case 6:
+                    return universityFiscalPeriodCode.Item06;
+                case 7:
+                    return universityFiscalPeriodCode.Item07;
+                case 8:
+                    return universityFiscalPeriodCode.Item08;
+                case 9:
+                    return universityFiscalPeriodCode.Item09;
+                case 10:
+                    return universityFiscalPeriodCode.Item10;
+                case 11:
+                    return universityFiscalPeriodCode.Item11;
+                case 12:
+                    return universityFiscalPeriodCode.Item12;
+                case 13:
+                    return universityFiscalPeriodCode.Item13;
+            }
+
+            return universityFiscalPeriodCode.Item;
         }
     }
 }

@@ -190,9 +190,6 @@ namespace Sloth.Api.Controllers
                 // create kfs number
                 transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
 
-                // create document number
-                transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
-
                 _context.Transactions.Add(transactionToCreate);
                 await _context.SaveChangesAsync();
                 tran.Commit();

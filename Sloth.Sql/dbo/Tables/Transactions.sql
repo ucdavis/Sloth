@@ -1,7 +1,7 @@
-﻿CREATE TABLE [dbo].[Transactions] (
+CREATE TABLE [dbo].[Transactions] (
     [Id]                      NVARCHAR (450) NOT NULL,
     [CreatorId]               NVARCHAR (450) NULL,
-    [DocumentNumber]          NVARCHAR (14)  NOT NULL,
+    [DocumentNumber]          NVARCHAR (14)  NULL,
     [KfsTrackingNumber]       NVARCHAR (10)  NULL,
     [MerchantTrackingNumber]  NVARCHAR (MAX) NULL,
     [MerchantTrackingUrl]     NVARCHAR (MAX) NULL,

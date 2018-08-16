@@ -1,4 +1,4 @@
-﻿using System.Xml.Serialization;
+using System.Xml.Serialization;
 
 namespace Sloth.Xml
 {
@@ -7,7 +7,7 @@ namespace Sloth.Xml
     [XmlRoot("balanceType", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
     public enum financialBalanceTypeCode {
         
-        /// <remarks/>
+        /// <remarks>Actuals</remarks>
         AC,
         
         /// <remarks/>

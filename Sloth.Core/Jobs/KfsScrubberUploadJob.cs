@@ -49,6 +49,19 @@ namespace Sloth.Core.Jobs
 
                     var originCode = source.OriginCode;
 
+                    // assign document numbers
+                    groupedTransactions.ForEach(async t =>
+                    {
+                        t.DocumentNumber = await _context.GetNextDocumentNumber();
+                    });
+
+                    // assign sequence numbers
+                    var transfers = groupedTransactions.SelectMany(t => t.Transfers).ToList();
+                    for (var i = 0; i < transfers.Count; i++)
+                    {
+                        transfers[i].SequenceNumber = i + 1;
+                    }
+
                     // create scrubber
                     log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
                     var scrubber = new Scrubber()
@@ -78,9 +91,10 @@ namespace Sloth.Core.Jobs
                     {
                         t.Status = TransactionStatuses.Completed;
                     });
+
+                    // save per scrubber
+                    await _context.SaveChangesAsync();
                 }
-                
-                await _context.SaveChangesAsync();
             }
             catch (Exception ex)
             {

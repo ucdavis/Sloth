@@ -18,9 +18,12 @@ namespace Sloth.Xml
         /// If the fiscal year/period combination referenced on lines in the file is not open for posting,
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>
-        [Range(1, 12)]
+        [Range(2017, 2099)]
         [XmlElement("fiscalYear", DataType = "int")]
-        public int FiscalYear { get; set; }
+        public int? FiscalYear { get; set; }
+
+        [XmlIgnore]
+        public bool FiscalYearSpecified => FiscalYear.HasValue;
 
         /// <summary>
         /// Chart Code associated with transaction.
@@ -96,11 +99,11 @@ namespace Sloth.Xml
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>
         [XmlElement("fiscalPeriod")]
-        public universityFiscalPeriodCode FiscalPeriod { get; set; }
+        public universityFiscalPeriodCode? FiscalPeriod { get; set; }
 
         /// <remarks/>
         [XmlIgnore()]
-        public bool FiscalPeriodSpecified { get; set; }
+        public bool FiscalPeriodSpecified => FiscalPeriod.HasValue;
 
         /// <summary>
         /// Financial System document type associated with the feed.
@@ -138,7 +141,10 @@ namespace Sloth.Xml
         /// </summary>
         [Range(1, 99999)]
         [XmlElement("sequenceNum", DataType = "int")]
-        public int SequenceNumber { get; set; }
+        public int? SequenceNumber { get; set; }
+
+        [XmlIgnore]
+        public bool  SequenceNumberSpecified => SequenceNumber.HasValue;
 
         /// <summary>
         /// A brief description of the specific transaction. Displays in reporting.
@@ -204,11 +210,11 @@ namespace Sloth.Xml
         /// Usage is not recommended unless reversing transactions from prior feed.
         /// </summary>
         [XmlElement("refDocType")]
-        public financialDocumentTypeCode RefDocType { get; set; }
+        public financialDocumentTypeCode? RefDocType { get; set; }
 
         /// <remarks/>
         [XmlIgnore()]
-        public bool RefDocTypeSpecified { get; set; }
+        public bool RefDocTypeSpecified => RefDocType.HasValue;
 
         /// <summary>
         /// Reference Origination Code.
@@ -233,20 +239,20 @@ namespace Sloth.Xml
         /// For Accounting & Financial Services use only.
         /// </summary>
         [XmlElement("reveralDate", DataType = "date")]
-        public DateTime ReversalDate { get; set; }
+        public DateTime? ReversalDate { get; set; }
 
         /// <remarks/>
         [XmlIgnore()]
-        public bool ReversalDateSpecified { get; set; }
+        public bool ReversalDateSpecified => ReversalDate.HasValue;
 
         /// <summary>
         /// For Accounting & Financial Services use only.
         /// </summary>
         [XmlElement("encumbCode")]
-        public transactionEncumbranceUpdateCode EncumbCode { get; set; }
+        public transactionEncumbranceUpdateCode? EncumbCode { get; set; }
 
         /// <remarks/>
         [XmlIgnore()]
-        public bool EncumbCodeSpecified { get; set; }
+        public bool EncumbCodeSpecified => EncumbCode.HasValue;
     }
 }
