@@ -75,7 +75,7 @@ namespace Sloth.Core.Models
         /// The system will auto-assign if not provided.
         /// </summary>
         [Range(1, 99999)]
-        public int SequenceNumber { get; set; }
+        public int? SequenceNumber { get; set; }
 
         /// <summary>
         /// A brief description of the specific transaction. Displays in reporting.
@@ -97,9 +97,8 @@ namespace Sloth.Core.Models
         /// Entries will default during general ledger processing based on run date.
         /// </summary>
         [Range(2017, 2099)]
-        [Required]
         [Display(Name = "Fiscal Year")]
-        public int FiscalYear { get; set; }
+        public int? FiscalYear { get; set; }
 
         /// <summary>
         /// Fiscal Year in which the feed will post to the General Ledger.
@@ -111,9 +110,8 @@ namespace Sloth.Core.Models
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>
         [Range(1, 12)]
-        [Required]
         [Display(Name = "Fiscal Period")]
-        public int FiscalPeriod { get; set; }
+        public int? FiscalPeriod { get; set; }
 
         /// <summary>
         /// Project is an optional accounting unit attribute that allows assignment of an identifier
