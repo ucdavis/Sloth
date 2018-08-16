@@ -69,7 +69,6 @@ namespace Sloth.Core.Models
         [MinLength(1)]
         [MaxLength(14)]
         [RegularExpression("[A-Z0-9]*")]
-        [Required]
         [DisplayName("Document Number")]
         public string DocumentNumber { get; set; }
 
