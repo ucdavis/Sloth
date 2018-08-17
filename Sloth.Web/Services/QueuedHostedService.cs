@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -23,8 +24,7 @@ namespace Sloth.Web.Services
 
         private IBackgroundTaskQueue TaskQueue { get; }
 
-        protected async override Task ExecuteAsync(
-            CancellationToken cancellationToken)
+        protected async override Task ExecuteAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Queued Hosted Service is starting.");
 
@@ -34,7 +34,10 @@ namespace Sloth.Web.Services
 
                 try
                 {
-                    await workItem(cancellationToken);
+                    using (var scope = _serviceProvider.CreateScope())
+                    {
+                        await workItem(cancellationToken, scope.ServiceProvider);
+                    }
                 }
                 catch (Exception ex)
                 {
