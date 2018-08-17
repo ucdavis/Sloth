@@ -18,6 +18,7 @@ using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Web.Logging;
 using Sloth.Web.Models;
+using Sloth.Web.Services;
 using StackifyLib;
 
 namespace Sloth.Web
@@ -65,6 +66,8 @@ namespace Sloth.Web
             services.AddSingleton<IStorageService, StorageService>();
 
             // add jobs services
+            services.AddHostedService<QueuedHostedService>();
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
             services.AddScoped<CybersourceBankReconcileJob>();
             services.AddScoped<KfsScrubberUploadJob>();
 
