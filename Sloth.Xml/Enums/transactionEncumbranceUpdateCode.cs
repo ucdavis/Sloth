@@ -1,11 +1,11 @@
-﻿using System.Xml.Serialization;
+using System.Xml.Serialization;
 
 namespace Sloth.Xml
 {
     /// <remarks/>
     [XmlType("transactionEncumbranceUpdateCode", Namespace="http://www.kuali.org/kfs/gl/collector")]
     [XmlRoot("encumbCode", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
-    public enum transactionEncumbranceUpdateCode {
+    public enum TransactionEncumbranceUpdateCode {
         
         /// <remarks/>
         R,
@@ -15,6 +15,6 @@ namespace Sloth.Xml
         
         /// <remarks/>
         [XmlEnum(" ")]
-        Item,
+        None,
     }
 }

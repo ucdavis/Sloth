@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+using System;
+using System.Xml.Serialization;
 
 namespace Sloth.Xml
 {
@@ -9,66 +10,66 @@ namespace Sloth.Xml
     {
         /// <remarks/>
         [XmlElement("fiscalPeriod")]
-        public universityFiscalPeriodCode fiscalPeriod { get; set; }
+        public UniversityFiscalPeriodCode FiscalPeriod { get; set; }
 
         /// <remarks/>
         [XmlElement("fiscalYear", DataType = "integer")]
-        public string fiscalYear { get; set; }
+        public string FiscalYear { get; set; }
 
         /// <remarks/>
         [XmlElement("createDate", DataType = "date")]
-        public System.DateTime createDate { get; set; }
+        public DateTime CreateDate { get; set; }
 
         /// <remarks/>
         [XmlElement("chart", DataType = "normalizedString")]
-        public string chart { get; set; }
+        public string Chart { get; set; }
 
         /// <remarks/>
         [XmlElement("account", DataType = "normalizedString")]
-        public string account { get; set; }
+        public string Account { get; set; }
 
         /// <remarks/>
         [XmlElement("subAccount", DataType = "normalizedString")]
-        public string subAccount { get; set; }
+        public string SubAccount { get; set; }
 
         /// <remarks/>
         [XmlElement("object", DataType = "normalizedString")]
-        public string objectCode { get; set; }
+        public string ObjectCode { get; set; }
 
         /// <remarks/>
         [XmlElement("subObject", DataType = "normalizedString")]
-        public string subObject { get; set; }
+        public string SubObject { get; set; }
 
         /// <remarks/>
         [XmlElement("balanceType")]
-        public financialBalanceTypeCode balanceType { get; set; }
+        public FinancialBalanceTypeCode BalanceType { get; set; }
 
         /// <remarks/>
         [XmlElement("objectType", DataType = "normalizedString")]
-        public string objectType { get; set; }
+        public string ObjectType { get; set; }
 
         /// <remarks/>
         [XmlElement("detailSequenceNum", DataType = "normalizedString")]
-        public string detailSequenceNum { get; set; }
+        public string DetailSequenceNumber { get; set; }
 
         /// <remarks/>
         [XmlElement("originCode", DataType = "normalizedString")]
-        public string originCode { get; set; }
+        public string OriginCode { get; set; }
 
         /// <remarks/>
         [XmlElement("docType")]
-        public financialDocumentTypeCode docType { get; set; }
+        public FinancialDocumentTypeCode DocType { get; set; }
 
         /// <remarks/>
         [XmlElement("docNum")]
-        public string docNum { get; set; }
+        public string DocNum { get; set; }
 
         /// <remarks/>
         [XmlElement("amount")]
-        public decimal amount { get; set; }
+        public decimal Amount { get; set; }
 
         /// <remarks/>
         [XmlElement("detailDescription", DataType = "normalizedString")]
-        public string detailDescription { get; set; }
+        public string DetailDescription { get; set; }
     }
 }

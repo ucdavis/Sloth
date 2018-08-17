@@ -13,7 +13,7 @@ namespace Sloth.Xml
     {
         public Batch()
         {
-            Entries = new List<EntryWithDetail>();
+            Entries = new List<Entry>();
         }
 
         /// <remarks/>
@@ -22,7 +22,7 @@ namespace Sloth.Xml
 
 
         /// <remarks/>
-        public List<EntryWithDetail> Entries { get; set; }
+        public List<Entry> Entries { get; set; }
 
         /// <remarks/>
         [Required]
@@ -71,9 +71,9 @@ namespace Sloth.Xml
             foreach (var entry in Entries)
             {
                 SerializeNode(writer, entry);
-                if (entry.Detail != null)
+                if (entry is EntryWithDetail entryWithDetail && entryWithDetail.Detail != null)
                 {
-                    SerializeNode(writer, entry.Detail);
+                    SerializeNode(writer, entryWithDetail.Detail);
                 }
             }
 

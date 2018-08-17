@@ -29,7 +29,7 @@ namespace Sloth.Core.Extensions
                     BatchDate           = scrubber.BatchDate,
                     BatchSequenceNumber = scrubber.BatchSequenceNumber,
                     Chart               = source.Chart,
-                    CampusCode          = campusCode.DV,
+                    CampusCode          = CampusCode.DV,
                     OrganizationCode    = source.OrganizationCode,
                     ContactUserId       = source.Team.KfsContactUserId,
                     ContactEmail        = source.Team.KfsContactEmail,
