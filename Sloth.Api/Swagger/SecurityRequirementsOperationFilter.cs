@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using Microsoft.Extensions.Options;
@@ -20,35 +21,45 @@ namespace Sloth.Api.Swagger
 
         public void Apply(Operation operation, OperationFilterContext context)
         {
-            var controllerPolicies = context.ApiDescription.ControllerAttributes()
+            // Policy names map to scopes
+            var requiredScopes = context.MethodInfo
+                .GetCustomAttributes(true)
                 .OfType<AuthorizeAttribute>()
-                .Select(attr => attr.Policy);
-
-            var actionPolicies = context.ApiDescription.ActionAttributes()
-                .OfType<AuthorizeAttribute>()
-                .Select(attr => attr.Policy);
-
-            var policies = controllerPolicies.Union(actionPolicies).Distinct();
-
-            var requiredClaimTypes = policies
-                .Select(x => _authorizationOptions.Value.GetPolicy(x))
-                .SelectMany(x => x.Requirements)
-                .OfType<ClaimsAuthorizationRequirement>()
-                .Select(x => x.ClaimType)
+                .Select(attr => attr.Policy)
+                .Distinct()
                 .ToList();
 
-            if (!requiredClaimTypes.Any()) return;
+            if (!requiredScopes.Any()) return;
 
             operation.Responses.Add("401", new Response { Description = "Unauthorized" });
             operation.Responses.Add("403", new Response { Description = "Forbidden" });
 
-            operation.Security = new List<IDictionary<string, IEnumerable<string>>>
+            operation.Security = new List<IDictionary<string, IEnumerable<string>>>();
+            operation.Security.Add(new Dictionary<string, IEnumerable<string>>
             {
-                new Dictionary<string, IEnumerable<string>>
-                {
-                    { "apiKey", requiredClaimTypes }
-                }
-            };
+                { "apiKey", requiredScopes }
+            });
+
+
+            //var requiredClaimTypes = requiredScopes
+            //    .Select(x => _authorizationOptions.Value.GetPolicy(x))
+            //    .SelectMany(x => x.Requirements)
+            //    .OfType<ClaimsAuthorizationRequirement>()
+            //    .Select(x => x.ClaimType)
+            //    .ToList();
+
+            //if (!requiredClaimTypes.Any()) return;
+
+            //operation.Responses.Add("401", new Response { Description = "Unauthorized" });
+            //operation.Responses.Add("403", new Response { Description = "Forbidden" });
+
+            //operation.Security = new List<IDictionary<string, IEnumerable<string>>>
+            //{
+            //    new Dictionary<string, IEnumerable<string>>
+            //    {
+            //        { "apiKey", requiredClaimTypes }
+            //    }
+            //};
         }
     }
 
