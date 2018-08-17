@@ -1,12 +1,14 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
+using Sloth.Xml.Types;
 
 namespace Sloth.Xml
 {
     /// <remarks/>
     [XmlRoot("glEntry", Namespace = KfsNamespace, IsNullable = false)]
     [XmlType("glEntryType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
+    [XmlInclude(typeof(EntryWithDetail))]
     public class Entry : KfsXmlElement
     {
         /// <summary>
@@ -78,7 +80,7 @@ namespace Sloth.Xml
         /// Feed system will be authorized for specific Balance Types; typically only AC(actuals).
         /// </summary>
         [XmlElement("balanceType")]
-        public financialBalanceTypeCode BalanceType { get; set; }
+        public FinancialBalanceTypeCode BalanceType { get; set; }
 
         /// <summary>
         /// Object Type defines the general use of an object code; such as income, asset, expense, or liability.
@@ -99,7 +101,7 @@ namespace Sloth.Xml
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>
         [XmlElement("fiscalPeriod")]
-        public universityFiscalPeriodCode? FiscalPeriod { get; set; }
+        public UniversityFiscalPeriodCode? FiscalPeriod { get; set; }
 
         /// <remarks/>
         [XmlIgnore()]
@@ -111,7 +113,7 @@ namespace Sloth.Xml
         /// </summary>
         [Required]
         [XmlElement("docType")]
-        public financialDocumentTypeCode DocType { get; set; }
+        public FinancialDocumentTypeCode DocType { get; set; }
 
         /// <summary>
         /// Unique feed origination identifier given to the Feed System.
@@ -168,7 +170,7 @@ namespace Sloth.Xml
         /// </summary>
         [Required]
         [XmlElement("debitCredit")]
-        public transactionDebitCreditCode DebitCredit { get; set; }
+        public TransactionDebitCreditCode DebitCredit { get; set; }
 
         /// <summary>
         /// Date the transaction occurred.
@@ -210,7 +212,7 @@ namespace Sloth.Xml
         /// Usage is not recommended unless reversing transactions from prior feed.
         /// </summary>
         [XmlElement("refDocType")]
-        public financialDocumentTypeCode? RefDocType { get; set; }
+        public FinancialDocumentTypeCode? RefDocType { get; set; }
 
         /// <remarks/>
         [XmlIgnore()]
@@ -249,7 +251,7 @@ namespace Sloth.Xml
         /// For Accounting & Financial Services use only.
         /// </summary>
         [XmlElement("encumbCode")]
-        public transactionEncumbranceUpdateCode? EncumbCode { get; set; }
+        public TransactionEncumbranceUpdateCode? EncumbCode { get; set; }
 
         /// <remarks/>
         [XmlIgnore()]

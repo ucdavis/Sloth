@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
 
@@ -64,7 +64,7 @@ namespace Sloth.Xml
         [MaxLength(2)]
         [Required]
         [XmlElement("campusCode")]
-        public campusCode CampusCode { get; set; }
+        public CampusCode CampusCode { get; set; }
 
         /// <summary>
         /// Contact number for personnel/unit responsible for feed.

@@ -7,13 +7,13 @@ namespace Sloth.Core.Extensions
 {
     public static class TransferExtensions
     {
-        public static EntryWithDetail ToEntry(this Transfer transfer)
+        public static Entry ToEntry(this Transfer transfer)
         {
             var direction = transfer.Direction == Transfer.CreditDebit.Credit
-                ? transactionDebitCreditCode.C
-                : transactionDebitCreditCode.D;
+                ? TransactionDebitCreditCode.Credit
+                : TransactionDebitCreditCode.Debit;
 
-            var result = new EntryWithDetail()
+            var result = new Entry()
             {
                 OriginCode      = transfer.Transaction.OriginCode,
                 Chart           = transfer.Chart,
@@ -28,7 +28,7 @@ namespace Sloth.Core.Extensions
                 FiscalYear      = transfer.FiscalYear,
                 SequenceNumber  = transfer.SequenceNumber,
                 Description     = transfer.Description,
-                BalanceType     = financialBalanceTypeCode.AC,
+                BalanceType     = FinancialBalanceTypeCode.AC,
                 TransactionDate = transfer.Transaction.TransactionDate,
             };
 
@@ -40,39 +40,39 @@ namespace Sloth.Core.Extensions
             return result;
         }
 
-        private static universityFiscalPeriodCode GetFiscalPeriod(int fiscalPeriod)
+        private static UniversityFiscalPeriodCode GetFiscalPeriod(int fiscalPeriod)
         {
             switch (fiscalPeriod)
             {
                 case 1:
-                    return universityFiscalPeriodCode.Item01;
+                    return UniversityFiscalPeriodCode.Period01;
                 case 2:
-                    return universityFiscalPeriodCode.Item02;
+                    return UniversityFiscalPeriodCode.Period02;
                 case 3:
-                    return universityFiscalPeriodCode.Item03;
+                    return UniversityFiscalPeriodCode.Period03;
                 case 4:
-                    return universityFiscalPeriodCode.Item04;
+                    return UniversityFiscalPeriodCode.Period04;
                 case 5:
-                    return universityFiscalPeriodCode.Item05;
+                    return UniversityFiscalPeriodCode.Period05;
                 case 6:
-                    return universityFiscalPeriodCode.Item06;
+                    return UniversityFiscalPeriodCode.Period06;
                 case 7:
-                    return universityFiscalPeriodCode.Item07;
+                    return UniversityFiscalPeriodCode.Period07;
                 case 8:
-                    return universityFiscalPeriodCode.Item08;
+                    return UniversityFiscalPeriodCode.Period08;
                 case 9:
-                    return universityFiscalPeriodCode.Item09;
+                    return UniversityFiscalPeriodCode.Period09;
                 case 10:
-                    return universityFiscalPeriodCode.Item10;
+                    return UniversityFiscalPeriodCode.Period10;
                 case 11:
-                    return universityFiscalPeriodCode.Item11;
+                    return UniversityFiscalPeriodCode.Period11;
                 case 12:
-                    return universityFiscalPeriodCode.Item12;
+                    return UniversityFiscalPeriodCode.Period12;
                 case 13:
-                    return universityFiscalPeriodCode.Item13;
+                    return UniversityFiscalPeriodCode.Period13;
             }
 
-            return universityFiscalPeriodCode.Item;
+            return UniversityFiscalPeriodCode.None;
         }
     }
 }

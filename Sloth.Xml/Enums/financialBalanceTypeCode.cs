@@ -5,7 +5,7 @@ namespace Sloth.Xml
     /// <remarks/>
     [XmlType("financialBalanceTypeCode", Namespace="http://www.kuali.org/kfs/gl/collector")]
     [XmlRoot("balanceType", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
-    public enum financialBalanceTypeCode {
+    public enum FinancialBalanceTypeCode {
         
         /// <remarks>Actuals</remarks>
         AC,

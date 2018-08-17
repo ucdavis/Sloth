@@ -1,66 +1,66 @@
-﻿using System.Xml.Serialization;
+using System.Xml.Serialization;
 
 namespace Sloth.Xml
 {
     /// <remarks/>
     [XmlType("universityFisccalPeriodCode", Namespace="http://www.kuali.org/kfs/gl/collector")]
     [XmlRoot("fiscalPeriod", Namespace="http://www.kuali.org/kfs/gl/collector", IsNullable=false)]
-    public enum universityFiscalPeriodCode {
+    public enum UniversityFiscalPeriodCode {
         
         /// <remarks/>
         [XmlEnum("")]
-        Item,
+        None,
         
         /// <remarks/>
         [XmlEnum("01")]
-        Item01,
+        Period01,
         
         /// <remarks/>
         [XmlEnum("02")]
-        Item02,
+        Period02,
         
         /// <remarks/>
         [XmlEnum("03")]
-        Item03,
+        Period03,
         
         /// <remarks/>
         [XmlEnum("04")]
-        Item04,
+        Period04,
         
         /// <remarks/>
         [XmlEnum("05")]
-        Item05,
+        Period05,
         
         /// <remarks/>
         [XmlEnum("06")]
-        Item06,
+        Period06,
         
         /// <remarks/>
         [XmlEnum("07")]
-        Item07,
+        Period07,
         
         /// <remarks/>
         [XmlEnum("08")]
-        Item08,
+        Period08,
         
         /// <remarks/>
         [XmlEnum("09")]
-        Item09,
+        Period09,
         
         /// <remarks/>
         [XmlEnum("10")]
-        Item10,
+        Period10,
         
         /// <remarks/>
         [XmlEnum("11")]
-        Item11,
+        Period11,
         
         /// <remarks/>
         [XmlEnum("12")]
-        Item12,
+        Period12,
         
         /// <remarks/>
         [XmlEnum("13")]
-        Item13,
+        Period13,
     }
 }
