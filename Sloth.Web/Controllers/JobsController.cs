@@ -20,13 +20,11 @@ namespace Sloth.Web.Controllers
     {
         private readonly SlothDbContext _dbContext;
         private readonly IBackgroundTaskQueue _queue;
-        private readonly IServiceProvider _serviceProvider;
 
-        public JobsController(SlothDbContext dbContext, IBackgroundTaskQueue queue, IServiceProvider serviceProvider)
+        public JobsController(SlothDbContext dbContext, IBackgroundTaskQueue queue)
         {
             _dbContext = dbContext;
             _queue = queue;
-            _serviceProvider = serviceProvider;
         }
 
         public IActionResult Index()
@@ -104,34 +102,31 @@ namespace Sloth.Web.Controllers
             await _dbContext.SaveChangesAsync();
 
             // build task and queue
-            _queue.QueueBackgroundWorkItem(async (token) =>
+            _queue.QueueBackgroundWorkItem(async (token, serviceProvider) =>
             {
-                using (var scope = _serviceProvider.CreateScope())
+                var dbContext = serviceProvider.GetRequiredService<SlothDbContext>();
+                var kfsScrubberUploadJob = serviceProvider.GetRequiredService<KfsScrubberUploadJob>();
+
+                // find job record
+                var scopedRecord = await dbContext.KfsScrubberUploadJobRecords.FindAsync(record.Id);
+
+                // build custom logger
+                var log = LoggingConfiguration.GetJobConfiguration()
+                    .CreateLogger()
+                    .ForContext("jobname", scopedRecord.Name)
+                    .ForContext("jobid", scopedRecord.Id);
+
+                try
                 {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<SlothDbContext>();
-                    var kfsScrubberUploadJob = scope.ServiceProvider.GetRequiredService<KfsScrubberUploadJob>();
-
-                    // find job record
-                    var scopedRecord = await dbContext.KfsScrubberUploadJobRecords.FindAsync(record.Id);
-
-                    // build custom logger
-                    var log = LoggingConfiguration.GetJobConfiguration()
-                        .CreateLogger()
-                        .ForContext("jobname", scopedRecord.Name)
-                        .ForContext("jobid", scopedRecord.Id);
-
-                    try
-                    {
-                        // schedule methods
-                        log.Information("Starting Job");
-                        await kfsScrubberUploadJob.UploadScrubber(log);
-                    }
-                    finally
-                    {
-                        // record status
-                        scopedRecord.Status = "Finished";
-                        await dbContext.SaveChangesAsync(token);
-                    }
+                    // schedule methods
+                    log.Information("Starting Job");
+                    await kfsScrubberUploadJob.UploadScrubber(log);
+                }
+                finally
+                {
+                    // record status
+                    scopedRecord.Status = "Finished";
+                    await dbContext.SaveChangesAsync(token);
                 }
             });
 
@@ -209,34 +204,31 @@ namespace Sloth.Web.Controllers
             await _dbContext.SaveChangesAsync();
 
             // build task and queue
-            _queue.QueueBackgroundWorkItem(async (token) =>
+            _queue.QueueBackgroundWorkItem(async (token, serviceProvider) =>
             {
-                using (var scope = _serviceProvider.CreateScope())
+                var dbContext = serviceProvider.GetRequiredService<SlothDbContext>();
+                var cybersourceBankReconcileJob = serviceProvider.GetRequiredService<CybersourceBankReconcileJob>();
+
+                // find job record
+                var scopedRecord = await dbContext.CybersourceBankReconcileJobRecords.FindAsync(record.Id);
+
+                // build custom logger
+                var log = LoggingConfiguration.GetJobConfiguration()
+                    .CreateLogger()
+                    .ForContext("jobname", scopedRecord.Name)
+                    .ForContext("jobid", scopedRecord.Id);
+
+                try
                 {
-                    var dbContext = scope.ServiceProvider.GetRequiredService<SlothDbContext>();
-                    var cybersourceBankReconcileJob = scope.ServiceProvider.GetRequiredService<CybersourceBankReconcileJob>();
-
-                    // find job record
-                    var scopedRecord = await dbContext.CybersourceBankReconcileJobRecords.FindAsync(record.Id);
-
-                    // build custom logger
-                    var log = LoggingConfiguration.GetJobConfiguration()
-                        .CreateLogger()
-                        .ForContext("jobname", scopedRecord.Name)
-                        .ForContext("jobid", scopedRecord.Id);
-
-                    try
-                    {
-                        // call methods
-                        log.Information("Starting Job");
-                        await cybersourceBankReconcileJob.ProcessReconcile(log, date);
-                    }
-                    finally
-                    {
-                        // record status
-                        scopedRecord.Status = "Finished";
-                        await dbContext.SaveChangesAsync(token);
-                    }
+                    // call methods
+                    log.Information("Starting Job");
+                    await cybersourceBankReconcileJob.ProcessReconcile(log, date);
+                }
+                finally
+                {
+                    // record status
+                    scopedRecord.Status = "Finished";
+                    await dbContext.SaveChangesAsync(token);
                 }
             });
 
