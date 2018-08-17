@@ -1,12 +1,14 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Xml.Serialization;
+using Sloth.Xml.Types;
 
 namespace Sloth.Xml
 {
     /// <remarks/>
     [XmlRoot("glEntry", Namespace = KfsNamespace, IsNullable = false)]
     [XmlType("glEntryType", Namespace = "http://www.kuali.org/kfs/gl/collector")]
+    [XmlInclude(typeof(EntryWithDetail))]
     public class Entry : KfsXmlElement
     {
         /// <summary>
