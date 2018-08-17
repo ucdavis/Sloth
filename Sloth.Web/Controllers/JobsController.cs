@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Sloth.Core;
 using Sloth.Core.Jobs;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Web.Logging;
+using Sloth.Web.Services;
 
 namespace Sloth.Web.Controllers
 {
@@ -17,14 +19,14 @@ namespace Sloth.Web.Controllers
     public class JobsController : Controller
     {
         private readonly SlothDbContext _dbContext;
-        private readonly CybersourceBankReconcileJob _cybersourceBankReconcileJob;
-        private readonly KfsScrubberUploadJob _kfsScrubberUploadJob;
+        private readonly IBackgroundTaskQueue _queue;
+        private readonly IServiceProvider _serviceProvider;
 
-        public JobsController(SlothDbContext dbContext, CybersourceBankReconcileJob cybersourceBankReconcileJob, KfsScrubberUploadJob kfsScrubberUploadJob)
+        public JobsController(SlothDbContext dbContext, IBackgroundTaskQueue queue, IServiceProvider serviceProvider)
         {
             _dbContext = dbContext;
-            _cybersourceBankReconcileJob = cybersourceBankReconcileJob;
-            _kfsScrubberUploadJob = kfsScrubberUploadJob;
+            _queue = queue;
+            _serviceProvider = serviceProvider;
         }
 
         public IActionResult Index()
@@ -91,36 +93,49 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> RunKfsScrubberUpload()
         {
             // log run
-            var jobRecord = new KfsScrubberUploadJobRecord()
+            var record = new KfsScrubberUploadJobRecord()
             {
                 Id = Guid.NewGuid().ToString(),
                 Name = KfsScrubberUploadJob.JobName,
                 RanOn = DateTime.UtcNow,
                 Status = "Running",
             };
-            _dbContext.KfsScrubberUploadJobRecords.Add(jobRecord);
+            _dbContext.KfsScrubberUploadJobRecords.Add(record);
             await _dbContext.SaveChangesAsync();
 
-            // build custom logger
-            var log = LoggingConfiguration.GetJobConfiguration()
-                .CreateLogger()
-                .ForContext("jobname", jobRecord.Name)
-                .ForContext("jobid", jobRecord.Id);
-
-            try
+            // build task and queue
+            _queue.QueueBackgroundWorkItem(async (token) =>
             {
-                // call methods
-                log.Information("Starting Job");
-                await _kfsScrubberUploadJob.UploadScrubber(log);
-            }
-            finally
-            {
-                // record status
-                jobRecord.Status = "Finished";
-                await _dbContext.SaveChangesAsync();
-            }
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<SlothDbContext>();
+                    var kfsScrubberUploadJob = scope.ServiceProvider.GetRequiredService<KfsScrubberUploadJob>();
 
-            return RedirectToAction(nameof(KfsScrubberUploadDetails), new { id = jobRecord.Id });
+                    // find job record
+                    var scopedRecord = await dbContext.KfsScrubberUploadJobRecords.FindAsync(record.Id);
+
+                    // build custom logger
+                    var log = LoggingConfiguration.GetJobConfiguration()
+                        .CreateLogger()
+                        .ForContext("jobname", scopedRecord.Name)
+                        .ForContext("jobid", scopedRecord.Id);
+
+                    try
+                    {
+                        // schedule methods
+                        log.Information("Starting Job");
+                        await kfsScrubberUploadJob.UploadScrubber(log);
+                    }
+                    finally
+                    {
+                        // record status
+                        scopedRecord.Status = "Finished";
+                        await dbContext.SaveChangesAsync(token);
+                    }
+                }
+            });
+
+            return RedirectToAction(nameof(KfsScrubberUploadDetails), new { id = record.Id });
         }
 
         public async Task<IActionResult> CybersourceBankReconcile()
@@ -182,7 +197,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> RunCybersourceBankReconcile(DateTime date)
         {
             // log run
-            var jobRecord = new CybersourceBankReconcileJobRecord()
+            var record = new CybersourceBankReconcileJobRecord()
             {
                 Id            = Guid.NewGuid().ToString(),
                 Name          = CybersourceBankReconcileJob.JobName,
@@ -190,29 +205,42 @@ namespace Sloth.Web.Controllers
                 Status        = "Running",
                 ProcessedDate = date,
             };
-            _dbContext.CybersourceBankReconcileJobRecords.Add(jobRecord);
+            _dbContext.CybersourceBankReconcileJobRecords.Add(record);
             await _dbContext.SaveChangesAsync();
 
-            // build custom logger
-            var log = LoggingConfiguration.GetJobConfiguration()
-                .CreateLogger()
-                .ForContext("jobname", jobRecord.Name)
-                .ForContext("jobid", jobRecord.Id);
-
-            try
+            // build task and queue
+            _queue.QueueBackgroundWorkItem(async (token) =>
             {
-                // call methods
-                log.Information("Starting Job");
-                await _cybersourceBankReconcileJob.ProcessReconcile(log, date);
-            }
-            finally
-            {
-                // record status
-                jobRecord.Status = "Finished";
-                await _dbContext.SaveChangesAsync();
-            }
+                using (var scope = _serviceProvider.CreateScope())
+                {
+                    var dbContext = scope.ServiceProvider.GetRequiredService<SlothDbContext>();
+                    var cybersourceBankReconcileJob = scope.ServiceProvider.GetRequiredService<CybersourceBankReconcileJob>();
 
-            return RedirectToAction(nameof(CybersourceBankReconcileDetails), new { id = jobRecord.Id });
+                    // find job record
+                    var scopedRecord = await dbContext.CybersourceBankReconcileJobRecords.FindAsync(record.Id);
+
+                    // build custom logger
+                    var log = LoggingConfiguration.GetJobConfiguration()
+                        .CreateLogger()
+                        .ForContext("jobname", scopedRecord.Name)
+                        .ForContext("jobid", scopedRecord.Id);
+
+                    try
+                    {
+                        // call methods
+                        log.Information("Starting Job");
+                        await cybersourceBankReconcileJob.ProcessReconcile(log, date);
+                    }
+                    finally
+                    {
+                        // record status
+                        scopedRecord.Status = "Finished";
+                        await dbContext.SaveChangesAsync(token);
+                    }
+                }
+            });
+
+            return RedirectToAction(nameof(CybersourceBankReconcileDetails), new { id = record.Id });
         }
     }
 }
