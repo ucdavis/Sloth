@@ -16,6 +16,8 @@ namespace Sloth.Core.Models
 
         public string Id { get; set; }
 
+        public string Description { get; set; }
+
         [JsonIgnore]
         public User Creator { get; set; }
 
