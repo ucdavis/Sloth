@@ -105,6 +105,13 @@ namespace Sloth.Core
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.HasSequence("Document_Number_Seq")
+                .StartsAt(1)
+                .HasMin(1)
+                .HasMax(999_999_999)
+                .IncrementsBy(1)
+                .IsCyclic();
+
             modelBuilder.HasSequence("KFS_Tracking_Number_Seq")
                 .StartsAt(1)
                 .HasMin(1)
