@@ -1,7 +1,6 @@
 using System;
 using Sloth.Core.Models;
 using Sloth.Xml;
-using Sloth.Xml.Types;
 
 namespace Sloth.Core.Extensions
 {
@@ -33,9 +32,20 @@ namespace Sloth.Core.Extensions
                 TransactionDate = transfer.Transaction.TransactionDate,
             };
 
+            // is nullable
             if (transfer.FiscalPeriod.HasValue)
             {
                 result.FiscalPeriod = GetFiscalPeriod(transfer.FiscalPeriod.Value);
+            }
+
+            // look for reversal info
+            if (transfer.Transaction.IsReversal)
+            {
+                // get ref transaction
+                var refDocument = transfer.Transaction.ReversalOfTransaction;
+                result.RefDocType    = GetDocumentType(refDocument.DocumentType);
+                result.RefDocNum     = refDocument.DocumentNumber;
+                result.RefOriginCode = refDocument.OriginCode;
             }
 
             return result;
