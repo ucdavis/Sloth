@@ -29,6 +29,7 @@ namespace Sloth.Core.Extensions
                 SequenceNumber  = transfer.SequenceNumber,
                 Description     = transfer.Description,
                 BalanceType     = FinancialBalanceTypeCode.AC,
+                DocType         = GetDocumentType(transfer.Transaction.DocumentType),
                 TransactionDate = transfer.Transaction.TransactionDate,
             };
 
@@ -38,6 +39,26 @@ namespace Sloth.Core.Extensions
             }
 
             return result;
+        }
+
+        private static FinancialDocumentTypeCode GetDocumentType(string docType)
+        {
+            if (string.IsNullOrWhiteSpace(docType))
+            {
+                throw new ArgumentNullException(nameof(docType));
+            }
+
+            if (string.Equals("GLIB", docType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return FinancialDocumentTypeCode.GLIB;
+            }
+
+            if (string.Equals("GLJV", docType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                return FinancialDocumentTypeCode.GLJV;
+            }
+
+            throw new ArgumentException($"Unsupported DocType: {docType}", nameof(docType));
         }
 
         private static UniversityFiscalPeriodCode GetFiscalPeriod(int fiscalPeriod)
