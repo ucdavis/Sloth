@@ -99,5 +99,12 @@ namespace Sloth.Core.Models
 
         [JsonIgnore]
         public Scrubber Scrubber { get; set; }
+
+        [JsonIgnore]
+        [DisplayName("Reversal Transaction")]
+        public Transaction ReversalOfTransaction { get; set; }
+
+        [DisplayName("Reversal Transaction Id")]
+        public string ReversalOfTransactionId { get; set; }
     }
 }
