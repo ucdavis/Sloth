@@ -35,7 +35,6 @@ namespace Sloth.Core.Models
         public string SourceType => Source?.Type;
 
 
-
         /// <summary>
         /// Tracking Number created by the merchant accountant
         /// </summary>
@@ -101,10 +100,32 @@ namespace Sloth.Core.Models
         public Scrubber Scrubber { get; set; }
 
         [JsonIgnore]
-        [DisplayName("Reversal Transaction")]
+        [DisplayName("Reversal for Transaction")]
         public Transaction ReversalOfTransaction { get; set; }
 
-        [DisplayName("Reversal Transaction Id")]
+        [DisplayName("Reversal for Transaction Id")]
         public string ReversalOfTransactionId { get; set; }
+
+        [NotMapped]
+        [DisplayName("Is Reversal Transaction")]
+        public bool IsReversal => !string.IsNullOrEmpty(ReversalOfTransactionId);
+
+        [JsonIgnore]
+        [DisplayName("Reversal Transaction")]
+        public Transaction ReversalTransaction { get; set; }
+
+        [DisplayName("Reversal Transaction Id")]
+        public string ReversalTransactionId { get; set; }
+
+        [NotMapped]
+        [DisplayName("Has Reversal Transaction")]
+        public bool HasReversal => !string.IsNullOrEmpty(ReversalTransactionId);
+
+        public void AddReversalTransaction(Transaction transaction)
+        {
+            // setup one to one
+            this.ReversalTransaction = transaction;
+            transaction.ReversalOfTransaction = this;
+        }
     }
 }
