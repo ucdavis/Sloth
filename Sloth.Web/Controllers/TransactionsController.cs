@@ -74,5 +74,80 @@ namespace Sloth.Web.Controllers
 
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateReversal(string id)
+        {
+            var transaction = await DbContext.Transactions
+                .Include(t => t.Scrubber)
+                .Include(t => t.Source)
+                .Include(t => t.Transfers)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            // you can only reverse a completed transaction
+            if (transaction.Status != TransactionStatuses.Completed)
+            {
+                return BadRequest("Cannot reverse incomplete transaction.");
+            }
+
+            // you can only reverse a transaction once
+            if (transaction.HasReversal)
+            {
+                return BadRequest("Cannot reverse transaction again");
+            }
+
+            var user = await UserManager.GetUserAsync(User);
+
+            // create new transaction
+            var reversal = new Transaction
+            {
+                Source                  = transaction.Source,
+                Creator                 = user,
+                Status                  = TransactionStatuses.Scheduled,
+                KfsTrackingNumber       = transaction.KfsTrackingNumber,
+                MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
+                MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
+                ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
+            };
+
+            // add reversal transfers
+            foreach (var transfer in transaction.Transfers)
+            {
+                // same info, except reverse direction
+                var direction = transfer.Direction == Transfer.CreditDebit.Credit
+                    ? Transfer.CreditDebit.Debit
+                    : Transfer.CreditDebit.Credit;
+
+                reversal.Transfers.Add(new Transfer
+                {
+                    Amount         = transfer.Amount,
+                    Account        = transfer.Account,
+                    Chart          = transfer.Chart,
+                    Description    = transfer.Description,
+                    Direction      = direction,
+                    FiscalPeriod   = transfer.FiscalPeriod,
+                    FiscalYear     = transfer.FiscalYear,
+                    ObjectCode     = transfer.ObjectCode,
+                    ObjectType     = transfer.ObjectType,
+                    Project        = transfer.Project,
+                    ReferenceId    = transfer.ReferenceId,
+                    SequenceNumber = transfer.SequenceNumber,
+                    SubAccount     = transfer.SubAccount,
+                    SubObjectCode  = transfer.SubObjectCode,
+                });
+            }
+
+            // setup relationship
+            transaction.AddReversalTransaction(reversal);
+            await DbContext.Transactions.AddAsync(reversal); 
+            await DbContext.SaveChangesAsync();
+
+            return RedirectToAction("Details", new { id = reversal.Id });
+        }
     }
 }
