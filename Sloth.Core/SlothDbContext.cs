@@ -126,6 +126,7 @@ namespace Sloth.Core
             UserTeamRole.OnModelCreating(modelBuilder);
             Source.OnModelCreating(modelBuilder);
             Integration.OnModelCreating(modelBuilder);
+            Transaction.OnModelCreating(modelBuilder);
             LogMessage.OnModelCreating(modelBuilder);
             CybersourceBankReconcileJobRecord.OnModelCreating(modelBuilder);
             KfsScrubberUploadJobRecord.OnModelCreating(modelBuilder);
