@@ -1,26 +1,73 @@
-@model IEnumerable<Sloth.Core.Models.Transaction>
+@using Sloth.Core.Models
+@model IList<Transaction>
 
 @{
     ViewBag.Title = "Transactions Needing Approval";
+
+    var approvalCount = Model.Count;
+    var approvalAmount = Model
+        .SelectMany(t => t.Transfers)
+        .Where(x => x.Direction == Transfer.CreditDebit.Credit)
+        .Sum(x => x.Amount);
 }
 
 @section AdditionalStyles {
     @Html.Partial("_DataTableStylePartial")
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="row mb-2">
+    <div class="col">
+        <h2>@ViewBag.Title</h2>
+    </div>
+    <div class="col d-flex justify-content-end align-items-end">
+        <button id="approvalAll" class="btn btn-primary" data-toggle="modal" data-target="#approvalAllModal">Approval All <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+        </button>
+    </div>
+</div>
 
 @Html.Partial("_TransactionsTable", Model)
 
+<div id="approvalAllModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Approval All Pending Transactions?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>You are about to approve:</p>
+                <dl class="row">
+                    <dt class="col-6">Count</dt>
+                    <dd class="col-6">@approvalCount</dd>
+                    <dt class="col-6">Amount</dt>
+                    <dd class="col-6">$@approvalAmount.ToString("F2")</dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <form id="approvalAllForm" asp-action="ApprovalAll">
+                    @Html.AntiForgeryToken()
+                    <button type="button" id="approvalAllSubmit" class="btn btn-primary">Approval All <i class="fa fa-thumbs-o-up" aria-hidden="true"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section AdditionalScripts {
     @Html.Partial("_DataTableScriptsPartial")
     <script>
         $('#transactionsTable').DataTable({
             "columnDefs": [
-                { "targets": 0, "visible": false },
+                { "targets": [0, 2, 3, 4, 5], "visible": false },
                 { "targets": [-1], "orderable": false },
             ]
+        });
+
+        $('#approvalAllSubmit').click(function() {
+            $('#approvalAllForm').submit();
         });
     </script>
 }

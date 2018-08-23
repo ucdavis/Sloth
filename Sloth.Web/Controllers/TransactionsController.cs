@@ -38,6 +38,24 @@ namespace Sloth.Web.Controllers
             return View(transactions);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> ApprovalAll()
+        {
+            // fetch transactions
+            var transactions = await DbContext.Transactions
+                .Include(t => t.Transfers)
+                .Where(t => t.Status == TransactionStatuses.PendingApproval)
+                .ToListAsync();
+
+            // update status
+            transactions.ForEach(t => t.Status = TransactionStatuses.Scheduled);
+
+            // save to db
+            await DbContext.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
         public async Task<IActionResult> Details(string id)
         {
             var transaction = await DbContext.Transactions
