@@ -30,6 +30,8 @@ CREATE TABLE [dbo].[Transactions] (
 
 
 
+
+
 GO
 CREATE NONCLUSTERED INDEX [IX_Transactions_ScrubberId]
     ON [dbo].[Transactions]([ScrubberId] ASC);
@@ -46,6 +48,13 @@ CREATE NONCLUSTERED INDEX [IX_Transactions_SourceId]
 
 
 GO
-CREATE NONCLUSTERED INDEX [IX_Transactions_ReversalOfTransactionId]
-    ON [dbo].[Transactions]([ReversalOfTransactionId] ASC);
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Transactions_ReversalOfTransactionId]
+    ON [dbo].[Transactions]([ReversalOfTransactionId] ASC) WHERE ([ReversalOfTransactionId] IS NOT NULL);
+
+
+
+
+GO
+CREATE UNIQUE NONCLUSTERED INDEX [IX_Transactions_ReversalTransactionId]
+    ON [dbo].[Transactions]([ReversalTransactionId] ASC) WHERE ([ReversalTransactionId] IS NOT NULL);
 
