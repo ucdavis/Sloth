@@ -20,6 +20,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var transactions = await DbContext.Transactions
+                .Include(t => t.Transfers)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -29,6 +30,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> NeedApproval()
         {
             var transactions = await DbContext.Transactions
+                .Include(t => t.Transfers)
                 .Where(t => t.Status == TransactionStatuses.PendingApproval)
                 .AsNoTracking()
                 .ToListAsync();
