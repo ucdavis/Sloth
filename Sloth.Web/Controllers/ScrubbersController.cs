@@ -31,6 +31,8 @@ namespace Sloth.Web.Controllers
                 .Include(s => s.Source)
                     .ThenInclude(s => s.Team)
                 .Include(s => s.Transactions)
+                    .ThenInclude(s => s.Source)
+                .Include(s => s.Transactions)
                     .ThenInclude(t => t.Transfers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);

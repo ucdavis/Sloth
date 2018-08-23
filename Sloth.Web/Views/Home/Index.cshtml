@@ -1,12 +1,42 @@
+@using Sloth.Core.Models
 @{
     ViewData["Title"] = "Home Page";
+
+    var needApproval = (IList<Transaction>) ViewBag.NeedApproval;
+    var approvalCount = needApproval.Count;
+    var approvalAmount = needApproval
+        .SelectMany(t => t.Transfers)
+        .Where(x => x.Direction == Transfer.CreditDebit.Credit)
+        .Sum(x => x.Amount);
 }
 
-<h1>SLOTH</h1>
-<ul>
-  <li>Scrubber</li>
-  <li>Loader &</li>
-  <li>Online</li>
-  <li>Transaction</li>
-  <li>Hub</li>
-</ul>
+<div class="row">
+    <div class="col">
+        <h1>SLOTH</h1>
+        <ul>
+            <li>Scrubber</li>
+            <li>Loader &</li>
+            <li>Online</li>
+            <li>Transaction</li>
+            <li>Hub</li>
+        </ul>
+    </div>
+    <div class="col d-flex justify-content-center align-items-center">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Pending Approvals</h5>
+                <p class="card-text">
+                    <dl class="row">
+                        <dt class="col-6">Count</dt>
+                        <dd class="col-6">@approvalCount</dd>
+                        <dt class="col-6">Amount</dt>
+                        <dd class="col-6">$@approvalAmount.ToString("F2")</dd>
+                    </dl>
+                </p>
+                <a asp-controller="Transactions" asp-action="NeedApproval" class="btn btn-primary">View Transactions</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
