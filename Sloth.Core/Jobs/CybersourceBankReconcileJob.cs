@@ -88,10 +88,6 @@ namespace Sloth.Core.Jobs
                         return;
                     }
 
-                    // setup values
-                    var fiscalYear = yesterday.FiscalYear();
-                    var fiscalPeriod = yesterday.FiscalPeriod();
-
                     // iterate over deposits
                     foreach (var deposit in report.Batches?.Batch?.SelectMany(b => b.Requests?.Request) ??
                                             new List<Request>())
@@ -130,10 +126,8 @@ namespace Sloth.Core.Jobs
                             Account      = integration.ClearingAccount,
                             Direction    = Transfer.CreditDebit.Debit,
                             Amount       = deposit.Amount,
-                            Description  = "Deposit",
+                            Description  = "Cybersource Deposit",
                             ObjectCode   = ObjectCodes.Income,
-                            FiscalYear   = fiscalYear,
-                            FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(clearing);
 
@@ -144,10 +138,8 @@ namespace Sloth.Core.Jobs
                             Account      = integration.HoldingAccount,
                             Direction    = Transfer.CreditDebit.Credit,
                             Amount       = deposit.Amount,
-                            Description  = "Deposit",
+                            Description  = "Cybersource Deposit",
                             ObjectCode   = ObjectCodes.Income,
-                            FiscalYear   = fiscalYear,
-                            FiscalPeriod = fiscalPeriod,
                         };
                         transaction.Transfers.Add(holding);
 
