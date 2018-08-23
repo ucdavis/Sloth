@@ -163,9 +163,12 @@ namespace Sloth.Web.Controllers
                 });
             }
 
-            // setup relationship
-            transaction.AddReversalTransaction(reversal);
+            // save transaction to establish id
             await DbContext.Transactions.AddAsync(reversal); 
+            await DbContext.SaveChangesAsync();
+
+            // save relationship
+            transaction.AddReversalTransaction(reversal);
             await DbContext.SaveChangesAsync();
 
             return RedirectToAction("Details", new { id = reversal.Id });
