@@ -128,6 +128,7 @@ namespace Sloth.Web.Controllers
             {
                 Source                  = transaction.Source,
                 Creator                 = user,
+                TransactionDate         = DateTime.UtcNow,
                 Status                  = TransactionStatuses.Scheduled,
                 KfsTrackingNumber       = transaction.KfsTrackingNumber,
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
