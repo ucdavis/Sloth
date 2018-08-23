@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using System.ComponentModel;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
@@ -125,9 +126,24 @@ namespace Sloth.Core.Models
 
         public void AddReversalTransaction(Transaction transaction)
         {
-            // setup one to one
+            // setup bidirectional relationship
             this.ReversalTransaction = transaction;
             transaction.ReversalOfTransaction = this;
+        }
+
+        public static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.ReversalTransaction)
+                .WithOne()
+                .HasForeignKey<Transaction>(t => t.ReversalTransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transaction>()
+                .HasOne(t => t.ReversalOfTransaction)
+                .WithOne()
+                .HasForeignKey<Transaction>(t => t.ReversalOfTransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
