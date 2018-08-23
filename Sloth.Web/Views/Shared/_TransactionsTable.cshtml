@@ -1,4 +1,5 @@
 @using Humanizer
+@using Sloth.Core.Models
 @using Sloth.Core.Resources
 @model IEnumerable<Sloth.Core.Models.Transaction>
 
@@ -14,6 +15,8 @@
             <th>@Html.DisplayNameFor(x => x.DocumentNumber)</th>
             <th>@Html.DisplayNameFor(x => x.ProcessorTrackingNumber)</th>
             <th>@Html.DisplayNameFor(x => x.MerchantTrackingNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.Description)</th>
+            <th>Accounts</th>
             <th>@Html.DisplayNameFor(x => x.Status)</th>
             <th></th>
         </tr>
@@ -21,6 +24,10 @@
     <tbody>
         @foreach (var t in Model)
         {
+            var description = t.Transfers[0].Description;
+            var firstDebit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Debit);
+            var firstCredit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Credit);
+
             <tr>
                 <th scope="row">@t.Id</th>
                 <td nowrap>@t.TransactionDate</td>
@@ -28,6 +35,8 @@
                 <td>@t.DocumentNumber</td>
                 <td>@t.ProcessorTrackingNumber</td>
                 <td>@t.MerchantTrackingNumber</td>
+                <td>@description</td>
+                <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
                 <td class="text-center">
                     <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize()</span>
                 </td>
