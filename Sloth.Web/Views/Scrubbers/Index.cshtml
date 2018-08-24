@@ -1,3 +1,4 @@
+@using Sloth.Core.Models
 @model IEnumerable<Sloth.Core.Models.Scrubber>
 
 @{
@@ -12,22 +13,36 @@
 
 <table id="scrubbersTable" class="table table-bordered" style="width:100%">
     <thead>
-    <tr>
-        <th>@Html.DisplayNameFor(x => x.Id)</th>
-        <th>@Html.DisplayNameFor(x => x.Source.OrganizationCode)</th>
-        <th>@Html.DisplayNameFor(x => x.BatchDate)</th>
-        <th></th>
-    </tr>
+        <tr>
+            <th>@Html.DisplayNameFor(x => x.Id)</th>
+            <th>@Html.DisplayNameFor(x => x.Uri)</th>
+            <th>@Html.DisplayNameFor(x => x.Source.OriginCode)</th>
+            <th>@Html.DisplayNameFor(x => x.Source.DocumentType)</th>
+            <th>@Html.DisplayNameFor(x => x.BatchDate)</th>
+            <th>Transfer Count</th>
+            <th>Credit Amount</th>
+            <th></th>
+        </tr>
     </thead>
     <tbody>
-    @foreach (var t in Model)
+    @foreach (var s in Model)
     {
+        var transferCount = s.Transactions.SelectMany(t => t.Transfers).Count();
+        var transferCreditAmount = s.Transactions
+            .SelectMany(t => t.Transfers)
+            .Where(x => x.Direction == Transfer.CreditDebit.Credit)
+            .Sum(x => x.Amount);
+
         <tr>
-            <th scope="row">@t.Id</th>
-            <td>@t.Source.OrganizationCode</td>
-            <td>@t.BatchDate</td>
+            <td>@s.Id</td>
+            <td>@s.Uri</td>
+            <td>@s.Source.OriginCode</td>
+            <td>@s.Source.DocumentType</td>
+            <td>@s.BatchDate.ToString("d")</td>
+            <td>@transferCount</td>
+            <td>$ @transferCreditAmount.ToString("N2")</td>
             <td style="width:10%">
-                <a class="btn btn-primary btn-sm" href="@Url.Action("Details", new { id = t.Id })">
+                <a class="btn btn-primary btn-sm" href="@Url.Action("Details", new { id = s.Id })">
                     <div class="fa fa-arrow-right"></div>
                 </a>
             </td>
@@ -40,6 +55,11 @@
 @section AdditionalScripts {
     @Html.Partial("_DataTableScriptsPartial")
     <script>
-        $('#scrubbersTable').DataTable({});
+        $('#scrubbersTable').DataTable({
+            "columnDefs": [
+                { "targets": [0, 1], "visible": false },
+                { "targets": [-1], "orderable": false },
+            ]
+        });
     </script>
 }

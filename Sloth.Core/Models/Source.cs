@@ -32,6 +32,7 @@ namespace Sloth.Core.Models
         /// </summary>
         [MaxLength(4)]
         [Required]
+        [Display(Name = "Org Code")]
         public string OrganizationCode { get; set; }
 
         /// <summary>
@@ -41,6 +42,7 @@ namespace Sloth.Core.Models
         [MinLength(2)]
         [MaxLength(2)]
         [Required]
+        [Display(Name = "Origin Code")]
         public string OriginCode { get; set; }
 
         /// <summary>
@@ -50,12 +52,15 @@ namespace Sloth.Core.Models
         [MinLength(4)]
         [MaxLength(4)]
         [Required]
+        [Display(Name = "Document Type")]
         public string DocumentType { get; set; }
 
         [JsonIgnore]
+        [Display(Name = "KFS FTP Username")]
         public string KfsFtpUsername { get; set; }
 
         [JsonIgnore]
+        [Display(Name = "KFS FTP Password Keyname")]
         public string KfsFtpPasswordKeyName { get; set; }
 
         [JsonIgnore]
