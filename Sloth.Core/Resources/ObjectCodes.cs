@@ -6,6 +6,6 @@ namespace Sloth.Core.Resources
 {
     public class ObjectCodes
     {
-        public static string Income = "0630";
+        public static string Income = "0060";
     }
 }
