@@ -54,6 +54,9 @@ namespace Sloth.Xml
         [XmlElement("subAccount", DataType = "normalizedString")]
         public string SubAccount { get; set; }
 
+        [XmlIgnore]
+        public bool SubAccountSpecified => !string.IsNullOrEmpty(SubAccount);
+
         /// <summary>
         /// Object codes represent all income, expense, asset, liability and fund balance classification
         ///  that are assigned to transactions and help identify the nature of the transaction.
@@ -74,6 +77,9 @@ namespace Sloth.Xml
         [RegularExpression("[A-Z0-9]*")]
         [XmlElement("subObject", DataType = "normalizedString")]
         public string SubObjectCode { get; set; }
+
+        [XmlIgnore]
+        public bool SubObjectCodeSpecified => !string.IsNullOrEmpty(SubObjectCode);
 
         /// <summary>
         /// Defines the type of financial balances used in reporting and queries.
