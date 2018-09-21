@@ -107,12 +107,16 @@ namespace Sloth.Core.Jobs
 
                         // create transaction per deposit item,
                         // moving monies from clearing to holding
+
+                        // create document number
+                        var documentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
                         var kfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
 
                         transaction = new Transaction()
                         {
                             Source                  = integration.Source,
                             Status                  = TransactionStatuses.Scheduled,
+                            DocumentNumber          = documentNumber,
                             KfsTrackingNumber       = kfsTrackingNumber,
                             MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber = deposit.RequestID,
