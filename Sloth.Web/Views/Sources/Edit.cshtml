@@ -8,7 +8,7 @@
     var teams = ViewBag.Teams as IEnumerable<Team>;
     var teamItems = teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.Id });
 
-    var documentTypes = DocumentTypes.GetAll().Select(t => new SelectListItem() {Text = t, Value = t});
+    var documentTypes = DocumentTypes.GetAll().Select(t => new SelectListItem() { Text = t, Value = t });
 }
 
 <h2>@ViewBag.Title</h2>
@@ -53,11 +53,11 @@
     </div>
     <div class="form-group">
         @Html.LabelFor(x => x.KfsFtpPasswordKey)
-        @Html.HiddenFor(x => x.KfsFtpPasswordKeyDirty, new { id = "kfs-ftp-password-key-dirty" })
+        @Html.HiddenFor(x => x.KfsFtpPasswordKeyDirty)
         <div class="input-group">
-            @Html.PasswordFor(x => x.KfsFtpPasswordKey, new { @class = "form-control", value = "password", id = "kfs-ftp-password-key-input", @readonly = true })
+            @Html.PasswordFor(x => x.KfsFtpPasswordKey, new { @class = "form-control", value = "password", @readonly = true })
             <div class="input-group-append">
-                <div id="kfs-ftp-password-key-clear" class="btn btn-danger">
+                <div id="kfs-ftp-password-key-clear" class="btn btn-danger" data-toggle="modal" data-target="#passwordModal">
                     <i class="fa fa-edit"></i>
                 </div>
             </div>
@@ -68,50 +68,46 @@
     </div>
 }
 
+<div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Upload Private Key</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <textarea id="passwordModalInput" class="form-control text-monospace"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="passwordModalSave">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section AdditionalScripts
-    {
+{
     <script>
-        $('#kfs-ftp-password-key-clear').click(function () {
-            if ($('#kfs-ftp-password-key-dirty').val() === 'False') {
-                editPassword();
-            } else {
-                uneditPassword();
-            }
+        $(function() {
+            var $modal = $('#passwordModal');
+            var $input = $('#passwordModalInput');
+            var $target = $('#KfsFtpPasswordKey');
+            var $dirt = $('#KfsFtpPasswordKeyDirty');
+
+            $modal.on('show.bs.modal', function () {
+                $input.val('');
+            });
+
+            $('#passwordModalSave').click(function () {
+                var key = $input.val();
+                var encoded = btoa(key);
+                $target.val(encoded);
+                $dirt.val('True');
+                $modal.modal('hide');
+            });
         });
-
-        function editPassword() {
-            // mark dirty
-            $('#kfs-ftp-password-key-dirty').val('True');
-
-            // make field editable
-            $('#kfs-ftp-password-key-input')
-                .removeAttr('readonly')
-                .val('')
-                .focus();
-
-            // change button
-            $('#kfs-ftp-password-key-clear i.fa').addClass('fa-undo').removeClass('fa-edit');
-        }
-
-        function uneditPassword() {
-            // mark clean
-            $('#kfs-ftp-password-key-dirty').val('False');
-
-            // make field editable
-            $('#kfs-ftp-password-key-input')
-                .attr('readonly', 'readonly')
-                .val('password');
-
-            // change button
-            $('#kfs-ftp-password-key-clear i.fa').removeClass('fa-undo').addClass('fa-edit');
-
-        }
-
-        $('#kfs-ftp-password-key-input').blur(function () {
-            $input = $(this);
-            if (!$input.val()) {
-                uneditPassword();
-            }
-        })
     </script>
 }

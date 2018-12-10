@@ -57,9 +57,11 @@ namespace Sloth.Web.Models.SourceViewModels
         public string TeamId { get; set; }
 
         [JsonIgnore]
+        [Display(Name = "KFS FTP Username")]
         public string KfsFtpUsername { get; set; }
 
         [JsonIgnore]
+        [Display(Name = "KFS FTP Password Private Key")]
         public string KfsFtpPasswordKey { get; set; }
     }
 }
