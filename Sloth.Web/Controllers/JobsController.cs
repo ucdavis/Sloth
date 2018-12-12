@@ -69,15 +69,17 @@ namespace Sloth.Web.Controllers
             var jsEpoch = new DateTime(1970, 1, 1).Ticks / 10_000;
 
             // format for js, add offset to local, reset to js epoch
-            var events = records.Select(r => new
-            {
-                id = r.Id,
-                title = r.Name,
-                @class = "event-success",
-                url = Url.Action(nameof(KfsScrubberUploadDetails), new { id = r.Id }),
-                start = (r.RanOn.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch,
-                end = (r.RanOn.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch + 1,
-            });
+            var events = records
+                .OrderBy(r => r.RanOn)
+                .Select(r => new
+                {
+                    id     = r.Id,
+                    title  = $"{r.Name} - {r.RanOn:G}",
+                    @class = "event-success",
+                    url    = Url.Action(nameof(KfsScrubberUploadDetails), new { id = r.Id }),
+                    start  = (r.RanOn.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch,
+                    end    = (r.RanOn.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch + 1,
+                });
 
 
             return new JsonResult(new
@@ -170,16 +172,17 @@ namespace Sloth.Web.Controllers
             var jsEpoch = new DateTime(1970, 1, 1).Ticks / 10_000;
 
             // format for js, add offset to local, reset to js epoch
-            var events = records.Select(r => new
-            {
-                id = r.Id,
-                title = r.Name,
-                @class = "event-success",
-                url = Url.Action(nameof(CybersourceBankReconcileDetails), new { id = r.Id }),
-                start = (r.ProcessedDate.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch,
-                end   = (r.ProcessedDate.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch + 1,
-            });
-
+            var events = records
+                .OrderBy(r => r.RanOn)
+                .Select(r => new
+                {
+                    id     = r.Id,
+                    title  = $"{r.Name} - {r.RanOn:G}",
+                    @class = "event-success",
+                    url    = Url.Action(nameof(CybersourceBankReconcileDetails), new {id = r.Id}),
+                    start  = (r.ProcessedDate.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch,
+                    end    = (r.ProcessedDate.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch + 1,
+                });
 
             return new JsonResult(new
             {

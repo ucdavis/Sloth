@@ -1,11 +1,13 @@
+@using Newtonsoft.Json
 @model Sloth.Core.Models.CybersourceBankReconcileJobRecord
 
 @{
-    ViewData["Title"] = "CybersourceBankReconcileDetails";
+    ViewData["Title"] = "Cybersource Bank Reconcile Details";
 }
 
 @section AdditionalStyles
-{
+    {
+    <link href="~/css/prism.css" rel="stylesheet" />
     <style>
         .console {
             font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
@@ -13,24 +15,37 @@
             color: #ffffff;
         }
 
-        .console .line {
-            margin: 0;
-            line-height: 1.4em;
-            min-height: 1.4em;
-            font-size: 0.85em;
-            word-break: normal;
-            overflow-wrap: break-word;
-            white-space: pre-wrap;
-            vertical-align: top;
-        }
+            .console .line {
+                margin: 0;
+                line-height: 1.4em;
+                min-height: 1.4em;
+                font-size: 0.85em;
+                word-break: normal;
+                overflow-wrap: break-word;
+                white-space: pre-wrap;
+                vertical-align: top;
+            }
 
-        .console .line .time {
-            text-align: right;
-        }
+            .console .line .time {
+                text-align: right;
+            }
+
+            .console .line .details {
+                text-align: right;
+            }
+
+            .console .line .details i {
+                display: none;
+                cursor: pointer;
+            }
+
+            .console .line:hover .details i {
+                display: inline-block;
+            }
     </style>
 }
 
-<h2>CybersourceBankReconcileDetails</h2>
+<h2>@ViewData["Title"]</h2>
 
 <div>
     <h4>CybersourceBankReconcileJobRecord</h4>
@@ -75,7 +90,8 @@
 
         <div class="row line">
             <div class="col-1 time">@(timeFormatted)</div>
-            <div class="col-11 message">@log.Message</div>
+            <div class="col-10 message">@log.Message</div>
+            <div class="col-1 details"><i class="fas fa-search fa-xs" data-toggle="modal" data-target="#detailsModal" data-log-id="@log.Id"></i></div>
         </div>
     }
 </div>
@@ -84,6 +100,51 @@
     <a asp-action="CybersourceBankReconcile">Back to List</a>
 </div>
 
+<div class="modal" tabindex="-1" role="dialog" id="detailsModal">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Log Message Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <pre><code id="detailsModalJson" class="language-json"></code></pre>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section AdditionalScripts
 {
+    <script src="~/js/prism.js"></script>
+    <script>
+        var logs = @Html.Raw(JsonConvert.SerializeObject(Model.Logs));
+
+        $(function () {
+            var $json = $('#detailsModalJson');
+
+            $('#detailsModal').on('show.bs.modal',
+                function(event) {
+                    var button = $(event.relatedTarget);
+                    var id = button.data('log-id');
+                    var log = logs.find(function(l) { return l.Id === id; });
+
+                    // try parse log event
+                    try {
+                        var properties = JSON.parse(log.LogEvent);
+                        log.LogEventParsed = properties;
+                    } catch (err) {
+                        // nom
+                    }
+
+                    $json.text(JSON.stringify(log, undefined, 4));
+                    Prism.highlightAll();
+                });
+        });
+    </script>
 }
