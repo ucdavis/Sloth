@@ -52,6 +52,7 @@ namespace Sloth.Jobs.Core.Logging
 
             // various sinks
             logConfig = logConfig
+                .WriteTo.Console()
                 .WriteToStackifyCustom()
                 .WriteToSqlCustom();
 
