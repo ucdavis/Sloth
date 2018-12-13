@@ -25,22 +25,29 @@
                 vertical-align: top;
             }
 
-                .console .line .time {
-                    text-align: right;
-                }
+            .console .line .time {
+                text-align: right;
+            }
 
-                .console .line .details {
-                    text-align: right;
-                }
+            .console .line .details {
+                display: flex;
+                justify-content: flex-end;
+                align-items: center;
+            }
 
-                    .console .line .details i {
-                        display: none;
-                        cursor: pointer;
-                    }
+            .console .line .details * {
+                display: inline-block;
+            }
 
-                .console .line:hover .details i {
-                    display: inline-block;
-                }
+            .console .line .details i.view-button {
+                opacity: 0;
+                cursor: pointer;
+            }
+
+            .console .line:hover .details i.view-button {
+                opacity: 1;
+                display: inline-block;
+            }
     </style>
 }
 
@@ -80,11 +87,16 @@
         {
             timeFormatted = $"{time.TotalMilliseconds:#}ms";
         }
-
         <div class="row line">
             <div class="col-1 time">@(timeFormatted)</div>
             <div class="col-10 message">@log.Message</div>
-            <div class="col-1 details"><i class="fas fa-search fa-xs" data-toggle="modal" data-target="#detailsModal" data-log-id="@log.Id"></i></div>
+            <div class="col-1 details">
+                @if (!string.IsNullOrWhiteSpace(log.Exception))
+                {
+                    <i class="text-danger fas fa-exclamation-triangle pr-2"></i>
+                }
+                <i class="fas fa-search fa-xs view-button" data-toggle="modal" data-target="#detailsModal" data-log-id="@log.Id"></i>
+            </div>
         </div>
     }
 </div>
@@ -104,6 +116,7 @@
             </div>
             <div class="modal-body">
                 <pre><code id="detailsModalJson" class="language-json"></code></pre>
+                <pre id="detailsModalException"></pre>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -113,13 +126,14 @@
 </div>
 
 @section AdditionalScripts
-    {
+{
     <script src="~/js/prism.js"></script>
     <script>
         var logs = @Html.Raw(JsonConvert.SerializeObject(Model.Logs));
 
         $(function () {
             var $json = $('#detailsModalJson');
+            var $exception = $('#detailsModalException');
 
             $('#detailsModal').on('show.bs.modal',
                 function(event) {
@@ -135,7 +149,17 @@
                         // nom
                     }
 
+                    // set json text
                     $json.text(JSON.stringify(log, undefined, 4));
+
+                    // set exception
+                    $exception.text(log.Exception);
+                    if (log.Exception) {
+                        $exception.removeClass('hide').addClass('show');
+                    } else {
+                        $exception.removeClass('show').addClass('hide');
+                    }
+
                     Prism.highlightAll();
                 });
         });
