@@ -52,11 +52,12 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
                 var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
 
                 // call methods
-                Task.Run(() => uploadScrubberJob.UploadScrubber(_log)).Wait();
+                uploadScrubberJob.UploadScrubber(_log).GetAwaiter().GetResult();
             }
             finally
             {
                 // record status
+                _log.Information("Finished");
                 jobRecord.Status = "Finished";
                 dbContext.SaveChanges();
             }

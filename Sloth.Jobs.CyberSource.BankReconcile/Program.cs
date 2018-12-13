@@ -54,11 +54,12 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
                 var bankReconcileJob = provider.GetService<CybersourceBankReconcileJob>();
 
                 // call methods
-                Task.Run(() => bankReconcileJob.ProcessReconcile(_log, yesterday)).Wait();
+                bankReconcileJob.ProcessReconcile(_log, yesterday).GetAwaiter().GetResult();
             }
             finally
             {
                 // record status
+                _log.Information("Finished");
                 jobRecord.Status = "Finished";
                 dbContext.SaveChanges();
             }
