@@ -5,19 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
-    public class KfsScrubberUploadJobRecord
+    public class KfsScrubberUploadJobRecord : JobRecord
     {
-        public string Id { get; set; }
-
-        public string Name { get; set; }
-
-        [Display(Name = "Ran On")]
-        public DateTime RanOn { get; set; }
-
-        public string Status { get; set; }
-
-        public IList<LogMessage> Logs { get; set; }
-
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<KfsScrubberUploadJobRecord>()
