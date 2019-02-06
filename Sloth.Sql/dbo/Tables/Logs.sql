@@ -24,3 +24,7 @@ GO
 CREATE NONCLUSTERED INDEX [IX_Logs_CorrelationId]
     ON [dbo].[Logs]([CorrelationId] ASC);
 
+GO
+CREATE NONCLUSTERED INDEX [IX_Logs_JobNameId]
+    ON [dbo].[Logs]([JobName] ASC, [JobId] ASC);
+
