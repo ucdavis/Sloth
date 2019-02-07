@@ -4,10 +4,6 @@
     ViewBag.Title = "Scrubbers";
 }
 
-@section AdditionalStyles {
-    @Html.Partial("_DataTableStylePartial")
-}
-
 <h2>@ViewBag.Title</h2>
 
 <table id="scrubbersTable" class="table table-bordered" style="width:100%">
@@ -38,7 +34,6 @@
 
 
 @section AdditionalScripts {
-    @Html.Partial("_DataTableScriptsPartial")
     <script>
         $('#scrubbersTable').DataTable({});
     </script>
