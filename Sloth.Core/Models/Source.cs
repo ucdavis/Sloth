@@ -32,6 +32,7 @@ namespace Sloth.Core.Models
         /// </summary>
         [MaxLength(4)]
         [Required]
+        [Display(Name = "Organization Code")]
         public string OrganizationCode { get; set; }
 
         /// <summary>
