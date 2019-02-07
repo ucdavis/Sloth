@@ -1,3 +1,4 @@
+@using Sloth.Core.Resources
 <!DOCTYPE html>
 <html>
 <head>
@@ -32,17 +33,26 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav mr-auto ml-auto">
-            <li class="nav-item">
-              <a class="nav-link" asp-area="" asp-controller="Transactions" asp-action="Index">Transactions</a>
-            </li>
               <li class="nav-item">
-                  <a class="nav-link" asp-area="" asp-controller="Scrubbers" asp-action="Index">Scrubbers</a>
+                  <a class="nav-link" asp-controller="Transactions" asp-action="Index">Transactions</a>
               </li>
+
               <li class="nav-item">
-                  <a class="nav-link" asp-area="" asp-controller="Teams" asp-action="Index">Teams</a>
+                  <a class="nav-link" asp-controller="Scrubbers" asp-action="Index">Scrubbers</a>
               </li>
+
+              <li class="nav-item">
+                  <a class="nav-link" asp-controller="Teams" asp-action="Index">Teams</a>
+              </li>
+
+              @if (User.IsInRole(Roles.SystemAdmin))
+              {
+                  <li class="nav-item">
+                      <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
+                  </li>
+              }
           </ul>
-          @Html.Partial("_LoginPartial")
+          <partial name="_LoginPartial" />
         </div>
       </div>
     </div>
