@@ -11,11 +11,18 @@
     <environment names="Development">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />
-        <link rel="stylesheet" href="~/dist/site.css" asp-append-version="true" />
     </environment>
     <environment names="Staging,Production">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" />
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css" />
+    </environment>
+
+    <partial name="_DataTableStyles" />
+
+    <environment names="Development">
+        <link rel="stylesheet" href="~/dist/site.css" asp-append-version="true" />
+    </environment>
+    <environment names="Staging,Production">
         <link rel="stylesheet" href="~/dist/site.min.css" asp-append-version="true" />
     </environment>
 
@@ -23,52 +30,52 @@
 </head>
 <body>
     <div class="navbar navbar-expand-md navbar-dark bg-dark">
-      <div class="container">
-        <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">
-          <img src="~/images/logo.png" alt="logo" />
-          Sloth Web
-        </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav mr-auto ml-auto">
-              <li class="nav-item">
-                  <a class="nav-link" asp-controller="Transactions" asp-action="Index">Transactions</a>
-              </li>
+        <div class="container">
+            <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">
+                <img src="~/images/logo.png" alt="logo" />
+                Sloth Web
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Transactions" asp-action="Index">Transactions</a>
+                    </li>
 
-              <li class="nav-item">
-                  <a class="nav-link" asp-controller="Scrubbers" asp-action="Index">Scrubbers</a>
-              </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Scrubbers" asp-action="Index">Scrubbers</a>
+                    </li>
 
-              <li class="nav-item">
-                  <a class="nav-link" asp-controller="Teams" asp-action="Index">Teams</a>
-              </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Teams" asp-action="Index">Teams</a>
+                    </li>
 
-              @if (User.IsInRole(Roles.SystemAdmin))
-              {
-                  <li class="nav-item">
-                      <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
-                  </li>
-              }
-          </ul>
-          <partial name="_LoginPartial" />
+                    @if (User.IsInRole(Roles.SystemAdmin))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
+                        </li>
+                    }
+                </ul>
+                <partial name="_LoginPartial" />
+            </div>
         </div>
-      </div>
     </div>
     <div class="body-content">
-      @RenderBody()
+        @RenderBody()
     </div>
     <footer class="border-top py-3">
-      <div class="text-center">
-          <p>&copy; - The Regents of the University of California, Davis campus. All rights reserved</p>
-      </div>
+        <div class="text-center">
+            <p>&copy; - The Regents of the University of California, Davis campus. All rights reserved</p>
+        </div>
     </footer>
 
     <environment names="Development">
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
     </environment>
     <environment names="Staging,Production">
@@ -77,6 +84,8 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.2/js/bootstrap.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
     </environment>
+
+    <partial name="_DataTableScripts" />
 
     @RenderSection("AdditionalScripts", required: false)
 </body>

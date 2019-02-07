@@ -11,10 +11,6 @@
         .Sum(x => x.Amount);
 }
 
-@section AdditionalStyles {
-    @Html.Partial("_DataTableStylePartial")
-}
-
 <div class="row mb-2">
     <div class="col">
         <h2>@ViewBag.Title</h2>
@@ -57,7 +53,6 @@
 </div>
 
 @section AdditionalScripts {
-    @Html.Partial("_DataTableScriptsPartial")
     <script>
         $('#transactionsTable').DataTable({
             "columnDefs": [

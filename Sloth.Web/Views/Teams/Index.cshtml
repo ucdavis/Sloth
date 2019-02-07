@@ -4,28 +4,24 @@
     ViewBag.Title = "Teams";
 }
 
-@section AdditionalStyles
-{
-    @Html.Partial("_DataTableStylePartial")
-}
-
-<div class="row mb-1">
-    <div class="col">
-        <h2>Teams</h2>
+<div class="container">
+    <div class="row mb-1">
+        <div class="col">
+            <h2>Teams</h2>
+        </div>
+        <div class="col d-flex justify-content-end align-items-end">
+            <a class="btn btn-primary" asp-action="Create">Create New Team</a>
+        </div>
     </div>
-    <div class="col d-flex justify-content-end align-items-end">
-        <a class="btn btn-primary" asp-action="Create">Create New Team</a>
-    </div>
-</div>
 
-<table id="teamsTable" class="table table-bordered">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
+    <table id="teamsTable" class="table table-bordered">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
         @foreach (var team in Model)
         {
             <tr>
@@ -33,12 +29,12 @@
                 <td><a href="@Url.Action("Details", new { id = team.Id })" class="btn btn-primary">Manage</a></td>
             </tr>
         }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
 @section AdditionalScripts
 {
-    @Html.Partial("_DataTableScriptsPartial")
     <script>
         $('#teamsTable').DataTable({
             columnDefs: [

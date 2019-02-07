@@ -4,10 +4,6 @@
     ViewBag.Title = "System Management";
 }
 
-@section AdditionalStyles {
-    @Html.Partial("_DataTableStylePartial")
-}
-
 <h2>@ViewBag.Title</h2>
 <hr />
 
@@ -95,7 +91,6 @@
 
 
 @section AdditionalScripts {
-    @Html.Partial("_DataTableScriptsPartial")
     <script src="/js/utils/debounce.js"></script>
 
     <script>

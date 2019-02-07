@@ -5,19 +5,12 @@
     ViewBag.Title = "Sources";
 }
 
-@section AdditionalStyles
-{
-    @Html.Partial("_DataTableStylePartial")
-}
-
 <h2>@ViewBag.Title</h2>
 
 @Html.Partial("_SourcesTable", Model)
 
 @section AdditionalScripts
 {
-    @Html.Partial("_DataTableScriptsPartial")
-
     <script>
         // setup tables
         var sourcesTable = $('#sourcesTable').DataTable({});
