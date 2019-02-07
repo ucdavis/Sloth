@@ -25,7 +25,7 @@
         <tr>
             <th scope="row">@t.Id</th>
             <td>@t.Source.OrganizationCode</td>
-            <td>@t.BatchDate</td>
+            <td data-sort="@t.BatchDate.Ticks">@t.BatchDate</td>
             <td style="width:10%">
                 <a class="btn btn-primary btn-sm" href="@Url.Action("Details", new { id = t.Id })">
                     <div class="fa fa-arrow-right"></div>

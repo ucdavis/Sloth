@@ -46,10 +46,10 @@
     <tbody>
     @foreach (var item in Model) {
         <tr>
-            <td>
+            <td data-sort="@item.ProcessedDate.Ticks">
                 @item.ProcessedDate.ToString("M/d/yyyy")
             </td>
-            <td>
+            <td data-sort="@item.RanOn.Ticks">
                 @item.RanOn
             </td>
             <td>

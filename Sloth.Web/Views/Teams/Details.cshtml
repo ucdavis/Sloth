@@ -150,13 +150,13 @@
             <tr class="@rowClass">
                 <td nowrap>
                     <span class="masked-key">
-                        <i class="fa fa-lock"></i> @k.MaskedKey()
-                    </span>
-                </td>
-                <td>@k.Issued.ToPacificTime().ToString("g")</td>
-                <td>
-                    @if (k.Revoked.HasValue)
-                    {
+                            <i class="fa fa-lock"></i> @k.MaskedKey()
+                        </span>
+                    </td>
+                    <td data-sort="@k.Issued.Ticks">@k.Issued.ToPacificTime().ToString("g")</td>
+                    <td>
+                        @if (k.Revoked.HasValue)
+                        {
                         @k.Revoked.Value.ToPacificTime().ToString("g")
                     }
                     else
