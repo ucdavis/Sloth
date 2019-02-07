@@ -19,135 +19,134 @@
     </style>
 }
 
+<div class="container">
+    <h2>Team</h2>
 
-<h2>Team</h2>
+    <hr />
 
-
-<hr />
-
-<div class="row mb-1">
-    <div class="col">
-        <h3>Users</h3>
+    <div class="row mb-1">
+        <div class="col">
+            <h3>Users</h3>
+        </div>
+        <div class="col d-flex justify-content-end align-items-end">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#add-user-modal">
+                Add User <i class="fa fa-fw fa-user"></i>
+            </button>
+        </div>
     </div>
-    <div class="col d-flex justify-content-end align-items-end">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#add-user-modal">
-            Add User <i class="fa fa-fw fa-user"></i>
-        </button>
-    </div>
-</div>
 
-<table id="usersTable" class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Role</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var userRole in Model.UserTeamRoles)
-        {
+    <table id="usersTable" class="table table-bordered">
+        <thead>
             <tr>
-                <td>@userRole.User.FullName</td>
-                <td>@userRole.User.UserName</td>
-                <td>@userRole.User.Email</td>
-                <td>@userRole.Role.Name</td>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
             </tr>
-        }
-    </tbody>
-</table>
-
-<hr />
-
-<div class="row mb-1">
-    <div class="col">
-        <h3>KFS Sources</h3>
-    </div>
-    <div class="col d-flex justify-content-end align-items-end">
-        <a asp-controller="Sources" asp-action="Create" asp-route-teamid="@Model.Id" class="btn btn-primary">
-            Create Source <i class="fa fa-fw fa-upload"></i>
-        </a>
-    </div>
-</div>
-
-@Html.Partial("_SourcesTable", Model.Sources)
-
-<hr />
-
-<div class="row mb-1">
-    <div class="col">
-        <h3>Integrations</h3>
-    </div>
-    <div class="col d-flex justify-content-end align-items-end">
-        <a asp-controller="Integrations" asp-action="Create" asp-route-teamid="@Model.Id" class="btn btn-primary">
-            Create Integration <i class="fa fa-fw fa-plug"></i>
-        </a>
-    </div>
-</div>
-
-<table id="integrationsTable" class="table table-bordered">
-    <thead>
-        <tr>
-            <th>Type</th>
-            <th>Team Name</th>
-            <th>Merchant</th>
-            <th>Default Account</th>
-            <th>Holding Account</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var integration in Model.Integrations)
-        {
-            <tr>
-                <td>@integration.Type</td>
-                <td>@integration.Team.Name</td>
-                <td>@integration.MerchantId</td>
-                <td>@integration.ClearingAccount</td>
-                <td>@integration.HoldingAccount</td>
-                <td class="text-center">
-                    <a asp-controller="Integrations" asp-action="Edit" asp-route-id="@integration.Id" class="btn btn-primary btn-sm">
-                        Edit
-                    </a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<hr />
-
-<div class="row mb-1">
-    <div class="col">
-        <h3>API Keys</h3>
-    </div>
-    <div class="col d-flex justify-content-end align-items-end">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#create-key-modal">
-            Create Api Key <i class="fa fa-fw fa-key"></i>
-        </button>
-    </div>
-</div>
-
-<table id="apiKeysTable" class="table table-bordered table-condensed table-hover">
-    <thead>
-        <tr>
-            <th>Key</th>
-            <th>Issued</th>
-            <th>Revoke ?</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var k in Model.ApiKeys)
-        {
-            var rowClass = "";
-            if (k.Revoked.HasValue)
+        </thead>
+        <tbody>
+            @foreach (var userRole in Model.UserTeamRoles)
             {
-                rowClass = "revoked";
+                <tr>
+                    <td>@userRole.User.FullName</td>
+                    <td>@userRole.User.UserName</td>
+                    <td>@userRole.User.Email</td>
+                    <td>@userRole.Role.Name</td>
+                </tr>
             }
-            <tr class="@rowClass">
-                <td nowrap>
-                    <span class="masked-key">
+        </tbody>
+    </table>
+
+    <hr />
+
+    <div class="row mb-1">
+        <div class="col">
+            <h3>KFS Sources</h3>
+        </div>
+        <div class="col d-flex justify-content-end align-items-end">
+            <a asp-controller="Sources" asp-action="Create" asp-route-teamid="@Model.Id" class="btn btn-primary">
+                Create Source <i class="fa fa-fw fa-upload"></i>
+            </a>
+        </div>
+    </div>
+
+    @Html.Partial("_SourcesTable", Model.Sources)
+
+    <hr />
+
+    <div class="row mb-1">
+        <div class="col">
+            <h3>Integrations</h3>
+        </div>
+        <div class="col d-flex justify-content-end align-items-end">
+            <a asp-controller="Integrations" asp-action="Create" asp-route-teamid="@Model.Id" class="btn btn-primary">
+                Create Integration <i class="fa fa-fw fa-plug"></i>
+            </a>
+        </div>
+    </div>
+
+    <table id="integrationsTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Type</th>
+                <th>Team Name</th>
+                <th>Merchant</th>
+                <th>Default Account</th>
+                <th>Holding Account</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var integration in Model.Integrations)
+            {
+                <tr>
+                    <td>@integration.Type</td>
+                    <td>@integration.Team.Name</td>
+                    <td>@integration.MerchantId</td>
+                    <td>@integration.ClearingAccount</td>
+                    <td>@integration.HoldingAccount</td>
+                    <td class="text-center">
+                        <a asp-controller="Integrations" asp-action="Edit" asp-route-id="@integration.Id" class="btn btn-primary btn-sm">
+                            Edit
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <hr />
+
+    <div class="row mb-1">
+        <div class="col">
+            <h3>API Keys</h3>
+        </div>
+        <div class="col d-flex justify-content-end align-items-end">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#create-key-modal">
+                Create Api Key <i class="fa fa-fw fa-key"></i>
+            </button>
+        </div>
+    </div>
+
+    <table id="apiKeysTable" class="table table-bordered table-condensed table-hover">
+        <thead>
+            <tr>
+                <th>Key</th>
+                <th>Issued</th>
+                <th>Revoke ?</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var k in Model.ApiKeys)
+            {
+                var rowClass = "";
+                if (k.Revoked.HasValue)
+                {
+                    rowClass = "revoked";
+                }
+                <tr class="@rowClass">
+                    <td nowrap>
+                        <span class="masked-key">
                             <i class="fa fa-lock"></i> @k.MaskedKey()
                         </span>
                     </td>
@@ -155,107 +154,109 @@
                     <td>
                         @if (k.Revoked.HasValue)
                         {
-                        @k.Revoked.Value.ToPacificTime().ToString("g")
-                    }
-                    else
-                    {
-                        <button class="btn btn-danger" data-toggle="modal" data-target="#revoke-key-modal" data-id="@k.Id" data-key="@k.MaskedKey()">
-                            Revoke Key
-                        </button>
-                    }
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                            @k.Revoked.Value.ToPacificTime().ToString("g")
+                        }
+                        else
+                        {
+                            <button class="btn btn-danger" data-toggle="modal" data-target="#revoke-key-modal" data-id="@k.Id" data-key="@k.MaskedKey()">
+                                Revoke Key
+                            </button>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 
-<div id="add-user-modal" class="modal fade">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Add User?</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label>Role</label>
-                        @Html.DropDownList("TeamRole", roleOptions, new { id = "add-user-modal-role", @class = "form-control" })
-                    </div>
-                    <div class="form-group">
-                        <label>User Search</label>
-                        <div class="input-group">
-                            <input type="text" id="add-user-modal-user-search" class="form-control" placeholder="kerb or email" />
-                            <div class="input-group-append">
-                                <span class="input-group-text" id="add-user-modal-user-search-icon">
-                                    <i id="add-user-modal-search-icon-search" class="fa fa-search"></i>
-                                    <i id="add-user-modal-search-icon-spinner" class="fa fa-spinner"></i>
-                                    <i id="add-user-modal-search-icon-warning" class="fa fa-warning text-danger"></i>
-                                    <i id="add-user-modal-search-icon-success" class="fa fa-check text-sucess"></i>
-                                </span>
+    <div id="add-user-modal" class="modal fade">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add User?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label>Role</label>
+                            @Html.DropDownList("TeamRole", roleOptions, new { id = "add-user-modal-role", @class = "form-control" })
+                        </div>
+                        <div class="form-group">
+                            <label>User Search</label>
+                            <div class="input-group">
+                                <input type="text" id="add-user-modal-user-search" class="form-control" placeholder="kerb or email" />
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="add-user-modal-user-search-icon">
+                                        <i id="add-user-modal-search-icon-search" class="fa fa-search"></i>
+                                        <i id="add-user-modal-search-icon-spinner" class="fa fa-spinner"></i>
+                                        <i id="add-user-modal-search-icon-warning" class="fa fa-warning text-danger"></i>
+                                        <i id="add-user-modal-search-icon-success" class="fa fa-check text-sucess"></i>
+                                    </span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="form-group" id="add-user-modal-user-results">
-                        <label>Results</label>
-                        <input type="hidden" id="add-user-modal-user-id" />
-                        <input type="text" id="add-user-modal-user-name" readonly="readonly" class="form-control mb-2" />
-                        <input type="text" id="add-user-modal-user-username" readonly="readonly" class="form-control mb-2" />
-                        <input type="text" id="add-user-modal-user-email" readonly="readonly" class="form-control mb-2" />
-                        <span class="text" id="add-user-modal-user-warning">User not found in database. User will be created automatically.</span>
-                    </div>
-                </form>
+                        <div class="form-group" id="add-user-modal-user-results">
+                            <label>Results</label>
+                            <input type="hidden" id="add-user-modal-user-id" />
+                            <input type="text" id="add-user-modal-user-name" readonly="readonly" class="form-control mb-2" />
+                            <input type="text" id="add-user-modal-user-username" readonly="readonly" class="form-control mb-2" />
+                            <input type="text" id="add-user-modal-user-email" readonly="readonly" class="form-control mb-2" />
+                            <span class="text" id="add-user-modal-user-warning">User not found in database. User will be created automatically.</span>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" id="add-user-action" class="btn btn-primary">Add User</button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" id="add-user-action" class="btn btn-primary">Add User</button>
+        </div>
+    </div>
+
+    <div id="create-key-modal" class="modal fade">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Api Key?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" id="create-key-action" class="btn btn-primary">Create</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="revoke-key-modal" class="modal fade" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to revoke key:</p>
+                    <span id="revoke-key-modal-key"></span>
+                    <form id="revoke-key-modal-form">
+                        <input type="hidden" id="revoke-key-modal-id" name="id" />
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" id="revoke-key-action" class="btn btn-danger">Revoke Key</button>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div id="create-key-modal" class="modal fade">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Create New Api Key?</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" id="create-key-action" class="btn btn-primary">Create</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="revoke-key-modal" class="modal fade" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">New message</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to revoke key:</p>
-                <span id="revoke-key-modal-key"></span>
-                <form id="revoke-key-modal-form">
-                    <input type="hidden" id="revoke-key-modal-id" name="id" />
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" id="revoke-key-action" class="btn btn-danger">Revoke Key</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 @section AdditionalScripts
 {
