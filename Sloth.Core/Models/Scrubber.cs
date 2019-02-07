@@ -18,6 +18,7 @@ namespace Sloth.Core.Models
         /// <summary>
         /// Date this file was created/submitted for batching
         /// </summary>
+        [Display(Name = "Batch Date")]
         [Required]
         public DateTime BatchDate { get; set; }
 

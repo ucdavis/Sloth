@@ -4,17 +4,12 @@
     ViewBag.Title = "Transactions";
 }
 
-@section AdditionalStyles {
-    @Html.Partial("_DataTableStylePartial")
-}
-
 <h2>@ViewBag.Title</h2>
 
 @Html.Partial("_TransactionsTable", Model)
 
 
 @section AdditionalScripts {
-    @Html.Partial("_DataTableScriptsPartial")
     <script>
         $('#transactionsTable').DataTable({
             "columnDefs": [

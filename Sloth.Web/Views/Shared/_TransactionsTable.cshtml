@@ -30,7 +30,7 @@
 
             <tr>
                 <th scope="row">@t.Id</th>
-                <td nowrap>@t.TransactionDate</td>
+                <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate</td>
                 <td>@t.KfsTrackingNumber</td>
                 <td>@t.DocumentNumber</td>
                 <td>@t.ProcessorTrackingNumber</td>
