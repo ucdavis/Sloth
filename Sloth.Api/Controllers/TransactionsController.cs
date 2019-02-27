@@ -155,6 +155,7 @@ namespace Sloth.Api.Controllers
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
                 MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
+                KfsTrackingNumber       = transaction.KfsTrackingNumber,
                 Source                  = source,
                 TransactionDate         = transaction.TransactionDate,
                 Transfers               = transaction.Transfers.Select(t => new Transfer()
@@ -189,8 +190,11 @@ namespace Sloth.Api.Controllers
                 // create document number
                 transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
 
-                // create kfs number
-                transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
+                // create kfs number if necessary
+                if (string.IsNullOrWhiteSpace(transactionToCreate.KfsTrackingNumber))
+                {
+                    transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
+                } 
 
                 _context.Transactions.Add(transactionToCreate);
                 await _context.SaveChangesAsync();

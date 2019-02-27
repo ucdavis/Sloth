@@ -34,6 +34,12 @@ namespace Sloth.Api.Models
         public string ProcessorTrackingNumber { get; set; }
 
         /// <summary>
+        /// Optionally set the kfs tracking number to be used
+        /// </summary>
+        [MaxLength(10)]
+        public string KfsTrackingNumber { get; set; }
+
+        /// <summary>
         /// Date the transaction occurred.
         /// </summary>
         [Required]
