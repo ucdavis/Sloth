@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
@@ -164,15 +165,23 @@ namespace Sloth.Web.Controllers
                 });
             }
 
-            // save transaction to establish id
-            await DbContext.Transactions.AddAsync(reversal); 
-            await DbContext.SaveChangesAsync();
+            // add document number
+            using (var tran = DbContext.Database.BeginTransaction())
+            {
+                // create document number
+                reversal.DocumentNumber = await DbContext.GetNextDocumentNumber(tran.GetDbTransaction());
+
+                // save transaction to establish id
+                await DbContext.Transactions.AddAsync(reversal); 
+                await DbContext.SaveChangesAsync();
 
             // save relationship
-            transaction.AddReversalTransaction(reversal);
-            await DbContext.SaveChangesAsync();
+                transaction.AddReversalTransaction(reversal);
+                await DbContext.SaveChangesAsync();
 
-            return RedirectToAction("Details", new { id = reversal.Id });
+                tran.Commit();
+                return RedirectToAction("Details", new { id = reversal.Id });
+            }
         }
     }
 }
