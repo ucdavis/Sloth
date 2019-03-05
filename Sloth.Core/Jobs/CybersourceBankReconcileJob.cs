@@ -72,7 +72,7 @@ namespace Sloth.Core.Jobs
                     var password = await _secretsService.GetSecret(integration.ReportPasswordKey);
 
                     // create client
-                    var client = new ReportClient(_options.ReportUrl, integration.MerchantId,
+                    var client = new ReportClient(_options.IsProduction, integration.MerchantId,
                         integration.ReportUsername,
                         password);
 
