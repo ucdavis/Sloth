@@ -110,7 +110,7 @@ namespace Sloth.Integrations.Cybersource.Clients
             request.AddHeader("Host", uri.Host);
             request.AddHeader("Signature", signature);
 
-            // add body digest header
+            // add body digest header if necessary
             if (method == Method.POST || method == Method.PUT || method == Method.PATCH)
             {
                 request.AddHeader("Digest", signer.GetDigest());
