@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
+using RestSharp;
 using Sloth.Integrations.Cybersource.Exceptions;
 using Sloth.Integrations.Cybersource.Helpers;
 
@@ -13,40 +12,48 @@ namespace Sloth.Integrations.Cybersource.Clients
 {
     public class ReportClient
     {
-        private readonly Uri _baseUri;
+        private readonly bool _isProduction;
         private readonly string _merchantId;
-        private readonly string _username;
-        private readonly string _password;
+        private readonly string _keyId;
+        private readonly string _secret;
 
-
-        public ReportClient(string baseUri, string merchantId, string username, string password)
+        public ReportClient(bool isProduction, string merchantId, string keyId, string secret)
         {
-            if (!Uri.TryCreate(baseUri, UriKind.Absolute, out _baseUri))
-            {
-                throw new ArgumentException("Base url should be a valid URI", nameof(baseUri));
-            }
-
+            _isProduction = isProduction;
             _merchantId = merchantId;
-            _username = username;
-            _password = password;
+            _keyId = keyId;
+            _secret = secret;
         }
 
 
         public async Task<Report> GetPaymentBatchDetailReport(DateTime date)
         {
             // fetch content
-            var content = await GetClientApiReport("PaymentBatchDetailReport", date);
+            var content = await GetClientApiReport<Report>("PaymentBatchtDetailReport_Daily_Classic", new DateTime(2019, 1, 1));
 
-            // deserialize
             return DeserializeReport<Report>(content);
         }
 
-        private async Task<string> GetClientApiReport(string reportName, DateTime date)
+        private async Task<string> GetClientApiReport<T>(string reportName, DateTime date)
         {
             // build uri
-            var uri = $"DownloadReport/{date:yyyy}/{date:MM}/{date:dd}/{_merchantId}/{reportName}.xml";
-            var client = GetHttpClient();
-            var response = await client.GetAsync(uri);
+            var uri = "reporting/v3/report-downloads";
+            var client = GetApiClient();
+
+            // build request
+            var request = new RestRequest(uri, Method.GET);
+            request.AddQueryParameter("organizationId", _merchantId);
+            request.AddQueryParameter("reportDate", date.ToString("yyyy-MM-dd"));
+            request.AddQueryParameter("reportName", reportName);
+
+            request.AddHeader("Accept", "*/*");
+            request.AddHeader("Content-Type", "application/xml");
+
+            // add auth
+            AddApiKeyAuthenticationHeaders(client, request);
+
+            // execute
+            var response = await client.ExecuteGetTaskAsync(request);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {
@@ -58,44 +65,56 @@ namespace Sloth.Integrations.Cybersource.Clients
                 throw new UnauthorizedException();
             }
 
-            response.EnsureSuccessStatusCode();
-
             // fetch content
-            return await response.Content.ReadAsStringAsync();
+            return response.Content;
         }
 
         /// <summary>
-        /// Get configured http cliewnt
+        /// Get configured http client
         /// </summary>
         /// <returns></returns>
-        private HttpClient GetHttpClient()
+        private IRestClient GetApiClient()
         {
-            var client = new HttpClient();
+            var baseUrl = _isProduction
+                ? "https://api.cybersource.com"
+                : "https://apitest.cybersource.com";
 
-            //specify to use TLS 1.2 as default connection
-            //ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12 | SecurityProtocolType.Tls11 | SecurityProtocolType.Tls;
-
-            client.BaseAddress = _baseUri;
-            client.DefaultRequestHeaders.Authorization = GetCredentials();
-            client.Timeout = new TimeSpan(0, 0, 0, 10);
-
+            var client = new RestClient(baseUrl);
             return client;
         }
 
-        /// <summary>
-        /// Get Credential Headers
-        /// </summary>
-        /// <returns></returns>
-        private AuthenticationHeaderValue GetCredentials()
+        private void AddApiKeyAuthenticationHeaders(IRestClient client, IRestRequest request)
         {
-            // basic authentication
-            var username = _username;
-            var password = _password;
-            var credentials = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(Encoding.ASCII.GetBytes(
-                    $"{username}:{password}")));
+            // parse out request values
+            var method = request.Method;
+            var uri = client.BuildUri(request);
+            var body = request.Parameters.FirstOrDefault(p => p.Type == ParameterType.RequestBody);
 
-            return credentials;
+            // configure signer
+            var signer = new SignatureRequest()
+            {
+                MerchantId = _merchantId,
+                KeyId      = _keyId,
+                KeySecret  = _secret,
+                HostName   = uri.Host,
+                Method     = request.Method,
+                TargetUri  = uri,
+                JsonBody   = body?.ToString()
+            };
+
+            // generate signature and set HTTP Signature headers
+            var signature = signer.GetSignature();
+
+            request.AddHeader("v-c-merchant-id", _merchantId);
+            request.AddHeader("Date", signer.SignedDateTime);
+            request.AddHeader("Host", uri.Host);
+            request.AddHeader("Signature", signature);
+
+            // add body digest header if necessary
+            if (method == Method.POST || method == Method.PUT || method == Method.PATCH)
+            {
+                request.AddHeader("Digest", signer.GetDigest());
+            }
         }
 
         /// <summary>
