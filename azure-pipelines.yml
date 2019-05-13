@@ -28,14 +28,14 @@ steps:
   displayName: 'Build Sloth.Api'
   inputs:
     command: 'build'
-    projects: './src/sloth.api/sloth.api.csproj'
+    projects: './sloth.api/sloth.api.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build Sloth.Web'
   inputs:
     command: 'build'
-    projects: './src/sloth.web/sloth.web.csproj'
+    projects: './sloth.web/sloth.web.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
@@ -45,7 +45,7 @@ steps:
     publishWebProjects: true
     zipAfterPublish: false
     modifyOutputPath: false
-    projects: './src/sloth.api/sloth.api.csproj'
+    projects: './sloth.api/sloth.api.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/'
 
 - task: DotNetCoreCLI@2
@@ -55,7 +55,7 @@ steps:
     publishWebProjects: true
     zipAfterPublish: false
     modifyOutputPath: false
-    projects: './src/sloth.web/sloth.web.csproj'
+    projects: './sloth.web/sloth.web.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/'
 
 - task: PublishBuildArtifacts@1
@@ -69,4 +69,4 @@ steps:
   displayName: 'Test'
   inputs:
     command: 'test'
-    projects: './test/sloth.test/sloth.test.csproj'
+    projects: './sloth.test/sloth.test.csproj'
