@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Newtonsoft.Json;
 
@@ -51,10 +50,6 @@ namespace Sloth.Web.Models.SourceViewModels
         [Required]
         [Display(Name = "Document Type")]
         public string DocumentType { get; set; }
-
-        [Required]
-        [Display(Name = "Team")]
-        public string TeamId { get; set; }
 
         [JsonIgnore]
         [Display(Name = "KFS FTP Username")]

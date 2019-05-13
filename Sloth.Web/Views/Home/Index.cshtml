@@ -1,13 +1,6 @@
-@using Sloth.Core.Models
+@model IEnumerable<Sloth.Core.Models.Team>
 @{
     ViewData["Title"] = "Home Page";
-
-    var needApproval = (IList<Transaction>) ViewBag.NeedApproval;
-    var approvalCount = needApproval.Count;
-    var approvalAmount = needApproval
-        .SelectMany(t => t.Transfers)
-        .Where(x => x.Direction == Transfer.CreditDebit.Credit)
-        .Sum(x => x.Amount);
 }
 
 <div class="container">
@@ -22,21 +15,19 @@
                 <li>Hub</li>
             </ul>
         </div>
-        <div class="col d-flex justify-content-center align-items-center">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Pending Approvals</h5>
-                    <p class="card-text">
-                        <dl class="row">
-                            <dt class="col-6">Count</dt>
-                            <dd class="col-6">@approvalCount</dd>
-                            <dt class="col-6">Amount</dt>
-                            <dd class="col-6">$@approvalAmount.ToString("F2")</dd>
-                        </dl>
-                    </p>
-                    <a asp-controller="Transactions" asp-action="NeedApproval" class="btn btn-primary">View Transactions</a>
-                </div>
+
+    </div>
+
+    <h2>Your Teams:</h2>
+
+    <div class="row flex-column align-items-start justify-content-center">
+        @foreach (var team in Model)
+        {
+            <div class="col-sm-12 col-md-5">
+                <a asp-controller="Home" asp-action="TeamIndex" asp-route-team="@team.Slug">
+                    <span>@team.Name</span>
+                </a>
             </div>
-        </div>
+        }
     </div>
 </div>

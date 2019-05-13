@@ -1,18 +1,18 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
+using Sloth.Web.Identity;
 
 namespace Sloth.Web.Controllers
 {
     public class TransactionsController : SuperController
     {
-        public TransactionsController(UserManager<User> userManager, SlothDbContext dbContext) : base(userManager, dbContext)
+        public TransactionsController(ApplicationUserManager userManager, SlothDbContext dbContext) : base(userManager, dbContext)
         {
         }
 
@@ -21,6 +21,7 @@ namespace Sloth.Web.Controllers
         {
             var transactions = await DbContext.Transactions
                 .Include(t => t.Transfers)
+                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -31,6 +32,7 @@ namespace Sloth.Web.Controllers
         {
             var transactions = await DbContext.Transactions
                 .Include(t => t.Transfers)
+                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .Where(t => t.Status == TransactionStatuses.PendingApproval)
                 .AsNoTracking()
                 .ToListAsync();
@@ -44,6 +46,7 @@ namespace Sloth.Web.Controllers
             // fetch transactions
             var transactions = await DbContext.Transactions
                 .Include(t => t.Transfers)
+                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .Where(t => t.Status == TransactionStatuses.PendingApproval)
                 .ToListAsync();
 

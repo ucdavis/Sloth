@@ -1,21 +1,19 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
-using Sloth.Core.Resources;
+using Sloth.Web.Identity;
 using Sloth.Web.Models.TeamViewModels;
 
 namespace Sloth.Web.Controllers
 {
     public class TeamsController : SuperController
     {
-        public TeamsController(UserManager<User> userManager, SlothDbContext dbContext) : base (userManager, dbContext)
+        public TeamsController(ApplicationUserManager userManager, SlothDbContext dbContext) : base (userManager, dbContext)
         {
         }
 

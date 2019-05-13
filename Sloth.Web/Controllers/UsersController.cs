@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
+using Sloth.Web.Identity;
 
 namespace Sloth.Web.Controllers
 {
@@ -13,7 +13,7 @@ namespace Sloth.Web.Controllers
     {
         private readonly IDirectorySearchService _directorySearchService;
 
-        public UsersController(UserManager<User> userManager, SlothDbContext dbContext, IDirectorySearchService directorySearchService)
+        public UsersController(ApplicationUserManager userManager, SlothDbContext dbContext, IDirectorySearchService directorySearchService)
             : base(userManager, dbContext)
         {
             _directorySearchService = directorySearchService;

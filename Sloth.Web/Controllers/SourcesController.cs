@@ -1,13 +1,14 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
+using Sloth.Web.Identity;
 using Sloth.Web.Models.SourceViewModels;
 
 namespace Sloth.Web.Controllers
@@ -17,7 +18,7 @@ namespace Sloth.Web.Controllers
     {
         private readonly ISecretsService _secretsService;
 
-        public SourcesController(UserManager<User> userManager, SlothDbContext dbContext, ISecretsService secretsService) : base(userManager, dbContext)
+        public SourcesController(ApplicationUserManager userManager, SlothDbContext dbContext, ISecretsService secretsService) : base(userManager, dbContext)
         {
             _secretsService = secretsService;
         }
@@ -27,24 +28,22 @@ namespace Sloth.Web.Controllers
         {
             var sources = await DbContext.Sources
                 .Include(s => s.Team)
+                .Where(s => s.Team.Slug == TeamSlug)
                 .ToListAsync();
 
             return View(sources);
         }
 
         [HttpGet]
-        public async Task<IActionResult> Create(string teamId)
+        public async Task<IActionResult> Create()
         {
-            ViewBag.Teams = await GetUsersAdminTeams();
-            ViewBag.DefaultTeamId = teamId;
-
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(CreateSourceViewModel model)
         {
-            var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == model.TeamId);
+            var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Slug == TeamSlug);
             if (team == null)
             {
                 return View(model);
@@ -85,12 +84,9 @@ namespace Sloth.Web.Controllers
                 return NotFound();
             }
 
-            ViewBag.Teams = await GetUsersAdminTeams();
-
             var model = new EditSourceViewModel()
             {
                 Name                   = source.Name,
-                TeamId                 = source.Team.Id,
                 Description            = source.Description,
                 Chart                  = source.Chart,
                 OrganizationCode       = source.OrganizationCode,
@@ -114,7 +110,7 @@ namespace Sloth.Web.Controllers
             }
 
             // validate model
-            var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Id == model.TeamId);
+            var team = await DbContext.Teams.FirstOrDefaultAsync(t => t.Slug == TeamSlug);
             if (team == null)
             {
                 return View(model);
