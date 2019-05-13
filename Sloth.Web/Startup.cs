@@ -79,7 +79,7 @@ namespace Sloth.Web
 
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<SlothDbContext>()
-                .AddUserManager<UserManager<User>>();
+                .AddUserManager<ApplicationUserManager>();
 
             services.AddAuthentication(options =>
                 {
