@@ -139,13 +139,39 @@ namespace Sloth.Web
 
             app.UseMvc(routes =>
             {
+                // non team root routes
+                routes.MapRoute(
+                    name: "non-team-routes",
+                    template: "{controller}/{action=Index}/{id?}",
+                    defaults: new { },
+                    constraints: new { controller = "(account|teams|jobs|system|users)" });
+
+                // team level routes
+                routes.MapRoute(
+                    name: "team-index",
+                    template: "{team}",
+                    defaults: new { controller = "home", action = "teamindex" },
+                    constraints: new
+                    {
+                        team = new CompositeRouteConstraint(new IRouteConstraint[] {
+                            new RegexInlineRouteConstraint(Team.SlugRegex),
+                        })
+                    });
+
+                routes.MapRoute(
+                    name: "team-routes",
+                    template: "{team}/{controller=Home}/{action=Index}/{id?}",
+                    defaults: new { },
+                    constraints: new
+                    {
+                        team = new CompositeRouteConstraint(new IRouteConstraint[] {
+                            new RegexInlineRouteConstraint(Team.SlugRegex),
+                        })
+                    });
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
             });
         }
     }
