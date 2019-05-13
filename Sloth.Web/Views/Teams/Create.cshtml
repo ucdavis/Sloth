@@ -4,32 +4,61 @@
     ViewBag.Title = "Create New Team";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container">
+    <h2>@ViewBag.Title</h2>
 
-<form method="post">
-    <div class="form-group">
-        @Html.LabelFor(x => x.Name)
-        @Html.TextBoxFor(x => x.Name, new { @class="form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.KfsContactDepartmentName)
-        @Html.TextBoxFor(x => x.KfsContactDepartmentName, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.KfsContactUserId)
-        @Html.TextBoxFor(x => x.KfsContactUserId, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.KfsContactEmail)
-        @Html.TextBoxFor(x => x.KfsContactEmail, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.KfsContactPhoneNumber)
-        @Html.TextBoxFor(x => x.KfsContactPhoneNumber, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.KfsContactMailingAddress)
-        @Html.TextBoxFor(x => x.KfsContactMailingAddress, new { @class = "form-control" })
-    </div>
-    <input type="submit" value="Create" class="btn btn-primary" />
-</form>
+    <form method="post">
+        <div class="form-group">
+            @Html.LabelFor(x => x.Name)
+            @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.Slug)
+            @Html.TextBoxFor(x => x.Slug, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.KfsContactDepartmentName)
+            @Html.TextBoxFor(x => x.KfsContactDepartmentName, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.KfsContactUserId)
+            @Html.TextBoxFor(x => x.KfsContactUserId, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.KfsContactEmail)
+            @Html.TextBoxFor(x => x.KfsContactEmail, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.KfsContactPhoneNumber)
+            @Html.TextBoxFor(x => x.KfsContactPhoneNumber, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.KfsContactMailingAddress)
+            @Html.TextBoxFor(x => x.KfsContactMailingAddress, new { @class = "form-control" })
+        </div>
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </form>
+</div>
+
+@section AdditionalScripts {
+    <script>
+        $(function () {
+            var dirtySlug = false;
+            $('#Name').keyup(function () {
+                if (dirtySlug) {
+                    return;
+                }
+                var slug = $(this).val();
+                slug = slug.replace(/[\W_]/g, '-');
+                slug = slug.replace(/--*/g, '-');
+                slug = slug.trim('-');
+                slug = slug.toLowerCase();
+                $('#Slug').val(slug);
+            });
+
+            $('#Slug').change(function () {
+                dirtySlug = true;
+            });
+        });
+    </script>
+}
