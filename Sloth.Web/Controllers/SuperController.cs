@@ -47,7 +47,6 @@ namespace Sloth.Web.Controllers
                     .Distinct();
             }
 
-            return teams;
+        protected string TeamSlug => ControllerContext.RouteData.Values["team"] as string;
         }
     }
-}
