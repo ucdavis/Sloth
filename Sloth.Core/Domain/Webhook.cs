@@ -13,8 +13,6 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         public Team Team { get; set; }
 
-        public int TeamId { get; set; }
-
         [DisplayName("Enabled")]
         public bool IsActive { get; set; }
 
