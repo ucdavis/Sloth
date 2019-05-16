@@ -71,6 +71,7 @@ namespace Sloth.Web
             services.AddSingleton<IKfsScrubberService, KfsScrubberService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
+            services.AddScoped<IWebHookService, WebHookService>();
 
             // add jobs services
             services.AddHostedService<QueuedHostedService>();
