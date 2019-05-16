@@ -45,8 +45,6 @@ namespace Sloth.Web.Models.SourceViewModels
         /// Financial System document type associated with the feed.
         /// Feed systems will be authorized to use a specific value based on transactions.
         /// </summary>
-        [MinLength(4)]
-        [MaxLength(4)]
         [Required]
         [Display(Name = "Document Type")]
         public string DocumentType { get; set; }
