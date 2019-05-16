@@ -68,6 +68,7 @@ namespace Sloth.Web.Controllers
             var team = new Team()
             {
                 Name                     = model.Name,
+                Slug                     = model.Slug,
                 KfsContactDepartmentName = model.KfsContactDepartmentName,
                 KfsContactUserId         = model.KfsContactUserId,
                 KfsContactEmail          = model.KfsContactEmail,
@@ -95,6 +96,7 @@ namespace Sloth.Web.Controllers
             var model = new EditTeamViewModel()
             {
                 Name                     = team.Name,
+                Slug                     = team.Slug,
                 KfsContactUserId         = team.KfsContactUserId,
                 KfsContactDepartmentName = team.KfsContactDepartmentName,
                 KfsContactEmail          = team.KfsContactEmail,
@@ -116,6 +118,7 @@ namespace Sloth.Web.Controllers
             }
 
             team.Name                     = model.Name;
+            team.Slug                     = model.Slug;
             team.KfsContactDepartmentName = model.KfsContactDepartmentName;
             team.KfsContactUserId         = model.KfsContactUserId;
             team.KfsContactEmail          = model.KfsContactEmail;
