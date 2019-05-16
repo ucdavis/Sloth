@@ -58,6 +58,24 @@ steps:
     projects: './sloth.web/sloth.web.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/sloth.web'
 
+- task: DotNetCoreCLI@2
+  displayName: 'Assemble Sloth.Jobs.CyberSource.BankReconcile w/ Web'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    zipAfterPublish: false
+    projects: './sloth.jobs.cybersource.bankreconcile/sloth.jobs.cybersource.bankreconcile.csproj'
+    arguments: '--configuration $(buildConfiguration) --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Assemble Sloth.Jobs.Kfs.ScrubberUpload w/ Web'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    zipAfterPublish: false
+    projects: './sloth.jobs.kfs.scrubberupload/sloth.jobs.kfs.scrubberupload.csproj'
+    arguments: '--configuration $(buildConfiguration) --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifacts'
   inputs:
