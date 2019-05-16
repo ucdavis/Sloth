@@ -23,7 +23,7 @@ namespace Sloth.Web.Controllers
             return View(teams);
         }
 
-        public async Task<IActionResult> Details(string id)
+        public async Task<IActionResult> Details()
         {
             var team = await DbContext.Teams
                 .Include(t => t.ApiKeys)
@@ -34,7 +34,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.UserTeamRoles)
                     .ThenInclude(r => r.Role)
                 .Include(t => t.WebHooks)
-                .FirstOrDefaultAsync(t => t.Id == id);
+                .FirstOrDefaultAsync(t => t.Slug == TeamSlug);
 
             if (team == null)
             {
@@ -68,6 +68,7 @@ namespace Sloth.Web.Controllers
             var team = new Team()
             {
                 Name                     = model.Name,
+                Slug                     = model.Slug,
                 KfsContactDepartmentName = model.KfsContactDepartmentName,
                 KfsContactUserId         = model.KfsContactUserId,
                 KfsContactEmail          = model.KfsContactEmail,
@@ -83,10 +84,10 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        public async Task<IActionResult> Edit()
         {
             var teams = await GetUsersAdminTeams();
-            var team = teams.FirstOrDefault(t => t.Id == id);
+            var team = teams.FirstOrDefault(t => t.Slug == TeamSlug);
             if (team == null)
             {
                 return NotFound();
@@ -95,6 +96,7 @@ namespace Sloth.Web.Controllers
             var model = new EditTeamViewModel()
             {
                 Name                     = team.Name,
+                Slug                     = team.Slug,
                 KfsContactUserId         = team.KfsContactUserId,
                 KfsContactDepartmentName = team.KfsContactDepartmentName,
                 KfsContactEmail          = team.KfsContactEmail,
@@ -106,16 +108,17 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(string id, EditTeamViewModel model)
+        public async Task<IActionResult> Edit(EditTeamViewModel model)
         {
             var teams = await GetUsersAdminTeams();
-            var team = teams.FirstOrDefault(t => t.Id == id);
+            var team = teams.FirstOrDefault(t => t.Slug == TeamSlug);
             if (team == null)
             {
                 return NotFound();
             }
 
             team.Name                     = model.Name;
+            team.Slug                     = model.Slug;
             team.KfsContactDepartmentName = model.KfsContactDepartmentName;
             team.KfsContactUserId         = model.KfsContactUserId;
             team.KfsContactEmail          = model.KfsContactEmail;

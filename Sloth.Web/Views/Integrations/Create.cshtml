@@ -12,49 +12,58 @@
     var typeItems = types?.Select(t => new SelectListItem() { Text = t, Value = t });
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container">
+    <h2>@ViewBag.Title</h2>
 
-@using (Html.BeginForm(FormMethod.Post))
-{
-    <div class="form-group">
-        @Html.LabelFor(x => x.SourceId)
-        @Html.DropDownListFor(x => x.SourceId, sourceItems, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.Type)
-        @Html.DropDownListFor(x => x.Type, typeItems, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.MerchantId)
-        @Html.TextBoxFor(x => x.MerchantId, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.ReportUserName)
-        @Html.TextBoxFor(x => x.ReportUserName, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.ReportPassword)
-        @Html.PasswordFor(x => x.ReportPassword, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.ClearingAccount)
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">3 - </span>
-            </div>
-            @Html.TextBoxFor(x => x.ClearingAccount, new { @class = "form-control" })
+    @using (Html.BeginForm(FormMethod.Post))
+    {
+        <div class="form-group">
+            @Html.LabelFor(x => x.SourceId)
+            @Html.DropDownListFor(x => x.SourceId, sourceItems, new { @class = "form-control" })
+            <span asp-validation-for="SourceId" class="text-danger"></span>
         </div>
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.HoldingAccount)
-        <div class="input-group">
-            <div class="input-group-prepend">
-                <span class="input-group-text">3 - </span>
-            </div>
-            @Html.TextBoxFor(x => x.HoldingAccount, new { @class = "form-control" })
+        <div class="form-group">
+            @Html.LabelFor(x => x.Type)
+            @Html.DropDownListFor(x => x.Type, typeItems, new { @class = "form-control" })
+            <span asp-validation-for="Type" class="text-danger"></span>
         </div>
-    </div>
-    <div class="d-flex justify-content-end align-items-end">
-        <input type="submit" value="Create" class="btn btn-primary"/>
-    </div>
-}
+        <div class="form-group">
+            @Html.LabelFor(x => x.MerchantId)
+            @Html.TextBoxFor(x => x.MerchantId, new { @class = "form-control" })
+            <span asp-validation-for="MerchantId" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.ReportUserName)
+            @Html.TextBoxFor(x => x.ReportUserName, new { @class = "form-control" })
+            <span asp-validation-for="ReportUserName" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.ReportPassword)
+            @Html.PasswordFor(x => x.ReportPassword, new { @class = "form-control" })
+            <span asp-validation-for="ReportPassword" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.ClearingAccount)
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">3 - </span>
+                </div>
+                @Html.TextBoxFor(x => x.ClearingAccount, new { @class = "form-control" })
+            </div>
+            <span asp-validation-for="ClearingAccount" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.HoldingAccount)
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">3 - </span>
+                </div>
+                @Html.TextBoxFor(x => x.HoldingAccount, new { @class = "form-control" })
+            </div>
+            <span asp-validation-for="HoldingAccount" class="text-danger"></span>
+        </div>
+        <div class="d-flex justify-content-end align-items-end">
+            <input type="submit" value="Create" class="btn btn-primary"/>
+        </div>
+    }
+</div>

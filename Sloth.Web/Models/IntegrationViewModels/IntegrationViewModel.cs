@@ -6,7 +6,7 @@ namespace Sloth.Web.Models.IntegrationViewModels
     public class IntegrationViewModel
     {
         [Required]
-        [Display(Name = "Source")]
+        [Display(Name = "KFS Feed Source")]
         public string SourceId { get; set; }
 
         [Required]
@@ -18,11 +18,11 @@ namespace Sloth.Web.Models.IntegrationViewModels
         public string MerchantId { get; set; }
 
         [Required]
-        [Display(Name = "Report Username")]
+        [Display(Name = "Report ApiKey Id")]
         public string ReportUserName { get; set; }
 
         [Required]
-        [Display(Name = "Report Password")]
+        [Display(Name = "Report ApiKey Secret")]
         public string ReportPassword { get; set; }
 
         [Required]
