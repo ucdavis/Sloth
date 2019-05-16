@@ -39,6 +39,20 @@ steps:
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
+  displayName: 'Build Sloth.Jobs.CyberSource.BankReconcile'
+  inputs:
+    command: 'build'
+    projects: './sloth.jobs.cybersource.bankreconcile/sloth.jobs.cybersource.bankreconcile.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build Sloth.Jobs.Kfs.ScrubberUpload'
+  inputs:
+    command: 'build'
+    projects: './sloth.jobs.kfs.scrubberupload/sloth.jobs.kfs.scrubberupload.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
   displayName: 'Assemble Sloth.Api'
   inputs:
     command: 'publish'
