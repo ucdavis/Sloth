@@ -10,7 +10,6 @@
     var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
 
     var teams = user.GetTeams().ToList();
-    var currentTeam = teams.FirstOrDefault(t => t.Slug == teamSlug);
 }
 
 <!DOCTYPE html>
@@ -55,21 +54,22 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav mr-auto ml-auto">
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Transactions" asp-action="Index">Transactions</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Scrubbers" asp-action="Index">Scrubbers</a>
-                    </li>
-
-                    <li class="nav-item">
                         <a class="nav-link" asp-controller="Teams" asp-action="Index">Teams</a>
                     </li>
 
                     @if (!string.IsNullOrEmpty(teamSlug))
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-id="@currentTeam.Id">Settings</a>
+                            <a class="nav-link" asp-controller="Transactions" asp-action="Index">Transactions</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Scrubbers" asp-action="Index">Scrubbers</a>
+                        </li>
+
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug">Settings</a>
                         </li>
                     }
 

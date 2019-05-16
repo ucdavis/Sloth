@@ -162,7 +162,13 @@ namespace Sloth.Web
                     name: "non-team-routes",
                     template: "{controller}/{action=Index}/{id?}",
                     defaults: new { },
-                    constraints: new { controller = "(account|teams|jobs|system|users)" });
+                    constraints: new { controller = "(account|jobs|system|users)" });
+
+                routes.MapRoute(
+                    name: "team-management-routes",
+                    template: "{controller}/{action=Index}/{id?}",
+                    defaults: new { },
+                    constraints: new { controller = "teams", action = "(index|create)" });
 
                 // team level routes
                 routes.MapRoute(
