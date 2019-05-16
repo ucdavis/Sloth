@@ -12,6 +12,7 @@ namespace Sloth.Web.Models.SourceViewModels
 
         [MaxLength(50)]
         [Required]
+        [Display(Name = "Source Type")]
         public string Type { get; set; }
 
         [MaxLength(255)]
@@ -29,6 +30,7 @@ namespace Sloth.Web.Models.SourceViewModels
         /// </summary>
         [MaxLength(4)]
         [Required]
+        [Display(Name = "Organization Code")]
         public string OrganizationCode { get; set; }
 
         /// <summary>

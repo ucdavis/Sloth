@@ -20,7 +20,10 @@
 }
 
 <div class="container">
-    <h2>Team</h2>
+    <div class="d-flex justify-content-between">
+        <h2>Team</h2>
+        <a asp-controller="Teams" asp-action="Edit" asp-route-team="@Model.Slug">Edit</a>
+    </div>
 
     <div class="card my-3">
         <div class="card-body">
@@ -62,7 +65,7 @@
         <div class="card-body">
             <div class="card-title">
                 <div class="d-flex justify-content-between align-items-start">
-                    <h3>KFS Sources</h3>
+                    <h3>KFS Feed Sources</h3>
                     <a asp-controller="Sources" asp-action="Create" class="btn btn-primary">
                         Create Source <i class="fas fa-fw fa-upload"></i>
                     </a>
@@ -224,12 +227,12 @@
                     <form>
                         <div class="form-group">
                             <label>Role</label>
-                            @Html.DropDownList("TeamRole", roleOptions, new { id = "add-user-modal-role", @class = "form-control" })
+                            @Html.DropDownList("TeamRole", roleOptions, new {id = "add-user-modal-role", @class = "form-control"})
                         </div>
                         <div class="form-group">
                             <label>User Search</label>
                             <div class="input-group">
-                                <input type="text" id="add-user-modal-user-search" class="form-control" placeholder="kerb or email" />
+                                <input type="text" id="add-user-modal-user-search" class="form-control" placeholder="kerb or email"/>
                                 <div class="input-group-append">
                                     <span class="input-group-text" id="add-user-modal-user-search-icon">
                                         <i id="add-user-modal-search-icon-search" class="fa fa-search"></i>
@@ -242,10 +245,10 @@
                         </div>
                         <div class="form-group" id="add-user-modal-user-results">
                             <label>Results</label>
-                            <input type="hidden" id="add-user-modal-user-id" />
-                            <input type="text" id="add-user-modal-user-name" readonly="readonly" class="form-control mb-2" />
-                            <input type="text" id="add-user-modal-user-username" readonly="readonly" class="form-control mb-2" />
-                            <input type="text" id="add-user-modal-user-email" readonly="readonly" class="form-control mb-2" />
+                            <input type="hidden" id="add-user-modal-user-id"/>
+                            <input type="text" id="add-user-modal-user-name" readonly="readonly" class="form-control mb-2"/>
+                            <input type="text" id="add-user-modal-user-username" readonly="readonly" class="form-control mb-2"/>
+                            <input type="text" id="add-user-modal-user-email" readonly="readonly" class="form-control mb-2"/>
                             <span class="text" id="add-user-modal-user-warning">User not found in database. User will be created automatically.</span>
                         </div>
                     </form>
@@ -288,7 +291,7 @@
                     <p>Are you sure you want to revoke key:</p>
                     <span id="revoke-key-modal-key"></span>
                     <form id="revoke-key-modal-form">
-                        <input type="hidden" id="revoke-key-modal-id" name="id" />
+                        <input type="hidden" id="revoke-key-modal-id" name="id"/>
                     </form>
                 </div>
                 <div class="modal-footer">
