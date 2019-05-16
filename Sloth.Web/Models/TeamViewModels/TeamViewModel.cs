@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Sloth.Core.Models;
 
 namespace Sloth.Web.Models.TeamViewModels
 {
@@ -7,6 +8,13 @@ namespace Sloth.Web.Models.TeamViewModels
     {
         [Required]
         public string Name { get; set; }
+
+        [Display(Name = "Team Slug")]
+        [Required]
+        [StringLength(40, MinimumLength = 3, ErrorMessage = "Slug must be between 3 and 40 characters")]
+        [RegularExpression(Team.SlugRegex,
+            ErrorMessage = "Slug may only contain lowercase alphanumeric characters or single hyphens, and cannot begin or end with a hyphen")]
+        public string Slug { get; set; }
 
         /// <summary>
         /// Campus User ID of main contact responsible for KFS feed.

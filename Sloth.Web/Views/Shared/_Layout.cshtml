@@ -1,4 +1,18 @@
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Routing
 @using Sloth.Core.Resources
+@using Sloth.Web.Identity
+@inject ApplicationUserManager UserManager
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var user = await UserManager.GetUserAsync(User);
+    var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
+
+    var teams = user.GetTeams().ToList();
+    var currentTeam = teams.FirstOrDefault(t => t.Slug == teamSlug);
+}
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -51,6 +65,13 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-controller="Teams" asp-action="Index">Teams</a>
                     </li>
+
+                    @if (!string.IsNullOrEmpty(teamSlug))
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-id="@currentTeam.Id">Settings</a>
+                        </li>
+                    }
 
                     @if (User.IsInRole(Roles.SystemAdmin))
                     {

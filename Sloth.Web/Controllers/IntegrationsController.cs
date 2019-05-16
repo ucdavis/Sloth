@@ -1,13 +1,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
+using Sloth.Web.Identity;
 using Sloth.Web.Models.IntegrationViewModels;
 
 namespace Sloth.Web.Controllers
@@ -16,19 +16,18 @@ namespace Sloth.Web.Controllers
     {
         private readonly ISecretsService _secretsService;
 
-        public IntegrationsController(UserManager<User> userManager, SlothDbContext dbContext, ISecretsService secretsService)
+        public IntegrationsController(ApplicationUserManager userManager, SlothDbContext dbContext, ISecretsService secretsService)
             : base(userManager, dbContext)
         {
             _secretsService = secretsService;
         } 
 
         [HttpGet]
-        public async Task<IActionResult> Create(string teamId)
+        public async Task<IActionResult> Create()
         {
-            ViewBag.Teams = await GetUsersAdminTeams();
-            ViewBag.DefaultTeamId = teamId;
-
-            ViewBag.Sources = await DbContext.Sources.ToListAsync();
+            ViewBag.Sources = await DbContext.Sources
+                .Where(s => s.Team.Slug == TeamSlug)
+                .ToListAsync();
 
             ViewBag.Types = new[]
             {
@@ -43,7 +42,7 @@ namespace Sloth.Web.Controllers
         {
             // TODO: validate model
             var adminTeams = await GetUsersAdminTeams();
-            var team = adminTeams.FirstOrDefault(t => t.Id == model.TeamId);
+            var team = adminTeams.FirstOrDefault(t => t.Slug == TeamSlug);
             if (team == null)
             {
                 return View(model);
@@ -60,7 +59,6 @@ namespace Sloth.Web.Controllers
             await _secretsService.UpdateSecret(secretId, model.ReportPassword);
 
             // create integration
-
             var target = new Integration
             {
                 MerchantId        = model.MerchantId,
@@ -81,8 +79,6 @@ namespace Sloth.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
-            ViewBag.Teams = await GetUsersAdminTeams();
-
             ViewBag.Sources = await DbContext.Sources.ToListAsync();
 
             ViewBag.Types = new[]
@@ -100,7 +96,6 @@ namespace Sloth.Web.Controllers
                 ReportPasswordDirty = false,
                 SourceId            = integration.Source.Id,
                 ReportUserName      = integration.ReportUsername,
-                TeamId              = integration.Team.Id,
                 Type                = integration.Type,
             };
 
@@ -118,7 +113,7 @@ namespace Sloth.Web.Controllers
 
             // validate model
             var adminTeams = await GetUsersAdminTeams();
-            var team = adminTeams.FirstOrDefault(t => t.Id == model.TeamId);
+            var team = adminTeams.FirstOrDefault(t => t.Slug == TeamSlug);
             if (team == null)
             {
                 return View(model);

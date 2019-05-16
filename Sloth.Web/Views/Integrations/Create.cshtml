@@ -1,16 +1,11 @@
 @using Sloth.Core.Models
-@using Sloth.Web.Models.IntegrationViewModels
 @model Sloth.Web.Models.IntegrationViewModels.CreateIntegrationViewModel
 
 @{
     ViewBag.Title = "Create Integration";
 
-    var defaultTeamId = ViewBag.DefaultTeamId as string;
-
-    var teams = ViewBag.Teams as IEnumerable<Team>;
     var sources = ViewBag.Sources as IEnumerable<Source>;
 
-    var teamItems = teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.Id, Selected = t.Id == defaultTeamId });
     var sourceItems = sources?.Select(s => new SelectListItem() { Text = $"{s.Name} {s.Type}", Value = s.Id });
 
     var types = ViewBag.Types as IEnumerable<string>;
@@ -21,10 +16,6 @@
 
 @using (Html.BeginForm(FormMethod.Post))
 {
-    <div class="form-group">
-        @Html.LabelFor(x => x.TeamId)
-        @Html.DropDownListFor(x => x.TeamId, teamItems, new { @class = "form-control" })
-    </div>
     <div class="form-group">
         @Html.LabelFor(x => x.SourceId)
         @Html.DropDownListFor(x => x.SourceId, sourceItems, new { @class = "form-control" })

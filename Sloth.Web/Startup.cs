@@ -1,8 +1,11 @@
 using AspNetCore.Security.CAS;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,8 +19,12 @@ using Sloth.Core.Configuration;
 using Sloth.Core.Jobs;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
+using Sloth.Web.Authorization;
+using Sloth.Web.Handlers;
+using Sloth.Web.Identity;
 using Sloth.Web.Logging;
 using Sloth.Web.Models;
+using Sloth.Web.Resources;
 using Sloth.Web.Services;
 using StackifyLib;
 
@@ -79,7 +86,7 @@ namespace Sloth.Web
 
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<SlothDbContext>()
-                .AddUserManager<UserManager<User>>();
+                .AddUserManager<ApplicationUserManager>();
 
             services.AddAuthentication(options =>
                 {
@@ -93,6 +100,16 @@ namespace Sloth.Web
                 {
                     options.CasServerUrlBase = Configuration["CasBaseUrl"];
                 });
+
+            services.AddAuthorization(o =>
+            {
+                o.AddPolicy(PolicyCodes.TeamAdmin,
+                    policy => policy.Requirements.Add(new VerifyTeamPermission(TeamRole.Admin)));
+
+                o.AddPolicy(PolicyCodes.TeamApprover,
+                    policy => policy.Requirements.Add(new VerifyTeamPermission(TeamRole.Admin, TeamRole.Approver)));
+            });
+            services.AddScoped<IAuthorizationHandler, VerifyTeamPermissionHandler>();
 
             services.AddMvc()
                 .AddJsonOptions(o =>
@@ -139,13 +156,39 @@ namespace Sloth.Web
 
             app.UseMvc(routes =>
             {
+                // non team root routes
+                routes.MapRoute(
+                    name: "non-team-routes",
+                    template: "{controller}/{action=Index}/{id?}",
+                    defaults: new { },
+                    constraints: new { controller = "(account|teams|jobs|system|users)" });
+
+                // team level routes
+                routes.MapRoute(
+                    name: "team-index",
+                    template: "{team}",
+                    defaults: new { controller = "home", action = "teamindex" },
+                    constraints: new
+                    {
+                        team = new CompositeRouteConstraint(new IRouteConstraint[] {
+                            new RegexInlineRouteConstraint(Team.SlugRegex),
+                        })
+                    });
+
+                routes.MapRoute(
+                    name: "team-routes",
+                    template: "{team}/{controller=Home}/{action=Index}/{id?}",
+                    defaults: new { },
+                    constraints: new
+                    {
+                        team = new CompositeRouteConstraint(new IRouteConstraint[] {
+                            new RegexInlineRouteConstraint(Team.SlugRegex),
+                        })
+                    });
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
             });
         }
     }
