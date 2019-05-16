@@ -81,6 +81,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             // required services
             services.AddTransient<ISecretsService, SecretsService>();
             services.AddTransient<CybersourceBankReconcileJob>();
+            services.AddTransient<IWebHookService, WebHookService>();
 
             services.AddSingleton(_log);
 
