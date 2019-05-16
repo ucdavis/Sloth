@@ -1,72 +1,78 @@
-@using Sloth.Core.Models;
 @using Sloth.Core.Resources
 @model Sloth.Web.Models.SourceViewModels.CreateSourceViewModel
 
 @{
-    ViewBag.Title = "Create Source";
+    ViewBag.Title = "Create KFS Feed Source";
 
     var sourceTypes = SourceTypes.GetAll().Select(t => new SelectListItem() { Text = t, Value = t });
-
-    var teams = ViewBag.Teams as IEnumerable<Team>;
-    var teamItems = teams?.Select(t => new SelectListItem() { Text = t.Name, Value = t.Id, Selected = t.Id == defaultTeamId });
-
     var documentTypes = DocumentTypes.GetAll().Select(t => new SelectListItem() { Text = t, Value = t });
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container">
+    <h2>@ViewBag.Title</h2>
 
-@using (Html.BeginForm(FormMethod.Post))
-{
-    <div class="form-group">
-        @Html.DisplayNameFor(x => x.Name)
-        @Html.TextBoxFor(x => x.Name, new { @class = "form-control", placeholder = "ex: Test Team Recharge Source" })
-    </div>
-    <div class="form-group">
-        @Html.DisplayNameFor(x => x.Type)
+    @using (Html.BeginForm(FormMethod.Post))
+    {
+        <div class="form-group">
+            @Html.DisplayNameFor(x => x.Name)
+            @Html.TextBoxFor(x => x.Name, new { @class = "form-control", placeholder = "ex: Test Team Recharge Source" })
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.DisplayNameFor(x => x.Type)
             <select asp-for="Type" asp-items="sourceTypes" class="form-control">
                 <option value=""></option>
             </select>
-    </div>
-    <div class="form-group">
-        @Html.DisplayNameFor(x => x.Description)
-        @Html.TextBoxFor(x => x.Description, new { @class = "form-control", placeholder = "ex: External Recharge Income" })
-    </div>
-    <div class="form-group">
-        @Html.DisplayNameFor(x => x.Chart)
-        @Html.TextBoxFor(x => x.Chart, new { @class = "form-control", placeholder = "XX" })
-    </div>
-    <div class="form-group">
-        @Html.DisplayNameFor(x => x.OrganizationCode)
-        @Html.TextBoxFor(x => x.OrganizationCode, new { @class = "form-control", placeholder = "XXXX" })
-    </div>
-    <div class="form-group">
-        @Html.DisplayNameFor(x => x.OriginCode)
-        @Html.TextBoxFor(x => x.OriginCode, new { @class = "form-control", placeholder = "XX" })
-    </div>
-    <div class="form-group">
-        @Html.DisplayNameFor(x => x.DocumentType)
-        @Html.DropDownListFor(x => x.DocumentType, documentTypes, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.KfsFtpUsername)
-        @Html.TextBoxFor(x => x.KfsFtpUsername, new { @class = "form-control" })
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(x => x.KfsFtpPasswordKey)
-        <div class="input-group">
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.DisplayNameFor(x => x.Description)
+            @Html.TextBoxFor(x => x.Description, new { @class = "form-control", placeholder = "ex: External Recharge Income" })
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.DisplayNameFor(x => x.Chart)
+            @Html.TextBoxFor(x => x.Chart, new { @class = "form-control", placeholder = "XX" })
+            <span asp-validation-for="Chart" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.DisplayNameFor(x => x.OrganizationCode)
+            @Html.TextBoxFor(x => x.OrganizationCode, new { @class = "form-control", placeholder = "XXXX" })
+            <span asp-validation-for="OrganizationCode" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.DisplayNameFor(x => x.OriginCode)
+            @Html.TextBoxFor(x => x.OriginCode, new { @class = "form-control", placeholder = "XX" })
+            <span asp-validation-for="OriginCode" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.DisplayNameFor(x => x.DocumentType)
+            @Html.DropDownListFor(x => x.DocumentType, documentTypes, "", new { @class = "form-control" })
+            <span asp-validation-for="DocumentType" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.KfsFtpUsername)
+            @Html.TextBoxFor(x => x.KfsFtpUsername, new { @class = "form-control" })
+            <span asp-validation-for="KfsFtpUsername" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(x => x.KfsFtpPasswordKey)
+            <div class="input-group">
 
-            @Html.PasswordFor(x => x.KfsFtpPasswordKey, new { @class = "form-control", @readonly = true })
-            <div class="input-group-append">
-                <div id="kfs-ftp-password-key-clear" class="btn btn-primary" data-toggle="modal" data-target="#passwordModal">
-                    <i class="fa fa-edit"></i>
+                @Html.PasswordFor(x => x.KfsFtpPasswordKey, new { @class = "form-control", @readonly = true })
+                <div class="input-group-append">
+                    <div id="kfs-ftp-password-key-clear" class="btn btn-primary" data-toggle="modal" data-target="#passwordModal">
+                        <i class="fa fa-edit"></i>
+                    </div>
                 </div>
             </div>
+            <span asp-validation-for="KfsFtpPasswordKey" class="text-danger"></span>
         </div>
-    </div>
-    <div class="d-flex justify-content-end align-items-end">
-        <input type="submit" value="Create" class="btn btn-primary" />
-    </div>
-}
+        <div class="d-flex justify-content-end align-items-end">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    }
+</div>
 
 <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
