@@ -91,5 +91,6 @@
     <Build Include="dbo\Tables\CybersourceBankReconcileJobRecords.sql" />
     <Build Include="dbo\Tables\KfsScrubberUploadJobRecords.sql" />
     <Build Include="dbo\Sequences\Document_Number_Seq.sql" />
+    <Build Include="dbo\Tables\WebHooks.sql" />
   </ItemGroup>
 </Project>

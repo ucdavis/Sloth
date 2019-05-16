@@ -39,6 +39,8 @@ namespace Sloth.Core
 
         public DbSet<LogMessage> Logs { get; set; }
 
+        public DbSet<WebHook> WebHooks { get; set; }
+
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
             const string sql = "SELECT NEXT VALUE FOR KFS_Tracking_Number_Seq AS KfsTrackingNumber";

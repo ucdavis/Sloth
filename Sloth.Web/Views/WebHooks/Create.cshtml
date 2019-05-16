@@ -1,0 +1,21 @@
+@model Sloth.Web.Models.WebHookViewModels.CreateWebHookViewModel
+
+@{
+    ViewBag.Title = "Create Integration";
+}
+
+<div class="container">
+    <h2>@ViewBag.Title</h2>
+
+    @using (Html.BeginForm(FormMethod.Post))
+    {
+        <div class="form-group">
+            <label asp-for="Url"></label>
+            <input asp-for="Url" class="form-control" />
+            <span asp-validation-for="Url"></span>
+        </div>
+        <div class="d-flex justify-content-end align-items-end">
+            <input type="submit" value="Create" class="btn btn-primary" />
+        </div>
+    }
+</div>

@@ -33,6 +33,7 @@ namespace Sloth.Web.Controllers
                     .ThenInclude(r => r.User)
                 .Include(t => t.UserTeamRoles)
                     .ThenInclude(r => r.Role)
+                .Include(t => t.WebHooks)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (team == null)

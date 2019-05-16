@@ -9,6 +9,7 @@ using Serilog;
 using Sloth.Core.Configuration;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
+using Sloth.Core.Models.WebHooks;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Integrations.Cybersource;
@@ -20,14 +21,16 @@ namespace Sloth.Core.Jobs
     {
         private readonly SlothDbContext _context;
         private readonly ISecretsService _secretsService;
+        private readonly IWebHookService _webHookService;
         private readonly CybersourceOptions _options;
 
         public static string JobName = "Cybersource.BankReconcile";
 
-        public CybersourceBankReconcileJob(SlothDbContext context, ISecretsService secretsService, IOptions<CybersourceOptions> options)
+        public CybersourceBankReconcileJob(SlothDbContext context, ISecretsService secretsService, IWebHookService webHookService, IOptions<CybersourceOptions> options)
         {
             _context = context;
             _secretsService = secretsService;
+            _webHookService = webHookService;
             _options = options.Value;
 
             // TODO validate options
@@ -42,6 +45,7 @@ namespace Sloth.Core.Jobs
                 var integrations = _context.Integrations
                     .Where(i => i.Type == IntegrationTypes.CyberSource)
                     .Include(i => i.Source)
+                    .Include(i => i.Team)
                     .ToList();
 
                 if (!integrations.Any())
@@ -154,6 +158,23 @@ namespace Sloth.Core.Jobs
                         }
 
                         _context.Transactions.Add(transaction);
+
+                        // push webhook for this reconcile
+                        try
+                        {
+                            await _webHookService.SendBankReconcileWebHook(integration.Team,
+                                new BankReconcileWebHookPayload()
+                                {
+                                    KfsTrackingNumber       = kfsTrackingNumber,
+                                    MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
+                                    ProcessorTrackingNumber = deposit.RequestID,
+                                    TransactionDate         = yesterday,
+                                });
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Error(ex, "Error when pushing webhook information");
+                        }
                     }
 
                     // push changes for this integration

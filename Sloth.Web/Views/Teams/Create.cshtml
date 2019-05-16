@@ -9,32 +9,39 @@
 
     <form method="post">
         <div class="form-group">
-            @Html.LabelFor(x => x.Name)
-            @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="form-group">
-            @Html.LabelFor(x => x.Slug)
-            @Html.TextBoxFor(x => x.Slug, new { @class = "form-control" })
+            <label asp-for="Slug"></label>
+            <input asp-for="Slug" class="form-control" />
+            <span asp-validation-for="Slug" class="text-danger"></span>
         </div>
         <div class="form-group">
-            @Html.LabelFor(x => x.KfsContactDepartmentName)
-            @Html.TextBoxFor(x => x.KfsContactDepartmentName, new { @class = "form-control" })
+            <label asp-for="KfsContactDepartmentName"></label>
+            <input asp-for="KfsContactDepartmentName" class="form-control" />
+            <span asp-validation-for="KfsContactDepartmentName" class="text-danger"></span>
         </div>
         <div class="form-group">
-            @Html.LabelFor(x => x.KfsContactUserId)
-            @Html.TextBoxFor(x => x.KfsContactUserId, new { @class = "form-control" })
+            <label asp-for="KfsContactUserId"></label>
+            <input asp-for="KfsContactUserId" class="form-control" />
+            <span asp-validation-for="KfsContactUserId" class="text-danger"></span>
         </div>
         <div class="form-group">
-            @Html.LabelFor(x => x.KfsContactEmail)
-            @Html.TextBoxFor(x => x.KfsContactEmail, new { @class = "form-control" })
+            <label asp-for="KfsContactEmail"></label>
+            <input asp-for="KfsContactEmail" class="form-control" />
+            <span asp-validation-for="KfsContactEmail" class="text-danger"></span>
         </div>
         <div class="form-group">
-            @Html.LabelFor(x => x.KfsContactPhoneNumber)
-            @Html.TextBoxFor(x => x.KfsContactPhoneNumber, new { @class = "form-control" })
+            <label asp-for="KfsContactPhoneNumber"></label>
+            <input asp-for="KfsContactPhoneNumber" class="form-control" />
+            <span asp-validation-for="KfsContactPhoneNumber" class="text-danger"></span>
         </div>
         <div class="form-group">
-            @Html.LabelFor(x => x.KfsContactMailingAddress)
-            @Html.TextBoxFor(x => x.KfsContactMailingAddress, new { @class = "form-control" })
+            <label asp-for="KfsContactMailingAddress"></label>
+            <input asp-for="KfsContactMailingAddress" class="form-control" />
+            <span asp-validation-for="KfsContactMailingAddress" class="text-danger"></span>
         </div>
         <input type="submit" value="Create" class="btn btn-primary" />
     </form>
