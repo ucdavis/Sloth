@@ -16,7 +16,7 @@ namespace Sloth.Core.Services
     {
         Task SendBankReconcileWebHook(Team team, BankReconcileWebHookPayload payload);
 
-        Task TestWebHook(WebHook webHook);
+        Task<HttpResponseMessage> TestWebHook(WebHook webHook);
     }
 
     public class WebHookService : IWebHookService
@@ -39,16 +39,16 @@ namespace Sloth.Core.Services
             }
         }
 
-        public async Task TestWebHook(WebHook webHook)
+        public Task<HttpResponseMessage> TestWebHook(WebHook webHook)
         {
             var payload = new TestWebHookPayload()
             {
                 HookId = webHook.Id,
             };
-            await SendWebHookPayload(webHook, payload);
+            return SendWebHookPayload(webHook, payload);
         }
 
-        private async Task SendWebHookPayload(WebHook webHook, WebHookPayload payload)
+        private async Task<HttpResponseMessage> SendWebHookPayload(WebHook webHook, WebHookPayload payload)
         {
             using (var client = new HttpClient())
             {
@@ -62,6 +62,8 @@ namespace Sloth.Core.Services
                 Log.ForContext("webhook", webHook, true)
                     .ForContext("response", response, true)
                     .Information("Sent webhook");
+
+                return response;
             }
         }
     }

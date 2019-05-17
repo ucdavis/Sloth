@@ -204,7 +204,9 @@
                         <td>
                             @w.IsActive
                         </td>
-                        <td></td>
+                        <td>
+                            <a asp-controller="WebHooks" asp-action="Test" asp-route-id="@w.Id">Test</a>
+                        </td>
                     </tr>
                 }
                 </tbody>
@@ -325,9 +327,15 @@
         });
 
         var apiKeysTable = $('#apiKeysTable').DataTable({
+            columnDefs: [
+                { sortable: false, targets: -1 },
+            ],
         });
 
         var webHooksTable = $('#webHooksTable').DataTable({
+            columnDefs: [
+                { sortable: false, targets: -1 },
+            ],
         });
 
         // global models
