@@ -5,9 +5,11 @@
     ViewBag.Title = "Sources";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container">
+    <h2>@ViewBag.Title</h2>
 
-@Html.Partial("_SourcesTable", Model)
+    <partial name="_SourcesTable" model="Model" />
+</div>
 
 @section AdditionalScripts
 {
