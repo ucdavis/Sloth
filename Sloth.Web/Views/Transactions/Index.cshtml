@@ -4,9 +4,11 @@
     ViewBag.Title = "Transactions";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container">
+    <h2>@ViewBag.Title</h2>
 
-@Html.Partial("_TransactionsTable", Model)
+    <partial name="_TransactionsTable" model="Model" />
+</div>
 
 
 @section AdditionalScripts {

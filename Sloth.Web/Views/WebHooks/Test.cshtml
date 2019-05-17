@@ -1,0 +1,53 @@
+@model Sloth.Core.Models.WebHook
+@{
+    ViewData["Title"] = "Test";
+}
+
+@section AdditionalStyles
+{
+    <link href="~/css/prism.css" rel="stylesheet" />
+}
+
+<div class="container">
+    <h2>Test</h2>
+
+    <div class="form-group">
+        <label>Response Status</label>
+        <input id="resultStatusCode" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+        <label>Response Content</label>
+        <pre id="resultResponse" class="form-control" readonly><code></code></pre>
+    </div>
+</div>
+
+@section AdditionalScripts
+{
+    <script src="~/js/prism.js" data-manual></script>
+    <script>
+        var url = '@Url.Action("SendTest", new { xid = Model.Id })';
+        $(function() {
+            $.post(url)
+                .done(function(result) {
+                    console.log(result);
+
+                    $('#resultStatusCode').val(result.statusCode);
+                    $('#resultResponse code').text(result.response);
+
+                    if (result.response.startsWith('{')) {
+                        $('#resultResponse code').attr('class', 'language-json');
+                    } else {
+                        $('#resultResponse code').attr('class', 'language-markdown');
+                    }
+
+                    Prism.highlightElement($('#resultResponse code')[0]);
+                })
+                .fail(function(error) {
+                    console.error(error);
+
+                    $('#resultStatusCode').val(error.statusText);
+                    $('#resultResponse code').text(error.responseText);
+                });
+        });
+    </script>
+}

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.WebHookViewModels;
 
@@ -12,9 +13,12 @@ namespace Sloth.Web.Controllers
 {
     public class WebHooksController : SuperController
     {
-        public WebHooksController(ApplicationUserManager userManager, SlothDbContext dbContext)
+        private readonly IWebHookService _webHookService;
+
+        public WebHooksController(ApplicationUserManager userManager, SlothDbContext dbContext, IWebHookService webHookService)
             : base(userManager, dbContext)
         {
+            _webHookService = webHookService;
         } 
 
         [HttpGet]
@@ -89,6 +93,38 @@ namespace Sloth.Web.Controllers
             await DbContext.SaveChangesAsync();
 
             return RedirectToAction("Details", "Teams", new { id = team.Id });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Test(string id)
+        {
+            var webhook = await DbContext.WebHooks.FirstOrDefaultAsync(i => i.Id == id);
+            if (webhook == null)
+            {
+                return NotFound();
+            }
+
+            return View(webhook);
+        }
+
+        [HttpPost]
+        [IgnoreAntiforgeryToken]
+        public async Task<IActionResult> SendTest(string id)
+        {
+            var webhook = await DbContext.WebHooks.FirstOrDefaultAsync(i => i.Id == id);
+            if (webhook == null)
+            {
+                return NotFound();
+            }
+
+            var result = await _webHookService.TestWebHook(webhook);
+
+            // ship result
+            return new JsonResult(new
+            {
+                result.StatusCode,
+                Response = await result.Content.ReadAsStringAsync(),
+            });
         }
     }
 }
