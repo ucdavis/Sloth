@@ -27,7 +27,7 @@
 
 <div id="jobsCalendar" class="mb-4"></div>
 
-<table id="recordsTable" class="table table-hover">
+<table id="recordsTable" class="table table-hover tabel-bordered">
     <thead>
     <tr>
         <th>
@@ -118,7 +118,7 @@
             columnDefs: [
                 { visible: false, targets: groupColumn },
                 { orderable: false, targets: -1 }],
-            order: [[groupColumn, 'asc']],
+            order: [[1, 'desc']],
             drawCallback: function(settings) {
                 var api = this.api();
                 var rows = api.rows( {page:'current'} ).nodes();

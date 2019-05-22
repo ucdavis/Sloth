@@ -46,6 +46,7 @@ namespace Sloth.Web.Controllers
             var needApproval = await DbContext.Transactions
                 .Include(t => t.Transfers)
                 .Where(t => t.Status == TransactionStatuses.PendingApproval)
+                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .AsNoTracking()
                 .ToListAsync();
             ViewBag.NeedApproval = needApproval;
