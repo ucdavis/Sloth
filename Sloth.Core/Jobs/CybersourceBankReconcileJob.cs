@@ -7,13 +7,14 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Sloth.Core.Configuration;
-using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Models.WebHooks;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
-using Sloth.Integrations.Cybersource;
+using Sloth.Integrations.CyberSource;
 using Sloth.Integrations.Cybersource.Clients;
+using Sloth.Integrations.Cybersource.Helpers;
+using Sloth.Integrations.Cybersource.Resources;
 
 namespace Sloth.Core.Jobs
 {
@@ -82,7 +83,7 @@ namespace Sloth.Core.Jobs
 
                     // fetch report
                     var report = await client.GetPaymentBatchDetailReport(yesterday);
-                    var count = report.Batches?.Batch?.Length ?? 0;
+                    var count = report.Requests?.Length ?? 0;
 
                     log.Information("Report found with {count} records.", new { count });
 
@@ -92,8 +93,7 @@ namespace Sloth.Core.Jobs
                     }
 
                     // iterate over deposits
-                    foreach (var deposit in report.Batches?.Batch?.SelectMany(b => b.Requests?.Request) ??
-                                            new List<Request>())
+                    foreach (var deposit in report.Requests?.ToList() ?? new List<ReportRequest>())
                     {
                         // look for existing transaction
                         var transaction =
@@ -110,6 +110,12 @@ namespace Sloth.Core.Jobs
 
                         // create transaction per deposit item,
                         // moving monies from clearing to holding
+
+                        // transfers can often have multiple application replies, locate the correct one
+                        var replyIndex = deposit.ApplicationReplies.IndexOf(r => r.Name == ApplicationReplyTypes.Bill);
+                        var paymentInfo = deposit.PaymentData[replyIndex];
+
+                        var amount = decimal.Parse(paymentInfo.Amount);
 
                         // create document number
                         var documentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
@@ -132,7 +138,7 @@ namespace Sloth.Core.Jobs
                             Chart        = "3",
                             Account      = integration.ClearingAccount,
                             Direction    = Transfer.CreditDebit.Debit,
-                            Amount       = deposit.Amount,
+                            Amount       = amount,
                             Description  = "Cybersource Deposit",
                             ObjectCode   = ObjectCodes.Income,
                         };
@@ -144,7 +150,7 @@ namespace Sloth.Core.Jobs
                             Chart        = "3",
                             Account      = integration.HoldingAccount,
                             Direction    = Transfer.CreditDebit.Credit,
-                            Amount       = deposit.Amount,
+                            Amount       = amount,
                             Description  = "Cybersource Deposit",
                             ObjectCode   = ObjectCodes.Income,
                         };
