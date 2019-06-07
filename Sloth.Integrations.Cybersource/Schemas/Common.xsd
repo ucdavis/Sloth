@@ -1,0 +1,512 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+  <xs:complexType name="BillTo">
+    <xs:all>
+      <xs:element name="Address1" type="xs:string" minOccurs="0"/>
+      <xs:element name="Address2" type="xs:string" minOccurs="0"/>
+      <xs:element name="City" type="xs:string" minOccurs="0"/>
+      <xs:element name="CompanyName" type="xs:string" minOccurs="0"/>
+      <xs:element name="CompanyTaxID" type="xs:string" minOccurs="0"/>
+      <xs:element name="Country" type="xs:string" minOccurs="0"/>
+      <xs:element name="CustomerID" type="xs:string" minOccurs="0"/>
+      <xs:element name="Email" type="xs:string" minOccurs="0"/>
+      <xs:element name="FirstName" type="xs:string" minOccurs="0"/>
+      <xs:element name="HostName" type="xs:string" minOccurs="0"/>
+      <xs:element name="IPAddress" type="xs:string" minOccurs="0"/>
+      <xs:element name="LastName" type="xs:string" minOccurs="0"/>
+      <xs:element name="MiddleName" type="xs:string" minOccurs="0"/>
+      <xs:element name="NameSuffix" type="xs:string" minOccurs="0"/>
+      <xs:element name="PersonalID" type="xs:string" minOccurs="0"/>
+      <xs:element name="Phone" type="xs:string" minOccurs="0"/>
+      <xs:element name="State" type="xs:string" minOccurs="0"/>
+      <xs:element name="Title" type="xs:string" minOccurs="0"/>
+      <xs:element name="UserName" type="xs:string" minOccurs="0"/>
+      <xs:element name="Zip" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ShipTo">
+    <xs:all>
+      <xs:element name="Address1" type="xs:string" minOccurs="0"/>
+      <xs:element name="Address2" type="xs:string" minOccurs="0"/>
+      <xs:element name="City" type="xs:string" minOccurs="0"/>
+      <xs:element name="CompanyName" type="xs:string" minOccurs="0"/>
+      <xs:element name="Country" type="xs:string" minOccurs="0"/>
+      <xs:element name="FirstName" type="xs:string" minOccurs="0"/>
+      <xs:element name="LastName" type="xs:string" minOccurs="0"/>
+      <xs:element name="Phone" type="xs:string" minOccurs="0"/>
+      <xs:element name="State" type="xs:string" minOccurs="0"/>
+      <xs:element name="Zip" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="Shipping">
+    <xs:all>
+      <xs:element name="Carrier" type="xs:string"/>
+      <xs:element name="Method" type="xs:string"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="PaymentMethod">
+    <xs:all>
+      <xs:element name="TypeDescription" type="xs:string" minOccurs="0"/>
+      <xs:element name="OverridePaymentMethod" type="xs:string" minOccurs="0"/>
+      <xs:element name="Check" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="AccountSuffix" type="xs:string" minOccurs="0"/>
+            <xs:element name="CheckNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="MandateId" type="xs:string" minOccurs="0"/>
+            <xs:element name="MandateType" type="xs:string" minOccurs="0"/>
+            <xs:element name="SignatureDate" type="xs:string" minOccurs="0"/>
+            <xs:element name="AccountType" type="xs:string" minOccurs="0"/>
+            <xs:element name="AccountEncoderID" type="xs:string" minOccurs="0"/>
+            <xs:element name="BankTransitNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="EffectiveDate" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="WalletType" type="xs:string" minOccurs="0"/>
+      <xs:element name="Card" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="CardType" type="xs:string" minOccurs="0"/>
+            <xs:element name="ExpirationMonth" type="xs:string" minOccurs="0"/>
+            <xs:element name="ExpirationYear" type="xs:string" minOccurs="0"/>
+            <xs:element name="StartMonth" type="xs:string" minOccurs="0"/>
+            <xs:element name="StartYear" type="xs:string" minOccurs="0"/>
+            <xs:element name="IssueNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="AccountSuffix" type="xs:string" minOccurs="0"/>
+            <xs:element name="AdditionalCardType" type="xs:string" minOccurs="0"/>
+            <xs:element name="CardPrepaidReloadable" type="xs:string" minOccurs="0"/>
+            <xs:element name="CardPrepaidType" type="xs:string" minOccurs="0"/>
+            <xs:element name="CardVirtual" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="FundTransfer" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="BankCheckDigit" type="xs:string" minOccurs="0"/>
+            <xs:element name="IbanIndicator" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="BankInfo" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="BankAddress" type="xs:string" minOccurs="0"/>
+            <xs:element name="BankBranchCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="BankCity" type="xs:string" minOccurs="0"/>
+            <xs:element name="BankCountry" type="xs:string" minOccurs="0"/>
+            <xs:element name="BankName" type="xs:string" minOccurs="0"/>
+            <xs:element name="BankSwiftCode" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Token" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="TokenCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="NetworkTokenTransType" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="BankCode" type="xs:string" minOccurs="0"/>
+      <xs:element name="BankAccountName" type="xs:string" minOccurs="0"/>
+      <xs:element name="BoletoBarCodeNumber" type="xs:string" minOccurs="0"/>
+      <xs:element name="Type" type="xs:string" minOccurs="0" />
+      <xs:element name="BoletoNumber" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="LineItems">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="LineItem" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="FulfillmentType" type="xs:string" minOccurs="0"/>
+            <xs:element name="InvoiceNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="MerchantProductSKU" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProductCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProductName" type="xs:string" minOccurs="0"/>
+            <xs:element name="Quantity" type="xs:string" minOccurs="0"/>
+            <xs:element name="TaxAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="UnitPrice" type="xs:string" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="Number" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="ApplicationReplies">
+    <xs:sequence>
+      <xs:element name="ApplicationReply" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="RCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="ReasonCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="RFlag" type="xs:string" minOccurs="0"/>
+            <xs:element name="RMsg" type="xs:string" minOccurs="0"/>
+          </xs:all>
+          <xs:attribute name="Name" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PaymentData">
+    <xs:sequence>
+      <xs:element name="PaymentInfo" maxOccurs="unbounded" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="AVSResult" type="xs:string" minOccurs="0"/>
+            <xs:element name="AVSResultMapped" type="xs:string" minOccurs="0"/>
+            <xs:element name="AcquirerMerchantNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="Amount" type="xs:string" minOccurs="0"/>
+            <xs:element name="AuthFactorCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="AuthIndicator" type="xs:string" minOccurs="0"/>
+            <xs:element name="AuthReversalAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="AuthReversalResult" type="xs:string" minOccurs="0"/>
+            <xs:element name="AuthorizationCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="AuthorizationType" type="xs:string" minOccurs="0"/>
+            <xs:element name="BatchFilesID" type="xs:string" minOccurs="0"/>
+            <xs:element name="CVResult" type="xs:string" minOccurs="0"/>
+            <xs:element name="CardCategory" type="xs:string" minOccurs="0"/>
+            <xs:element name="CardCategoryCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="CardPresent" type="xs:string" minOccurs="0"/>
+            <xs:element name="CardVerificationMethod" type="xs:string" minOccurs="0"/>
+            <xs:element name="CustomerID" type="xs:string" minOccurs="0"/>
+            <xs:element name="DCCIndicator" type="xs:string" minOccurs="0"/>
+            <xs:element name="EMVRequestFallBack" type="xs:string" minOccurs="0"/>
+            <xs:element name="ExchangeRate" type="xs:string" minOccurs="0"/>
+            <xs:element name="ExchangeRateDate" type="xs:string" minOccurs="0"/>
+            <xs:element name="IssuerResponseCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="MandateReferenceNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="NetworkCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="NetworkTransactionID" type="xs:string" minOccurs="0"/>
+            <xs:element name="OriginalAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="OriginalCurrency" type="xs:string" minOccurs="0"/>
+            <xs:element name="POSCatLevel" type="xs:string" minOccurs="0"/>
+            <xs:element name="POSEntryMode" type="xs:string" minOccurs="0"/>
+            <xs:element name="POSEnvironment" type="xs:string" minOccurs="0"/>
+            <xs:element name="PaymentProcessor" type="xs:string" minOccurs="0"/>
+            <xs:element name="PaymentRequestID" type="xs:string" minOccurs="0"/>
+            <xs:element name="PinType" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProcessorMID" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProcessorResponseCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProcessorResponseID" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProcessorTID" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProcessorTransactionID" type="xs:string" minOccurs="0"/>
+            <xs:element name="RoutingNetworkType" type="xs:string" minOccurs="0"/>
+            <xs:element name="SolutionType" type="xs:string" minOccurs="0"/>
+            <xs:element name="StoreAndForwardIndicator" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantCity" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantCountry" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantEmail" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantID" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantName" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantPhone" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantPostalCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantState" type="xs:string" minOccurs="0"/>
+            <xs:element name="SubMerchantStreet" type="xs:string" minOccurs="0"/>
+            <xs:element name="TargetAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="TargetCurrency" type="xs:string" minOccurs="0"/>
+            <xs:element name="TerminalIDAlternate" type="xs:string" minOccurs="0"/>
+            <xs:element name="TotalTaxAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="TransactionReferenceNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="eCommerceIndicator" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientAddress" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientCity" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientCountry" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientDOB" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientFirstName" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientLastName" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientMiddleInitial" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientPhoneNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientPostalCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientBillingAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientBillingCurrency" type="xs:string" minOccurs="0"/>
+            <xs:element name="RecipientState" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderAddress" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderCity" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderCountry" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderDOB" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderFirstName" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderLastName" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderMiddleInitial" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderPhoneNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderPostalCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderReferenceNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderSourceOfFunds" type="xs:string" minOccurs="0"/>
+            <xs:element name="SenderState" type="xs:string" minOccurs="0"/>
+            <xs:element name="PayerAuthenticationInfo">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element name="AAV_CAVV" type="xs:string" minOccurs="0"/>
+                  <xs:element name="ECI" type="xs:string" minOccurs="0"/>
+                  <xs:element name="XID" type="xs:string" minOccurs="0"/>
+                </xs:all>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="ACHVerificationResult" type="xs:string" minOccurs="0"/>
+            <xs:element name="ACHVerificationResultMapped" type="xs:string" minOccurs="0"/>
+            <xs:element name="CurrencyCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="NumberOfInstallments" type="xs:string" minOccurs="0"/>
+            <xs:element name="PaymentProductCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="GrandTotal" type="xs:string" minOccurs="0"/>
+            <xs:element name="BalanceAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="BalanceCurrencyCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="RequestedAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="RequestedAmountCurrencyCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="BinNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVEmail" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVEmailRaw" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVName" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVNameRaw" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVPhoneNumber" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVPhoneNumberRaw" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVPostalCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVPostalCodeRaw" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVStreet" type="xs:string" minOccurs="0"/>
+            <xs:element name="EVStreetRaw" type="xs:string" minOccurs="0"/>
+            <xs:element name="DebitIndicator" type="xs:string" minOccurs="0"/>
+            <xs:element name="EMVServiceCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="AFTIndicator" type="xs:string" minOccurs="0"/>
+            <xs:element name="CategoryAffiliate" type="xs:string" minOccurs="0"/>
+            <xs:element name="CategoryCampaign" type="xs:string" minOccurs="0"/>
+            <xs:element name="CategoryGroup" type="xs:string" minOccurs="0"/>
+            <xs:element name="AVSResultMode" type="xs:string" minOccurs="0"/>
+            <xs:element name="AVSResponse" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="MerchantDefinedData">
+    <xs:all>
+      <xs:element name="field1" type="xs:string" minOccurs="0"/>
+      <xs:element name="field2" type="xs:string" minOccurs="0"/>
+      <xs:element name="field3" type="xs:string" minOccurs="0"/>
+      <xs:element name="field4" type="xs:string" minOccurs="0"/>
+      <xs:element name="field5" type="xs:string" minOccurs="0"/>
+      <xs:element name="field6" type="xs:string" minOccurs="0"/>
+      <xs:element name="field7" type="xs:string" minOccurs="0"/>
+      <xs:element name="field8" type="xs:string" minOccurs="0"/>
+      <xs:element name="field9" type="xs:string" minOccurs="0"/>
+      <xs:element name="field10" type="xs:string" minOccurs="0"/>
+      <xs:element name="field11" type="xs:string" minOccurs="0"/>
+      <xs:element name="field12" type="xs:string" minOccurs="0"/>
+      <xs:element name="field13" type="xs:string" minOccurs="0"/>
+      <xs:element name="field14" type="xs:string" minOccurs="0"/>
+      <xs:element name="field15" type="xs:string" minOccurs="0"/>
+      <xs:element name="field16" type="xs:string" minOccurs="0"/>
+      <xs:element name="field17" type="xs:string" minOccurs="0"/>
+      <xs:element name="field18" type="xs:string" minOccurs="0"/>
+      <xs:element name="field19" type="xs:string" minOccurs="0"/>
+      <xs:element name="field20" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="RiskData">
+    <xs:all>
+      <xs:element name="AppliedAVS" type="xs:string" minOccurs="0"/>
+      <xs:element name="AppliedCV" type="xs:string" minOccurs="0"/>
+      <xs:element name="AppliedCategoryGift" type="xs:string" minOccurs="0"/>
+      <xs:element name="AppliedCategoryTime" type="xs:string" minOccurs="0"/>
+      <xs:element name="AppliedHostHedge" type="xs:string" minOccurs="0"/>
+      <xs:element name="AppliedThreshold" type="xs:string" minOccurs="0"/>
+      <xs:element name="AppliedTimeHedge" type="xs:string" minOccurs="0"/>
+      <xs:element name="AppliedVelocityHedge" type="xs:string" minOccurs="0"/>
+      <xs:element name="BinAccountType" type="xs:string" minOccurs="0"/>
+      <xs:element name="BinCountry" type="xs:string" minOccurs="0"/>
+      <xs:element name="BinIssuer" type="xs:string" minOccurs="0"/>
+      <xs:element name="BinScheme" type="xs:string" minOccurs="0"/>
+      <xs:element name="ConsumerLoyalty" type="xs:string" minOccurs="0"/>
+      <xs:element name="ConsumerPasswordProvided" type="xs:string" minOccurs="0"/>
+      <xs:element name="ConsumerPromotions" type="xs:string" minOccurs="0"/>
+      <xs:element name="CookiesAccepted" type="xs:string" minOccurs="0"/>
+      <xs:element name="CookiesEnabled" type="xs:string" minOccurs="0"/>
+      <xs:element name="DeviceFingerprint" type="xs:string" minOccurs="0"/>
+      <xs:element name="Factors" type="xs:string" minOccurs="0"/>
+      <xs:element name="FlashEnabled" type="xs:string" minOccurs="0"/>
+      <xs:element name="GiftWrap" type="xs:string" minOccurs="0"/>
+      <xs:element name="HostSeverity" type="xs:string" minOccurs="0"/>
+      <xs:element name="IPCity" type="xs:string" minOccurs="0"/>
+      <xs:element name="IPCountry" type="xs:string" minOccurs="0"/>
+      <xs:element name="IPRoutingMethod" type="xs:string" minOccurs="0"/>
+      <xs:element name="IPState" type="xs:string" minOccurs="0"/>
+      <xs:element name="ImagesEnabled" type="xs:string" minOccurs="0"/>
+      <xs:element name="JavascriptEnabled" type="xs:string" minOccurs="0"/>
+      <xs:element name="LostPassword" type="xs:string" minOccurs="0"/>
+      <xs:element name="ProductRisk" type="xs:string" minOccurs="0"/>
+      <xs:element name="ProxyIPAddress" type="xs:string" minOccurs="0"/>
+      <xs:element name="ProxyIPAddressActivities" type="xs:string" minOccurs="0"/>
+      <xs:element name="ProxyIPAddressAttributes" type="xs:string" minOccurs="0"/>
+      <xs:element name="ProxyServerType" type="xs:string" minOccurs="0"/>
+      <xs:element name="RepeatCustomer" type="xs:string" minOccurs="0"/>
+      <xs:element name="ReturnsAccepted" type="xs:string" minOccurs="0"/>
+      <xs:element name="Score" type="xs:string" minOccurs="0"/>
+      <xs:element name="TimeLocal" type="xs:string" minOccurs="0"/>
+      <xs:element name="TrueIPAddress" type="xs:string" minOccurs="0"/>
+      <xs:element name="TrueIPAddressAttributes" type="xs:string" minOccurs="0"/>
+      <xs:element name="TrueIPAddressCity" type="xs:string" minOccurs="0"/>
+      <xs:element name="TrueIPAddressCountry" type="xs:string" minOccurs="0"/>
+      <xs:element name="TrueIPAddressActivities" type="xs:string" minOccurs="0"/>
+      <xs:element name="InfoCodes">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="InfoCode" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element name="CodeType" type="xs:string" minOccurs="0"/>
+                  <xs:element name="CodeValue" type="xs:string" minOccurs="0"/>
+                </xs:all>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ProfileList">
+    <xs:sequence>
+      <xs:element name="Profile" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="ProfileMode" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProfileDecision" type="xs:string" minOccurs="0"/>
+            <xs:element name="RuleList">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element name="Rule" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:all>
+                        <xs:element name="RuleName" type="xs:string" minOccurs="0"/>
+                        <xs:element name="RuleDecision" type="xs:string" minOccurs="0"/>
+                      </xs:all>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+              </xs:complexType>
+            </xs:element>
+          </xs:all>
+          <xs:attribute name="Name" type="xs:string"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="TravelData">
+    <xs:all>
+      <xs:element name="TripInfo">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="CompleteRoute" type="xs:string" minOccurs="0"/>
+            <xs:element name="JourneyType" type="xs:string" minOccurs="0"/>
+            <xs:element name="DepartureDateTime" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="PassengerInfo">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="Passenger" minOccurs="0" maxOccurs="unbounded">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element name="PassengerEmail" type="xs:string" minOccurs="0"/>
+                  <xs:element name="PassengerFirstName" type="xs:string" minOccurs="0"/>
+                  <xs:element name="PassengerID" type="xs:string" minOccurs="0"/>
+                  <xs:element name="PassengerLastName" type="xs:string" minOccurs="0"/>
+                  <xs:element name="PassengerPhone" type="xs:string" minOccurs="0"/>
+                  <xs:element name="PassengerStatus" type="xs:string" minOccurs="0"/>
+                  <xs:element name="PassengerType" type="xs:string" minOccurs="0"/>
+                </xs:all>
+                <xs:attribute name="Number" type="xs:string"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="Device">
+    <xs:all>
+      <xs:element name="DeviceID" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="GiftCardInfo">
+    <xs:all>
+      <xs:element name="currentBalance" type="xs:string" minOccurs="0"/>
+      <xs:element name="previousBalance" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="InvoiceHeaderInfo">
+    <xs:all>
+      <xs:element name="CustomData_1" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="Events">
+    <xs:sequence>
+      <xs:element name="Event" maxOccurs="unbounded" minOccurs="0">
+        <xs:complexType>
+          <xs:all>
+            <xs:element name="Amount" type="xs:string" minOccurs="0"/>
+            <xs:element name="ConsumerAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="ConsumerCurrencyCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="CurrencyCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="Event" type="xs:string"/>
+            <xs:element name="EventDate" type="xs:dateTime"/>
+            <xs:element name="FeeAmount" type="xs:string" minOccurs="0"/>
+            <xs:element name="FeeCurrencyCode" type="xs:string" minOccurs="0"/>
+            <xs:element name="ProcessorMessage" type="xs:string"/>
+            <xs:element name="DebitIndicator" type="xs:string" minOccurs="0"/>
+          </xs:all>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="BATCH">
+    <xs:all>
+      <xs:element name="BatchID" type="xs:string"/>
+      <xs:element name="BatchDate" type="xs:dateTime"/>
+      <xs:element name="Status"  type="xs:string"/>
+      <xs:element name="SuccessFlag" type="xs:string" minOccurs="0"/>
+    </xs:all>
+  </xs:complexType>
+  <xs:complexType name="ExceptionInformation">
+    <xs:sequence>
+      <xs:choice maxOccurs="unbounded">
+        <xs:element name="Action" type="xs:string"/>
+        <xs:element name="CYBSExceptionID" type="xs:string" minOccurs="0"/>
+        <xs:element name="ClientID" type="xs:string" minOccurs="0"/>
+        <xs:element name="ProcessorResponseCode" type="xs:string"/>
+        <xs:element name="DccExchangeRate" type="xs:string" minOccurs="0"/>
+        <xs:element name="DccLookupStatus" type="xs:string" minOccurs="0"/>
+        <xs:element name="DccMarginRate" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionAmount" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionAmountCurrency" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionCategory" type="xs:string"/>
+        <xs:element name="ExceptionDate" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionDescription" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionDeviceHardwareRevision" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionDeviceID" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionDeviceOS" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionDeviceOSVersion" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionDeviceTerminalID" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionMessage" type="xs:string"/>
+        <xs:element name="ExceptionReasonCode" type="xs:string"/>
+        <xs:element name="ExceptionReasonDescription" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionStatus" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionStatusCode" type="xs:string" minOccurs="0"/>
+        <xs:element name="ExceptionType" type="xs:string"/>
+        <xs:element name="FinancialStatus" type="xs:string" minOccurs="0"/>
+        <xs:element name="LastActionDate" type="xs:string" minOccurs="0"/>
+        <xs:element name="LocalCurrencyCode" type="xs:string" minOccurs="0"/>
+        <xs:element name="NextActionDate" type="xs:string" minOccurs="0"/>
+        <xs:element name="OriginalTransactionSubmissionDate" type="xs:string" minOccurs="0"/>
+        <xs:element name="PartnerMerchantID" type="xs:string" minOccurs="0"/>
+        <xs:element name="PartnerMerchantName" type="xs:string" minOccurs="0"/>
+        <xs:element name="PaymentNumber" type="xs:string" minOccurs="0"/>
+        <xs:element name="ProcessorCaseID" type="xs:string" minOccurs="0"/>
+        <xs:element name="Retries" type="xs:string" minOccurs="0"/>
+        <xs:element name="SDKVersion" type="xs:string" minOccurs="0"/>
+        <xs:element name="SchemeOperator" type="xs:string" minOccurs="0"/>
+        <xs:element name="StorageMechanism" type="xs:string" minOccurs="0"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

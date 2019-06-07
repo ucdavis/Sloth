@@ -1,0 +1,54 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+  <xs:include schemaLocation="Common.xsd" />
+  <xs:element name="Report">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="Requests">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element maxOccurs="unbounded" name="Request">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="BillTo" name="BillTo" minOccurs="0"/>
+                    <xs:element type="ShipTo" name="ShipTo" minOccurs="0" />
+                    <xs:element type="Shipping" name="Shipping" minOccurs="0"/>
+                    <xs:element name="PaymentMethod" type="PaymentMethod" minOccurs="0"/>
+                    <xs:element name="LineItems" type="LineItems" minOccurs="0"/>
+                    <xs:element name="ApplicationReplies" type="ApplicationReplies" minOccurs="0"/>
+                    <xs:element name="PaymentData" type="PaymentData" minOccurs="0"/>
+                    <xs:element name="MerchantDefinedData" type="MerchantDefinedData" minOccurs="0"/>
+                    <xs:element name="RiskData" type="RiskData" minOccurs="0"/>
+                    <xs:element name="ProfileList" type="ProfileList" minOccurs="0"/>
+                    <xs:element name="TravelData" type="TravelData" minOccurs="0"/>
+                    <xs:element name="BATCH" type="BATCH"/>
+                    <xs:element name="Device" type="Device" minOccurs="0"/>
+                    <xs:element name="GiftCardInfo" type="GiftCardInfo" minOccurs="0"/>
+                    <xs:element name="InvoiceHeaderInfo" type="InvoiceHeaderInfo" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute name="Comments" type="xs:string"/>
+                  <xs:attribute name="LocalizedRequestDate" type="xs:dateTime"/>
+                  <xs:attribute name="MerchantID" type="xs:string" use="required" />
+                  <xs:attribute name="MerchantReferenceNumber" type="xs:string" />
+                  <xs:attribute name="PartnerOriginalTransactionID" type="xs:string" />
+                  <xs:attribute name="PartnerSDKVersion" type="xs:string" />
+                  <xs:attribute name="RequestID" type="xs:integer" use="required" />
+                  <xs:attribute name="Source" type="xs:string" />
+                  <xs:attribute name="SubscriptionID" type="xs:string" />
+                  <xs:attribute name="TerminalSerialNumber" type="xs:string" />
+                  <xs:attribute name="RequestDate" type="xs:dateTime" use="required"/>
+                  <xs:attribute name="User" type="xs:string"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+      <xs:attribute name="Name" type="xs:string" use="required"/>
+      <xs:attribute name="Type" type="xs:string" use="required"/>
+      <xs:attribute name="Version" type="xs:float" use="required"/>
+      <xs:attribute type="xs:string" use="required" name="OrganizationID"/>
+      <xs:attribute name="ReportStartDate" type="xs:dateTime" use="required"/>
+      <xs:attribute name="ReportEndDate" type="xs:dateTime" use="required" />
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

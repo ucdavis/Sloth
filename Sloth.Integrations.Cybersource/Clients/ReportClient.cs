@@ -5,6 +5,7 @@ using System.Net;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 using RestSharp;
+using Sloth.Integrations.CyberSource;
 using Sloth.Integrations.Cybersource.Exceptions;
 using Sloth.Integrations.Cybersource.Helpers;
 
@@ -28,8 +29,28 @@ namespace Sloth.Integrations.Cybersource.Clients
 
         public async Task<Report> GetPaymentBatchDetailReport(DateTime date)
         {
+            /*
+             * This report requires more information than what is made available by the standard report.
+             * Specifically, a custom report should be created on the cybersource portal with the following:
+             * Name: PaymentBatchDetailReport_Full
+             * Format: XML
+             * Frequency: Daily
+             * Start Time: 12AM
+             * TimeZone: PST
+             * Custom Fields:
+             *      Application
+             *      Batch
+             *      BillTo
+             *      PaymentData
+             *          Amount
+             *          PaymentRequestId
+             *          TransactionRefNumber
+             *
+             * Other fields are okay, but not necessary
+             */
+
             // fetch content
-            var content = await GetClientApiReport<Report>("PaymentBatchtDetailReport_Daily_Classic", new DateTime(2019, 1, 1));
+            var content = await GetClientApiReport<Report>("PaymentBatchDetailReport_Full", new DateTime(2019, 1, 1));
 
             return DeserializeReport<Report>(content);
         }
