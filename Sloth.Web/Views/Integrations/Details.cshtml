@@ -1,0 +1,58 @@
+@model Sloth.Core.Models.Integration
+
+@{
+    ViewBag.Title = "Integration Details";
+}
+
+<div class="container">
+    <div class="d-flex justify-content-between">
+        <h2>@ViewBag.Title</h2>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#run-job-modal">Run Integration</button>
+    </div>
+
+    <dl>
+        <dt>Source</dt>
+        <dd>@Model.Source.Name</dd>
+
+        <dt></dt>
+    </dl>
+</div>
+
+<form id="run-job-modal-form" method="post" asp-controller="Jobs" asp-action="RunOneTimeCyberSourceIntegration">
+    <div id="run-job-modal" class="modal fade">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Run KFS Scrubber Upload Job?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="integrationId" value="@Model.Id" />
+
+                    <div class="form-group">
+                        <label>Report Name</label>
+                        <input type="text" name="reportName" class="form-control" value="PaymentBatchDetailReport_Full" />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Report Generated Date</label>
+                        <div class="input-group date" data-provide="datepicker" data-date-container="body">
+                            <input name="date" type="text" class="form-control" placeholder="MM/DD/YYYY" />
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fa fa-fw fa-calendar"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="reset" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" id="run-job-modal-action" class="btn btn-primary">Run Job</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

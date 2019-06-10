@@ -108,7 +108,10 @@
                         <td>@integration.MerchantId</td>
                         <td>@integration.ClearingAccount</td>
                         <td>@integration.HoldingAccount</td>
-                        <td class="text-center">
+                        <td class="text-center" nowrap>
+                            <a asp-controller="Integrations" asp-action="Details" asp-route-id="@integration.Id" class="btn btn-primary btn-sm">
+                                View
+                            </a>
                             <a asp-controller="Integrations" asp-action="Edit" asp-route-id="@integration.Id" class="btn btn-primary btn-sm">
                                 Edit
                             </a>
