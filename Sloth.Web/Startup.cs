@@ -76,6 +76,7 @@ namespace Sloth.Web
             // add jobs services
             services.AddHostedService<QueuedHostedService>();
             services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
+            services.AddScoped<ICyberSourceBankReconcileService, CyberSourceBankReconcileService>();
             services.AddScoped<CybersourceBankReconcileJob>();
             services.AddScoped<KfsScrubberUploadJob>();
 

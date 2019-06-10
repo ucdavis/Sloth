@@ -1,5 +1,4 @@
 using System;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,7 +53,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
                 var bankReconcileJob = provider.GetService<CybersourceBankReconcileJob>();
 
                 // call methods
-                bankReconcileJob.ProcessReconcile(_log, yesterday).GetAwaiter().GetResult();
+                bankReconcileJob.ProcessReconcile(yesterday, _log).GetAwaiter().GetResult();
             }
             finally
             {
@@ -80,6 +79,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
 
             // required services
             services.AddTransient<ISecretsService, SecretsService>();
+            services.AddTransient<ICyberSourceBankReconcileService, CyberSourceBankReconcileService>();
             services.AddTransient<CybersourceBankReconcileJob>();
             services.AddTransient<IWebHookService, WebHookService>();
 
