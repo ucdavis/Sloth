@@ -20,7 +20,16 @@ namespace Sloth.Web.Controllers
             : base(userManager, dbContext)
         {
             _secretsService = secretsService;
-        } 
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(string id)
+        {
+            var integration = await DbContext.Integrations
+                .Include(i => i.Source)
+                .FirstOrDefaultAsync(i => i.Id == id);
+            return View(integration);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Create()

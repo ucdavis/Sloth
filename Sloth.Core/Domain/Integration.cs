@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
 {
@@ -9,9 +10,11 @@ namespace Sloth.Core.Models
         public string Id { get; set; }
 
         [Required]
+        [JsonIgnore]
         public Team Team { get; set; }
 
         [Required]
+        [JsonIgnore]
         public Source Source { get; set; }
 
         [Required]
@@ -19,8 +22,10 @@ namespace Sloth.Core.Models
 
         public string MerchantId { get; set; }
 
+        [JsonIgnore]
         public string ReportUsername { get; set; }
 
+        [JsonIgnore]
         public string ReportPasswordKey { get; set; }
 
         public string ClearingAccount { get; set; }

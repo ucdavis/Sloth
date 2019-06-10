@@ -10,6 +10,7 @@ using Sloth.Core;
 using Sloth.Core.Jobs;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
+using Sloth.Core.Services;
 using Sloth.Web.Logging;
 using Sloth.Web.Services;
 
@@ -20,11 +21,13 @@ namespace Sloth.Web.Controllers
     {
         private readonly SlothDbContext _dbContext;
         private readonly IBackgroundTaskQueue _queue;
+        private readonly ICyberSourceBankReconcileService _cyberSourceBankReconcileService;
 
-        public JobsController(SlothDbContext dbContext, IBackgroundTaskQueue queue)
+        public JobsController(SlothDbContext dbContext, IBackgroundTaskQueue queue, ICyberSourceBankReconcileService cyberSourceBankReconcileService)
         {
             _dbContext = dbContext;
             _queue = queue;
+            _cyberSourceBankReconcileService = cyberSourceBankReconcileService;
         }
 
         public IActionResult Index()
@@ -135,6 +138,51 @@ namespace Sloth.Web.Controllers
             return RedirectToAction(nameof(KfsScrubberUploadDetails), new { id = record.Id });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> RunOneTimeCyberSourceIntegration(string integrationId, string reportName, DateTime date)
+        {
+            // fetch integration
+            var integration = await _dbContext.Integrations
+                .Include(i => i.Source)
+                .Include(i => i.Team)
+                .FirstOrDefaultAsync(i => i.Id == integrationId);
+
+            // log run
+            var record = new KfsScrubberUploadJobRecord()
+            {
+                Id     = Guid.NewGuid().ToString(),
+                Name   = KfsScrubberUploadJob.JobName,
+                RanOn  = DateTime.UtcNow,
+                Status = "Running",
+            };
+            _dbContext.KfsScrubberUploadJobRecords.Add(record);
+            await _dbContext.SaveChangesAsync();
+
+            // build custom logger
+            var log = LoggingConfiguration.GetJobConfiguration()
+                .CreateLogger()
+                .ForContext("date", date)
+                .ForContext("reportName", reportName)
+                .ForContext("jobname", record.Name)
+                .ForContext("jobid", record.Id);
+
+            try
+            {
+                // schedule methods
+                log.Information("Starting Job");
+
+                await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, log);
+            }
+            finally
+            {
+                // record status
+                record.Status = "Finished";
+                await _dbContext.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(KfsScrubberUploadDetails), new { id = record.Id });
+        }
+
         public async Task<IActionResult> CybersourceBankReconcile()
         {
             var records = await _dbContext.CybersourceBankReconcileJobRecords
@@ -225,7 +273,7 @@ namespace Sloth.Web.Controllers
                 {
                     // call methods
                     log.Information("Starting Job");
-                    await cybersourceBankReconcileJob.ProcessReconcile(log, date);
+                    await cybersourceBankReconcileJob.ProcessReconcile(date, log);
                 }
                 finally
                 {
