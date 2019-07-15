@@ -135,6 +135,24 @@ namespace Sloth.Api.Controllers
                 }
             }
 
+            // validate amounts
+            var creditTotal = transaction.Transfers
+                .Where(t => t.Direction == Transfer.CreditDebit.Credit)
+                .Sum(t => t.Amount);
+
+            var debitTotal = transaction.Transfers
+                .Where(t => t.Direction == Transfer.CreditDebit.Debit)
+                .Sum(t => t.Amount);
+
+            if (creditTotal != debitTotal)
+            {
+                return new BadRequestObjectResult(new {
+                    Message = "Credit/Debit Amounts don't match",
+                    Credits = creditTotal,
+                    Debits = debitTotal,
+                });
+            }
+
             // find source
             var source = await _context.Sources.FirstOrDefaultAsync(s =>
                 string.Equals(s.Name, transaction.Source, StringComparison.InvariantCultureIgnoreCase)
