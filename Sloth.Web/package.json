@@ -7,7 +7,7 @@
     "aspnet-webpack-react": "^3.0.0",
     "css-loader": "0.28.4",
     "extract-text-webpack-plugin": "^2.1.2",
-    "node-sass": "^4.9.1",
+    "node-sass": "^4.13.1",
     "postcss-loader": "^2.0.6",
     "precss": "^2.0.0",
     "sass-loader": "^6.0.6",

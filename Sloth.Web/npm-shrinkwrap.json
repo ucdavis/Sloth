@@ -2916,8 +2916,8 @@
       }
     },
     "node-sass": {
-      "version": "4.13.1",
-      "resolved": "https://registry.npmjs.org/node-sass/-/node-sass-4.13.1.tgz",
+      "version": "4.11.0",
+      "resolved": "https://registry.npmjs.org/node-sass/-/node-sass-4.11.0.tgz",
       "integrity": "sha512-bHUdHTphgQJZaF1LASx0kAviPH7sGlcyNhWade4eVIpFp6tsn7SV8xNMTbsQFpEV9VXpnwTTnNYlfsZXgGgmkA==",
       "dev": true,
       "requires": {
