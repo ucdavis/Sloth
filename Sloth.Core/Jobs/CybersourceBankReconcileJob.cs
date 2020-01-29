@@ -47,7 +47,6 @@ namespace Sloth.Core.Jobs
                     catch (Exception ex)
                     {
                         log.Error(ex, ex.Message);
-                        continue;
                     }
                     
                 }
