@@ -40,7 +40,15 @@ namespace Sloth.Core.Jobs
 
                 foreach (var integration in integrations)
                 {
-                    await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, log);
+                    try
+                    {
+                        await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, log);
+                    }
+                    catch (Exception ex)
+                    {
+                        log.Error(ex, ex.Message);
+                    }
+                    
                 }
             }
             catch (Exception ex)
