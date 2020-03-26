@@ -131,6 +131,12 @@ namespace Sloth.Core.Services
 
                         // transfers can often have multiple application replies, locate the correct one
                         var replyIndex = deposit.ApplicationReplies.IndexOf(r => r.Name == ApplicationReplyTypes.Bill);
+                        if (replyIndex == -1)
+                        {
+                            log.ForContext("tracking_number", deposit.MerchantReferenceNumber)
+                                .Information("Reply Type Bill not found. (Maybe a refund). Skipping.");
+                            continue;
+                        }
                         var paymentInfo = deposit.PaymentData[replyIndex];
 
                         var amount = decimal.Parse(paymentInfo.Amount);
