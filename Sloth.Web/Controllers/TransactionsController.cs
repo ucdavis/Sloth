@@ -7,6 +7,7 @@ using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Web.Identity;
+using Sloth.Web.Models.TransactionViewModels;
 
 namespace Sloth.Web.Controllers
 {
@@ -19,13 +20,38 @@ namespace Sloth.Web.Controllers
         // GET: /<controller>/
         public async Task<IActionResult> Index()
         {
+            return await Filtered(DateTime.Now.AddMonths(-1), DateTime.Now);
+        }
+
+        public async Task<IActionResult> Filtered(DateTime @from, DateTime to)
+        {
+            var fromUtc = DateTime.SpecifyKind(@from, DateTimeKind.Local).ToUniversalTime().Date;
+            var throughUtc = DateTime.SpecifyKind(to, DateTimeKind.Local).ToUniversalTime().AddDays(1).Date;
+
+            if (fromUtc > DateTime.UtcNow)
+            {
+                return BadRequest("From cannot be a future date.");
+            }
+
+            if (fromUtc > throughUtc)
+            {
+                return BadRequest("To cannot be earlier than From.");
+            }
+
             var transactions = await DbContext.Transactions
                 .Include(t => t.Transfers)
-                .Where(t => t.Source.Team.Slug == TeamSlug)
+                .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= fromUtc && t.TransactionDate < throughUtc)
                 .AsNoTracking()
                 .ToListAsync();
 
-            return View(transactions);
+            var result = new TransactionsReturnedViewModel()
+            {
+                From = @from.Date,
+                To = to.Date,
+                Transactions = transactions
+            };
+
+            return View("Index", result);
         }
 
         public async Task<IActionResult> NeedApproval()

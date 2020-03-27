@@ -184,6 +184,13 @@ namespace Sloth.Web
                     });
 
                 routes.MapRoute(
+                    name: "transactions-filtered",
+                    template: "{team}/{controller}/{action}/{from:datetime}/{to:datetime}",
+                    defaults: new { },
+                    constraints: new { controller = "transactions", action = "filtered" }
+                );
+
+                routes.MapRoute(
                     name: "team-routes",
                     template: "{team}/{controller=Home}/{action=Index}/{id?}",
                     defaults: new { },

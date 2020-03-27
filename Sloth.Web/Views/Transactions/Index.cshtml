@@ -1,4 +1,4 @@
-@model IEnumerable<Sloth.Core.Models.Transaction>
+@model Sloth.Web.Models.TransactionViewModels.TransactionsReturnedViewModel
 
 @{
     ViewBag.Title = "Transactions";
@@ -7,11 +7,45 @@
 <div class="container">
     <h2>@ViewBag.Title</h2>
 
-    <partial name="_TransactionsTable" model="Model" />
+    <form id="filter" action="@Url.Action("Index")" onsubmit="return trySubmitFilter()">
+        <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+            <div class="row mb-2">
+                <div class="col-sm-12 col-md-6"></div>
+                <div class="col-sm-12 col-md-6">
+
+                    <div class="dataTables_filter form-inline float-right">
+                        <label for="from-datepicker">From:</label>
+                        <div id="from-datepicker" class="input-group input-group-sm date mx-2" data-provide="datepicker" data-date-container="body">
+                            <input name="from" id="from-input" type="text" class="form-control form-control-sm" placeholder="MM/DD/YYYY" value="@Html.DisplayFor(x => x.From)"/>
+                            <span class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fa fa-fw fa-calendar"></i>
+                                </button>
+                            </span>
+                        </div>
+
+                        <label for="to-datepicker">To:</label>
+                        <div id="to-datepicker" class="input-group input-group-sm date ml-2" data-provide="datepicker" data-date-container="body">
+                            <input name="to" id="to-input" type="text" class="form-control form-control-sm" placeholder="MM/DD/YYYY" value="@Html.DisplayFor(x => x.To)"/>
+                            <span class="input-group-append">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fa fa-fw fa-calendar"></i>
+                                </button>
+                            </span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <partial name="_TransactionsTable" model="Model.Transactions" />
 </div>
 
 
 @section AdditionalScripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script>
         $('#transactionsTable').DataTable({
             "columnDefs": [
@@ -19,5 +53,48 @@
                 { "targets": [-1], "orderable": false },
             ]
         });
+
+        // wire up filtering form events
+        (function() {
+            $('#from-input, #to-input').each(function() {
+                var value = this.value;
+
+                $(this).on('focusin', function (e) {
+                    value = e.target.value;
+                });
+
+                $(this).on('focusout', function (e) {
+                    if ((value || "") !== e.target.value) {
+                        trySubmitFilter();
+                    }
+                });
+            });
+
+            $('#from-datepicker, #to-datepicker').each(function() {
+                var id = this.id;
+
+                $(this).on('changeDate',
+                    function(e) {
+                        trySubmitFilter();
+                    });
+            });
+
+            function trySubmitFilter() {
+                var from = moment($('#from-input')[0].value, "MM/DD/YYYY");
+                var to = moment($('#to-input')[0].value, "MM/DD/YYYY");
+
+                if (!from.isValid() || !to.isValid())
+                    return false;
+
+                var newLocation = "@Url.Action("Index")/Filtered/" +
+                    from.format("YYYY-MM-DD") +
+                    "/" +
+                    to.format("YYYY-MM-DD");
+
+                window.location.replace(newLocation);
+
+                return false;
+            }
+        })();
     </script>
 }
