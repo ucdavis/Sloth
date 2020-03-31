@@ -85,6 +85,27 @@
         </div>
     </div>
     <div class="body-content">
+        @if (!string.IsNullOrWhiteSpace(ViewBag?.Message ?? ViewBag?.ErrorMessage))
+        {
+            <div class="container">
+                <div class="row mb-1">
+                    @if (!string.IsNullOrWhiteSpace(ViewBag?.Message))
+                    {
+                        <div class="col alert alert-info">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            @ViewBag.Message
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(ViewBag?.ErrorMessage))
+                    {
+                        <div class="col alert alert-danger">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            @ViewBag.ErrorMessage
+                        </div>
+                    }
+                </div>
+            </div>
+        }
         @RenderBody()
     </div>
     <footer class="border-top py-3">

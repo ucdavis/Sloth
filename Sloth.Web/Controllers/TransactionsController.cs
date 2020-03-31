@@ -23,19 +23,31 @@ namespace Sloth.Web.Controllers
             return await Filtered(DateTime.Now.AddMonths(-1), DateTime.Now);
         }
 
-        public async Task<IActionResult> Filtered(DateTime @from, DateTime to)
+        public async Task<IActionResult> Filtered(DateTime from, DateTime to)
         {
-            var fromUtc = DateTime.SpecifyKind(@from, DateTimeKind.Local).ToUniversalTime().Date;
-            var throughUtc = DateTime.SpecifyKind(to, DateTimeKind.Local).ToUniversalTime().AddDays(1).Date;
+            var fromUtc = from.ToUniversalTime().Date;
+            var throughUtc = to.ToUniversalTime().AddDays(1).Date;
+            var redirectNeeded = false;
 
-            if (fromUtc > DateTime.UtcNow)
+            if (fromUtc > DateTime.UtcNow || fromUtc < DateTime.UtcNow.AddYears(-100)) 
             {
-                return BadRequest("From cannot be a future date.");
+                // invalid, so default to filtering from one month ago
+                from = DateTime.Now.AddMonths((-1)).Date;
+                fromUtc = from.ToUniversalTime();
+                redirectNeeded = true;
             }
 
-            if (fromUtc > throughUtc)
+            if (fromUtc >= throughUtc)
             {
-                return BadRequest("To cannot be earlier than From.");
+                // invalid, so default to filtering through one month after fromUtc
+                throughUtc = fromUtc.AddMonths(1).AddDays(1).Date;
+                to = throughUtc.AddDays(-1).ToLocalTime();
+                redirectNeeded = true;
+            }
+
+            if (redirectNeeded)
+            {
+                return new RedirectResult($"/{TeamSlug}/transactions/filtered/{from:yyyy-MM-dd}/{to:yyyy-MM-dd}");
             }
 
             var transactions = await DbContext.Transactions
@@ -46,7 +58,7 @@ namespace Sloth.Web.Controllers
 
             var result = new TransactionsReturnedViewModel()
             {
-                From = @from.Date,
+                From = from.Date,
                 To = to.Date,
                 Transactions = transactions
             };
