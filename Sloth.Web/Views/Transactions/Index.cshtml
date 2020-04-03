@@ -10,28 +10,13 @@
     <form id="filter" action="@Url.Action("Index")" onsubmit="return trySubmitFilter()">
         <div class="dataTables_wrapper dt-bootstrap4 no-footer">
             <div class="row mb-2">
-                <div class="col-sm-6 col-md-3"></div>
-                <div class="col-sm-18 col-md-9">
-                    <div class="dataTables_filter form-inline float-right">
-                        <label for="to-datepicker">To:</label>
-                        <div id="to-datepicker" class="input-group input-group-sm date ml-2" data-provide="datepicker" data-date-container="body">
-                            <input name="to" id="to-input" type="text" class="form-control form-control-sm" placeholder="MM/DD/YYYY" value="@Html.DisplayFor(x => x.To)" />
-                            <span class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fa fa-fw fa-calendar"></i>
-                                </button>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="dataTables_filter form-inline float-right">
-                        <label for="from-datepicker">From:</label>
-                        <div id="from-datepicker" class="input-group input-group-sm date mx-2" data-provide="datepicker" data-date-container="body">
-                            <input name="from" id="from-input" type="text" class="form-control form-control-sm" placeholder="MM/DD/YYYY" value="@Html.DisplayFor(x => x.From)" />
-                            <span class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fa fa-fw fa-calendar"></i>
-                                </button>
-                            </span>
+                <div class="col">
+                    <div class="form-inline float-right">
+                        <div id="date-range" class="input-group-sm input-daterange form-inline" data-provide="datepicker" data-date-container="body">
+                            <label for="from-input">From:</label>
+                            <input name="from" id="from-input" type="text" class="form-control form-control-sm ml-2 mr-1" placeholder="MM/DD/YYYY" value="@Html.DisplayFor(x => x.From)" />
+                            <label for="to-input">To:</label>
+                            <input name="to" id="to-input" type="text" class="form-control form-control-sm ml-2" placeholder="MM/DD/YYYY" value="@Html.DisplayFor(x => x.To)" />
                         </div>
                     </div>
                 </div>
@@ -69,13 +54,8 @@
                 });
             });
 
-            $('#from-datepicker, #to-datepicker').each(function() {
-                var id = this.id;
-
-                $(this).on('changeDate',
-                    function(e) {
-                        trySubmitFilter();
-                    });
+            $('#date-range').on('changeDate', function(e) {
+                trySubmitFilter();
             });
 
             function trySubmitFilter() {
