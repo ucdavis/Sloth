@@ -23,7 +23,7 @@ namespace Sloth.Web.Controllers
             return await Filtered(DateTime.Now.AddMonths(-1), DateTime.Now);
         }
 
-        public async Task<IActionResult> Filtered(DateTime from, DateTime to)
+        public async Task<IActionResult> Filtered(DateTime from, DateTime to, string merchantId = "")
         {
             var fromUtc = from.ToUniversalTime().Date;
             var throughUtc = to.ToUniversalTime().AddDays(1).Date;
@@ -50,14 +50,33 @@ namespace Sloth.Web.Controllers
                 return new RedirectResult($"/{TeamSlug}/transactions/filtered/{from:yyyy-MM-dd}/{to:yyyy-MM-dd}");
             }
 
-            var transactions = await DbContext.Transactions
+            var teamMerchants = await DbContext.Integrations
+                .Where(i => i.Team.Slug == TeamSlug)
+                .OrderBy(i => i.MerchantId)
+                .Select(i => i.MerchantId)
+                .ToListAsync();
+
+            var query = DbContext.Transactions
                 .Include(t => t.Transfers)
-                .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= fromUtc && t.TransactionDate < throughUtc)
+                .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= fromUtc &&
+                            t.TransactionDate < throughUtc);
+
+            if (!string.IsNullOrWhiteSpace(merchantId) && teamMerchants.Contains(merchantId))
+            {
+                query = query
+                    .Where(t => t.Source.Team.Integrations.Any(
+                        i => i.MerchantId == merchantId
+                        && i.Source == t.Source));
+            }
+
+            var transactions = await query
                 .AsNoTracking()
                 .ToListAsync();
 
             var result = new TransactionsReturnedViewModel()
             {
+                TeamMerchantIds = teamMerchants,
+                SelectedMerchantId = merchantId ?? "",
                 From = from.Date,
                 To = to.Date,
                 Transactions = transactions

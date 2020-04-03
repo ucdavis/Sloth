@@ -2,6 +2,7 @@
 
 @{
     ViewBag.Title = "Transactions";
+    const string defaultMerchant = "Any Merchant";
 }
 
 <div class="container">
@@ -17,6 +18,32 @@
                             <input name="from" id="from-input" type="text" class="form-control form-control-sm ml-2 mr-1" placeholder="MM/DD/YYYY" value="@Html.DisplayFor(x => x.From)" />
                             <label for="to-input">To:</label>
                             <input name="to" id="to-input" type="text" class="form-control form-control-sm ml-2" placeholder="MM/DD/YYYY" value="@Html.DisplayFor(x => x.To)" />
+                        </div>
+                    </div>
+                    <div class="dataTables_filter form-inline float-right">
+                        <label for="to-datepicker">Merchant:</label>
+                        <div id="merchant-dropdown" class="btn-group mx-2">
+                            <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @if (!string.IsNullOrWhiteSpace(@Model.SelectedMerchantId))
+                                {
+                                    @Model.SelectedMerchantId
+                                }
+                                else
+                                {
+                                    <text>@defaultMerchant</text>
+                                }
+                            </button>
+                            <div class="dropdown-menu">
+                                @{
+                                    var active = string.IsNullOrWhiteSpace(Model.SelectedMerchantId) ? "active" : "";
+                                }
+                                <button name="merchant-option" class="dropdown-item @active" type="button">@defaultMerchant</button>
+                                @foreach (var merchantId in Model.TeamMerchantIds)
+                                {
+                                    active = Model.SelectedMerchantId == merchantId ? "active" : "";
+                                    <button name="merchant-option" class="dropdown-item @active" type="button">@merchantId</button>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -40,6 +67,8 @@
 
         // wire up filtering form events
         (function() {
+            var selectedMerchant = "@defaultMerchant";
+
             $('#from-input, #to-input').each(function() {
                 var value = this.value;
 
@@ -58,6 +87,14 @@
                 trySubmitFilter();
             });
 
+            $("button[name='merchant-option']").each(function () {
+                $(this).on("click",
+                    function (e) {
+                        selectedMerchant = e.currentTarget.innerHTML;
+                        trySubmitFilter();
+                    });
+            });
+
             function trySubmitFilter() {
                 var from = moment($('#from-input')[0].value, "MM/DD/YYYY");
                 var to = moment($('#to-input')[0].value, "MM/DD/YYYY");
@@ -69,6 +106,9 @@
                     from.format("YYYY-MM-DD") +
                     "/" +
                     to.format("YYYY-MM-DD");
+
+                if ((selectedMerchant || "@defaultMerchant") !== "@defaultMerchant")
+                    newLocation = newLocation + "?merchantId=" + selectedMerchant;
 
                 window.location.replace(newLocation);
 
