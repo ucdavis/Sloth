@@ -23,7 +23,7 @@ namespace Sloth.Web.Controllers
             return await Filtered(DateTime.Now.AddMonths(-1), DateTime.Now);
         }
 
-        public async Task<IActionResult> Filtered(DateTime from, DateTime to, string merchantId = "")
+        public async Task<IActionResult> Filtered(DateTime from, DateTime to, string merchantId = "", string trackingNum = "")
         {
             var fromUtc = from.ToUniversalTime().Date;
             var throughUtc = to.ToUniversalTime().AddDays(1).Date;
@@ -69,12 +69,21 @@ namespace Sloth.Web.Controllers
                         && i.Source == t.Source));
             }
 
+            if (!string.IsNullOrWhiteSpace(trackingNum))
+            {
+                query = query
+                    .Where(t => t.KfsTrackingNumber == trackingNum
+                                || t.MerchantTrackingNumber == trackingNum
+                                || t.ProcessorTrackingNumber == trackingNum);
+            }
+
             var transactions = await query
                 .AsNoTracking()
                 .ToListAsync();
 
             var result = new TransactionsReturnedViewModel()
             {
+                TrackingNumber = trackingNum ?? "",
                 TeamMerchantIds = teamMerchants,
                 SelectedMerchantId = merchantId ?? "",
                 From = from.Date,

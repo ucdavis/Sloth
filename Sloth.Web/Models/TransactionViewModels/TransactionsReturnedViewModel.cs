@@ -9,6 +9,8 @@ namespace Sloth.Web.Models.TransactionViewModels
 {
     public class TransactionsReturnedViewModel
     {
+        public string TrackingNumber { get; set; }
+
         public string SelectedMerchantId { get; set; }
 
         public  List<string> TeamMerchantIds { get; set; }
