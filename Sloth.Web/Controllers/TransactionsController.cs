@@ -94,6 +94,32 @@ namespace Sloth.Web.Controllers
             return View("Index", result);
         }
 
+        public async Task<IActionResult> Search(string trackingNum = "")
+        {
+            var query =
+                from t in DbContext.Transactions
+                join t2 in DbContext.Transactions.Where(t => t.ProcessorTrackingNumber == trackingNum)
+                    on t.MerchantTrackingNumber equals t2.MerchantTrackingNumber into joined
+                from j in joined.DefaultIfEmpty()
+                where j != null
+                      || t.KfsTrackingNumber == trackingNum
+                      || t.MerchantTrackingNumber == trackingNum
+                select t;
+
+            var transactions = await query
+                .Include(t => t.Transfers)
+                .AsNoTracking()
+                .ToListAsync();
+
+            var result = new TransactionsSearchViewModel()
+            {
+                TrackingNumber = trackingNum ?? "",
+                Transactions = transactions
+            };
+
+            return View("Search", result);
+        }
+
         public async Task<IActionResult> NeedApproval()
         {
             var transactions = await DbContext.Transactions

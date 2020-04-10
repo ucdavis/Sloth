@@ -71,6 +71,10 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug">Settings</a>
                         </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug">Search</a>
+                        </li>
                     }
 
                     @if (User.IsInRole(Roles.SystemAdmin))

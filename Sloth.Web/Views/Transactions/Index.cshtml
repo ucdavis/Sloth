@@ -23,7 +23,7 @@
                         </div>
                     </div>
                     <div class="dataTables_filter form-inline float-right">
-                        <label for="to-datepicker" class="mx-2">Merchant:</label>
+                        <label for="merchant-dropdown" class="mx-2">Merchant:</label>
                         <div id="merchant-dropdown" class="btn-group input-group input-group-sm">
                             <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
                                     aria-expanded="false" tabindex="2">
@@ -49,14 +49,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-inline float-right">
-                        <div id="tracking-num" class="input-group input-group-sm">
-                            <label for="tracking-num-input" class="mx-2">Tracking Num:</label>
-                            <input name="tracking-num-input" id="tracking-num-input" type="text" class="form-control form-control-sm"
-                                   placeholder="Full Tracking Number" value="@Html.DisplayFor(x => x.TrackingNumber)"
-                                   tabindex="1"/>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -80,7 +72,7 @@
         (function() {
             var selectedMerchant = "@defaultMerchant";
 
-            $('#from-input, #to-input, #tracking-num-input').each(function() {
+            $('#from-input, #to-input').each(function() {
                 var value = this.value;
 
                 $(this).on('focusin',
@@ -109,14 +101,6 @@
                     });
             });
 
-            $('#tracking-num-input').on('keypress', function(e) {
-                var key = e.charCode || e.keyCode || 0;
-                if(key == 13) {
-                    e.preventDefault();
-                    trySubmitFilter();
-                }
-            });
-
             function trySubmitFilter() {
                 var from = moment($('#from-input')[0].value, "MM/DD/YYYY");
                 var to = moment($('#to-input')[0].value, "MM/DD/YYYY");
@@ -134,16 +118,11 @@
                 if ((selectedMerchant || "@defaultMerchant") !== "@defaultMerchant")
                     params.merchantId = encodeURIComponent(selectedMerchant);
 
-                var trackingNum = $('#tracking-num-input')[0].value;
-
-                if (trackingNum)
-                    params.trackingNum = encodeURIComponent(trackingNum);
-
                 if (!$.isEmptyObject(params)) {
                     newLocation = newLocation + "?" + $.param(params);
                 }
 
-                window.location.replace(newLocation);
+                window.location.assign(newLocation);
 
                 return false;
             }
