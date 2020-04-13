@@ -106,7 +106,7 @@ namespace Sloth.Web.Controllers
             else
             {
                 var query =
-                    from t in DbContext.Transactions
+                    from t in DbContext.Transactions.Where(t => t.Source.Team.Slug == TeamSlug)
                     join t2 in DbContext.Transactions.Where(t => t.ProcessorTrackingNumber == trackingNum)
                         on t.MerchantTrackingNumber equals t2.MerchantTrackingNumber into joined
                     from j in joined.DefaultIfEmpty()
