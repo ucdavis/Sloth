@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -96,20 +97,29 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> Search(string trackingNum = "")
         {
-            var query =
-                from t in DbContext.Transactions
-                join t2 in DbContext.Transactions.Where(t => t.ProcessorTrackingNumber == trackingNum)
-                    on t.MerchantTrackingNumber equals t2.MerchantTrackingNumber into joined
-                from j in joined.DefaultIfEmpty()
-                where j != null
-                      || t.KfsTrackingNumber == trackingNum
-                      || t.MerchantTrackingNumber == trackingNum
-                select t;
+            List<Transaction> transactions;
 
-            var transactions = await query
-                .Include(t => t.Transfers)
-                .AsNoTracking()
-                .ToListAsync();
+            if (string.IsNullOrWhiteSpace(trackingNum))
+            {
+                transactions = new List<Transaction>();
+            }
+            else
+            {
+                var query =
+                    from t in DbContext.Transactions
+                    join t2 in DbContext.Transactions.Where(t => t.ProcessorTrackingNumber == trackingNum)
+                        on t.MerchantTrackingNumber equals t2.MerchantTrackingNumber into joined
+                    from j in joined.DefaultIfEmpty()
+                    where j != null
+                          || t.KfsTrackingNumber == trackingNum
+                          || t.MerchantTrackingNumber == trackingNum
+                    select t;
+
+                transactions = await query
+                    .Include(t => t.Transfers)
+                    .AsNoTracking()
+                    .ToListAsync();
+            }
 
             var result = new TransactionsSearchViewModel()
             {

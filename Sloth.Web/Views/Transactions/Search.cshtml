@@ -8,29 +8,11 @@
 <div class="container">
     <h2>@ViewBag.Title</h2>
 
-    <form id="filter" action="@Url.Action("Index")" onsubmit="return trySubmitFilter()">
-        <div class="dataTables_wrapper dt-bootstrap4 no-footer">
-            <div class="row mb-2">
-                <div class="col">
-                    <div class="form-inline float-right">
-                        <div id="tracking-num" class="input-group input-group-sm">
-                            <label for="tracking-num-input" class="mx-2">Tracking Num:</label>
-                            <input name="tracking-num-input" id="tracking-num-input" type="text" class="form-control form-control-sm"
-                                   placeholder="Full Tracking Number" value="@Html.DisplayFor(x => x.TrackingNumber)"
-                                   tabindex="1"/>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-
     <partial name="_TransactionsTable" model="Model.Transactions" />
 </div>
 
 
 @section AdditionalScripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script>
         $('#transactionsTable').DataTable({
             "columnDefs": [
@@ -38,54 +20,5 @@
                 { "targets": [-1], "orderable": false },
             ]
         });
-
-        // wire up filtering form events
-        (function() {
-            var selectedMerchant = "@defaultMerchant";
-
-            $('#tracking-num-input').each(function() {
-                var value = this.value;
-
-                $(this).on('focusin',
-                    function(e) {
-                        value = e.target.value;
-                    });
-
-                $(this).on('focusout',
-                    function(e) {
-                        if ((value || "") !== e.target.value) {
-                            trySubmitSearch();
-                        }
-                    });
-            });
-
-            $('#tracking-num-input').on('keypress', function(e) {
-                var key = e.charCode || e.keyCode || 0;
-                if(key == 13) {
-                    e.preventDefault();
-                    trySubmitSearch();
-                }
-            });
-
-            function trySubmitSearch() {
-
-                var newLocation = "@Url.Action("Index")/Search";
-
-                var params = {};
-
-                var trackingNum = $('#tracking-num-input')[0].value;
-
-                if (trackingNum)
-                    params.trackingNum = encodeURIComponent(trackingNum);
-
-                if (!$.isEmptyObject(params)) {
-                    newLocation = newLocation + "?" + $.param(params);
-                }
-
-                window.location.assign(newLocation);
-
-                return false;
-            }
-        })();
     </script>
 }

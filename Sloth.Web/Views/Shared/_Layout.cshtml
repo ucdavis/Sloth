@@ -8,8 +8,19 @@
 @{
     var user = await UserManager.GetUserAsync(User);
     var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
+    var controller = HttpContextAccessor.HttpContext.GetRouteData().Values["controller"] as string;
+    var action = HttpContextAccessor.HttpContext.GetRouteData().Values["action"] as string;
 
     var teams = user.GetTeams().ToList();
+
+    var trackingNum = "";
+
+    if (string.Equals("transactions", controller, StringComparison.OrdinalIgnoreCase)
+        && string.Equals("search", action, StringComparison.OrdinalIgnoreCase))
+    {
+        trackingNum = HttpContextAccessor.HttpContext.Request.Query["trackingNum"];
+    }
+
 }
 
 <!DOCTYPE html>
@@ -73,7 +84,9 @@
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug">Search</a>
+                            <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="get">
+                                <input class="form-control" name="trackingNum" type="search" placeholder="Search Tracking Number" value="@trackingNum" aria-label="Search Tracking Number">
+                            </form>
                         </li>
                     }
 
@@ -84,7 +97,7 @@
                         </li>
                     }
                 </ul>
-                <partial name="_LoginPartial" />
+
             </div>
         </div>
     </div>
