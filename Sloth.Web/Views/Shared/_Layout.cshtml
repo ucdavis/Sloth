@@ -82,12 +82,6 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug">Settings</a>
                         </li>
-
-                        <li class="nav-item">
-                            <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="get">
-                                <input class="form-control" name="trackingNum" type="search" placeholder="Search Tracking Number" value="@trackingNum" aria-label="Search Tracking Number">
-                            </form>
-                        </li>
                     }
 
                     @if (User.IsInRole(Roles.SystemAdmin))
@@ -96,8 +90,17 @@
                             <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
                         </li>
                     }
-                </ul>
 
+                    @if (!string.IsNullOrEmpty(teamSlug))
+                    {
+                        <li class="nav-item">
+                            <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="get">
+                                <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
+                            </form>
+                        </li>
+                    }
+                </ul>
+                <partial name="_LoginPartial" />
             </div>
         </div>
     </div>
