@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
+using Sloth.Web.Helpers;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.TransactionViewModels;
 
@@ -21,37 +23,12 @@ namespace Sloth.Web.Controllers
         // GET: /<controller>/
         public async Task<IActionResult> Index()
         {
-            return await Filtered(DateTime.Now.AddMonths(-1), DateTime.Now);
-        }
+            var filter = GetTransactionsFilter();
 
-        public async Task<IActionResult> Filtered(DateTime from, DateTime to, string merchantId = "", string trackingNum = "")
-        {
-            var fromUtc = from.ToUniversalTime().Date;
-            var throughUtc = to.ToUniversalTime().AddDays(1).Date;
-            var redirectNeeded = false;
+            var fromUtc = (filter.From ?? DateTime.Now.AddMonths(-1)).ToUniversalTime().Date;
+            var throughUtc = (filter.To ?? DateTime.Now.AddDays(1)).ToUniversalTime().Date;
 
-            if (fromUtc > DateTime.UtcNow || fromUtc < DateTime.UtcNow.AddYears(-100)) 
-            {
-                // invalid, so default to filtering from one month ago
-                from = DateTime.Now.AddMonths((-1)).Date;
-                fromUtc = from.ToUniversalTime();
-                redirectNeeded = true;
-            }
-
-            if (fromUtc >= throughUtc)
-            {
-                // invalid, so default to filtering through one month after fromUtc
-                throughUtc = fromUtc.AddMonths(1).AddDays(1).Date;
-                to = throughUtc.AddDays(-1).ToLocalTime();
-                redirectNeeded = true;
-            }
-
-            if (redirectNeeded)
-            {
-                return new RedirectResult($"/{TeamSlug}/transactions/filtered/{from:yyyy-MM-dd}/{to:yyyy-MM-dd}");
-            }
-
-            var teamMerchants = await DbContext.Integrations
+            var teamMerchantIds = await DbContext.Integrations
                 .Where(i => i.Team.Slug == TeamSlug)
                 .OrderBy(i => i.MerchantId)
                 .Select(i => i.MerchantId)
@@ -62,37 +39,39 @@ namespace Sloth.Web.Controllers
                 .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= fromUtc &&
                             t.TransactionDate < throughUtc);
 
-            if (!string.IsNullOrWhiteSpace(merchantId) && teamMerchants.Contains(merchantId))
+            if (!string.IsNullOrWhiteSpace(filter.SelectedMerchantId) && teamMerchantIds.Contains(filter.SelectedMerchantId))
             {
                 query = query
                     .Where(t => t.Source.Team.Integrations.Any(
-                        i => i.MerchantId == merchantId
+                        i => i.MerchantId == filter.SelectedMerchantId
                         && i.Source == t.Source));
-            }
-
-            if (!string.IsNullOrWhiteSpace(trackingNum))
-            {
-                query = query
-                    .Where(t => t.KfsTrackingNumber == trackingNum
-                                || t.MerchantTrackingNumber == trackingNum
-                                || t.ProcessorTrackingNumber == trackingNum);
             }
 
             var transactions = await query
                 .AsNoTracking()
                 .ToListAsync();
 
-            var result = new TransactionsReturnedViewModel()
+            var filterViewModel = new TransactionsFilterViewModel
             {
-                TrackingNumber = trackingNum ?? "",
-                TeamMerchantIds = teamMerchants,
-                SelectedMerchantId = merchantId ?? "",
-                From = from.Date,
-                To = to.Date,
+                Filter = filter,
+                TeamMerchantIds = teamMerchantIds.Select(i => new SelectListItem() { Value = i, Text = i }).ToList()
+            };
+
+            var result = new TransactionsViewModel()
+            {
+                TransactionsFilter = filterViewModel,
                 Transactions = transactions
             };
 
             return View("Index", result);
+        }
+
+        public IActionResult SetFilter(TransactionsFilterModel model)
+        {
+            // save model to session
+            SetTransactionsFilter(model);
+
+            return RedirectToAction("Index");
         }
 
         public async Task<IActionResult> Search(string trackingNum = "")
@@ -279,5 +258,51 @@ namespace Sloth.Web.Controllers
 
             return RedirectToAction("Details", new { id = reversal.Id });
         }
+
+        private void SanitizeTransactionsFilter(TransactionsFilterModel model)
+        {
+            var fromUtc = (model.From ?? DateTime.Now.AddMonths(-1)).ToUniversalTime().Date;
+            var throughUtc = (model.To ?? DateTime.Now).ToUniversalTime().AddDays(1).Date;
+
+            if (fromUtc > DateTime.UtcNow || fromUtc < DateTime.UtcNow.AddYears(-100))
+            {
+                // invalid, so default to filtering from one month ago
+                model.From = DateTime.Now.AddMonths((-1)).Date;
+                fromUtc = model.From.Value.ToUniversalTime();
+            }
+
+            if (fromUtc >= throughUtc)
+            {
+                // invalid, so default to filtering through one month after fromUtc
+                throughUtc = fromUtc.AddMonths(1).AddDays(1).Date;
+                model.To = throughUtc.AddDays(-1).ToLocalTime();
+            }
+        }
+
+        private TransactionsFilterModel GetTransactionsFilter()
+        {
+            var model = HttpContext.Session.GetObjectFromJson<TransactionsFilterModel>("InvoiceFilter");
+
+            if (model != null)
+                return model;
+
+            model = new TransactionsFilterModel()
+            {
+                From = DateTime.Now.AddMonths(-1).Date,
+                To = DateTime.Now.Date
+            };
+
+            SanitizeTransactionsFilter(model);
+
+            return model;
+        }
+
+        private void SetTransactionsFilter(TransactionsFilterModel model)
+        {
+            SanitizeTransactionsFilter(model);
+
+            HttpContext.Session.SetObjectAsJson("InvoiceFilter", model);
+        }
+
     }
 }

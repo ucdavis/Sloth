@@ -1,65 +1,32 @@
-@model Sloth.Web.Models.TransactionViewModels.TransactionsReturnedViewModel
+@model Sloth.Web.Models.TransactionViewModels.TransactionsViewModel
 
 @{
     ViewBag.Title = "Transactions";
-    const string defaultMerchant = "Any Merchant";
 }
 
-<div class="container">
-    <h2>@ViewBag.Title</h2>
+    <div class="container">
+        <h2>@ViewBag.Title</h2>
 
-    <form id="filter" action="@Url.Action("Index")" onsubmit="return trySubmitFilter()">
-        <div class="dataTables_wrapper dt-bootstrap4 no-footer">
-            <div class="row mb-2">
-                <div class="col">
-                    <div class="form-inline float-right">
-                        <div id="date-range" class="input-group-sm input-daterange form-inline" data-provide="datepicker" data-date-container="body">
-                            <label for="from-input" class="mx-2">From:</label>
-                            <input name="from" id="from-input" type="text" class="form-control form-control-sm" placeholder="MM/DD/YYYY"
-                                   value="@Html.DisplayFor(x => x.From)" tabindex="3" />
-                            <label for="to-input" class="mx-2">To:</label>
-                            <input name="to" id="to-input" type="text" class="form-control form-control-sm" placeholder="MM/DD/YYYY"
-                                   value="@Html.DisplayFor(x => x.To)" tabindex="4"/>
-                        </div>
-                    </div>
-                    <div class="dataTables_filter form-inline float-right">
-                        <label for="merchant-dropdown" class="mx-2">Merchant:</label>
-                        <div id="merchant-dropdown" class="btn-group input-group input-group-sm">
-                            <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true"
-                                    aria-expanded="false" tabindex="2">
-                                @if (!string.IsNullOrWhiteSpace(@Model.SelectedMerchantId))
-                                {
-                                    @Model.SelectedMerchantId
-                                }
-                                else
-                                {
-                                    <text>@defaultMerchant</text>
-                                }
-                            </button>
-                            <div class="dropdown-menu">
-                                @{
-                                    var active = string.IsNullOrWhiteSpace(Model.SelectedMerchantId) ? "active" : "";
-                                }
-                                <button name="merchant-option" class="dropdown-item @active" type="button">@defaultMerchant</button>
-                                @foreach (var merchantId in Model.TeamMerchantIds)
-                                {
-                                    active = Model.SelectedMerchantId == merchantId ? "active" : "";
-                                    <button name="merchant-option" class="dropdown-item @active" type="button">@merchantId</button>
-                                }
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <div class="row justify-content-between">
+            <div class="col-12"><hr /></div>
+            <div class="col-6">
+                <h3>Filters</h3>
             </div>
-        </div>
-    </form>
+            <div class="col-6 d-flex justify-content-end align-items-end">
+                <button class="btn align-self-end" type="button" data-toggle="collapse" data-target="#transactions-filter"><i class="fas fa-filter"></i></button>
+            </div>
 
-    <partial name="_TransactionsTable" model="Model.Transactions" />
-</div>
+            <div id="transactions-filter" class="col-12 collapse">
+                <partial name="_Filter" model="@Model.TransactionsFilter" />
+            </div>
+            <div class="col-12"><hr /></div>
+        </div>
+
+        <partial name="_TransactionsTable" model="Model.Transactions" />
+    </div>
 
 
 @section AdditionalScripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
     <script>
         $('#transactionsTable').DataTable({
             "columnDefs": [
@@ -67,65 +34,5 @@
                 { "targets": [-1], "orderable": false },
             ]
         });
-
-        // wire up filtering form events
-        (function() {
-            var selectedMerchant = "@defaultMerchant";
-
-            $('#from-input, #to-input').each(function() {
-                var value = this.value;
-
-                $(this).on('focusin',
-                    function(e) {
-                        value = e.target.value;
-                    });
-
-                $(this).on('focusout',
-                    function(e) {
-                        if ((value || "") !== e.target.value) {
-                            trySubmitFilter();
-                        }
-                    });
-            });
-
-            $('#date-range').on('changeDate',
-                function(e) {
-                    trySubmitFilter();
-                });
-
-            $("button[name='merchant-option']").each(function() {
-                $(this).on("click",
-                    function(e) {
-                        selectedMerchant = e.currentTarget.innerHTML;
-                        trySubmitFilter();
-                    });
-            });
-
-            function trySubmitFilter() {
-                var from = moment($('#from-input')[0].value, "MM/DD/YYYY");
-                var to = moment($('#to-input')[0].value, "MM/DD/YYYY");
-
-                if (!from.isValid() || !to.isValid())
-                    return false;
-
-                var newLocation = "@Url.Action("Index")/Filtered/" +
-                    from.format("YYYY-MM-DD") +
-                    "/" +
-                    to.format("YYYY-MM-DD");
-
-                var params = {};
-
-                if ((selectedMerchant || "@defaultMerchant") !== "@defaultMerchant")
-                    params.merchantId = encodeURIComponent(selectedMerchant);
-
-                if (!$.isEmptyObject(params)) {
-                    newLocation = newLocation + "?" + $.param(params);
-                }
-
-                window.location.assign(newLocation);
-
-                return false;
-            }
-        })();
     </script>
 }

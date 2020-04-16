@@ -119,6 +119,8 @@ namespace Sloth.Web
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                     o.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
+
+            services.AddSession();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -155,6 +157,8 @@ namespace Sloth.Web
             app.UseStaticFiles();
 
             app.UseAuthentication();
+
+            app.UseSession();
 
             app.UseMvc(routes =>
             {
