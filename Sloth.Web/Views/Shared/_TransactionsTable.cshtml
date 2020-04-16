@@ -1,9 +1,13 @@
 @using Humanizer
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Routing
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
 @model IEnumerable<Sloth.Core.Models.Transaction>
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
+    var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
 }
 
 <table id="transactionsTable" class="table table-bordered">
@@ -34,7 +38,7 @@
                 <td>@t.KfsTrackingNumber</td>
                 <td>@t.DocumentNumber</td>
                 <td>@t.ProcessorTrackingNumber</td>
-                <td>@t.MerchantTrackingNumber</td>
+                <td><a asp-controller="Transactions" asp-action="Search" asp-route-trackingNum="@t.MerchantTrackingNumber">@t.MerchantTrackingNumber</a></td>
                 <td>@description</td>
                 <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
                 <td class="text-center">

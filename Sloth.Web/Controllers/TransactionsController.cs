@@ -84,15 +84,11 @@ namespace Sloth.Web.Controllers
             }
             else
             {
-                var query =
-                    from t in DbContext.Transactions.Where(t => t.Source.Team.Slug == TeamSlug)
-                    join t2 in DbContext.Transactions.Where(t => t.ProcessorTrackingNumber == trackingNum)
-                        on t.MerchantTrackingNumber equals t2.MerchantTrackingNumber into joined
-                    from j in joined.DefaultIfEmpty()
-                    where j != null
-                          || t.KfsTrackingNumber == trackingNum
-                          || t.MerchantTrackingNumber == trackingNum
-                    select t;
+                var query = DbContext.Transactions
+                    .Where(t => t.Source.Team.Slug == TeamSlug
+                                && (t.ProcessorTrackingNumber == trackingNum
+                                    || t.KfsTrackingNumber == trackingNum
+                                    || t.MerchantTrackingNumber == trackingNum));
 
                 transactions = await query
                     .Include(t => t.Transfers)
