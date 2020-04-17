@@ -241,8 +241,9 @@ namespace Sloth.Web.Controllers
             if (fromUtc > DateTime.UtcNow || fromUtc < DateTime.UtcNow.AddYears(-100))
             {
                 // invalid, so default to filtering from one month ago
-                model.From = DateTime.Now.AddMonths((-1)).Date;
-                fromUtc = model.From.Value.ToUniversalTime(); //lgtm [cs/dereferenced-value-may-be-null]
+                var from = DateTime.Now.AddMonths((-1)).Date;
+                model.From = from;
+                fromUtc = from.ToUniversalTime();
             }
             else
             {
