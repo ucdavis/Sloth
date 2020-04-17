@@ -1,12 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Web.Identity;
+using Sloth.Web.Models.TransactionViewModels;
 
 namespace Sloth.Web.Controllers
 {
@@ -17,15 +20,67 @@ namespace Sloth.Web.Controllers
         }
 
         // GET: /<controller>/
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(TransactionsFilterModel filter = null)
         {
-            var transactions = await DbContext.Transactions
+            if (filter == null)
+                filter = new TransactionsFilterModel();
+
+            SanitizeTransactionsFilter(filter);
+
+            IQueryable<Transaction> query;
+
+            List<string> teamMerchantIds = null;
+
+            var result = new TransactionsViewModel()
+            {
+                Filter = filter
+            };
+
+            if (!string.IsNullOrWhiteSpace(filter.TrackingNum))
+            {
+                query = DbContext.Transactions
+                    .Where(t => t.Source.Team.Slug == TeamSlug
+                                && (t.ProcessorTrackingNumber == filter.TrackingNum
+                                    || t.KfsTrackingNumber == filter.TrackingNum
+                                    || t.MerchantTrackingNumber == filter.TrackingNum));
+
+            }
+            else
+            {
+                var fromUtc = (filter.From ?? DateTime.Now.AddMonths(-1)).ToUniversalTime().Date;
+                var throughUtc = (filter.To ?? DateTime.Now.AddDays(1)).ToUniversalTime().Date;
+
+                teamMerchantIds = await DbContext.Integrations
+                    .Where(i => i.Team.Slug == TeamSlug)
+                    .OrderBy(i => i.MerchantId)
+                    .Select(i => i.MerchantId)
+                    .ToListAsync();
+
+                query = DbContext.Transactions
+                    .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= fromUtc &&
+                                t.TransactionDate < throughUtc);
+
+                if (!string.IsNullOrWhiteSpace(filter.SelectedMerchantId) && teamMerchantIds.Contains(filter.SelectedMerchantId))
+                {
+                    query = query
+                        .Where(t => t.Source.Team.Integrations.Any(
+                            i => i.MerchantId == filter.SelectedMerchantId
+                                 && i.Source == t.Source));
+                }
+
+                result.TeamMerchantIds =
+                    teamMerchantIds.Select(i => new SelectListItem() {Value = i, Text = i}).ToList();
+            }
+
+            result.Transactions = await query
                 .Include(t => t.Transfers)
-                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .AsNoTracking()
                 .ToListAsync();
 
-            return View(transactions);
+
+           
+
+            return View("Index", result);
         }
 
         public async Task<IActionResult> NeedApproval()
@@ -176,6 +231,35 @@ namespace Sloth.Web.Controllers
             await DbContext.SaveChangesAsync();
 
             return RedirectToAction("Details", new { id = reversal.Id });
+        }
+
+        private static void SanitizeTransactionsFilter(TransactionsFilterModel model)
+        {
+            var fromUtc = (model.From ?? DateTime.Now.AddMonths(-1)).ToUniversalTime().Date;
+            var throughUtc = (model.To ?? DateTime.Now).ToUniversalTime().AddDays(1).Date;
+
+            if (fromUtc > DateTime.UtcNow || fromUtc < DateTime.UtcNow.AddYears(-100))
+            {
+                // invalid, so default to filtering from one month ago
+                var from = DateTime.Now.AddMonths((-1)).Date;
+                model.From = from;
+                fromUtc = from.ToUniversalTime();
+            }
+            else
+            {
+                model.From = fromUtc.ToLocalTime();
+            }
+
+            if (fromUtc >= throughUtc)
+            {
+                // invalid, so default to filtering through one month after fromUtc
+                throughUtc = fromUtc.AddMonths(1).AddDays(1).Date;
+                model.To = throughUtc.AddDays(-1).ToLocalTime();
+            }
+            else
+            {
+                model.To = throughUtc.ToLocalTime();
+            }
         }
     }
 }

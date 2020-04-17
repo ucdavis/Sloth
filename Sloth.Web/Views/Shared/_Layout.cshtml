@@ -8,8 +8,19 @@
 @{
     var user = await UserManager.GetUserAsync(User);
     var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
+    var controller = HttpContextAccessor.HttpContext.GetRouteData().Values["controller"] as string;
+    var action = HttpContextAccessor.HttpContext.GetRouteData().Values["action"] as string;
 
     var teams = user.GetTeams().ToList();
+
+    var trackingNum = "";
+
+    if (string.Equals("transactions", controller, StringComparison.OrdinalIgnoreCase)
+        && string.Equals("search", action, StringComparison.OrdinalIgnoreCase))
+    {
+        trackingNum = HttpContextAccessor.HttpContext.Request.Query["trackingNum"];
+    }
+
 }
 
 <!DOCTYPE html>
@@ -79,12 +90,42 @@
                             <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
                         </li>
                     }
+
+                    @if (!string.IsNullOrEmpty(teamSlug))
+                    {
+                        <li class="nav-item">
+                            <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
+                                <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
+                            </form>
+                        </li>
+                    }
                 </ul>
                 <partial name="_LoginPartial" />
             </div>
         </div>
     </div>
     <div class="body-content">
+        @if (!string.IsNullOrWhiteSpace(ViewBag?.Message ?? ViewBag?.ErrorMessage))
+        {
+            <div class="container">
+                <div class="row mb-1">
+                    @if (!string.IsNullOrWhiteSpace(ViewBag?.Message))
+                    {
+                        <div class="col alert alert-info">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            @ViewBag.Message
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(ViewBag?.ErrorMessage))
+                    {
+                        <div class="col alert alert-danger">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            @ViewBag.ErrorMessage
+                        </div>
+                    }
+                </div>
+            </div>
+        }
         @RenderBody()
     </div>
     <footer class="border-top py-3">

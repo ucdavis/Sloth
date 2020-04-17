@@ -1,14 +1,56 @@
-@model IEnumerable<Sloth.Core.Models.Transaction>
+@model Sloth.Web.Models.TransactionViewModels.TransactionsViewModel
 
 @{
     ViewBag.Title = "Transactions";
 }
 
-<div class="container">
-    <h2>@ViewBag.Title</h2>
+    <div class="container">
+        <h2>@ViewBag.Title</h2>
 
-    <partial name="_TransactionsTable" model="Model" />
-</div>
+        @if (string.IsNullOrWhiteSpace(Model.Filter.TrackingNum))
+        {
+            <div class="row justify-content-between">
+                <div class="col-12"><hr /></div>
+                <div class="col-6">
+                    <h3>Filters</h3>
+                </div>
+                <div class="col-6 d-flex justify-content-end align-items-end">
+                    <button class="btn align-self-end" type="button" data-toggle="collapse" data-target="#transactions-filter"><i class="fas fa-filter"></i></button>
+                </div>
+
+                <div id="transactions-filter" class="col-12 collapse">
+                    <form class="row" id="invoiceFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
+                        <div class="col-lg-9">
+                            <div class="row">
+                                <div class="input-group-sm form-group col-lg-6">
+                                    <label for="filter_merchant_id">Merchant Id</label>
+                                    <select id="filter_merchant_id" name="selectedMerchantId" class="form-control" asp-for="Filter.SelectedMerchantId" asp-items="Model.TeamMerchantIds" data-style="btn-primary"></select>
+                                </div>
+
+                                <div class="input-group-sm form-group col-12">
+                                    <label for="filter-date-range">Transaction Date</label>
+                                    <div id="filter-date-range" class="input-group input-daterange">
+                                        <input name="from" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.From" asp-format="{0:MM/dd/yyyy}" />
+                                        <div class="input-group-addon add-on px-2" style="height: auto">to</div>
+                                        <input name="to" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.To" asp-format="{0:MM/dd/yyyy}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 d-flex justify-content-end align-items-end">
+                            <div class="d-flex justify-content-end align-items-center form-group">
+                                <button class="btn" type="reset">Clear Filter</button>
+                                <button class="btn btn-outline-secondary ml-2" type="submit">Apply Filter <i class="fas fa-filter"></i></button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-12"><hr /></div>
+            </div>
+        }
+
+        <partial name="_TransactionsTable" model="Model.Transactions" />
+    </div>
 
 
 @section AdditionalScripts {
@@ -19,5 +61,12 @@
                 { "targets": [-1], "orderable": false },
             ]
         });
+
+        // setup datepickers
+        $('#filter-date-range').datepicker({
+            inputs: $('#filter-date-range input'),
+            keepEmptyValues: true,
+        });
+
     </script>
 }
