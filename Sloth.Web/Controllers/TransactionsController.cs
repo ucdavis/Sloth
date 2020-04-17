@@ -242,7 +242,7 @@ namespace Sloth.Web.Controllers
             {
                 // invalid, so default to filtering from one month ago
                 model.From = DateTime.Now.AddMonths((-1)).Date;
-                fromUtc = model.From.Value.ToUniversalTime();
+                fromUtc = model.From.Value.ToUniversalTime(); //lgtm [cs/dereferenced-value-may-be-null]
             }
             else
             {
