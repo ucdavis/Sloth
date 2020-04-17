@@ -38,7 +38,7 @@
                 <td>@t.KfsTrackingNumber</td>
                 <td>@t.DocumentNumber</td>
                 <td>@t.ProcessorTrackingNumber</td>
-                <td><a asp-controller="Transactions" asp-action="Search" asp-route-trackingNum="@t.MerchantTrackingNumber">@t.MerchantTrackingNumber</a></td>
+                <td><a asp-controller="Transactions" asp-action="Index" asp-route-trackingNum="@t.MerchantTrackingNumber">@t.MerchantTrackingNumber</a></td>
                 <td>@description</td>
                 <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
                 <td class="text-center">

@@ -94,7 +94,7 @@
                     @if (!string.IsNullOrEmpty(teamSlug))
                     {
                         <li class="nav-item">
-                            <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="get">
+                            <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
                                 <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
                             </form>
                         </li>

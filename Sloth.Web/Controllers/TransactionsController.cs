@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
-using Sloth.Web.Helpers;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.TransactionViewModels;
 
@@ -21,88 +20,67 @@ namespace Sloth.Web.Controllers
         }
 
         // GET: /<controller>/
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(TransactionsFilterModel filter = null)
         {
-            var filter = GetTransactionsFilter();
+            if (filter == null)
+                filter = new TransactionsFilterModel();
 
-            var fromUtc = (filter.From ?? DateTime.Now.AddMonths(-1)).ToUniversalTime().Date;
-            var throughUtc = (filter.To ?? DateTime.Now.AddDays(1)).ToUniversalTime().Date;
+            SanitizeTransactionsFilter(filter);
 
-            var teamMerchantIds = await DbContext.Integrations
-                .Where(i => i.Team.Slug == TeamSlug)
-                .OrderBy(i => i.MerchantId)
-                .Select(i => i.MerchantId)
-                .ToListAsync();
+            IQueryable<Transaction> query;
 
-            var query = DbContext.Transactions
-                .Include(t => t.Transfers)
-                .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= fromUtc &&
-                            t.TransactionDate < throughUtc);
-
-            if (!string.IsNullOrWhiteSpace(filter.SelectedMerchantId) && teamMerchantIds.Contains(filter.SelectedMerchantId))
-            {
-                query = query
-                    .Where(t => t.Source.Team.Integrations.Any(
-                        i => i.MerchantId == filter.SelectedMerchantId
-                        && i.Source == t.Source));
-            }
-
-            var transactions = await query
-                .AsNoTracking()
-                .ToListAsync();
-
-            var filterViewModel = new TransactionsFilterViewModel
-            {
-                Filter = filter,
-                TeamMerchantIds = teamMerchantIds.Select(i => new SelectListItem() { Value = i, Text = i }).ToList()
-            };
+            List<string> teamMerchantIds = null;
 
             var result = new TransactionsViewModel()
             {
-                TransactionsFilter = filterViewModel,
-                Transactions = transactions
+                Filter = filter
             };
 
-            return View("Index", result);
-        }
-
-        public IActionResult SetFilter(TransactionsFilterModel model)
-        {
-            // save model to session
-            SetTransactionsFilter(model);
-
-            return RedirectToAction("Index");
-        }
-
-        public async Task<IActionResult> Search(string trackingNum = "")
-        {
-            List<Transaction> transactions;
-
-            if (string.IsNullOrWhiteSpace(trackingNum))
+            if (!string.IsNullOrWhiteSpace(filter.TrackingNum))
             {
-                transactions = new List<Transaction>();
+                query = DbContext.Transactions
+                    .Where(t => t.Source.Team.Slug == TeamSlug
+                                && (t.ProcessorTrackingNumber == filter.TrackingNum
+                                    || t.KfsTrackingNumber == filter.TrackingNum
+                                    || t.MerchantTrackingNumber == filter.TrackingNum));
+
             }
             else
             {
-                var query = DbContext.Transactions
-                    .Where(t => t.Source.Team.Slug == TeamSlug
-                                && (t.ProcessorTrackingNumber == trackingNum
-                                    || t.KfsTrackingNumber == trackingNum
-                                    || t.MerchantTrackingNumber == trackingNum));
+                var fromUtc = (filter.From ?? DateTime.Now.AddMonths(-1)).ToUniversalTime().Date;
+                var throughUtc = (filter.To ?? DateTime.Now.AddDays(1)).ToUniversalTime().Date;
 
-                transactions = await query
-                    .Include(t => t.Transfers)
-                    .AsNoTracking()
+                teamMerchantIds = await DbContext.Integrations
+                    .Where(i => i.Team.Slug == TeamSlug)
+                    .OrderBy(i => i.MerchantId)
+                    .Select(i => i.MerchantId)
                     .ToListAsync();
+
+                query = DbContext.Transactions
+                    .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= fromUtc &&
+                                t.TransactionDate < throughUtc);
+
+                if (!string.IsNullOrWhiteSpace(filter.SelectedMerchantId) && teamMerchantIds.Contains(filter.SelectedMerchantId))
+                {
+                    query = query
+                        .Where(t => t.Source.Team.Integrations.Any(
+                            i => i.MerchantId == filter.SelectedMerchantId
+                                 && i.Source == t.Source));
+                }
+
+                result.TeamMerchantIds =
+                    teamMerchantIds.Select(i => new SelectListItem() {Value = i, Text = i}).ToList();
             }
 
-            var result = new TransactionsSearchViewModel()
-            {
-                TrackingNumber = trackingNum ?? "",
-                Transactions = transactions
-            };
+            result.Transactions = await query
+                .Include(t => t.Transfers)
+                .AsNoTracking()
+                .ToListAsync();
 
-            return View("Search", result);
+
+           
+
+            return View("Index", result);
         }
 
         public async Task<IActionResult> NeedApproval()
@@ -255,7 +233,7 @@ namespace Sloth.Web.Controllers
             return RedirectToAction("Details", new { id = reversal.Id });
         }
 
-        private void SanitizeTransactionsFilter(TransactionsFilterModel model)
+        private static void SanitizeTransactionsFilter(TransactionsFilterModel model)
         {
             var fromUtc = (model.From ?? DateTime.Now.AddMonths(-1)).ToUniversalTime().Date;
             var throughUtc = (model.To ?? DateTime.Now).ToUniversalTime().AddDays(1).Date;
@@ -266,6 +244,10 @@ namespace Sloth.Web.Controllers
                 model.From = DateTime.Now.AddMonths((-1)).Date;
                 fromUtc = model.From.Value.ToUniversalTime();
             }
+            else
+            {
+                model.From = fromUtc.ToLocalTime();
+            }
 
             if (fromUtc >= throughUtc)
             {
@@ -273,32 +255,10 @@ namespace Sloth.Web.Controllers
                 throughUtc = fromUtc.AddMonths(1).AddDays(1).Date;
                 model.To = throughUtc.AddDays(-1).ToLocalTime();
             }
-        }
-
-        private TransactionsFilterModel GetTransactionsFilter()
-        {
-            var model = HttpContext.Session.GetObjectFromJson<TransactionsFilterModel>("InvoiceFilter");
-
-            if (model != null)
-                return model;
-
-            model = new TransactionsFilterModel()
+            else
             {
-                From = DateTime.Now.AddMonths(-1).Date,
-                To = DateTime.Now.Date
-            };
-
-            SanitizeTransactionsFilter(model);
-
-            return model;
+                model.To = throughUtc.ToLocalTime();
+            }
         }
-
-        private void SetTransactionsFilter(TransactionsFilterModel model)
-        {
-            SanitizeTransactionsFilter(model);
-
-            HttpContext.Session.SetObjectAsJson("InvoiceFilter", model);
-        }
-
     }
 }

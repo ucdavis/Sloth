@@ -9,6 +9,8 @@ namespace Sloth.Web.Models.TransactionViewModels
 {
     public class TransactionsFilterModel
     {
+        public string TrackingNum { get; set; }
+
         public string SelectedMerchantId { get; set; }
 
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
