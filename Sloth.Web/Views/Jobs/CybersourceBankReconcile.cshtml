@@ -1,7 +1,19 @@
-@model IEnumerable<Sloth.Core.Models.CybersourceBankReconcileJobRecord>
+@using Sloth.Web.Controllers
+@model Sloth.Web.Models.JobViewModels.CybersourceBankReconcileJobsViewModel
 
 @{
     ViewData["Title"] = "CybersourceBankReconcile";
+
+    string GetEventType(string recordStatus)
+    {
+        switch (recordStatus)
+        {
+            case "Finished":
+                return "event-success";
+            default:
+                return "event-info";
+        }
+    }
 }
 
 @section AdditionalStyles
@@ -14,53 +26,90 @@
     </style>
 }
 
+<div class="container">
+    <div class="row mb-2">
+        <div class="col-8">
+            <h2>Cybersource BankReconcile Job Records</h2>
 
-<div class="row mb-2">
-    <div class="col-8">
-        <h2>Cybersource BankReconcile Job Records</h2>
-
+        </div>
+        <div class="col-4 d-flex justify-content-end align-items-end">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#run-job-modal">Run Job</button>
+        </div>
     </div>
-    <div class="col-4 d-flex justify-content-end align-items-end">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#run-job-modal">Run Job</button>
-    </div>
-</div>
 
-<div id="jobsCalendar" class="mb-4"></div>
+    @if (!Model.Filter.SearchDate.HasValue || string.IsNullOrWhiteSpace(Model.Filter.SearchType))
+    {
+        <div class="row justify-content-between">
+            <div class="col-12"><hr /></div>
+            <div class="col-6">
+                <h3>Filters</h3>
+            </div>
+            <div class="col-6 d-flex justify-content-end align-items-end">
+                <button class="btn align-self-end" type="button" data-toggle="collapse" data-target="#jobs-filter"><i class="fas fa-filter"></i></button>
+            </div>
 
-<table id="recordsTable" class="table table-hover tabel-bordered">
-    <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.ProcessedDate)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.RanOn)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Status)
-        </th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model) {
-        <tr>
-            <td data-sort="@item.ProcessedDate.Ticks">
-                @item.ProcessedDate.ToString("M/d/yyyy")
-            </td>
-            <td data-sort="@item.RanOn.Ticks">
-                @item.RanOn
-            </td>
-            <td>
-                @item.Status
-            </td>
-            <td>
-                <a asp-action="CybersourceBankReconcileDetails" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
-            </td>
-        </tr>
+            <div id="jobs-filter" class="col-12 collapse">
+                <form class="row" id="jobs-filter-form" asp-controller="Jobs" asp-action="CybersourceBankReconcile" method="get">
+                    <div class="col-lg-9">
+                        <div class="row">
+                            <div class="input-group-sm form-group col-lg-5 col-md-7 col-sm-9">
+                                <label for="filter-date">Month</label>
+                                <div id="filter-date" class="input-group input-daterange">
+                                    <input name="date" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.Date" asp-format="{0:MM/dd/yyyy}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 d-flex justify-content-end align-items-end">
+                        <div class="d-flex justify-content-end align-items-center form-group">
+                            <button class="btn" type="reset">Clear Filter</button>
+                            <button class="btn btn-outline-secondary ml-2" type="submit">Apply Filter <i class="fas fa-filter"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12"><hr /></div>
+        </div>
     }
-    </tbody>
-</table>
+
+    <div id="jobsCalendar" class="mb-4"></div>
+
+    <table id="recordsTable" class="table table-hover tabel-bordered">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().ProcessedDate)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().RanOn)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Status)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Jobs)
+            {
+                <tr>
+                    <td data-sort="@item.ProcessedDate.Ticks">
+                        @item.ProcessedDate.ToString("M/d/yyyy")
+                    </td>
+                    <td data-sort="@item.RanOn.Ticks">
+                        @item.RanOn
+                    </td>
+                    <td>
+                        @item.Status
+                    </td>
+                    <td>
+                        <a asp-action="CybersourceBankReconcileDetails" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
 <div id="run-job-modal" class="modal fade">
     <div class="modal-dialog" role="document">
@@ -98,16 +147,22 @@
     <script>
         $('#jobsCalendar').calendar({
             tmpl_path: "/calendar/",
-            events_source: '@Url.Action("CybersourceBankReconcileRecords")',
-            views: {
-                week: {
-                    enable: 0
-                },
-                day: {
-                    enable: 0
+            events_source: [
+                @foreach (var r in Model.Jobs)
+                {
+                    @:{ id: '@r.Id', title: '@($"{r.Name} - {r.RanOn:G}")', class: '@GetEventType(r.Status)', url: '@Url.Action("CybersourceBankReconcileDetails", new {id = r.Id})', start: @(new DateTimeOffset(r.ProcessedDate.ToLocalTime()).ToUnixTimeMilliseconds()), end: @(new DateTimeOffset(r.ProcessedDate.ToLocalTime()).ToUnixTimeMilliseconds() + 1) },
                 }
+        ],
+        views: {
+            week: {
+                enable: 0
+            },
+            day: {
+                enable: 0
             }
-        });
+        },
+        day: '@Model.Filter.Date.Value.ToString("yyyy-MM-dd")'
+    });
 
         $('#run-job-modal-action').click(function() {
             $('#run-job-modal-form').submit();
@@ -117,34 +172,43 @@
         $('#recordsTable').DataTable({
             columnDefs: [
                 { visible: false, targets: groupColumn },
-                { orderable: false, targets: -1 }],
+                { orderable: false, targets: -1 }
+            ],
             order: [[1, 'desc']],
             drawCallback: function(settings) {
                 var api = this.api();
-                var rows = api.rows( {page:'current'} ).nodes();
+                var rows = api.rows({ page: 'current' }).nodes();
                 var last = null;
- 
-                api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
-                    if ( last !== group ) {
-                        $(rows).eq( i ).before(
-                            '<tr class="group"><td colspan="4">Date Processed: '+group+'</td></tr>'
+
+                api.column(groupColumn, { page: 'current' }).data().each(function(group, i) {
+                    if (last !== group) {
+                        $(rows).eq(i).before(
+                            '<tr class="group"><td colspan="4">Date Processed: ' + group + '</td></tr>'
                         );
- 
+
                         last = group;
                     }
-                } );
+                });
             }
         });
 
         // manage order grouping
-        $('#recordsTable tbody').on( 'click', 'tr.group', function () {
-            var currentOrder = table.order()[0];
-            if ( currentOrder[0] === groupColumn && currentOrder[1] === 'asc' ) {
-                table.order( [ groupColumn, 'desc' ] ).draw();
-            }
-            else {
-                table.order( [ groupColumn, 'asc' ] ).draw();
-            }
-        } );
+        $('#recordsTable tbody').on('click',
+            'tr.group',
+            function() {
+                var currentOrder = table.order()[0];
+                if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+                    table.order([groupColumn, 'desc']).draw();
+                } else {
+                    table.order([groupColumn, 'asc']).draw();
+                }
+            });
+
+        $('#filter-date').datepicker({
+            inputs: $('#filter-date input'),
+            keepEmptyValues: true,
+            startView: "months",
+            minViewMode: "months"
+        });
     </script>
 }
