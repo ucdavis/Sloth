@@ -1,10 +1,14 @@
+@using Sloth.Core.Models
 @using Sloth.Web.Controllers
 @model Sloth.Web.Models.JobViewModels.CybersourceBankReconcileJobsViewModel
 
-@{
-    ViewData["Title"] = "CybersourceBankReconcile";
+@functions {
+    private static long GetEventMilliseconds(CybersourceBankReconcileJobRecord r)
+    {
+        return new DateTimeOffset(r.RanOn.ToLocalTime()).ToUnixTimeMilliseconds();
+    }
 
-    string GetEventType(string recordStatus)
+    private static string GetEventType(string recordStatus)
     {
         switch (recordStatus)
         {
@@ -14,6 +18,10 @@
                 return "event-info";
         }
     }
+}
+
+@{
+    ViewData["Title"] = "CybersourceBankReconcile";
 }
 
 @section AdditionalStyles
@@ -145,70 +153,72 @@
     <script src="https://cdn.jsdelivr.net/npm/underscore@1.9.1/underscore-min.js"></script>
     <script src="~/js/calendar.js"></script>
     <script>
-        $('#jobsCalendar').calendar({
-            tmpl_path: "/calendar/",
-            events_source: [
-                @foreach (var r in Model.Jobs)
+        (function() {
+            $('#jobsCalendar').calendar({
+                tmpl_path: "/calendar/",
+                events_source: [
+                    @foreach (var r in Model.Jobs)
                 {
-                    @:{ id: '@r.Id', title: '@($"{r.Name} - {r.RanOn:G}")', class: '@GetEventType(r.Status)', url: '@Url.Action("CybersourceBankReconcileDetails", new {id = r.Id})', start: @(new DateTimeOffset(r.ProcessedDate.ToLocalTime()).ToUnixTimeMilliseconds()), end: @(new DateTimeOffset(r.ProcessedDate.ToLocalTime()).ToUnixTimeMilliseconds() + 1) },
+                    @:{ id: '@r.Id', title: '@($"{r.Name} - {r.RanOn:G}")', class: '@GetEventType(r.Status)', url: '@Url.Action("CybersourceBankReconcileDetails", new {id = r.Id})', start: @GetEventMilliseconds(r), end: @GetEventMilliseconds(r) + 1 },
                 }
-        ],
-        views: {
-            week: {
-                enable: 0
-            },
-            day: {
-                enable: 0
-            }
-        },
-        day: '@Model.Filter.Date.Value.ToString("yyyy-MM-dd")'
-    });
-
-        $('#run-job-modal-action').click(function() {
-            $('#run-job-modal-form').submit();
-        });
-
-        var groupColumn = 0;
-        $('#recordsTable').DataTable({
-            columnDefs: [
-                { visible: false, targets: groupColumn },
-                { orderable: false, targets: -1 }
-            ],
-            order: [[1, 'desc']],
-            drawCallback: function(settings) {
-                var api = this.api();
-                var rows = api.rows({ page: 'current' }).nodes();
-                var last = null;
-
-                api.column(groupColumn, { page: 'current' }).data().each(function(group, i) {
-                    if (last !== group) {
-                        $(rows).eq(i).before(
-                            '<tr class="group"><td colspan="4">Date Processed: ' + group + '</td></tr>'
-                        );
-
-                        last = group;
+                ],
+                views: {
+                    week: {
+                        enable: 0
+                    },
+                    day: {
+                        enable: 0
                     }
-                });
-            }
-        });
+                },
+                day: '@Model.Filter.Date.Value.ToString("yyyy-MM-dd")'
+            });
 
-        // manage order grouping
-        $('#recordsTable tbody').on('click',
-            'tr.group',
-            function() {
-                var currentOrder = table.order()[0];
-                if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
-                    table.order([groupColumn, 'desc']).draw();
-                } else {
-                    table.order([groupColumn, 'asc']).draw();
+            $('#run-job-modal-action').click(function() {
+                $('#run-job-modal-form').submit();
+            });
+
+            var groupColumn = 0;
+            $('#recordsTable').DataTable({
+                columnDefs: [
+                    { visible: false, targets: groupColumn },
+                    { orderable: false, targets: -1 }
+                ],
+                order: [[1, 'desc']],
+                drawCallback: function(settings) {
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(groupColumn, { page: 'current' }).data().each(function(group, i) {
+                        if (last !== group) {
+                            $(rows).eq(i).before(
+                                '<tr class="group"><td colspan="4">Date Processed: ' + group + '</td></tr>'
+                            );
+
+                            last = group;
+                        }
+                    });
                 }
             });
 
-        $('#filter-date').datepicker({
-            inputs: $('#filter-date input'),
-            keepEmptyValues: true,
-            startView: "months",
-            minViewMode: "months"
-        });
+            // manage order grouping
+            $('#recordsTable tbody').on('click',
+                'tr.group',
+                function() {
+                    var currentOrder = table.order()[0];
+                    if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+                        table.order([groupColumn, 'desc']).draw();
+                    } else {
+                        table.order([groupColumn, 'asc']).draw();
+                    }
+                });
+
+            $('#filter-date').datepicker({
+                inputs: $('#filter-date input'),
+                keepEmptyValues: true,
+                startView: "months",
+                minViewMode: "months"
+            });
+        })();
     </script>
 }

@@ -36,12 +36,28 @@ namespace Sloth.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> KfsScrubberUpload()
+        public async Task<IActionResult> KfsScrubberUpload(KfsScrubberJobsFilterModel filter)
         {
-            var records = await _dbContext.KfsScrubberUploadJobRecords
-                .ToListAsync();
+            if (filter == null)
+                filter = new KfsScrubberJobsFilterModel();
 
-            return View(records);
+            SanitizeKfsScrubberJobsFilter(filter);
+
+            var date = filter.Date ?? DateTime.Now.AddMonths(-1);
+
+            var fromUtc = date.ToUniversalTime();
+            var throughUtc = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month)).ToUniversalTime();
+
+            var result = new KfsScrubberJobsViewModel()
+            {
+                Filter = filter,
+                Jobs = await _dbContext.KfsScrubberUploadJobRecords
+                    .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc)
+                    .OrderBy(j => j.RanOn)
+                    .ToListAsync()
+            };
+
+            return View(result);
         }
 
         public async Task<IActionResult> KfsScrubberUploadDetails(string id)
@@ -51,46 +67,6 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             return View(record);
-        }
-
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        public async Task<IActionResult> KfsScrubberUploadRecords(double from, double to, int utc_offset_from, int utc_offset_to)
-        {
-            // js offsets are in minutes
-            var startOffset = new TimeSpan(0, utc_offset_from, 0);
-            var endOffset = new TimeSpan(0, utc_offset_to, 0);
-
-            // js ticks are in milliseconds, remove offset to utc
-            var start = new DateTime(1970, 1, 1).AddMilliseconds(from) - startOffset;
-            var end = new DateTime(1970, 1, 1).AddMilliseconds(to) - endOffset;
-
-            // fetch records
-            var records = await _dbContext.KfsScrubberUploadJobRecords
-                .Where(r => r.RanOn >= start && r.RanOn <= end)
-                .ToListAsync();
-
-            // js epoch is 1/1/1970
-            var jsEpoch = new DateTime(1970, 1, 1).Ticks / 10_000;
-
-            // format for js, add offset to local, reset to js epoch
-            var events = records
-                .OrderBy(r => r.RanOn)
-                .Select(r => new
-                {
-                    id     = r.Id,
-                    title  = $"{r.Name} - {r.RanOn:G}",
-                    @class = "event-success",
-                    url    = Url.Action(nameof(KfsScrubberUploadDetails), new { id = r.Id }),
-                    start  = (r.RanOn.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch,
-                    end    = (r.RanOn.Ticks / 10_000) + (startOffset.Ticks / 10_000) - jsEpoch + 1,
-                });
-
-
-            return new JsonResult(new
-            {
-                success = 1,
-                result = events,
-            });
         }
 
         [HttpPost]
@@ -200,10 +176,13 @@ namespace Sloth.Web.Controllers
             {
                 Filter = filter,
                 Jobs = await _dbContext.CybersourceBankReconcileJobRecords
-                    .Where(r => r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
+                    .Where(r =>
+                        (r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
+                        || (r.RanOn > fromUtc && r.RanOn <= throughUtc))
                     .OrderBy(r => r.ProcessedDate)
+                    .ThenBy(r => r.RanOn)
                     .ToListAsync()
-        };
+            };
 
             return View(result);
         }
@@ -265,6 +244,13 @@ namespace Sloth.Web.Controllers
         }
 
         private static void SanitizeCybersourceBankReconcileJobsFilter(CybersourceBankReconcileJobsFilterModel model)
+        {
+            var date = (model.Date ?? DateTime.Now).Date;
+
+            model.Date = new DateTime(date.Year, date.Month, 1);
+        }
+
+        private static void SanitizeKfsScrubberJobsFilter(KfsScrubberJobsFilterModel model)
         {
             var date = (model.Date ?? DateTime.Now).Date;
 
