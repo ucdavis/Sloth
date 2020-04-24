@@ -9,6 +9,6 @@ namespace Sloth.Web.Models.JobViewModels
     {
         public List<CybersourceBankReconcileJobRecord> Jobs { get; set; }
         
-        public CybersourceBankReconcileJobsFilterModel Filter { get; set; }
+        public JobsFilterModel Filter { get; set; }
     }
 }

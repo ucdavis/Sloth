@@ -36,17 +36,17 @@ namespace Sloth.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> KfsScrubberUpload(KfsScrubberJobsFilterModel filter)
+        public async Task<IActionResult> KfsScrubberUpload(JobsFilterModel filter)
         {
             if (filter == null)
-                filter = new KfsScrubberJobsFilterModel();
+                filter = new JobsFilterModel();
 
-            SanitizeKfsScrubberJobsFilter(filter);
+            SanitizeJobsFilter(filter);
 
             var date = filter.Date ?? DateTime.Now.AddMonths(-1);
 
             var fromUtc = date.ToUniversalTime();
-            var throughUtc = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month)).ToUniversalTime();
+            var throughUtc = date.AddMonths(1).ToUniversalTime();
 
             var result = new KfsScrubberJobsViewModel()
             {
@@ -160,17 +160,17 @@ namespace Sloth.Web.Controllers
             return RedirectToAction(nameof(KfsScrubberUploadDetails), new { id = record.Id });
         }
 
-        public async Task<IActionResult> CybersourceBankReconcile(CybersourceBankReconcileJobsFilterModel filter = null)
+        public async Task<IActionResult> CybersourceBankReconcile(JobsFilterModel filter = null)
         {
             if (filter == null)
-                filter = new CybersourceBankReconcileJobsFilterModel();
+                filter = new JobsFilterModel();
 
-            SanitizeCybersourceBankReconcileJobsFilter(filter);
+            SanitizeJobsFilter(filter);
 
             var date = filter.Date ?? DateTime.Now.AddMonths(-1);
 
             var fromUtc = date.ToUniversalTime();
-            var throughUtc = new DateTime(date.Year, date.Month, DateTime.DaysInMonth(date.Year, date.Month)).ToUniversalTime();
+            var throughUtc = date.AddMonths(1).ToUniversalTime();
 
             var result = new CybersourceBankReconcileJobsViewModel()
             {
@@ -243,14 +243,7 @@ namespace Sloth.Web.Controllers
             return RedirectToAction(nameof(CybersourceBankReconcileDetails), new { id = record.Id });
         }
 
-        private static void SanitizeCybersourceBankReconcileJobsFilter(CybersourceBankReconcileJobsFilterModel model)
-        {
-            var date = (model.Date ?? DateTime.Now).Date;
-
-            model.Date = new DateTime(date.Year, date.Month, 1);
-        }
-
-        private static void SanitizeKfsScrubberJobsFilter(KfsScrubberJobsFilterModel model)
+        private static void SanitizeJobsFilter(JobsFilterModel model)
         {
             var date = (model.Date ?? DateTime.Now).Date;
 

@@ -7,12 +7,8 @@ using Sloth.Core.Models;
 
 namespace Sloth.Web.Models.JobViewModels
 {
-    public class KfsScrubberJobsFilterModel
+    public class JobsFilterModel
     {
-        public DateTime? SearchDate { get; set; }
-
-        public string SearchType { get; set; }
-
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime? Date { get; set; }
     }

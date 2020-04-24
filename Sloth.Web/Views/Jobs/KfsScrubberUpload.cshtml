@@ -46,8 +46,6 @@
         </div>
     </div>
 
-    @if (!Model.Filter.SearchDate.HasValue || string.IsNullOrWhiteSpace(Model.Filter.SearchType))
-    {
         <div class="row justify-content-between">
             <div class="col-12"><hr /></div>
             <div class="col-6">
@@ -79,7 +77,6 @@
             </div>
             <div class="col-12"><hr /></div>
         </div>
-    }
 
     <div id="jobsCalendar" class="mb-4"></div>
 
