@@ -1,4 +1,25 @@
-@model IEnumerable<Sloth.Core.Models.KfsScrubberUploadJobRecord>
+@using System.Linq
+@using Sloth.Core.Jobs
+@using Sloth.Core.Models
+@model Sloth.Web.Models.JobViewModels.KfsScrubberJobsViewModel
+
+@functions {
+    private static long GetEventMilliseconds(KfsScrubberUploadJobRecord r)
+    {
+        return new DateTimeOffset(r.RanOn.ToLocalTime()).ToUnixTimeMilliseconds();
+    }
+
+    private static string GetEventType(string recordStatus)
+    {
+        switch (recordStatus)
+        {
+            case "Finished":
+                return "event-success";
+            default:
+                return "event-info";
+        }
+    }
+}
 
 @{
     ViewBag.Title = "KfsScrubberUploadJobRecord";
@@ -14,47 +35,81 @@
     </style>
 }
 
+<div class="container">
+    <div class="row mb-2">
+        <div class="col-8">
+            <h2>KFS Upload Scrubber Job Records</h2>
 
-<div class="row mb-2">
-    <div class="col-8">
-        <h2>KFS Upload Scrubber Job Records</h2>
+        </div>
+        <div class="col-4 d-flex justify-content-end align-items-end">
+            <button class="btn btn-primary" data-toggle="modal" data-target="#run-job-modal">Run Job</button>
+        </div>
+    </div>
 
-    </div>
-    <div class="col-4 d-flex justify-content-end align-items-end">
-        <button class="btn btn-primary" data-toggle="modal" data-target="#run-job-modal">Run Job</button>
-    </div>
+        <div class="row justify-content-between">
+            <div class="col-12"><hr /></div>
+            <div class="col-6">
+                <h3>Filters</h3>
+            </div>
+            <div class="col-6 d-flex justify-content-end align-items-end">
+                <button class="btn align-self-end" type="button" data-toggle="collapse" data-target="#jobs-filter"><i class="fas fa-filter"></i></button>
+            </div>
+
+            <div id="jobs-filter" class="col-12 collapse">
+                <form class="row" id="jobs-filter-form" asp-controller="Jobs" asp-action="KfsScrubberUpload" method="get">
+                    <div class="col-lg-9">
+                        <div class="row">
+                            <div class="input-group-sm form-group col-lg-5 col-md-7 col-sm-9">
+                                <label for="filter-date">Month</label>
+                                <div id="filter-date" class="input-group input-daterange">
+                                    <input name="date" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.Date" asp-format="{0:MM/dd/yyyy}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 d-flex justify-content-end align-items-end">
+                        <div class="d-flex justify-content-end align-items-center form-group">
+                            <button class="btn" type="reset">Clear Filter</button>
+                            <button class="btn btn-outline-secondary ml-2" type="submit">Apply Filter <i class="fas fa-filter"></i></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-12"><hr /></div>
+        </div>
+
+    <div id="jobsCalendar" class="mb-4"></div>
+
+    <table id="recordsTable" class="table table-hover table-bordered">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().RanOn)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Status)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Jobs)
+            {
+                <tr>
+                    <td data-sort="@item.RanOn.Ticks">
+                        @item.RanOn
+                    </td>
+                    <td>
+                        @item.Status
+                    </td>
+                    <td>
+                        <a asp-action="KfsScrubberUploadDetails" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
-
-<div id="jobsCalendar" class="mb-4"></div>
-
-<table id="recordsTable" class="table table-hover table-bordered">
-    <thead>
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.RanOn)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Status)
-        </th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model) {
-        <tr>
-            <td data-sort="@item.RanOn.Ticks">
-                @item.RanOn
-            </td>
-            <td>
-                @item.Status
-            </td>
-            <td>
-                <a asp-action="KfsScrubberUploadDetails" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
 
 <div id="run-job-modal" class="modal fade">
     <div class="modal-dialog" role="document">
@@ -90,55 +145,73 @@
     <script src="https://cdn.jsdelivr.net/npm/underscore@1.9.1/underscore-min.js"></script>
     <script src="~/js/calendar.js"></script>
     <script>
-        $('#jobsCalendar').calendar({
-            tmpl_path: "/calendar/",
-            events_source: '@Url.Action("KfsScrubberUploadRecords")',
-            views: {
-                week: {
-                    enable: 0
-                },
-                day: {
-                    enable: 0
+        (function() {
+            $('#jobsCalendar').calendar({
+                tmpl_path: "/calendar/",
+                events_source: [
+                    @foreach (var r in Model.Jobs)
+                {
+                    @:{ id: '@r.Id', title: '@($"{r.Name} - {r.RanOn:G}")', class: '@GetEventType(r.Status)', url: '@Url.Action("KfsScrubberUploadDetails", new {id = r.Id})', start: @GetEventMilliseconds(r), end: @GetEventMilliseconds(r) + 1 },
                 }
-            }
-        });
-
-        $('#run-job-modal-action').click(function() {
-            $('#run-job-modal-form').submit();
-        });
-
-        var groupColumn = 0;
-        $('#recordsTable').DataTable({
-            columnDefs: [
-                { visible: false, targets: groupColumn },
-                { orderable: false, targets: -1 }],
-            order: [[groupColumn, 'asc']],
-            drawCallback: function(settings) {
-                var api = this.api();
-                var rows = api.rows( {page:'current'} ).nodes();
-                var last = null;
- 
-                api.column(groupColumn, {page:'current'} ).data().each( function ( group, i ) {
-                    if ( last !== group ) {
-                        $(rows).eq( i ).before(
-                            '<tr class="group"><td colspan="4">Date Processed: '+group+'</td></tr>'
-                        );
- 
-                        last = group;
+                ],
+                views: {
+                    week: {
+                        enable: 0
+                    },
+                    day: {
+                        enable: 0
                     }
-                } );
-            }
-        });
+                },
+                day: '@Model.Filter.Date.Value.ToString("yyyy-MM-dd")'
+            });
 
-        // manage order grouping
-        $('#recordsTable tbody').on( 'click', 'tr.group', function () {
-            var currentOrder = table.order()[0];
-            if ( currentOrder[0] === groupColumn && currentOrder[1] === 'asc' ) {
-                table.order( [ groupColumn, 'desc' ] ).draw();
-            }
-            else {
-                table.order( [ groupColumn, 'asc' ] ).draw();
-            }
-        } );
+            $('#run-job-modal-action').click(function() {
+                $('#run-job-modal-form').submit();
+            });
+
+            var groupColumn = 0;
+            $('#recordsTable').DataTable({
+                columnDefs: [
+                    { visible: false, targets: groupColumn },
+                    { orderable: false, targets: -1 }
+                ],
+                order: [[groupColumn, 'asc']],
+                drawCallback: function(settings) {
+                    var api = this.api();
+                    var rows = api.rows({ page: 'current' }).nodes();
+                    var last = null;
+
+                    api.column(groupColumn, { page: 'current' }).data().each(function(group, i) {
+                        if (last !== group) {
+                            $(rows).eq(i).before(
+                                '<tr class="group"><td colspan="4">Date Processed: ' + group + '</td></tr>'
+                            );
+
+                            last = group;
+                        }
+                    });
+                }
+            });
+
+            // manage order grouping
+            $('#recordsTable tbody').on('click',
+                'tr.group',
+                function() {
+                    var currentOrder = table.order()[0];
+                    if (currentOrder[0] === groupColumn && currentOrder[1] === 'asc') {
+                        table.order([groupColumn, 'desc']).draw();
+                    } else {
+                        table.order([groupColumn, 'asc']).draw();
+                    }
+                });
+
+
+            $('#filter-date').datepicker({
+                inputs: $('#filter-date input'),
+                keepEmptyValues: true,
+                startView: "months",
+                minViewMode: "months"
+            });
+        })();
     </script>
 }
