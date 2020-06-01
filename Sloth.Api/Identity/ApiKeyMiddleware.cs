@@ -28,13 +28,17 @@ namespace Sloth.Api.Identity
 
         public Task Invoke(HttpContext context, SlothDbContext dbContext)
         {
+            _logger.Log(LogLevel.Information, "API - Starting Auth");
             // check for header
             if (!context.Request.Headers.ContainsKey(HeaderKey))
             {
+                _logger.Log(LogLevel.Information, "API - Header Key not found");
                 return _next(context);
             }
+            _logger.Log(LogLevel.Information, "API - Extract Key");
             var headerValue = context.Request.Headers[HeaderKey].FirstOrDefault();
 
+            _logger.Log(LogLevel.Information, "API - Lookup Key");
             // lookup apikey from db
             var apiKey = dbContext.ApiKeys
                 .Include(a => a.Team)
@@ -42,13 +46,16 @@ namespace Sloth.Api.Identity
 
             if (apiKey == null || apiKey.Revoked.HasValue)
             {
+                _logger.Log(LogLevel.Information, "API - Key not found");
                 return _next(context);
             }
 
+            _logger.Log(LogLevel.Information, "API - Create Claim");
             context.User.AddIdentity(new ClaimsIdentity(new[]
             {
                 new Claim(ClaimTypes.Name, apiKey.Team.Name)
             }));
+            _logger.Log(LogLevel.Information, "API - About to return");
 
             return _next(context);
         }
