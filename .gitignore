@@ -252,3 +252,6 @@ _Pvt_Extensions
 *.jfm
 
 keys/
+
+# VS undocumented serviceDependencies files
+**/Properties/serviceDependencies.*
