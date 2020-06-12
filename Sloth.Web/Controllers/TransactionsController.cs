@@ -243,7 +243,7 @@ namespace Sloth.Web.Controllers
             var transaction = await DbContext.Transactions
                 .Include(t => t.Source)
                 .ThenInclude(s => s.Team)
-                .FirstOrDefaultAsync(t => t.Id == id);
+                .SingleOrDefaultAsync(t => t.Id == id);
 
             if (transaction == null)
             {
