@@ -252,3 +252,5 @@ _Pvt_Extensions
 *.jfm
 
 keys/
+
+**/Properties/serviceDependencies.*
