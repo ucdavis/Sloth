@@ -3,7 +3,7 @@
 @using Microsoft.AspNetCore.Routing
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
-@model IEnumerable<Sloth.Core.Models.Transaction>
+@model Sloth.Web.Models.TransactionViewModels.TransactionsViewModel
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
@@ -13,20 +13,20 @@
 <table id="transactionsTable" class="table table-bordered">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(x => x.Id)</th>
-            <th>@Html.DisplayNameFor(x => x.TransactionDate)</th>
-            <th>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</th>
-            <th>@Html.DisplayNameFor(x => x.DocumentNumber)</th>
-            <th>@Html.DisplayNameFor(x => x.ProcessorTrackingNumber)</th>
-            <th>@Html.DisplayNameFor(x => x.MerchantTrackingNumber)</th>
-            <th>@Html.DisplayNameFor(x => x.Description)</th>
+            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Id)</th>
+            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().TransactionDate)</th>
+            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().KfsTrackingNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().DocumentNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().ProcessorTrackingNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().MerchantTrackingNumber)</th>
+            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Description)</th>
             <th>Accounts</th>
-            <th>@Html.DisplayNameFor(x => x.Status)</th>
+            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Status)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var t in Model)
+        @foreach (var t in Model.Transactions)
         {
             var description = t.Transfers[0].Description;
             var firstDebit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Debit);
@@ -46,9 +46,22 @@
                 </td>
                 <td>
                     <a asp-controller="Transactions" asp-action="Details" asp-route-id="@t.Id" class="btn btn-primary btn-sm" target="_blank">
-                        <i class="fa fa-fw fa-info"></i>
-                        <i class="fa fa-fw fa-external-link"></i>
+                        <span style="white-space:nowrap">
+                            <span class="fa-layers">
+                                <i class="fa fa-info"></i>
+                                <i class="fa fa-external-link-alt" data-fa-transform="shrink-8 up-8 right-8"></i>
+                            </span>
+                            &nbsp;Details
+                        </span>
                     </a>
+                    @if (Model.HasWebhooks)
+                    {
+                        <button id="callWebHook" class="btn btn-danger btn-sm">
+                            <span style="white-space: nowrap">
+                                <i class="fa fa-redo-alt"></i>&nbsp;WebHook
+                            </span>
+                        </button>
+                    }
                 </td>
             </tr>
         }

@@ -12,5 +12,7 @@ namespace Sloth.Web.Models.TransactionViewModels
         public List<SelectListItem> TeamMerchantIds { get; set; }
 
         public TransactionsFilterModel Filter { get; set; }
+
+        public bool HasWebhooks { get; set; }
     }
 }

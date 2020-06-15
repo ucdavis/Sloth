@@ -253,4 +253,5 @@ _Pvt_Extensions
 
 keys/
 
+# VS undocumented serviceDependencies files
 **/Properties/serviceDependencies.*

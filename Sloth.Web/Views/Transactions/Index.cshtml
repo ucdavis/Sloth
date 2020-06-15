@@ -49,13 +49,12 @@
             </div>
         }
 
-        <partial name="_TransactionsTable" model="Model.Transactions" />
+        <partial name="_TransactionsTable" model="Model" />
     </div>
-
 
 @section AdditionalScripts {
     <script>
-        $('#transactionsTable').DataTable({
+        const table = $('#transactionsTable').DataTable({
             "columnDefs": [
                 { "targets": 0, "visible": false },
                 { "targets": [-1], "orderable": false },
@@ -67,6 +66,26 @@
             inputs: $('#filter-date-range input'),
             keepEmptyValues: true,
         });
+
+        $("body").on("click",
+            "#transactionsTable tbody tr #callWebHook",
+            function(e) {
+                e.preventDefault();
+                var row = table.row($(this).closest('tr')).data();
+                if (row && row[0]) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("CallWebHook", "Transactions")",
+                        data: { id: row[0] },
+                        success: function(msg) {
+                            alert("WebHook Called");
+                        },
+                        error: function(_, status, error) {
+                            alert(status + ((error && (": " + error)) || ""));
+                        }
+                    });
+                }
+            });
 
     </script>
 }

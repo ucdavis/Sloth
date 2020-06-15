@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Models.WebHooks;
 using Sloth.Core.Resources;
+using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.TransactionViewModels;
 
@@ -15,8 +17,11 @@ namespace Sloth.Web.Controllers
 {
     public class TransactionsController : SuperController
     {
-        public TransactionsController(ApplicationUserManager userManager, SlothDbContext dbContext) : base(userManager, dbContext)
+        private readonly IWebHookService WebHookService;
+
+        public TransactionsController(ApplicationUserManager userManager, SlothDbContext dbContext, IWebHookService webHookService) : base(userManager, dbContext)
         {
+            WebHookService = webHookService;
         }
 
         // GET: /<controller>/
@@ -77,8 +82,7 @@ namespace Sloth.Web.Controllers
                 .AsNoTracking()
                 .ToListAsync();
 
-
-           
+            result.HasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug);
 
             return View("Index", result);
         }
@@ -232,6 +236,43 @@ namespace Sloth.Web.Controllers
 
             return RedirectToAction("Details", new { id = reversal.Id });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CallWebHook(string id)
+        {
+            var transaction = await DbContext.Transactions
+                .Include(t => t.Source)
+                .ThenInclude(s => s.Team)
+                .SingleOrDefaultAsync(t => t.Id == id);
+
+            if (transaction == null)
+            {
+                return NotFound();
+            }
+
+            if (transaction.Source.Team.Slug != TeamSlug)
+            {
+                return Forbid();
+            }
+
+            var hasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug);
+
+            if (!hasWebhooks)
+            {
+                return NotFound();
+            }
+
+            await WebHookService.SendBankReconcileWebHook(transaction.Source.Team, new BankReconcileWebHookPayload()
+            {
+                KfsTrackingNumber = transaction.KfsTrackingNumber,
+                MerchantTrackingNumber = transaction.MerchantTrackingNumber,
+                ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
+                TransactionDate = transaction.TransactionDate
+            });
+
+            return Ok();
+        }
+
 
         private static void SanitizeTransactionsFilter(TransactionsFilterModel model)
         {
