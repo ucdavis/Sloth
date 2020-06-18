@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Constraints;
+using Microsoft.AspNetCore.SpaServices;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -26,7 +29,9 @@ using Sloth.Web.Logging;
 using Sloth.Web.Models;
 using Sloth.Web.Resources;
 using Sloth.Web.Services;
+using SpaCliMiddleware;
 using StackifyLib;
+using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Sloth.Web
 {
@@ -114,7 +119,8 @@ namespace Sloth.Web
             services.AddScoped<IAuthorizationHandler, VerifyTeamPermissionHandler>();
 
             services.AddMvc()
-                .AddJsonOptions(o =>
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(o =>
                 {
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                     o.SerializerSettings.Converters.Add(new StringEnumConverter());
@@ -124,9 +130,9 @@ namespace Sloth.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             ILoggerFactory loggerFactory,
-            IApplicationLifetime appLifetime)
+            IHostApplicationLifetime appLifetime)
         {
             // setup logging
             LoggingConfiguration.Setup(Configuration);
@@ -142,10 +148,6 @@ namespace Sloth.Web
             {
                 app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true,
-                });
             }
             else
             {
@@ -153,28 +155,29 @@ namespace Sloth.Web
             }
 
             app.UseStaticFiles();
-
+            app.UseRouting();
             app.UseAuthentication();
+            app.UseAuthorization();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(routes =>
             {
                 // non team root routes
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "non-team-routes",
-                    template: "{controller}/{action=Index}/{id?}",
+                    pattern: "{controller}/{action=Index}/{id?}",
                     defaults: new { },
                     constraints: new { controller = "(account|jobs|system|users)" });
 
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "team-management-routes",
-                    template: "{controller}/{action=Index}/{id?}",
+                    pattern: "{controller}/{action=Index}/{id?}",
                     defaults: new { },
                     constraints: new { controller = "teams", action = "(index|create)" });
 
                 // team level routes
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "team-index",
-                    template: "{team}",
+                    pattern: "{team}",
                     defaults: new { controller = "home", action = "teamindex" },
                     constraints: new
                     {
@@ -183,9 +186,9 @@ namespace Sloth.Web
                         })
                     });
 
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "team-routes",
-                    template: "{team}/{controller=Home}/{action=Index}/{id?}",
+                    pattern: "{team}/{controller=Home}/{action=Index}/{id?}",
                     defaults: new { },
                     constraints: new
                     {
@@ -194,9 +197,24 @@ namespace Sloth.Web
                         })
                     });
 
-                routes.MapRoute(
+                routes.MapControllerRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                if (env.IsDevelopment())
+                {
+                    routes.MapToSpaCliProxy(
+                        "{*path}",
+                        options: new SpaOptions { SourcePath = "wwwroot/dist" },
+                        npmScript: "devpack",
+                        port: /*default(int)*/ 8080, // Allow webpack to find own port
+                        regex: "Project is running",
+                        forceKill: true, // kill anything running on our webpack port
+                        useProxy: true, // proxy webpack requests back through our aspnet server
+                        runner: ScriptRunnerType.Npm
+                    );
+                }
+
             });
         }
     }
