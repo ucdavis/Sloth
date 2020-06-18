@@ -5,14 +5,12 @@ using Sloth.Core.Models;
 
 namespace Sloth.Web.Models.TransactionViewModels
 {
-    public class TransactionsViewModel
+    public class TransactionsIndexViewModel
     {
-        public List<Transaction> Transactions { get; set; }
-
         public List<SelectListItem> TeamMerchantIds { get; set; }
 
         public TransactionsFilterModel Filter { get; set; }
 
-        public bool HasWebhooks { get; set; }
+        public TransactionsTableViewModel TransactionsTable { get; set; }
     }
 }
