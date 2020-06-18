@@ -1,4 +1,4 @@
-@model Sloth.Web.Models.TransactionViewModels.TransactionsViewModel
+@model Sloth.Web.Models.TransactionViewModels.TransactionsIndexViewModel
 
 @{
     ViewBag.Title = "Transactions";
@@ -49,7 +49,7 @@
             </div>
         }
 
-        <partial name="_TransactionsTable" model="Model" />
+        <partial name="_TransactionsTable" model="Model.TransactionsTable" />
     </div>
 
 @section AdditionalScripts {

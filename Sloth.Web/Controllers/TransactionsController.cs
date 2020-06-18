@@ -36,9 +36,9 @@ namespace Sloth.Web.Controllers
 
             List<string> teamMerchantIds = null;
 
-            var result = new TransactionsViewModel()
+            var result = new TransactionsIndexViewModel()
             {
-                Filter = filter
+                Filter = filter,
             };
 
             if (!string.IsNullOrWhiteSpace(filter.TrackingNum))
@@ -77,26 +77,34 @@ namespace Sloth.Web.Controllers
                     teamMerchantIds.Select(i => new SelectListItem() {Value = i, Text = i}).ToList();
             }
 
-            result.Transactions = await query
-                .Include(t => t.Transfers)
-                .AsNoTracking()
-                .ToListAsync();
-
-            result.HasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug);
+            result.TransactionsTable = new TransactionsTableViewModel()
+            {
+                Transactions = await query
+                    .Include(t => t.Transfers)
+                    .AsNoTracking()
+                    .ToListAsync(),
+                HasWebhooks = await DbContext.WebHooks
+                    .AnyAsync(w => w.Team.Slug == TeamSlug)
+            };
 
             return View("Index", result);
         }
 
         public async Task<IActionResult> NeedApproval()
         {
-            var transactions = await DbContext.Transactions
-                .Include(t => t.Transfers)
-                .Where(t => t.Source.Team.Slug == TeamSlug)
-                .Where(t => t.Status == TransactionStatuses.PendingApproval)
-                .AsNoTracking()
-                .ToListAsync();
+            var transactionsTable = new TransactionsTableViewModel()
+            {
+                Transactions = await DbContext.Transactions
+                    .Include(t => t.Transfers)
+                    .Where(t => t.Source.Team.Slug == TeamSlug)
+                    .Where(t => t.Status == TransactionStatuses.PendingApproval)
+                    .AsNoTracking()
+                    .ToListAsync(),
+                HasWebhooks = await DbContext.WebHooks
+                    .AnyAsync(w => w.Team.Slug == TeamSlug)
+            };
 
-            return View(transactions);
+            return View(transactionsTable);
         }
 
         [HttpPost]
