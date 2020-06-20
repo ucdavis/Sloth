@@ -3,11 +3,13 @@ using System.IO;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Serilog;
@@ -20,13 +22,14 @@ using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Services;
 using StackifyLib;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace Sloth.Api
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        private readonly string CorsPolicyAllowAnyOrgin = "CorsPolicyAllowAnyOrgin";
+
+        public Startup(IWebHostEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
@@ -67,7 +70,7 @@ namespace Sloth.Api
             });
 
             // cors support and policies
-            services.AddCors(o => o.AddPolicy("AllowAnyOrgin",
+            services.AddCors(o => o.AddPolicy(CorsPolicyAllowAnyOrgin,
                 b => b.AllowAnyOrigin()
                       .AllowAnyHeader()
                       .AllowAnyMethod()
@@ -75,11 +78,7 @@ namespace Sloth.Api
 
             // add framework services.
             services.AddMvc()
-                .AddMvcOptions(o =>
-                {
-                    o.Filters.Add(new CorsAuthorizationFilterFactory("AllowAnyOrgin"));
-                })
-                .AddJsonOptions(o =>
+                .AddNewtonsoftJson(o =>
                 {
                     o.SerializerSettings.Formatting = Formatting.Indented;
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -99,46 +98,56 @@ namespace Sloth.Api
             // add swagger/swashbuckler
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info
+                c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Title = "Sloth API v1",
                     Version = "v1",
                     Description = "Scrubber Loader & Online Transaction Hub",
-                    Contact = new Contact()
+                    Contact = new OpenApiContact
                     {
                         Name = "John Knoll",
                         Email = "jpknoll@ucdavis.edu"
                     },
-                    License = new License()
+                    License = new OpenApiLicense
                     {
                         Name = "MIT",
-                        Url = "https://www.github.com/ucdavis/sloth/LICENSE"
+                        Url = new Uri("https://www.github.com/ucdavis/sloth/LICENSE")
                     },
                     Extensions =
                     {
-                        { "ProjectUrl", "https://www.github.com/ucdavis/sloth" }
+                        { "ProjectUrl", new OpenApiString("https://www.github.com/ucdavis/sloth") }
                     }
                 });
-                
+
                 var xmlFilePath = Path.Combine(AppContext.BaseDirectory, "Sloth.Api.xml");
                 c.IncludeXmlComments(xmlFilePath);
 
-                c.AddSecurityDefinition("apiKey", new ApiKeyScheme()
+                var securityScheme = new OpenApiSecurityScheme
                 {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "ApiKey"
+                    },
+                    Type = SecuritySchemeType.ApiKey,
                     Description = "API Key Authentication",
                     Name = ApiKeyMiddleware.HeaderKey,
-                    In = "header"
-                });
-                c.OperationFilter<SecurityRequirementsOperationFilter>();
+                    In = ParameterLocation.Header,
+                    Scheme = "ApiKey"
+                };
+
+                c.AddSecurityDefinition("ApiKey", securityScheme);
+
+                c.OperationFilter<SecurityRequirementsOperationFilter>(securityScheme);
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(
             IApplicationBuilder app,
-            IHostingEnvironment env,
+            IWebHostEnvironment env,
             ILoggerFactory loggerFactory,
-            IApplicationLifetime appLifetime)
+            IHostApplicationLifetime appLifetime)
         {
             // setup logging
             LoggingConfiguration.Setup(Configuration);
@@ -156,7 +165,11 @@ namespace Sloth.Api
                 app.UseInternalExceptionMiddleware();
             }
 
-            app.UseMvc();
+            app.UseRouting();
+
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseCors(CorsPolicyAllowAnyOrgin);
 
             // add swagger ui
             app.UseSwagger(o =>
