@@ -1,9 +1,10 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Azure.Storage.Blobs.Specialized;
 using Microsoft.Extensions.Options;
-using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Blob;
 using Sloth.Core.Configuration;
 
 namespace Sloth.Core.Services
@@ -17,45 +18,43 @@ namespace Sloth.Core.Services
 
     public class StorageService : IStorageService
     {
-        private readonly CloudStorageAccount _account;
+        private readonly BlobServiceClient _blobServiceClient;
 
         public StorageService(IOptions<StorageServiceOptions> options)
         {
             // parse connection string
             var connectionString = options.Value.ConnectionString;
-            _account = CloudStorageAccount.Parse(connectionString);
+            _blobServiceClient = new BlobServiceClient(connectionString);
         }
 
         public async Task GetBlobAsync(Stream stream, string containerName, string blobName)
         {
             var container = await GetBlobContainerAsync(containerName);
-            var blob = container.GetBlockBlobReference(blobName);
-            await blob.DownloadToStreamAsync(stream);
+            var blob = container.GetBlockBlobClient(blobName);
+            await blob.DownloadToAsync(stream);
         }
 
-        public async Task GetBlobAsync(Stream stream, Uri uri)
+        public Task GetBlobAsync(Stream stream, Uri uri)
         {
-            var client = _account.CreateCloudBlobClient();
-            var blob = await client.GetBlobReferenceFromServerAsync(uri);
-            await blob.DownloadToStreamAsync(stream);
+            var blobUriBuilder = new BlobUriBuilder(uri);
+            return GetBlobAsync(stream, blobUriBuilder.BlobContainerName, blobUriBuilder.BlobName);
         }
 
         public async Task<Uri> PutBlobAsync(Stream stream, string containerName, string blobName)
         {
             var container = await GetBlobContainerAsync(containerName);
-            var blob = container.GetBlockBlobReference(blobName);
-            await blob.UploadFromStreamAsync(stream);
+            var blob = container.GetBlockBlobClient(blobName);
+            await blob.UploadAsync(stream);
 
             return blob.Uri;
         }
 
-        private async Task<CloudBlobContainer> GetBlobContainerAsync(string containerName)
+        private async Task<BlobContainerClient> GetBlobContainerAsync(string containerName)
         {
-            var client = _account.CreateCloudBlobClient();
-            var container = client.GetContainerReference(containerName);
-            await container.CreateIfNotExistsAsync();
+            var client = _blobServiceClient.GetBlobContainerClient(containerName);
+            await client.CreateIfNotExistsAsync();
 
-            return container;
+            return client;
         }
 
     }
