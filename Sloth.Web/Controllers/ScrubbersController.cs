@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Web.Identity;
+using Sloth.Web.Models.ScrubberViewModels;
+using Sloth.Web.Models.TransactionViewModels;
 
 namespace Sloth.Web.Controllers
 {
@@ -41,7 +43,18 @@ namespace Sloth.Web.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            return View(scrubber);
+            var scrubberDetails = new ScrubberDetailsViewModel()
+            {
+                Scrubber = scrubber,
+                TransactionsTable = new TransactionsTableViewModel()
+                {
+                    Transactions = scrubber.Transactions,
+                    HasWebhooks = await DbContext.WebHooks
+                        .AnyAsync(w => w.Team.Slug == TeamSlug)
+                }
+            };
+
+            return View(scrubberDetails);
         }
     }
 }

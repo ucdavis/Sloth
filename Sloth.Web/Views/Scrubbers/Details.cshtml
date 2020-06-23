@@ -1,5 +1,5 @@
 @using Sloth.Core.Extensions
-@model Sloth.Core.Models.Scrubber
+@model Sloth.Web.Models.ScrubberViewModels.ScrubberDetailsViewModel
 
 @{
     ViewBag.Title = "Scrubber Details";
@@ -23,18 +23,18 @@
 
     <dl class="row">
         <div class="col>
-            <dt>@Html.DisplayNameFor(x => x.Id)</dt>
-            <dd>@Model.Id</dd>
+            <dt>@Html.DisplayNameFor(x => x.Scrubber.Id)</dt>
+            <dd>@Model.Scrubber.Id</dd>
         </div>
         <div class="col>
-            <dt>@Html.DisplayNameFor(x => x.Uri)</dt>
-            <dd>@Model.Uri</dd>
+            <dt>@Html.DisplayNameFor(x => x.Scrubber.Uri)</dt>
+            <dd>@Model.Scrubber.Uri</dd>
         </div>
     </dl>
 
-    <partial name="_TransactionsTable" model="Model.Transactions" />
+    <partial name="_TransactionsTable" model="Model.TransactionsTable" />
 
-    <pre><code class="language-markup">@Model.ToXml()</code></pre>
+    <pre><code class="language-markup">@Model.Scrubber.ToXml()</code></pre>
 </div>
 
 @section AdditionalScripts

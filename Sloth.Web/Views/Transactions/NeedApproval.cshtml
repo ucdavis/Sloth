@@ -1,11 +1,11 @@
 @using Sloth.Core.Models
-@model IList<Transaction>
+@model Sloth.Web.Models.TransactionViewModels.TransactionsTableViewModel
 
 @{
     ViewBag.Title = "Transactions Needing Approval";
 
-    var approvalCount = Model.Count;
-    var approvalAmount = Model
+    var approvalCount = Model.Transactions.Count;
+    var approvalAmount = Model.Transactions
         .SelectMany(t => t.Transfers)
         .Where(x => x.Direction == Transfer.CreditDebit.Credit)
         .Sum(x => x.Amount);
