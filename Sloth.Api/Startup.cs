@@ -105,8 +105,8 @@ namespace Sloth.Api
                     Description = "Scrubber Loader & Online Transaction Hub",
                     Contact = new OpenApiContact
                     {
-                        Name = "John Knoll",
-                        Email = "jpknoll@ucdavis.edu"
+                        Name = "Application Support",
+                        Email = "apprequests@caes.ucdavis.edu"
                     },
                     License = new OpenApiLicense
                     {
