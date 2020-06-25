@@ -80,7 +80,7 @@ namespace Sloth.Integrations.Cybersource.Clients
             AddApiKeyAuthenticationHeaders(client, request);
 
             // execute
-            var response = await client.ExecuteGetTaskAsync(request);
+            var response = await client.ExecuteGetAsync(request);
 
             if (response.StatusCode == HttpStatusCode.NotFound)
             {

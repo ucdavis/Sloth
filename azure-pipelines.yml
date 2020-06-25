@@ -15,14 +15,12 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-- task: NuGetToolInstaller@1
+- task: DotNetCoreCLI@2
+  displayName: Restore nuget packages
   inputs:
-    versionSpec: 4.9.x
-
-- task: NuGetCommand@2
-  inputs:
-    command: 'restore'
-    restoreSolution: '**/*.sln'
+    command: restore
+    projects: '**/*.csproj'
+    workingDirectory: $(Build.SourcesDirectory)
 
 - task: DotNetCoreCLI@2
   displayName: 'Build Sloth.Api'

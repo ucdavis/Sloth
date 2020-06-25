@@ -7,6 +7,7 @@ using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.MSSqlServer;
+using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
 using StackifyLib;
 
 namespace Sloth.Web.Logging
@@ -85,18 +86,18 @@ namespace Sloth.Web.Logging
             columnOptions.LogEvent.ExcludeAdditionalProperties = true;
 
             // special columns for indexing
-            columnOptions.AdditionalDataColumns = new List<DataColumn>()
+            columnOptions.AdditionalColumns = new List<SqlColumn>()
             {
-                new DataColumn {ColumnName = "Source", AllowDBNull = true, DataType = typeof(string), MaxLength = 128},
-                new DataColumn {ColumnName = "CorrelationId", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
-                new DataColumn {ColumnName = "JobName", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
-                new DataColumn {ColumnName = "JobId", AllowDBNull = true, DataType = typeof(string), MaxLength = 50},
+                new SqlColumn {ColumnName = "Source", AllowNull = true, DataType = SqlDbType.NVarChar, DataLength = 128},
+                new SqlColumn {ColumnName = "CorrelationId", AllowNull = true, DataType = SqlDbType.NVarChar, DataLength = 50},
+                new SqlColumn {ColumnName = "JobName", AllowNull = true, DataType = SqlDbType.NVarChar, DataLength = 50},
+                new SqlColumn {ColumnName = "JobId", AllowNull = true, DataType = SqlDbType.NVarChar, DataLength = 50},
             };
 
             return logConfig
                 .WriteTo.MSSqlServer(
                     connectionString: _configuration.GetConnectionString("DefaultConnection"),
-                    tableName: "Logs",
+                    sinkOptions: new SinkOptions { TableName = "Logs" },
                     restrictedToMinimumLevel: LogEventLevel.Information,
                     columnOptions: columnOptions
                 );
