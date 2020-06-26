@@ -45,6 +45,7 @@ namespace Sloth.Web.Controllers
             // create webhook
             var target = new WebHook
             {
+                Id = Guid.NewGuid().ToString(),
                 Url         = model.Url,
                 ContentType = model.ContentType,
                 Team        = team,
