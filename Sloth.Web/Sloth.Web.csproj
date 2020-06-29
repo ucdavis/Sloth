@@ -14,7 +14,7 @@
 
   <ItemGroup>
     <PackageReference Include="AspNetCore.Security.CAS" Version="2.0.5" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.5" />
     <PackageReference Include="SpaCliMiddleware" Version="3.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="2.2.0" />
     <PackageReference Include="Humanizer" Version="2.8.26" />
