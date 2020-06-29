@@ -15,6 +15,12 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
+#ensure we're using an up-to-date sdk
+- task: UseDotNet@2
+  inputs:
+    packageType: 'sdk'
+    version: '3.1.x'
+
 - task: DotNetCoreCLI@2
   displayName: Restore nuget packages
   inputs:
@@ -58,7 +64,7 @@ steps:
     zipAfterPublish: false
     modifyOutputPath: false
     projects: './sloth.api/sloth.api.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/sloth.api'
+    arguments: '--configuration $(buildConfiguration) --runtime win-x86 --output $(build.artifactstagingdirectory)/sloth.api'
 
 - task: DotNetCoreCLI@2
   displayName: 'Assemble Sloth.Web'
@@ -68,7 +74,7 @@ steps:
     zipAfterPublish: false
     modifyOutputPath: false
     projects: './sloth.web/sloth.web.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/sloth.web'
+    arguments: '--configuration $(buildConfiguration) --runtime win-x86 --output $(build.artifactstagingdirectory)/sloth.web'
 
 - task: DotNetCoreCLI@2
   displayName: 'Assemble Sloth.Jobs.CyberSource.BankReconcile w/ Web'
@@ -77,7 +83,7 @@ steps:
     publishWebProjects: false
     zipAfterPublish: false
     projects: './sloth.jobs.cybersource.bankreconcile/sloth.jobs.cybersource.bankreconcile.csproj'
-    arguments: '--configuration $(buildConfiguration) --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
+    arguments: '--configuration $(buildConfiguration) --runtime win-x86 --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
 
 - task: DotNetCoreCLI@2
   displayName: 'Assemble Sloth.Jobs.Kfs.ScrubberUpload w/ Web'
@@ -86,7 +92,7 @@ steps:
     publishWebProjects: false
     zipAfterPublish: false
     projects: './sloth.jobs.kfs.scrubberupload/sloth.jobs.kfs.scrubberupload.csproj'
-    arguments: '--configuration $(buildConfiguration) --runtime win-x64 --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
+    arguments: '--configuration $(buildConfiguration) --runtime win-x86 --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifacts'
