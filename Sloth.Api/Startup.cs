@@ -111,11 +111,11 @@ namespace Sloth.Api
                     License = new OpenApiLicense
                     {
                         Name = "MIT",
-                        Url = new Uri("https://www.github.com/ucdavis/sloth/LICENSE")
+                        Url = new Uri("https://github.com/ucdavis/Sloth/blob/master/LICENSE")
                     },
                     Extensions =
                     {
-                        { "ProjectUrl", new OpenApiString("https://www.github.com/ucdavis/sloth") }
+                        { "ProjectUrl", new OpenApiString("https://github.com/ucdavis/Sloth/") }
                     }
                 });
 
