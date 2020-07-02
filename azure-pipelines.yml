@@ -64,7 +64,7 @@ steps:
     zipAfterPublish: false
     modifyOutputPath: false
     projects: './sloth.api/sloth.api.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/sloth.api /property:PublishWithAspNetCoreTargetManifest=false'
+    arguments: '--configuration $(buildConfiguration) --output $(build.artifactstagingdirectory)/sloth.api'
 
 - task: DotNetCoreCLI@2
   displayName: 'Assemble Sloth.Web'
