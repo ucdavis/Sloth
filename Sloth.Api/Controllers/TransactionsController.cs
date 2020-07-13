@@ -155,8 +155,7 @@ namespace Sloth.Api.Controllers
 
             // find source
             var source = await _context.Sources.FirstOrDefaultAsync(s =>
-                string.Equals(s.Name, transaction.Source, StringComparison.InvariantCultureIgnoreCase)
-                && string.Equals(s.Type, transaction.SourceType, StringComparison.InvariantCultureIgnoreCase));
+                s.Name == transaction.Source && s.Type == transaction.SourceType);
 
             if (source == null)
             {
