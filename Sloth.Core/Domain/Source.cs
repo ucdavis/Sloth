@@ -7,7 +7,7 @@ namespace Sloth.Core.Models
 {
     public class Source
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [MaxLength(50)]
         [Required]

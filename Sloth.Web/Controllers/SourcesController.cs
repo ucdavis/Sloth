@@ -55,7 +55,6 @@ namespace Sloth.Web.Controllers
 
             var source = new Source()
             {
-                Id                    = Guid.NewGuid().ToString(),
                 Name                  = model.Name,
                 Type                  = model.Type,
                 Chart                 = model.Chart,

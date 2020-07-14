@@ -11,7 +11,7 @@ namespace Sloth.Core.Models
             Issued = DateTime.UtcNow;
         }
 
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string Key { get; set; }
         public Team Team { get; set; }
         public DateTime Issued { get; set; }

@@ -11,7 +11,7 @@ namespace Sloth.Core.Models
             Transactions = new List<Transaction>();
         }
 
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public string Uri { get; set; }
 

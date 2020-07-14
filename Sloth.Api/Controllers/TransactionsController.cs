@@ -169,7 +169,6 @@ namespace Sloth.Api.Controllers
 
             var transactionToCreate = new Transaction
             {
-                Id                      = Guid.NewGuid().ToString(),
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
                 MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
@@ -178,7 +177,6 @@ namespace Sloth.Api.Controllers
                 TransactionDate         = transaction.TransactionDate,
                 Transfers               = transaction.Transfers.Select(t => new Transfer()
                 {
-                    Id            = Guid.NewGuid().ToString(),
                     Account       = t.Account,
                     Amount        = t.Amount,
                     Chart         = t.Chart,

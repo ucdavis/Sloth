@@ -197,7 +197,6 @@ namespace Sloth.Web.Controllers
             // create new transaction
             var reversal = new Transaction
             {
-                Id                      = Guid.NewGuid().ToString(),
                 Source                  = transaction.Source,
                 Creator                 = user,
                 TransactionDate         = DateTime.UtcNow,
@@ -218,7 +217,6 @@ namespace Sloth.Web.Controllers
 
                 reversal.Transfers.Add(new Transfer
                 {
-                    Id             = Guid.NewGuid().ToString(),
                     Amount         = transfer.Amount,
                     Account        = transfer.Account,
                     Chart          = transfer.Chart,

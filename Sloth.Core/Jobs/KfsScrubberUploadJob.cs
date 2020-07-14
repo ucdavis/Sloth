@@ -54,7 +54,6 @@ namespace Sloth.Core.Jobs
                     log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
                     var scrubber = new Scrubber()
                     {
-                        Id                  = Guid.NewGuid().ToString(),
                         BatchDate           = DateTime.Today,
                         BatchSequenceNumber = 1,
                         Transactions        = groupedTransactions,

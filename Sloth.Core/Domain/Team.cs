@@ -15,7 +15,7 @@ namespace Sloth.Core.Models
             UserTeamRoles = new List<UserTeamRole>();
         }
 
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [StringLength(128)]
         [Display(Name = "Team Name")]

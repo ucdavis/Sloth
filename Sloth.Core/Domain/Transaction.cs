@@ -15,7 +15,7 @@ namespace Sloth.Core.Models
             Transfers = new List<Transfer>();
         }
 
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         public string Description { get; set; }
 

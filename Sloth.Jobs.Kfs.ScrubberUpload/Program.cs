@@ -25,7 +25,6 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             // log run
             var jobRecord = new KfsScrubberUploadJobRecord()
             {
-                Id     = Guid.NewGuid().ToString(),
                 Name   = KfsScrubberUploadJob.JobName,
                 RanOn  = DateTime.UtcNow,
                 Status = "Running",

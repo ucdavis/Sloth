@@ -25,7 +25,6 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             var yesterday = DateTime.UtcNow.Date.AddDays(-1);
             var jobRecord = new CybersourceBankReconcileJobRecord()
             {
-                Id            = Guid.NewGuid().ToString(),
                 Name          = CybersourceBankReconcileJob.JobName,
                 RanOn         = DateTime.UtcNow,
                 Status        = "Running",

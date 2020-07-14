@@ -147,7 +147,6 @@ namespace Sloth.Core.Services
 
                         transaction = new Transaction()
                         {
-                            Id                      = Guid.NewGuid().ToString(),
                             Source                  = integration.Source,
                             Status                  = TransactionStatuses.Scheduled,
                             DocumentNumber          = documentNumber,
@@ -160,7 +159,6 @@ namespace Sloth.Core.Services
                         // move money out of clearing
                         var clearing = new Transfer()
                         {
-                            Id          = Guid.NewGuid().ToString(),
                             Chart       = "3",
                             Account     = integration.ClearingAccount,
                             Direction   = Transfer.CreditDebit.Debit,
@@ -173,7 +171,6 @@ namespace Sloth.Core.Services
                         // move money into holding
                         var holding = new Transfer()
                         {
-                            Id          = Guid.NewGuid().ToString(),
                             Chart       = "3",
                             Account     = integration.HoldingAccount,
                             Direction   = Transfer.CreditDebit.Credit,

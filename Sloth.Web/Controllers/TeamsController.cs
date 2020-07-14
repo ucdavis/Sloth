@@ -67,7 +67,6 @@ namespace Sloth.Web.Controllers
 
             var team = new Team()
             {
-                Id                       = Guid.NewGuid().ToString(),
                 Name                     = model.Name,
                 Slug                     = model.Slug,
                 KfsContactDepartmentName = model.KfsContactDepartmentName,
