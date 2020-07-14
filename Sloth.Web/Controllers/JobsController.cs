@@ -75,7 +75,6 @@ namespace Sloth.Web.Controllers
             // log run
             var record = new KfsScrubberUploadJobRecord()
             {
-                Id = Guid.NewGuid().ToString(),
                 Name = KfsScrubberUploadJob.JobName,
                 RanOn = DateTime.UtcNow,
                 Status = "Running",
@@ -127,7 +126,6 @@ namespace Sloth.Web.Controllers
             // log run
             var record = new KfsScrubberUploadJobRecord()
             {
-                Id     = Guid.NewGuid().ToString(),
                 Name   = KfsScrubberUploadJob.JobName,
                 RanOn  = DateTime.UtcNow,
                 Status = "Running",
@@ -202,7 +200,6 @@ namespace Sloth.Web.Controllers
             // log run
             var record = new CybersourceBankReconcileJobRecord()
             {
-                Id            = Guid.NewGuid().ToString(),
                 Name          = CybersourceBankReconcileJob.JobName,
                 RanOn         = DateTime.UtcNow,
                 Status        = "Running",

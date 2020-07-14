@@ -6,7 +6,7 @@ namespace Sloth.Core.Models
 {
     public class Transfer
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [JsonIgnore]
         public Transaction Transaction { get; set; }

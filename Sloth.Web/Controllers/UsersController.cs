@@ -118,7 +118,7 @@ namespace Sloth.Web.Controllers
             var user = new User
             {
                 UserName = directoryUser.Kerberos,
-                Email = directoryUser.Email,
+                Email    = directoryUser.Email,
                 FullName = directoryUser.FullName,
             };
             await UserManager.CreateAsync(user);

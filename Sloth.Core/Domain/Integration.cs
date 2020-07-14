@@ -7,7 +7,7 @@ namespace Sloth.Core.Models
 {
     public class Integration
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [Required]
         [JsonIgnore]

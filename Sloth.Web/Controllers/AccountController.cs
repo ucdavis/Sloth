@@ -76,7 +76,7 @@ namespace Sloth.Web.Controllers
             user = new User
             {
                 UserName = username,
-                Email = email,
+                Email    = email,
                 FullName = fullname,
             };
             await _userManager.CreateAsync(user);
