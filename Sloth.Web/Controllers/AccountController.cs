@@ -75,8 +75,9 @@ namespace Sloth.Web.Controllers
             var fullname = info.Principal.FindFirstValue(ClaimTypes.Name);
             user = new User
             {
+                Id       = Guid.NewGuid().ToString(),
                 UserName = username,
-                Email = email,
+                Email    = email,
                 FullName = fullname,
             };
             await _userManager.CreateAsync(user);

@@ -70,6 +70,7 @@ namespace Sloth.Web.Controllers
             // create integration
             var target = new Integration
             {
+                Id                = Guid.NewGuid().ToString(),
                 MerchantId        = model.MerchantId,
                 Source            = source,
                 Team              = team,

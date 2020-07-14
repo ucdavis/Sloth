@@ -19,10 +19,11 @@ namespace Sloth.Core.Extensions
             // create fake scrubber to serialize
             var scrubber = new Scrubber()
             {
-                BatchDate = DateTime.Today,
+                Id                  = Guid.NewGuid().ToString(),
+                BatchDate           = DateTime.Today,
                 BatchSequenceNumber = 1,
-                Transactions = new List<Transaction>() { transaction },
-                Source = transaction.Source
+                Transactions        = new List<Transaction>() { transaction },
+                Source              = transaction.Source
             };
 
             scrubber.ToXml(output);

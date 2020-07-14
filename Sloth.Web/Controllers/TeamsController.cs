@@ -67,6 +67,7 @@ namespace Sloth.Web.Controllers
 
             var team = new Team()
             {
+                Id                       = Guid.NewGuid().ToString(),
                 Name                     = model.Name,
                 Slug                     = model.Slug,
                 KfsContactDepartmentName = model.KfsContactDepartmentName,
@@ -163,7 +164,7 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
             // create new key
-            var apiKey = new ApiKey();
+            var apiKey = new ApiKey { Id = Guid.NewGuid().ToString() };
 
             // associate key and update db
             team.ApiKeys.Add(apiKey);
