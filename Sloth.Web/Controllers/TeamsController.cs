@@ -164,7 +164,7 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
             // create new key
-            var apiKey = new ApiKey { Id = Guid.NewGuid().ToString() };
+            var apiKey = new ApiKey();
 
             // associate key and update db
             team.ApiKeys.Add(apiKey);
