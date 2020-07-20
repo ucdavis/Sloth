@@ -86,7 +86,7 @@ namespace Sloth.Core.Jobs
                     catch (Exception ex)
                     {
                         log.Error(ex, ex.Message);
-                        log.Error($"KFS Upload error for source {group.Key}");
+                        log.Error($"KFS Upload error for source {group.Key.Name}");
                     }
                 }
             }
