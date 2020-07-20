@@ -45,43 +45,49 @@ namespace Sloth.Core.Jobs
                 var groups = transactions.GroupBy(t => t.Source);
                 foreach (var group in groups)
                 {
-                    var source = group.Key;
-                    var groupedTransactions = group.ToList();
-
-                    var originCode = source.OriginCode;
-
-                    // create scrubber
-                    log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
-                    var scrubber = new Scrubber()
+                    try
                     {
-                        BatchDate           = DateTime.Today,
-                        BatchSequenceNumber = 1,
-                        Transactions        = groupedTransactions,
-                        Source              = source
-                    };
+                        var source = group.Key;
+                        var groupedTransactions = group.ToList();
 
-                    // create filename
-                    var prefix = DocumentTypes.GetDocumentTypeFilePrefix(source.DocumentType);
-                    var filename = $"{prefix}.{originCode}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
+                        var originCode = source.OriginCode;
 
-                    // ship scrubber
-                    log.Information("Uploading {filename}", filename);
-                    var username = source.KfsFtpUsername;
-                    var passwordKeyName = source.KfsFtpPasswordKeyName;
-                    var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, username, passwordKeyName, log);
-                    scrubber.Uri = uri.AbsoluteUri;
+                        // create scrubber
+                        log.Information("Creating Scrubber for {count} transactions.", groupedTransactions.Count);
+                        var scrubber = new Scrubber()
+                        {
+                            BatchDate = DateTime.Today,
+                            BatchSequenceNumber = 1,
+                            Transactions = groupedTransactions,
+                            Source = source
+                        };
 
-                    // persist scrubber uri
-                    _context.Scrubbers.Add(scrubber);
+                        // create filename
+                        var prefix = DocumentTypes.GetDocumentTypeFilePrefix(source.DocumentType);
+                        var filename = $"{prefix}.{originCode}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
 
-                    // update transactions' status
-                    groupedTransactions.ForEach(t =>
+                        // ship scrubber
+                        log.Information("Uploading {filename}", filename);
+                        var username = source.KfsFtpUsername;
+                        var passwordKeyName = source.KfsFtpPasswordKeyName;
+                        var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, username,
+                            passwordKeyName, log);
+                        scrubber.Uri = uri.AbsoluteUri;
+
+                        // persist scrubber uri
+                        _context.Scrubbers.Add(scrubber);
+
+                        // update transactions' status
+                        groupedTransactions.ForEach(t => { t.Status = TransactionStatuses.Completed; });
+
+                        // save per scrubber
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
                     {
-                        t.Status = TransactionStatuses.Completed;
-                    });
-
-                    // save per scrubber
-                    await _context.SaveChangesAsync();
+                        log.Error(ex, ex.Message);
+                        log.Error($"KFS Upload error for source {group.Key}");
+                    }
                 }
             }
             catch (Exception ex)
