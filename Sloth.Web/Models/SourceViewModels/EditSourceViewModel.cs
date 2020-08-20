@@ -10,5 +10,6 @@ namespace Sloth.Web.Models.SourceViewModels
         }
 
         public bool KfsFtpPasswordKeyDirty { get; set; }
+        public string Id { get; internal set; }
     }
 }

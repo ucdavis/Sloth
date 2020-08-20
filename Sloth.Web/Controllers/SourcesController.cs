@@ -17,10 +17,12 @@ namespace Sloth.Web.Controllers
     public class SourcesController : SuperController
     {
         private readonly ISecretsService _secretsService;
+        private readonly IKfsScrubberService _kfsScrubberService;
 
-        public SourcesController(ApplicationUserManager userManager, SlothDbContext dbContext, ISecretsService secretsService) : base(userManager, dbContext)
+        public SourcesController(ApplicationUserManager userManager, SlothDbContext dbContext, ISecretsService secretsService, IKfsScrubberService kfsScrubberService) : base(userManager, dbContext)
         {
             _secretsService = secretsService;
+            _kfsScrubberService = kfsScrubberService;
         }
 
         [HttpGet]
@@ -86,6 +88,7 @@ namespace Sloth.Web.Controllers
 
             var model = new EditSourceViewModel()
             {
+                Id                     = source.Id,
                 Name                   = source.Name,
                 Description            = source.Description,
                 Chart                  = source.Chart,
@@ -143,6 +146,28 @@ namespace Sloth.Web.Controllers
             await DbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
+        }
+
+        // test the source connection settings
+        [HttpGet]
+        public async Task<IActionResult> TestConnection(string id) {
+            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == id);
+
+            if (source == null)
+            {
+                return NotFound();
+            }
+
+            try {
+                await _kfsScrubberService.VerifyConnection(source.KfsFtpUsername, source.KfsFtpPasswordKeyName);
+
+                // TODO: for now, return success as long as we don't get an error
+                return Content("connection successful");
+            } catch (Exception e) {
+                return Content("connection not successful: " + e.ToString());
+
+                // throw e;
+            }
         }
     }
 }

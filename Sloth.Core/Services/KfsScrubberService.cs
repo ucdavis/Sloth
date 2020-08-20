@@ -12,6 +12,7 @@ namespace Sloth.Core.Services
     public interface IKfsScrubberService
     {
         Task<Uri> UploadScrubber(Scrubber scrubber, string filename, string username, string passwordKeyName, ILogger logger = null);
+        Task VerifyConnection(string username, string passwordKeyName);
     }
 
     public class KfsScrubberService : IKfsScrubberService
@@ -61,6 +62,14 @@ namespace Sloth.Core.Services
             }
 
             return uri;
+        }
+
+        public async Task VerifyConnection(string username, string passwordKeyName) {
+            using (var client = await GetClient(username, passwordKeyName))
+            {
+                client.Connect();
+                client.Disconnect();
+            }
         }
 
         private async Task<SftpClient> GetClient(string username, string passwordKeyName)
