@@ -228,11 +228,11 @@ namespace Sloth.Core.Services
             log.ForContext("container", _options.ReportBlobContainer).Information("Uploading {filename} to Blob Storage", filename);
             await using (var memoryStream = new MemoryStream())
             {
-                var writer = new StreamWriter(memoryStream);
+                var writer = new StreamWriter(memoryStream); // lgtm [cs/local-not-disposed]
                 await writer.WriteAsync(reportXml);
                 await writer.FlushAsync();
                 memoryStream.Position = 0;
-                var uri = await _storageService.PutBlobAsync(memoryStream, _options.ReportBlobContainer, filename);
+                await _storageService.PutBlobAsync(memoryStream, _options.ReportBlobContainer, filename);
                 //TODO: store uri.AbsoluteUri;
             }
 
