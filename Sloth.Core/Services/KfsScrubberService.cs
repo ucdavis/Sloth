@@ -46,7 +46,7 @@ namespace Sloth.Core.Services
             ms.Flush();
 
             // save copy of file online
-            logger.ForContext("container", _storageContainer).Information("Uploading {filename} to Blog Storage", filename);
+            logger.ForContext("container", _storageContainer).Information("Uploading {filename} to Blob Storage", filename);
             ms.Seek(0, SeekOrigin.Begin);
             var uri = await _storageService.PutBlobAsync(ms, _storageContainer, filename);
             scrubber.Uri = uri.AbsoluteUri;

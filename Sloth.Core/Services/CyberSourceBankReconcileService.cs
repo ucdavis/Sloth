@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -29,13 +30,16 @@ namespace Sloth.Core.Services
         private readonly ISecretsService _secretsService;
         private readonly IWebHookService _webHookService;
         private readonly CybersourceOptions _options;
+        private readonly IStorageService _storageService;
 
-        public CyberSourceBankReconcileService(SlothDbContext context, ISecretsService secretsService, IWebHookService webHookService, IOptions<CybersourceOptions> options)
+        public CyberSourceBankReconcileService(SlothDbContext context, ISecretsService secretsService,
+            IWebHookService webHookService, IOptions<CybersourceOptions> options, IStorageService storageService)
         {
             _context = context;
             _secretsService = secretsService;
             _webHookService = webHookService;
             _options = options.Value;
+            _storageService = storageService;
 
             // TODO validate options
         }
@@ -58,7 +62,7 @@ namespace Sloth.Core.Services
                 password);
 
             // fetch report
-            var report = await client.GetPaymentBatchDetailReport(date);
+            var (report, reportXml) = await client.GetPaymentBatchDetailReport(date);
 
             var count = report.Requests?.Length ?? 0;
 
@@ -69,7 +73,7 @@ namespace Sloth.Core.Services
                 return;
             }
 
-            await ProcessReport(report, integration, log);
+            await ProcessReport(report, reportXml, integration, log);
         }
 
         public async Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date, ILogger log = null)
@@ -90,7 +94,7 @@ namespace Sloth.Core.Services
                 password);
 
             // fetch report
-            var report = await client.GetOneTimePaymentBatchDetailReport(reportName, date);
+            var (report, reportXml) = await client.GetOneTimePaymentBatchDetailReport(reportName, date);
 
             var count = report.Requests?.Length ?? 0;
 
@@ -101,10 +105,10 @@ namespace Sloth.Core.Services
                 return;
             }
 
-            await ProcessReport(report, integration, log);
+            await ProcessReport(report, reportXml, integration, log);
         }
 
-        private async Task ProcessReport(Report report, Integration integration, ILogger log)
+        private async Task ProcessReport(Report report, string reportXml, Integration integration, ILogger log)
         {
             using (var tran = await _context.Database.BeginTransactionAsync())
             {
@@ -218,6 +222,21 @@ namespace Sloth.Core.Services
                     tran.Rollback();
                 }
             }
+
+            // save copy to blob storage
+            var filename = $"{report.Name}.{report.OrganizationID}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
+            log.ForContext("container", _options.ReportBlobContainer).Information("Uploading {filename} to Blob Storage", filename);
+            await using (var memoryStream = new MemoryStream())
+            {
+                var writer = new StreamWriter(memoryStream);
+                await writer.WriteAsync(reportXml);
+                await writer.FlushAsync();
+                memoryStream.Position = 0;
+                var uri = await _storageService.PutBlobAsync(memoryStream, _options.ReportBlobContainer, filename);
+                //TODO: store uri.AbsoluteUri;
+            }
+
+
         }
     }
 }

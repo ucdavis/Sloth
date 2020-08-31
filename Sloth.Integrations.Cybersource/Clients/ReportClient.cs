@@ -27,7 +27,7 @@ namespace Sloth.Integrations.Cybersource.Clients
         }
 
 
-        public Task<Report> GetPaymentBatchDetailReport(DateTime date)
+        public Task<(Report report, string reportXml)> GetPaymentBatchDetailReport(DateTime date)
         {
             /*
              * This report requires more information than what is made available by the standard report.
@@ -53,12 +53,14 @@ namespace Sloth.Integrations.Cybersource.Clients
             return GetOneTimePaymentBatchDetailReport("PaymentBatchDetailReport_Full", date);
         }
 
-        public async Task<Report> GetOneTimePaymentBatchDetailReport(string reportName, DateTime date)
+        public async Task<(Report report, string reportXml)> GetOneTimePaymentBatchDetailReport(string reportName, DateTime date)
         {
             // fetch content
             var content = await GetClientApiReport<Report>(reportName, date);
 
-            return DeserializeReport<Report>(content);
+            var report = DeserializeReport<Report>(content);
+
+            return (report, content);
         }
 
         private async Task<string> GetClientApiReport<T>(string reportName, DateTime date)
