@@ -45,11 +45,22 @@ namespace Sloth.Core.Services
             sw.Flush();
             ms.Flush();
 
-            // save copy of file online
-            logger.ForContext("container", _storageContainer).Information("Uploading {filename} to Blob Storage", filename);
-            ms.Seek(0, SeekOrigin.Begin);
-            var uri = await _storageService.PutBlobAsync(ms, _storageContainer, filename);
-            scrubber.Uri = uri.AbsoluteUri;
+            Uri uri = default;
+
+            try
+            {
+                // save copy of file online
+                logger.ForContext("container", _storageContainer)
+                    .Information("Uploading {filename} to Blob Storage", filename);
+                ms.Seek(0, SeekOrigin.Begin);
+                uri = await _storageService.PutBlobAsync(ms, _storageContainer, filename);
+                scrubber.Uri = uri.AbsoluteUri;
+            }
+            catch (Exception ex)
+            {
+                logger.ForContext("container", _storageContainer)
+                    .Error(ex, ex.Message);
+            }
 
             // upload scrubber
             using (var client = await GetClient(username, passwordKeyName))

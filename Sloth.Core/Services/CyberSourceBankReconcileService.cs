@@ -223,11 +223,13 @@ namespace Sloth.Core.Services
                 }
             }
 
-            // save copy to blob storage
-            var filename = $"{report.Name}.{report.OrganizationID}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
-            log.ForContext("container", _options.ReportBlobContainer).Information("Uploading {filename} to Blob Storage", filename);
-            await using (var memoryStream = new MemoryStream())
+            try
             {
+                // save copy to blob storage
+                var filename = $"{report.Name}.{report.OrganizationID}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
+                log.ForContext("container", _options.ReportBlobContainer)
+                    .Information("Uploading {filename} to Blob Storage", filename);
+                await using var memoryStream = new MemoryStream();
                 var writer = new StreamWriter(memoryStream); // lgtm [cs/local-not-disposed]
                 await writer.WriteAsync(reportXml);
                 await writer.FlushAsync();
@@ -235,8 +237,11 @@ namespace Sloth.Core.Services
                 await _storageService.PutBlobAsync(memoryStream, _options.ReportBlobContainer, filename);
                 //TODO: store uri.AbsoluteUri;
             }
-
-
+            catch (Exception ex)
+            {
+                log.ForContext("container", _options.ReportBlobContainer)
+                    .Error(ex, ex.Message);
+            }
         }
     }
 }
