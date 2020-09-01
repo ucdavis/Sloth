@@ -38,12 +38,12 @@ namespace Sloth.Core.Services
                 logger = Log.Logger;
             }
 
-            var ms = new MemoryStream();
-            var sw = new StreamWriter(ms);
+            await using var ms = new MemoryStream();
+            await using var sw = new StreamWriter(ms);
             scrubber.ToXml(sw);
 
-            sw.Flush();
-            ms.Flush();
+            await sw.FlushAsync();
+            await ms.FlushAsync();
 
             Uri uri = default;
 
@@ -63,13 +63,11 @@ namespace Sloth.Core.Services
             }
 
             // upload scrubber
-            using (var client = await GetClient(username, passwordKeyName))
-            {
-                client.Connect();
+            using var client = await GetClient(username, passwordKeyName);
+            client.Connect();
 
-                ms.Seek(0, SeekOrigin.Begin);
-                await Task.Factory.FromAsync(client.BeginUploadFile(ms, filename), client.EndUploadFile);
-            }
+            ms.Seek(0, SeekOrigin.Begin);
+            await Task.Factory.FromAsync(client.BeginUploadFile(ms, filename), client.EndUploadFile);
 
             return uri;
         }

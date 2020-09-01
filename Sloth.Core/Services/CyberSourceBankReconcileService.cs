@@ -230,7 +230,7 @@ namespace Sloth.Core.Services
                 log.ForContext("container", _options.ReportBlobContainer)
                     .Information("Uploading {filename} to Blob Storage", filename);
                 await using var memoryStream = new MemoryStream();
-                var writer = new StreamWriter(memoryStream); // lgtm [cs/local-not-disposed]
+                await using var writer = new StreamWriter(memoryStream);
                 await writer.WriteAsync(reportXml);
                 await writer.FlushAsync();
                 memoryStream.Position = 0;
