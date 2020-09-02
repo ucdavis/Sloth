@@ -156,14 +156,14 @@ namespace Sloth.Core.Services
 
                         transaction = new Transaction()
                         {
-                            Source                  = integration.Source,
-                            Status                  = TransactionStatuses.Scheduled,
-                            DocumentNumber          = documentNumber,
-                            KfsTrackingNumber       = kfsTrackingNumber,
-                            MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
-                            ProcessorTrackingNumber = deposit.RequestID,
-                            TransactionDate         = deposit.LocalizedRequestDate,
-                            CybersourceReconcileJob = jobRecord
+                            Source                    = integration.Source,
+                            Status                    = TransactionStatuses.Scheduled,
+                            DocumentNumber            = documentNumber,
+                            KfsTrackingNumber         = kfsTrackingNumber,
+                            MerchantTrackingNumber    = deposit.MerchantReferenceNumber,
+                            ProcessorTrackingNumber   = deposit.RequestID,
+                            TransactionDate           = deposit.LocalizedRequestDate,
+                            CybersourceReconcileJobId = jobRecord.Id
                         };
 
                         // move money out of clearing

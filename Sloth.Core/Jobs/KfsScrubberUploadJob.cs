@@ -81,7 +81,7 @@ namespace Sloth.Core.Jobs
                         groupedTransactions.ForEach(t =>
                         {
                             t.Status = TransactionStatuses.Completed;
-                            t.KfsScrubberUploadJob = jobRecord;
+                            t.KfsScrubberUploadJobId = jobRecord.Id;
                         });
 
                         // save per scrubber
