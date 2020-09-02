@@ -101,7 +101,7 @@ namespace Sloth.Web.Controllers
                 {
                     // schedule methods
                     log.Information("Starting Job");
-                    await kfsScrubberUploadJob.UploadScrubber(log);
+                    await kfsScrubberUploadJob.UploadScrubber(log, record);
                 }
                 finally
                 {
