@@ -22,15 +22,7 @@ namespace Sloth.Core.Jobs
             _cyberSourceBankReconcileService = cyberSourceBankReconcileService;
         }
 
-        /// <summary>
-        /// Process Reconcile
-        /// </summary>
-        /// <param name="date">Date of reoncile</param>
-        /// <param name="log">logger</param>
-        /// <param name="jobRecord">Job record to be linked to any transactions created by this operation, or null if reconcile
-        /// was manually launched</param>
-        /// <returns></returns>
-        public async Task ProcessReconcile(DateTime date, ILogger log, CybersourceBankReconcileJobRecord jobRecord = null)
+        public async Task ProcessReconcile(DateTime date, CybersourceBankReconcileJobRecord jobRecord, ILogger log)
         {
             log = log.ForContext("date", date);
 
@@ -51,7 +43,7 @@ namespace Sloth.Core.Jobs
                 {
                     try
                     {
-                        await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, log, jobRecord);
+                        await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, log);
                     }
                     catch (Exception ex)
                     {

@@ -124,13 +124,14 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync(i => i.Id == integrationId);
 
             // log run
-            var record = new KfsScrubberUploadJobRecord()
+            var record = new CybersourceBankReconcileJobRecord()
             {
-                Name   = KfsScrubberUploadJob.JobName,
+                Name   = CybersourceBankReconcileJob.JobName,
                 RanOn  = DateTime.UtcNow,
                 Status = "Running",
+                ProcessedDate = date
             };
-            _dbContext.KfsScrubberUploadJobRecords.Add(record);
+            _dbContext.CybersourceBankReconcileJobRecords.Add(record);
             await _dbContext.SaveChangesAsync();
 
             // build custom logger
@@ -146,7 +147,7 @@ namespace Sloth.Web.Controllers
                 // schedule methods
                 log.Information("Starting Job");
 
-                await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, log);
+                await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, record, log);
             }
             finally
             {
@@ -155,7 +156,7 @@ namespace Sloth.Web.Controllers
                 await _dbContext.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(KfsScrubberUploadDetails), new { id = record.Id });
+            return RedirectToAction(nameof(CybersourceBankReconcileDetails), new { id = record.Id });
         }
 
         public async Task<IActionResult> CybersourceBankReconcile(JobsFilterModel filter = null)
@@ -227,7 +228,7 @@ namespace Sloth.Web.Controllers
                 {
                     // call methods
                     log.Information("Starting Job");
-                    await cybersourceBankReconcileJob.ProcessReconcile(date, log);
+                    await cybersourceBankReconcileJob.ProcessReconcile(date, record, log);
                 }
                 finally
                 {

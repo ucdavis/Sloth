@@ -72,7 +72,7 @@ namespace Sloth.Core.Jobs
                         var passwordKeyName = source.KfsFtpPasswordKeyName;
                         var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, username,
                             passwordKeyName, log);
-                        scrubber.Uri = uri.AbsoluteUri;
+                        scrubber.Uri = uri?.AbsoluteUri ?? "";
 
                         // persist scrubber uri
                         _context.Scrubbers.Add(scrubber);

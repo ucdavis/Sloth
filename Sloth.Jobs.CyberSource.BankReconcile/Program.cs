@@ -52,7 +52,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
                 var bankReconcileJob = provider.GetService<CybersourceBankReconcileJob>();
 
                 // call methods
-                bankReconcileJob.ProcessReconcile(yesterday, _log, jobRecord).GetAwaiter().GetResult();
+                bankReconcileJob.ProcessReconcile(yesterday, jobRecord, _log).GetAwaiter().GetResult();
             }
             finally
             {
