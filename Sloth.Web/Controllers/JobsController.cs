@@ -13,6 +13,7 @@ using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Web.Logging;
 using Sloth.Web.Models.JobViewModels;
+using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Services;
 
 namespace Sloth.Web.Controllers
@@ -54,6 +55,11 @@ namespace Sloth.Web.Controllers
                 Jobs = await _dbContext.KfsScrubberUploadJobRecords
                     .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc)
                     .OrderBy(j => j.RanOn)
+                    .Select(r => new KfsScrubberJobViewModel
+                    {
+                        Job = r,
+                        TransactionCount = r.Transactions.Count
+                    })
                     .ToListAsync()
             };
 
@@ -64,7 +70,19 @@ namespace Sloth.Web.Controllers
         {
             var record = await _dbContext.KfsScrubberUploadJobRecords
                 .Include(r => r.Logs)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .Include(r => r.Transactions)
+                .ThenInclude(t => t.Transfers)
+                .Select(r => new KfsScrubberJobViewModel()
+                {
+                    Job = r,
+                    TransactionsTable = new TransactionsTableViewModel()
+                    {
+                        Transactions = r.Transactions,
+                        HasWebhooks = r.Transactions.Any(t => t.Source.Team.WebHooks.Any())
+                    },
+                    TransactionCount = r.Transactions.Count
+                })
+                .FirstOrDefaultAsync();
 
             return View(record);
         }
@@ -180,6 +198,11 @@ namespace Sloth.Web.Controllers
                         || (r.RanOn > fromUtc && r.RanOn <= throughUtc))
                     .OrderBy(r => r.ProcessedDate)
                     .ThenBy(r => r.RanOn)
+                    .Select(r => new CybersourceBankReconcileJobViewModel
+                    {
+                        Job = r,
+                        TransactionCount = r.Transactions.Count
+                    })
                     .ToListAsync()
             };
 
@@ -188,11 +211,25 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> CybersourceBankReconcileDetails(string id)
         {
-            var record = await _dbContext.CybersourceBankReconcileJobRecords
+            var viewModel = await _dbContext.CybersourceBankReconcileJobRecords
+                .Where(r => r.Id == id)
                 .Include(r => r.Logs)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .Include(r => r.Transactions)
+                .ThenInclude(t => t.Transfers)
+                .AsNoTracking()
+                .Select(r => new CybersourceBankReconcileJobViewModel
+                {
+                    Job = r,
+                    TransactionsTable = new TransactionsTableViewModel()
+                    {
+                        Transactions = r.Transactions,
+                        HasWebhooks = r.Transactions.Any(t => t.Source.Team.WebHooks.Any())
+                    },
+                    TransactionCount = r.Transactions.Count
+                })
+                .FirstOrDefaultAsync();
 
-            return View(record);
+            return View(viewModel);
         }
 
         [HttpPost]

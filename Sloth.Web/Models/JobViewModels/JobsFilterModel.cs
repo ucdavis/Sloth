@@ -11,5 +11,7 @@ namespace Sloth.Web.Models.JobViewModels
     {
         [DisplayFormat(DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime? Date { get; set; }
+
+        public bool DisplayJobsWithTransactions { get; set; }
     }
 }

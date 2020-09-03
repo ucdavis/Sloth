@@ -125,16 +125,16 @@ namespace Sloth.Core.Models
         public bool HasReversal => !string.IsNullOrEmpty(ReversalTransactionId);
 
         [DisplayName("Cybersource Reconcile Job")]
-        public CybersourceBankReconcileJobRecord CybersourceReconcileJob { get; set; }
+        public CybersourceBankReconcileJobRecord CybersourceBankReconcileJob { get; set; }
 
-        [DisplayName("Cybersource Reconcile Job Id")]
-        public string CybersourceReconcileJobId { get; set; }
+        [DisplayName("Cybersource Reconcile Job Record Id")]
+        public string CybersourceBankReconcileJobRecordId { get; set; }
 
         [DisplayName("Kfs Scrubber Upload Job")]
         public KfsScrubberUploadJobRecord KfsScrubberUploadJob { get; set; }
 
-        [DisplayName("Kfs Scrubber Upload Job Id")]
-        public string KfsScrubberUploadJobId { get; set; }
+        [DisplayName("Kfs Scrubber Upload Job Record Id")]
+        public string KfsScrubberUploadJobRecordId { get; set; }
 
         public void AddReversalTransaction(Transaction transaction)
         {

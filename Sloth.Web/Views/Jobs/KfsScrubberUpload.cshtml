@@ -84,10 +84,13 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().RanOn)
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.RanOn)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Status)
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().TransactionCount)
                 </th>
                 <th></th>
             </tr>
@@ -95,17 +98,20 @@
         <tbody>
             @foreach (var item in Model.Jobs)
             {
-                <tr>
-                    <td data-sort="@item.RanOn.Ticks">
-                        @item.RanOn
-                    </td>
-                    <td>
-                        @item.Status
-                    </td>
-                    <td>
-                        <a asp-action="KfsScrubberUploadDetails" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
-                    </td>
-                </tr>
+            <tr>
+                <td data-sort="@item.Job.RanOn.Ticks">
+                    @item.Job.RanOn
+                </td>
+                <td>
+                    @item.Job.Status
+                </td>
+                <td>
+                    @item.TransactionCount
+                </td>
+                <td>
+                    <a asp-action="KfsScrubberUploadDetails" asp-route-id="@item.Job.Id" class="btn btn-primary">Details</a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
@@ -151,7 +157,7 @@
                 events_source: [
                     @foreach (var r in Model.Jobs)
                 {
-                    @:{ id: '@r.Id', title: '@($"{r.Name} - {r.RanOn:G}")', class: '@GetEventType(r.Status)', url: '@Url.Action("KfsScrubberUploadDetails", new {id = r.Id})', start: @GetEventMilliseconds(r), end: @GetEventMilliseconds(r) + 1 },
+                    @:{ id: '@r.Job.Id', title: '@($"{r.Job.Name} - {r.Job.RanOn:G}")', class: '@GetEventType(r.Job.Status)', url: '@Url.Action("KfsScrubberUploadDetails", new {id = r.Job.Id})', start: @GetEventMilliseconds(r.Job), end: @GetEventMilliseconds(r.Job) + 1 },
                 }
                 ],
                 views: {

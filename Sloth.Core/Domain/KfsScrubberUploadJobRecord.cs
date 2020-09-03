@@ -20,7 +20,7 @@ namespace Sloth.Core.Models
             modelBuilder.Entity<KfsScrubberUploadJobRecord>()
                 .HasMany(r => r.Transactions)
                 .WithOne(t => t.KfsScrubberUploadJob)
-                .HasForeignKey(t => t.KfsScrubberUploadJobId)
+                .HasForeignKey(t => t.KfsScrubberUploadJobRecordId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

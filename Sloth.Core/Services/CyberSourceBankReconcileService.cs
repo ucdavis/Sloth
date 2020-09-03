@@ -163,7 +163,7 @@ namespace Sloth.Core.Services
                             MerchantTrackingNumber    = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber   = deposit.RequestID,
                             TransactionDate           = deposit.LocalizedRequestDate,
-                            CybersourceReconcileJobId = jobRecord.Id
+                            CybersourceBankReconcileJobRecordId = jobRecord.Id
                         };
 
                         // move money out of clearing

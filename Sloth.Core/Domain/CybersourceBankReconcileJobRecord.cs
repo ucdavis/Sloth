@@ -23,8 +23,8 @@ namespace Sloth.Core.Models
 
             modelBuilder.Entity<CybersourceBankReconcileJobRecord>()
                 .HasMany(r => r.Transactions)
-                .WithOne(t => t.CybersourceReconcileJob)
-                .HasForeignKey(t => t.CybersourceReconcileJobId)
+                .WithOne(t => t.CybersourceBankReconcileJob)
+                .HasForeignKey(t => t.CybersourceBankReconcileJobRecordId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
