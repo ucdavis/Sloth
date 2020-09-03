@@ -56,13 +56,21 @@
 
             <div id="jobs-filter" class="col-12 collapse">
                 <form class="row" id="jobs-filter-form" asp-controller="Jobs" asp-action="CybersourceBankReconcile" method="get">
-                    <div class="col-lg-9">
+                    <div class="col-lg-3">
                         <div class="row">
-                            <div class="input-group-sm form-group col-lg-5 col-md-7 col-sm-9">
+                            <div class="input-group-sm form-group">
                                 <label for="filter-date">Month</label>
                                 <div id="filter-date" class="input-group input-daterange">
                                     <input name="date" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.Date" asp-format="{0:MM/dd/yyyy}" />
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="row">
+                            <div class="form-check checkbox">
+                                @Html.CheckBoxFor(model => model.Filter.HasTransactions)
+                                @Html.LabelFor(model => model.Filter.HasTransactions)
                             </div>
                         </div>
                     </div>

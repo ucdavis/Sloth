@@ -53,7 +53,8 @@ namespace Sloth.Web.Controllers
             {
                 Filter = filter,
                 Jobs = await _dbContext.KfsScrubberUploadJobRecords
-                    .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc)
+                    .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc
+                                                  && (!filter.HasTransactions || r.Transactions.Count > 0))
                     .OrderBy(j => j.RanOn)
                     .Select(r => new KfsScrubberJobViewModel
                     {
@@ -194,8 +195,9 @@ namespace Sloth.Web.Controllers
                 Filter = filter,
                 Jobs = await _dbContext.CybersourceBankReconcileJobRecords
                     .Where(r =>
-                        (r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
+                        ((r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
                         || (r.RanOn > fromUtc && r.RanOn <= throughUtc))
+                        && (!filter.HasTransactions || r.Transactions.Count > 0))
                     .OrderBy(r => r.ProcessedDate)
                     .ThenBy(r => r.RanOn)
                     .Select(r => new CybersourceBankReconcileJobViewModel
