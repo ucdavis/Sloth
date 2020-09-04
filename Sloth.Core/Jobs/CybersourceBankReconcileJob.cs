@@ -28,11 +28,11 @@ namespace Sloth.Core.Jobs
 
             try
             {
-                var integrations = _context.Integrations
+                var integrations = await _context.Integrations
                     .Where(i => i.Type == IntegrationTypes.CyberSource)
                     .Include(i => i.Source)
                     .Include(i => i.Team)
-                    .ToList();
+                    .ToListAsync();
 
                 if (!integrations.Any())
                 {

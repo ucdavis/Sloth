@@ -26,23 +26,25 @@ namespace Sloth.Api.Identity
             _logger = loggerFactory.CreateLogger<ApiKeyMiddleware>();
         }
 
-        public Task Invoke(HttpContext context, SlothDbContext dbContext)
+        public async Task InvokeAsync(HttpContext context, SlothDbContext dbContext)
         {
             // check for header
             if (!context.Request.Headers.ContainsKey(HeaderKey))
             {
-                return _next(context);
+                await _next(context);
+                return;
             }
             var headerValue = context.Request.Headers[HeaderKey].FirstOrDefault();
 
             // lookup apikey from db
-            var apiKey = dbContext.ApiKeys
+            var apiKey = await dbContext.ApiKeys
                 .Include(a => a.Team)
-                .FirstOrDefault(a => a.Key == headerValue);
+                .FirstOrDefaultAsync(a => a.Key == headerValue);
 
             if (apiKey == null || apiKey.Revoked.HasValue)
             {
-                return _next(context);
+                await _next(context);
+                return;
             }
 
             context.User.AddIdentity(new ClaimsIdentity(new[]
@@ -50,7 +52,7 @@ namespace Sloth.Api.Identity
                 new Claim(ClaimTypes.Name, apiKey.Team.Name)
             }));
 
-            return _next(context);
+            await _next(context);
         }
     }
 
