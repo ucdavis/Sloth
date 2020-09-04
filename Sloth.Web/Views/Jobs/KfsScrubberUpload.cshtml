@@ -67,8 +67,8 @@
                     </div>
                     <div class="col-6">
                         <div class="form-check checkbox">
-                            @Html.CheckBoxFor(model => model.Filter.HasTransactions)
-                            @Html.LabelFor(model => model.Filter.HasTransactions)
+                            @Html.CheckBox("hasTransactions", Model.Filter.HasTransactions)
+                            @Html.LabelFor(model => model.Filter.HasTransactions, new { @for = "hasTransactions" })
                         </div>
                     </div>
                     <div class="col-3 d-flex justify-content-end align-items-end">
