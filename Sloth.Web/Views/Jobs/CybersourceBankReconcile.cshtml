@@ -56,17 +56,21 @@
 
             <div id="jobs-filter" class="col-12 collapse">
                 <form class="row" id="jobs-filter-form" asp-controller="Jobs" asp-action="CybersourceBankReconcile" method="get">
-                    <div class="col-lg-9">
-                        <div class="row">
-                            <div class="input-group-sm form-group col-lg-5 col-md-7 col-sm-9">
-                                <label for="filter-date">Month</label>
-                                <div id="filter-date" class="input-group input-daterange">
-                                    <input name="date" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.Date" asp-format="{0:MM/dd/yyyy}" />
-                                </div>
+                    <div class="col-3">
+                        <div class="input-group-sm form-group">
+                            <label for="filter-date">Month</label>
+                            <div id="filter-date" class="input-group input-daterange">
+                                <input name="date" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.Date" asp-format="{0:MM/dd/yyyy}" />
                             </div>
                         </div>
                     </div>
-                    <div class="col-lg-3 d-flex justify-content-end align-items-end">
+                    <div class="col-6">
+                        <div class="form-check checkbox">
+                            @Html.CheckBoxFor(model => model.Filter.HasTransactions)
+                            @Html.LabelFor(model => model.Filter.HasTransactions)
+                        </div>
+                    </div>
+                    <div class="col-3 d-flex justify-content-end align-items-end">
                         <div class="d-flex justify-content-end align-items-center form-group">
                             <button class="btn" type="reset">Clear Filter</button>
                             <button class="btn btn-outline-secondary ml-2" type="submit">Apply Filter <i class="fas fa-filter"></i></button>
@@ -83,13 +87,16 @@
         <thead>
             <tr>
                 <th>
-                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().ProcessedDate)
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.ProcessedDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().RanOn)
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.RanOn)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Status)
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.Status)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().TransactionCount)
                 </th>
                 <th></th>
             </tr>
@@ -97,20 +104,23 @@
         <tbody>
             @foreach (var item in Model.Jobs)
             {
-                <tr>
-                    <td data-sort="@item.ProcessedDate.Ticks">
-                        @item.ProcessedDate.ToString("M/d/yyyy")
-                    </td>
-                    <td data-sort="@item.RanOn.Ticks">
-                        @item.RanOn
-                    </td>
-                    <td>
-                        @item.Status
-                    </td>
-                    <td>
-                        <a asp-action="CybersourceBankReconcileDetails" asp-route-id="@item.Id" class="btn btn-primary">Details</a>
-                    </td>
-                </tr>
+            <tr>
+                <td data-sort="@item.Job.ProcessedDate.Ticks">
+                    @item.Job.ProcessedDate.ToString("M/d/yyyy")
+                </td>
+                <td data-sort="@item.Job.RanOn.Ticks">
+                    @item.Job.RanOn
+                </td>
+                <td>
+                    @item.Job.Status
+                </td>
+                <td>
+                    @item.TransactionCount
+                </td>
+                <td>
+                    <a asp-action="CybersourceBankReconcileDetails" asp-route-id="@item.Job.Id" class="btn btn-primary">Details</a>
+                </td>
+            </tr>
             }
         </tbody>
     </table>
@@ -156,7 +166,7 @@
                 events_source: [
                     @foreach (var r in Model.Jobs)
                 {
-                    @:{ id: '@r.Id', title: '@($"{r.Name} - {r.RanOn:G}")', class: '@GetEventType(r.Status)', url: '@Url.Action("CybersourceBankReconcileDetails", new {id = r.Id})', start: @GetEventMilliseconds(r), end: @GetEventMilliseconds(r) + 1 },
+                    @:{ id: '@r.Job.Id', title: '@($"{r.Job.Name} - {r.Job.RanOn:G}")', class: '@GetEventType(r.Job.Status)', url: '@Url.Action("CybersourceBankReconcileDetails", new {id = r.Job.Id})', start: @GetEventMilliseconds(r.Job), end: @GetEventMilliseconds(r.Job) + 1 },
                 }
                 ],
                 views: {

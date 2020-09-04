@@ -7,7 +7,7 @@ namespace Sloth.Web.Models.JobViewModels
 {
     public class CybersourceBankReconcileJobsViewModel
     {
-        public List<CybersourceBankReconcileJobRecord> Jobs { get; set; }
+        public List<CybersourceBankReconcileJobViewModel> Jobs { get; set; }
         
         public JobsFilterModel Filter { get; set; }
     }

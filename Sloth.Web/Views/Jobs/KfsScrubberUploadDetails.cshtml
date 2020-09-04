@@ -1,4 +1,4 @@
-@model Sloth.Core.Models.KfsScrubberUploadJobRecord
+@model Sloth.Web.Models.JobViewModels.KfsScrubberJobViewModel
 
 @{
     ViewBag.Title = "Kfs Scrubber Upload Job Details";
@@ -8,40 +8,77 @@
 {
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container">
+    <h2>@ViewBag.Title</h2>
 
-<div>
-    <h4>KFS Upload Scrubber Job Record</h4>
+    <div>
+        <h4>KFS Upload Scrubber Job Record</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Job.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Job.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Job.RanOn)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Job.RanOn)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Job.Status)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Job.Status)
+            </dd>
+        </dl>
+    </div>
+
+    <h4>Transactions</h4>
     <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.RanOn)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.RanOn)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-    </dl>
-</div>
+    <partial name="_TransactionsTable" model="Model.TransactionsTable" />
 
-<partial name="_LogConsole" />
+    <h4>Log</h4>
+    <hr />
+    <partial name="_LogConsole" model="Model.Job" />
 
-<div>
-    <a asp-action="KfsScrubberUpload">Back to List</a>
+    <div>
+        <a asp-action="KfsScrubberUpload">Back to List</a>
+    </div>
 </div>
 
 @section AdditionalScripts
 {
+    <script>
+        const table = $('#transactionsTable').DataTable({
+            "columnDefs": [
+                { "targets": 0, "visible": false },
+                { "targets": [-1], "orderable": false },
+            ]
+        });
+
+        $("body").on("click",
+            "#transactionsTable tbody tr #callWebHook",
+            function(e) {
+                e.preventDefault();
+                var row = table.row($(this).closest('tr')).data();
+                if (row && row[0]) {
+                    $.ajax({
+                        type: "POST",
+                        url: "@Url.Action("CallWebHook", "Transactions")",
+                        data: { id: row[0] },
+                        success: function(msg) {
+                            alert("WebHook Called");
+                        },
+                        error: function(_, status, error) {
+                            alert(status + ((error && (": " + error)) || ""));
+                        }
+                    });
+                }
+            });
+
+    </script>
 }
 

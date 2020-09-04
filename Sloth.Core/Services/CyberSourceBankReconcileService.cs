@@ -19,9 +19,11 @@ namespace Sloth.Core.Services
 {
     public interface ICyberSourceBankReconcileService
     {
-        Task ProcessIntegration(Integration integration, DateTime date, ILogger log = null);
+        Task ProcessIntegration(Integration integration, DateTime date, CybersourceBankReconcileJobRecord jobRecord,
+            ILogger log = null);
 
-        Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date, ILogger log = null);
+        Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null);
     }
 
     public class CyberSourceBankReconcileService : ICyberSourceBankReconcileService
@@ -44,7 +46,8 @@ namespace Sloth.Core.Services
             // TODO validate options
         }
 
-        public async Task ProcessIntegration(Integration integration, DateTime date, ILogger log = null)
+        public async Task ProcessIntegration(Integration integration, DateTime date,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null)
         {
             if (log == null)
             {
@@ -52,7 +55,7 @@ namespace Sloth.Core.Services
             }
 
             log = log.ForContext("integration", integration.Id);
-            
+
             // fetch password secret
             var password = await _secretsService.GetSecret(integration.ReportPasswordKey);
 
@@ -66,17 +69,18 @@ namespace Sloth.Core.Services
 
             var count = report.Requests?.Length ?? 0;
 
-            log.Information("Report found with {count} records.", new { count });
+            log.Information("Report found with {count} records.", new {count});
 
             if (count < 1)
             {
                 return;
             }
 
-            await ProcessReport(report, reportXml, integration, log);
+            await ProcessReport(report, reportXml, integration, jobRecord, log);
         }
 
-        public async Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date, ILogger log = null)
+        public async Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null)
         {
             if (log == null)
             {
@@ -98,17 +102,18 @@ namespace Sloth.Core.Services
 
             var count = report.Requests?.Length ?? 0;
 
-            log.Information("Report found with {count} records.", new { count });
+            log.Information("Report found with {count} records.", new {count});
 
             if (count < 1)
             {
                 return;
             }
 
-            await ProcessReport(report, reportXml, integration, log);
+            await ProcessReport(report, reportXml, integration, jobRecord, log);
         }
 
-        private async Task ProcessReport(Report report, string reportXml, Integration integration, ILogger log)
+        private async Task ProcessReport(Report report, string reportXml, Integration integration,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log)
         {
             using (var tran = await _context.Database.BeginTransactionAsync())
             {
@@ -151,13 +156,14 @@ namespace Sloth.Core.Services
 
                         transaction = new Transaction()
                         {
-                            Source                  = integration.Source,
-                            Status                  = TransactionStatuses.Scheduled,
-                            DocumentNumber          = documentNumber,
-                            KfsTrackingNumber       = kfsTrackingNumber,
-                            MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
-                            ProcessorTrackingNumber = deposit.RequestID,
-                            TransactionDate         = deposit.LocalizedRequestDate,
+                            Source                              = integration.Source,
+                            Status                              = TransactionStatuses.Scheduled,
+                            DocumentNumber                      = documentNumber,
+                            KfsTrackingNumber                   = kfsTrackingNumber,
+                            MerchantTrackingNumber              = deposit.MerchantReferenceNumber,
+                            ProcessorTrackingNumber             = deposit.RequestID,
+                            TransactionDate                     = deposit.LocalizedRequestDate,
+                            CybersourceBankReconcileJobRecordId = jobRecord.Id
                         };
 
                         // move money out of clearing

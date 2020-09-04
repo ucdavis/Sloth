@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
 
@@ -21,7 +22,7 @@ namespace Sloth.Core.Jobs
             _cyberSourceBankReconcileService = cyberSourceBankReconcileService;
         }
 
-        public async Task ProcessReconcile(DateTime date, ILogger log)
+        public async Task ProcessReconcile(DateTime date, CybersourceBankReconcileJobRecord jobRecord, ILogger log)
         {
             log = log.ForContext("date", date);
 
@@ -42,7 +43,7 @@ namespace Sloth.Core.Jobs
                 {
                     try
                     {
-                        await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, log);
+                        await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, log);
                     }
                     catch (Exception ex)
                     {
