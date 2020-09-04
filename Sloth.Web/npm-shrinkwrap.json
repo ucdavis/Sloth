@@ -10946,7 +10946,7 @@
     "postcss-simple-vars": {
       "version": "4.1.0",
       "resolved": "https://registry.npmjs.org/postcss-simple-vars/-/postcss-simple-vars-4.1.0.tgz",
-      "integrity": "sha512-J/TRomA8EqXhS4VjQJsPCYTFIa9FYN/dkJK/8oZ0BYeVIPx91goqM8T+ljsP57+4bwSEywFOuB7EZ8n1gjjxZw==",
+      "integrity": "sha1-BDJIz++NP1GzSGoowJ+Dddvxsvk=",
       "dev": true,
       "requires": {
         "postcss": "^6.0.9"
@@ -11826,7 +11826,7 @@
     "sax": {
       "version": "1.2.4",
       "resolved": "https://registry.npmjs.org/sax/-/sax-1.2.4.tgz",
-      "integrity": "sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==",
+      "integrity": "sha1-KBYjTiN4vdxOU1T6tcqold9xANk=",
       "dev": true
     },
     "schema-utils": {
