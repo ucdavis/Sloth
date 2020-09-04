@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -124,7 +125,8 @@ namespace Sloth.Core.Services
                     {
                         // look for existing transaction
                         var transaction =
-                            _context.Transactions.FirstOrDefault(t => t.ProcessorTrackingNumber == deposit.RequestID);
+                            await _context.Transactions.FirstOrDefaultAsync(t =>
+                                t.ProcessorTrackingNumber == deposit.RequestID);
                         if (transaction != null)
                         {
                             log.ForContext("tracking_number", deposit.MerchantReferenceNumber)

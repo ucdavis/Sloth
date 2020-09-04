@@ -29,7 +29,7 @@ namespace Sloth.Web.Controllers
             if (User.IsInRole(Roles.SystemAdmin))
             {
                 // get all teams
-                return DbContext.Teams.ToList();
+                return await DbContext.Teams.ToListAsync();
             }
 
             // get user + roles, include their teams

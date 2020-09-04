@@ -27,13 +27,13 @@ namespace Sloth.Core.Jobs
             try
             {
                 // fetch all staged transactions
-                var transactions = _context.Transactions
+                var transactions = await _context.Transactions
                     .Where(t => t.Status == TransactionStatuses.Scheduled)
                     .Include(t => t.Transfers)
                     .Include(t => t.Source)
                         .ThenInclude(s => s.Team)
                     .Include(t => t.ReversalOfTransaction)
-                    .ToList();
+                    .ToListAsync();
 
                 if (!transactions.Any())
                 {
