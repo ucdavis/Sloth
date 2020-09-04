@@ -156,13 +156,13 @@ namespace Sloth.Core.Services
 
                         transaction = new Transaction()
                         {
-                            Source                    = integration.Source,
-                            Status                    = TransactionStatuses.Scheduled,
-                            DocumentNumber            = documentNumber,
-                            KfsTrackingNumber         = kfsTrackingNumber,
-                            MerchantTrackingNumber    = deposit.MerchantReferenceNumber,
-                            ProcessorTrackingNumber   = deposit.RequestID,
-                            TransactionDate           = deposit.LocalizedRequestDate,
+                            Source                              = integration.Source,
+                            Status                              = TransactionStatuses.Scheduled,
+                            DocumentNumber                      = documentNumber,
+                            KfsTrackingNumber                   = kfsTrackingNumber,
+                            MerchantTrackingNumber              = deposit.MerchantReferenceNumber,
+                            ProcessorTrackingNumber             = deposit.RequestID,
+                            TransactionDate                     = deposit.LocalizedRequestDate,
                             CybersourceBankReconcileJobRecordId = jobRecord.Id
                         };
 
