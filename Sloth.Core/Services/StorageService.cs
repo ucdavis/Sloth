@@ -29,9 +29,9 @@ namespace Sloth.Core.Services
 
         public async Task GetBlobAsync(Stream stream, string containerName, string blobName)
         {
-            var container = await GetBlobContainerAsync(containerName);
-            var blob = container.GetBlockBlobClient(blobName);
-            await blob.DownloadToAsync(stream);
+            var containerClient = await GetBlobContainerAsync(containerName);
+            var blobClient = containerClient.GetBlockBlobClient(blobName);
+            await blobClient.DownloadToAsync(stream);
         }
 
         public Task GetBlobAsync(Stream stream, Uri uri)
@@ -42,19 +42,19 @@ namespace Sloth.Core.Services
 
         public async Task<Uri> PutBlobAsync(Stream stream, string containerName, string blobName)
         {
-            var container = await GetBlobContainerAsync(containerName);
-            var blob = container.GetBlockBlobClient(blobName);
-            await blob.UploadAsync(stream);
+            var containerClient = await GetBlobContainerAsync(containerName);
+            var blobClient = containerClient.GetBlockBlobClient(blobName);
+            await blobClient.UploadAsync(stream);
 
-            return blob.Uri;
+            return blobClient.Uri;
         }
 
         private async Task<BlobContainerClient> GetBlobContainerAsync(string containerName)
         {
-            var client = _blobServiceClient.GetBlobContainerClient(containerName);
-            await client.CreateIfNotExistsAsync();
+            var containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
+            await containerClient.CreateIfNotExistsAsync();
 
-            return client;
+            return containerClient;
         }
 
     }

@@ -9,6 +9,10 @@ namespace Sloth.Core.Models
     {
         public IList<Transaction> Transactions { get; set; }
 
+        public string BlobId { get; set; }
+
+        public Blob Blob { get; set; }
+
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<KfsScrubberUploadJobRecord>()
