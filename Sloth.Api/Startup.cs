@@ -165,6 +165,7 @@ namespace Sloth.Api
                 app.UseInternalExceptionMiddleware();
             }
 
+            app.UseHttpsRedirection();
             app.UseRouting();
 
             app.UseAuthorization();
