@@ -166,7 +166,12 @@ namespace Sloth.Web.Controllers
                 // schedule methods
                 log.Information("Starting Job");
 
-                await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, record, log);
+                var jobBlob = await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, record, log);
+                if (jobBlob != null)
+                {
+                    // save uploaded blob metadata
+                    _dbContext.CybersourceBankReconcileJobBlobs.Add(jobBlob);
+                }
             }
             finally
             {
@@ -267,7 +272,12 @@ namespace Sloth.Web.Controllers
                 {
                     // call methods
                     log.Information("Starting Job");
-                    await cybersourceBankReconcileJob.ProcessReconcile(date, record, log);
+                    await foreach (var jobBlob in cybersourceBankReconcileJob.ProcessReconcile(date, record, log))
+                    {
+                        if (jobBlob == null) continue;
+                        // save uploaded blob metadata
+                        dbContext.CybersourceBankReconcileJobBlobs.Add(jobBlob);
+                    }
                 }
                 finally
                 {

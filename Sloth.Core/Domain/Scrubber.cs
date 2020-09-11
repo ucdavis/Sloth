@@ -37,5 +37,11 @@ namespace Sloth.Core.Models
         [MinLength(1)]
         [Required]
         public IList<Transaction> Transactions { get; set; }
+
+        public string BlobId { get; set; }
+
+        public Blob Blob { get; set; }
+
+
     }
 }

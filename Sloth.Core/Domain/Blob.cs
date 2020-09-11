@@ -25,16 +25,16 @@ namespace Sloth.Core.Models
         [Display(Name = "Uploaded Date")]
         public DateTime UploadedDate { get; set; }
 
-        public IList<KfsScrubberUploadJobRecord> KfsScrubberUploadJobRecords { get; set; }
+        public IList<Scrubber> Scrubbers { get; set; }
 
         public IList<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Blob>()
-                .HasMany(blob => blob.KfsScrubberUploadJobRecords)
-                .WithOne(r => r.Blob)
-                .HasForeignKey(r => r.BlobId)
+                .HasMany(blob => blob.Scrubbers)
+                .WithOne(s => s.Blob)
+                .HasForeignKey(s => s.BlobId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Blob>()

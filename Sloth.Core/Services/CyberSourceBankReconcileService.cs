@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Sloth.Core.Configuration;
+using Sloth.Core.Domain;
 using Sloth.Core.Models;
 using Sloth.Core.Models.WebHooks;
 using Sloth.Core.Resources;
@@ -20,10 +22,10 @@ namespace Sloth.Core.Services
 {
     public interface ICyberSourceBankReconcileService
     {
-        Task ProcessIntegration(Integration integration, DateTime date, CybersourceBankReconcileJobRecord jobRecord,
+        Task<CybersourceBankReconcileJobBlob> ProcessIntegration(Integration integration, DateTime date, CybersourceBankReconcileJobRecord jobRecord,
             ILogger log = null);
 
-        Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
+        Task<CybersourceBankReconcileJobBlob> ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
             CybersourceBankReconcileJobRecord jobRecord, ILogger log = null);
     }
 
@@ -47,7 +49,7 @@ namespace Sloth.Core.Services
             // TODO validate options
         }
 
-        public async Task ProcessIntegration(Integration integration, DateTime date,
+        public async Task<CybersourceBankReconcileJobBlob> ProcessIntegration(Integration integration, DateTime date,
             CybersourceBankReconcileJobRecord jobRecord, ILogger log = null)
         {
             if (log == null)
@@ -74,13 +76,13 @@ namespace Sloth.Core.Services
 
             if (count < 1)
             {
-                return;
+                return null;
             }
 
-            await ProcessReport(report, reportXml, integration, jobRecord, log);
+            return await ProcessReport(report, reportXml, integration, jobRecord, log);
         }
 
-        public async Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
+        public async Task<CybersourceBankReconcileJobBlob> ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
             CybersourceBankReconcileJobRecord jobRecord, ILogger log = null)
         {
             if (log == null)
@@ -107,16 +109,16 @@ namespace Sloth.Core.Services
 
             if (count < 1)
             {
-                return;
+                return null;
             }
 
-            await ProcessReport(report, reportXml, integration, jobRecord, log);
+            return await ProcessReport(report, reportXml, integration, jobRecord, log);
         }
 
-        private async Task ProcessReport(Report report, string reportXml, Integration integration,
+        private async Task<CybersourceBankReconcileJobBlob> ProcessReport(Report report, string reportXml, Integration integration,
             CybersourceBankReconcileJobRecord jobRecord, ILogger log)
         {
-            using (var tran = await _context.Database.BeginTransactionAsync())
+            await using (var tran = await _context.Database.BeginTransactionAsync())
             {
                 try
                 {
@@ -221,15 +223,17 @@ namespace Sloth.Core.Services
 
                     // push changes for this integration
                     var inserted = await _context.SaveChangesAsync();
-                    tran.Commit();
+                    await tran.CommitAsync();
                     log.Information("{count} records created.", new {count = inserted});
                 }
                 catch (Exception ex)
                 {
                     log.Error(ex, ex.Message);
-                    tran.Rollback();
+                    await tran.RollbackAsync();
                 }
             }
+
+            CybersourceBankReconcileJobBlob jobBlob = null;
 
             try
             {
@@ -242,14 +246,24 @@ namespace Sloth.Core.Services
                 await writer.WriteAsync(reportXml);
                 await writer.FlushAsync();
                 memoryStream.Position = 0;
-                await _storageService.PutBlobAsync(memoryStream, _options.ReportBlobContainer, filename);
-                //TODO: store uri.AbsoluteUri;
+                var blob = await _storageService.PutBlobAsync(memoryStream, _options.ReportBlobContainer, filename,
+                    "Cybersource Bank Reconcile Report",
+                    MediaTypeNames.Application.Xml);
+                jobBlob = new CybersourceBankReconcileJobBlob
+                {
+                    IntegrationId =  integration.Id,
+                    BlobId = blob.Id,
+                    Blob = blob,
+                    CybersourceBankReconcileJobRecordId = jobRecord.Id,
+                };
             }
             catch (Exception ex)
             {
                 log.ForContext("container", _options.ReportBlobContainer)
                     .Error(ex, ex.Message);
             }
+
+            return jobBlob;
         }
     }
 }

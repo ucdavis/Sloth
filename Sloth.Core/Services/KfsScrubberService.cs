@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Renci.SshNet;
@@ -11,7 +12,7 @@ namespace Sloth.Core.Services
 {
     public interface IKfsScrubberService
     {
-        Task<Uri> UploadScrubber(Scrubber scrubber, string filename, string username, string passwordKeyName, ILogger logger = null);
+        Task<Blob> UploadScrubber(Scrubber scrubber, string filename, string username, string passwordKeyName, ILogger logger = null);
     }
 
     public class KfsScrubberService : IKfsScrubberService
@@ -31,7 +32,7 @@ namespace Sloth.Core.Services
             _storageContainer = options.Value.ScrubberBlobContainer;
         }
 
-        public async Task<Uri> UploadScrubber(Scrubber scrubber, string filename, string username, string passwordKeyName, ILogger logger = null)
+        public async Task<Blob> UploadScrubber(Scrubber scrubber, string filename, string username, string passwordKeyName, ILogger logger = null)
         {
             if (logger == null)
             {
@@ -45,7 +46,7 @@ namespace Sloth.Core.Services
             await sw.FlushAsync();
             await ms.FlushAsync();
 
-            Uri uri = default;
+            Blob blob = null;
 
             try
             {
@@ -53,8 +54,8 @@ namespace Sloth.Core.Services
                 logger.ForContext("container", _storageContainer)
                     .Information("Uploading {filename} to Blob Storage", filename);
                 ms.Seek(0, SeekOrigin.Begin);
-                uri = await _storageService.PutBlobAsync(ms, _storageContainer, filename);
-                scrubber.Uri = uri.AbsoluteUri;
+                blob = await _storageService.PutBlobAsync(ms, _storageContainer, filename, "Kfs Scrubber",
+                    MediaTypeNames.Application.Xml);
             }
             catch (Exception ex)
             {
@@ -69,7 +70,7 @@ namespace Sloth.Core.Services
             ms.Seek(0, SeekOrigin.Begin);
             await Task.Factory.FromAsync(client.BeginUploadFile(ms, filename), client.EndUploadFile);
 
-            return uri;
+            return blob;
         }
 
         private async Task<SftpClient> GetClient(string username, string passwordKeyName)
