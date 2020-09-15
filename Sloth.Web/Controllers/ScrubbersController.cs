@@ -1,15 +1,18 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.ScrubberViewModels;
 using Sloth.Web.Models.TransactionViewModels;
+using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
+    [Authorize(Policy = PolicyCodes.TeamAdmin)]
     public class ScrubbersController : SuperController
     {
         public ScrubbersController(ApplicationUserManager userManager, SlothDbContext dbContext) : base(userManager, dbContext)
