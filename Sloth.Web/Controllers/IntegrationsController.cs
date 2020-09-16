@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
@@ -9,9 +10,11 @@ using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.IntegrationViewModels;
+using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
+    [Authorize(Policy = PolicyCodes.TeamAdmin)]
     public class IntegrationsController : SuperController
     {
         private readonly ISecretsService _secretsService;

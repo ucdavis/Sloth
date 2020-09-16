@@ -2,8 +2,10 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Web.Authorization;
@@ -13,10 +15,12 @@ namespace Sloth.Web.Handlers
     public class VerifyTeamPermissionHandler : AuthorizationHandler<VerifyTeamPermission>
     {
         private readonly UserManager<User> _userManager;
+        private readonly IHttpContextAccessor _httpContext;
 
-        public VerifyTeamPermissionHandler(UserManager<User> userManager)
+        public VerifyTeamPermissionHandler(UserManager<User> userManager, IHttpContextAccessor httpContext)
         {
             _userManager = userManager;
+            _httpContext = httpContext;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, VerifyTeamPermission requirement)
@@ -27,13 +31,11 @@ namespace Sloth.Web.Handlers
                 return;
             }
 
+            // get team name from url
             var team = "";
-            if (context.Resource is AuthorizationFilterContext mvcContext)
+            if (context.Resource is Endpoint)
             {
-                if (mvcContext.RouteData.Values["team"] != null)
-                {
-                    team = mvcContext.RouteData.Values["team"].ToString();
-                }
+                team = _httpContext.HttpContext.Request.RouteValues["team"]?.ToString() ?? "";
             }
 
             var user = await _userManager.GetUserAsync(context.User);
@@ -48,8 +50,6 @@ namespace Sloth.Web.Handlers
                     context.Succeed(requirement);
                 }
             }
-
-            // TODO: Check for system admin role
         }
     }
 }

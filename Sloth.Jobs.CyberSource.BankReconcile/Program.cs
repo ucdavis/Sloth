@@ -76,6 +76,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             // options files
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
+            services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
             // db service
             services.AddDbContext<SlothDbContext>(options =>
@@ -87,6 +88,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             services.AddTransient<ICyberSourceBankReconcileService, CyberSourceBankReconcileService>();
             services.AddTransient<CybersourceBankReconcileJob>();
             services.AddTransient<IWebHookService, WebHookService>();
+            services.AddTransient<IStorageService, StorageService>();
 
             services.AddSingleton(_log);
 

@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
@@ -8,6 +9,7 @@ using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.TeamViewModels;
+using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
@@ -23,6 +25,7 @@ namespace Sloth.Web.Controllers
             return View(teams);
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         public async Task<IActionResult> Details()
         {
             var team = await DbContext.Teams
@@ -50,12 +53,14 @@ namespace Sloth.Web.Controllers
             return View(team);
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpPost]
         public async Task<IActionResult> Create(CreateTeamViewModel model)
         {
@@ -83,6 +88,7 @@ namespace Sloth.Web.Controllers
             return RedirectToAction("Details", new { id = team.Id });
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpGet]
         public async Task<IActionResult> Edit()
         {
@@ -107,6 +113,7 @@ namespace Sloth.Web.Controllers
             return View(model);
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpPost]
         public async Task<IActionResult> Edit(EditTeamViewModel model)
         {
@@ -129,6 +136,7 @@ namespace Sloth.Web.Controllers
             return RedirectToAction("Details", new { id = team.Id });
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpPost]
         public async Task<IActionResult> CreateUserRole(string teamId, string userId, string roleId)
         {
@@ -154,6 +162,7 @@ namespace Sloth.Web.Controllers
             });
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpPost]
         public async Task<IActionResult> CreateNewApiKey(string teamId)
         {
@@ -178,6 +187,7 @@ namespace Sloth.Web.Controllers
             });
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpPost]
         public async Task<IActionResult> RevokeApiKey(string id, string teamId)
         {
