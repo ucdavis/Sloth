@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,7 +17,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
     {
         private static ILogger _log;
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // setup env
             Configure();
@@ -44,7 +45,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
 
             // save log to db
             dbContext.CybersourceBankReconcileJobRecords.Add(jobRecord);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
 
             try
             {
@@ -52,7 +53,12 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
                 var bankReconcileJob = provider.GetService<CybersourceBankReconcileJob>();
 
                 // call methods
-                bankReconcileJob.ProcessReconcile(yesterday, jobRecord, _log).GetAwaiter().GetResult();
+                await foreach (var jobBlob in bankReconcileJob.ProcessReconcile(yesterday, jobRecord, _log))
+                {
+                    if (jobBlob == null) continue;
+                    // save uploaded blob metadata
+                    dbContext.CybersourceBankReconcileJobBlobs.Add(jobBlob);
+                }
             }
             finally
             {

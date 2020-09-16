@@ -21,7 +21,7 @@ CREATE TABLE [dbo].[Transactions] (
     CONSTRAINT [FK_Transactions_Sources_SourceId] FOREIGN KEY ([SourceId]) REFERENCES [dbo].[Sources] ([Id]) ON DELETE CASCADE,
     CONSTRAINT [FK_Transactions_Transactions_ReversalOfTransactionId] FOREIGN KEY ([ReversalOfTransactionId]) REFERENCES [dbo].[Transactions] ([Id]),
     CONSTRAINT [FK_Transactions_Transactions_ReversalTransactionId] FOREIGN KEY ([ReversalTransactionId]) REFERENCES [dbo].[Transactions] ([Id]), 
-    CONSTRAINT [FK_Transactions_CybersourceBankReconcileJobRecords_CybersourceBankReconcileJobRecordId] FOREIGN KEY ([CybersourceBankReconcileJobRecordId]) REFERENCES [CyberSourceBankReconcileJobRecords]([Id]),
+    CONSTRAINT [FK_Transactions_CybersourceBankReconcileJobRecords_CybersourceBankReconcileJobRecordId] FOREIGN KEY ([CybersourceBankReconcileJobRecordId]) REFERENCES [CybersourceBankReconcileJobRecords]([Id]),
     CONSTRAINT [FK_Transactions_KfsScrubberUploadJobRecords_KfsScrubberUploadJobRecordId] FOREIGN KEY ([KfsScrubberUploadJobRecordId]) REFERENCES [KfsScrubberUploadJobRecords]([Id])
 );
 

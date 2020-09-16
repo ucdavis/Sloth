@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Sloth.Core.Domain;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
@@ -22,13 +24,16 @@ namespace Sloth.Core.Jobs
             _cyberSourceBankReconcileService = cyberSourceBankReconcileService;
         }
 
-        public async Task ProcessReconcile(DateTime date, CybersourceBankReconcileJobRecord jobRecord, ILogger log)
+        public async IAsyncEnumerable<CybersourceBankReconcileJobBlob> ProcessReconcile(DateTime date,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log)
         {
             log = log.ForContext("date", date);
 
+            List<Integration> integrations;
+
             try
             {
-                var integrations = await _context.Integrations
+                integrations = await _context.Integrations
                     .Where(i => i.Type == IntegrationTypes.CyberSource)
                     .Include(i => i.Source)
                     .Include(i => i.Team)
@@ -37,24 +42,29 @@ namespace Sloth.Core.Jobs
                 if (!integrations.Any())
                 {
                     log.Information("Early exit, no active integrations found.");
+                    yield break;
                 }
 
-                foreach (var integration in integrations)
-                {
-                    try
-                    {
-                        await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, log);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.Error(ex, ex.Message);
-                    }
-                    
-                }
             }
             catch (Exception ex)
             {
                 log.Error(ex, ex.Message);
+                yield break;
+            }
+
+            foreach (var integration in integrations)
+            {
+                CybersourceBankReconcileJobBlob jobBlob = null;
+                try
+                {
+                    jobBlob = await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, log);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, ex.Message);
+                }
+                if (jobBlob != null)
+                    yield return jobBlob;
             }
         }
     }

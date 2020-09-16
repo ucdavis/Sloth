@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Sloth.Core.Domain;
 using Sloth.Core.Models;
 
 namespace Sloth.Core
@@ -40,6 +41,10 @@ namespace Sloth.Core
         public DbSet<LogMessage> Logs { get; set; }
 
         public DbSet<WebHook> WebHooks { get; set; }
+
+        public DbSet<Blob> Blobs { get; set; }
+
+        public DbSet<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
 
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
@@ -132,6 +137,7 @@ namespace Sloth.Core
             LogMessage.OnModelCreating(modelBuilder);
             CybersourceBankReconcileJobRecord.OnModelCreating(modelBuilder);
             KfsScrubberUploadJobRecord.OnModelCreating(modelBuilder);
+            Blob.OnModelCreating(modelBuilder);
         }
     }
 }

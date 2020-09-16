@@ -70,9 +70,11 @@ namespace Sloth.Core.Jobs
                         log.Information("Uploading {filename}", filename);
                         var username = source.KfsFtpUsername;
                         var passwordKeyName = source.KfsFtpPasswordKeyName;
-                        var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, username,
+                        var blob = await _kfsScrubberService.UploadScrubber(scrubber, filename, username,
                             passwordKeyName, log);
-                        scrubber.Uri = uri?.AbsoluteUri ?? "";
+                        scrubber.Uri = blob?.Uri ?? ""; //TODO: remove Uri from scrubber table after ensureing data is in Blob table
+                        scrubber.Blob = blob;
+                        scrubber.BlobId = blob?.Id;
 
                         // persist scrubber uri
                         _context.Scrubbers.Add(scrubber);
