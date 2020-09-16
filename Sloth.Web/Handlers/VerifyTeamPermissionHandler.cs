@@ -16,13 +16,11 @@ namespace Sloth.Web.Handlers
     {
         private readonly UserManager<User> _userManager;
         private readonly IHttpContextAccessor _httpContext;
-        private readonly ITempDataDictionaryFactory _tempDataDictionaryFactory;
 
-        public VerifyTeamPermissionHandler(UserManager<User> userManager, IHttpContextAccessor httpContext, ITempDataDictionaryFactory tempDataDictionary)
+        public VerifyTeamPermissionHandler(UserManager<User> userManager, IHttpContextAccessor httpContext)
         {
             _userManager = userManager;
             _httpContext = httpContext;
-            _tempDataDictionaryFactory = tempDataDictionary;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, VerifyTeamPermission requirement)
@@ -52,8 +50,6 @@ namespace Sloth.Web.Handlers
                     context.Succeed(requirement);
                 }
             }
-
-            // TODO: Check for system admin role
         }
     }
 }
