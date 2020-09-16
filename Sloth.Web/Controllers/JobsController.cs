@@ -70,6 +70,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> KfsScrubberUploadDetails(string id)
         {
             var record = await _dbContext.KfsScrubberUploadJobRecords
+                .Where(r => r.Id == id)
                 .Include(r => r.Logs)
                 .Include(r => r.Transactions)
                 .ThenInclude(t => t.Transfers)
