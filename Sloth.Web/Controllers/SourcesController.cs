@@ -161,12 +161,10 @@ namespace Sloth.Web.Controllers
             try {
                 await _kfsScrubberService.VerifyConnection(source.KfsFtpUsername, source.KfsFtpPasswordKeyName);
 
-                // TODO: for now, return success as long as we don't get an error
+                // TODO: return success as long as we don't get an error
                 return Content("connection successful");
             } catch (Exception e) {
-                return Content("connection not successful: " + e.ToString());
-
-                // throw e;
+                return Content("connection not successful: " + e.Message);
             }
         }
     }
