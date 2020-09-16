@@ -17,7 +17,7 @@ using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
-    [Authorize(Policy = PolicyCodes.TeamAdmin)]
+    [Authorize(Policy = PolicyCodes.TeamApprover)]
     public class TransactionsController : SuperController
     {
         private readonly IWebHookService WebHookService;
