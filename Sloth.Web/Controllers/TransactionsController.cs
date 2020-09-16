@@ -121,7 +121,7 @@ namespace Sloth.Web.Controllers
                 .ToListAsync();
 
             // update status
-            transactions.ForEach(t => t.Status = TransactionStatuses.Scheduled);
+            transactions.ForEach(t => t.SetStatus(TransactionStatuses.Scheduled));
 
             // save to db
             await DbContext.SaveChangesAsync();
@@ -162,7 +162,7 @@ namespace Sloth.Web.Controllers
                 return NotFound();
             }
 
-            transaction.Status = TransactionStatuses.Scheduled;
+            transaction.SetStatus(TransactionStatuses.Scheduled);
 
             await DbContext.SaveChangesAsync();
 
@@ -203,12 +203,11 @@ namespace Sloth.Web.Controllers
                 Source                  = transaction.Source,
                 Creator                 = user,
                 TransactionDate         = DateTime.UtcNow,
-                Status                  = TransactionStatuses.Scheduled,
                 KfsTrackingNumber       = transaction.KfsTrackingNumber,
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
                 MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
-            };
+            }.SetStatus(TransactionStatuses.Scheduled);
 
             // add reversal transfers
             foreach (var transfer in transaction.Transfers)

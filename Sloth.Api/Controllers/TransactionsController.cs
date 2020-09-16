@@ -193,14 +193,9 @@ namespace Sloth.Api.Controllers
                 }).ToList(),
             };
 
-            if (transaction.AutoApprove)
-            {
-                transactionToCreate.Status = TransactionStatuses.Scheduled;
-            }
-            else
-            {
-                transactionToCreate.Status = TransactionStatuses.PendingApproval;
-            }
+            transactionToCreate.SetStatus(transaction.AutoApprove
+                ? TransactionStatuses.Scheduled
+                : TransactionStatuses.PendingApproval);
 
             using (var tran = _context.Database.BeginTransaction())
             {

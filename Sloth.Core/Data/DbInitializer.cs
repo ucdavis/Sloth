@@ -129,7 +129,6 @@ namespace Sloth.Core.Data
                 {
                     Creator                 = _context.Users.FirstOrDefault(u => u.UserName == "jpknoll"),
                     Source                  = _context.Sources.FirstOrDefault(s => s.Name == "ANLAB" && s.Type == "Recharge"),
-                    Status                  = TransactionStatuses.Scheduled,
                     MerchantTrackingNumber  = "ORDER-10",
                     ProcessorTrackingNumber = "123456",
                     KfsTrackingNumber       = "TESTTHIS1",
@@ -156,7 +155,7 @@ namespace Sloth.Core.Data
                             Direction   = Transfer.CreditDebit.Credit,
                         },
                     }
-                }
+                }.SetStatus(TransactionStatuses.Scheduled)
             };
             _context.Transactions.AddRange(transactions);
             _context.SaveChanges();

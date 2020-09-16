@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
@@ -25,7 +28,8 @@ namespace Sloth.Core.Models
         [NotMapped]
         public string CreatorName => Creator?.UserName;
 
-        public string Status { get; set; }
+        // Status updates must go through SetStatus to ensure StatusEvents are properly updated
+        public string Status { get; private set; }
 
         [JsonIgnore]
         [Required]
@@ -136,11 +140,49 @@ namespace Sloth.Core.Models
         [DisplayName("Kfs Scrubber Upload Job Record Id")]
         public string KfsScrubberUploadJobRecordId { get; set; }
 
+        public IList<TransactionStatusEvent> StatusEvents { get; set; }
+
         public void AddReversalTransaction(Transaction transaction)
         {
             // setup bidirectional relationship
             this.ReversalTransaction = transaction;
             transaction.ReversalOfTransaction = this;
+        }
+
+        public Transaction SetStatus(string status, [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            var previousStatusEvent = StatusEvents?
+                .Where(e => e.ValidToDate == null)
+                .OrderByDescending(e => e.ValidFromDate)
+                .FirstOrDefault();
+
+            var statusChangeDate = DateTime.UtcNow;
+
+            if (previousStatusEvent != null)
+                previousStatusEvent.ValidToDate = statusChangeDate;
+
+            StatusEvents ??= new List<TransactionStatusEvent>();
+
+            var statusChange = "";
+
+            if (StatusEvents.Count > 0)
+                statusChange = Status == status ? "Status not changed" : "Status changed";
+            else
+                statusChange = "Status assigned";
+
+            StatusEvents.Add(new TransactionStatusEvent
+            {
+                TransactionId = Id,
+                Status = status,
+                ValidFromDate = statusChangeDate,
+                EventDetails =
+                    $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}, ({statusChange})"
+            });
+
+            Status = status;
+
+            return this;
         }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
@@ -155,6 +197,12 @@ namespace Sloth.Core.Models
                 .HasOne(t => t.ReversalOfTransaction)
                 .WithOne()
                 .HasForeignKey<Transaction>(t => t.ReversalOfTransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transaction>()
+                .HasMany(t => t.StatusEvents)
+                .WithOne(e => e.Transaction)
+                .HasForeignKey(e => e.TransactionId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

@@ -82,8 +82,8 @@ namespace Sloth.Core.Jobs
                         // update transactions' status and jobRecord
                         groupedTransactions.ForEach(t =>
                         {
-                            t.Status = TransactionStatuses.Completed;
                             t.KfsScrubberUploadJobRecordId = jobRecord.Id;
+                            t.SetStatus(TransactionStatuses.Completed);
                         });
 
                         // save per scrubber
