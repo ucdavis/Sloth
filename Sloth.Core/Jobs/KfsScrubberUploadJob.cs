@@ -22,18 +22,18 @@ namespace Sloth.Core.Jobs
             _kfsScrubberService = kfsScrubberService;
         }
 
-        public async Task UploadScrubber(ILogger log)
+        public async Task UploadScrubber(ILogger log, KfsScrubberUploadJobRecord jobRecord)
         {
             try
             {
                 // fetch all staged transactions
-                var transactions = _context.Transactions
+                var transactions = await _context.Transactions
                     .Where(t => t.Status == TransactionStatuses.Scheduled)
                     .Include(t => t.Transfers)
                     .Include(t => t.Source)
                         .ThenInclude(s => s.Team)
                     .Include(t => t.ReversalOfTransaction)
-                    .ToList();
+                    .ToListAsync();
 
                 if (!transactions.Any())
                 {
@@ -72,13 +72,17 @@ namespace Sloth.Core.Jobs
                         var passwordKeyName = source.KfsFtpPasswordKeyName;
                         var uri = await _kfsScrubberService.UploadScrubber(scrubber, filename, username,
                             passwordKeyName, log);
-                        scrubber.Uri = uri.AbsoluteUri;
+                        scrubber.Uri = uri?.AbsoluteUri ?? "";
 
                         // persist scrubber uri
                         _context.Scrubbers.Add(scrubber);
 
-                        // update transactions' status
-                        groupedTransactions.ForEach(t => { t.Status = TransactionStatuses.Completed; });
+                        // update transactions' status and jobRecord
+                        groupedTransactions.ForEach(t =>
+                        {
+                            t.Status = TransactionStatuses.Completed;
+                            t.KfsScrubberUploadJobRecordId = jobRecord.Id;
+                        });
 
                         // save per scrubber
                         await _context.SaveChangesAsync();

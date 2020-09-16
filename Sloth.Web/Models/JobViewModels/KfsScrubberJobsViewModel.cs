@@ -7,7 +7,7 @@ namespace Sloth.Web.Models.JobViewModels
 {
     public class KfsScrubberJobsViewModel
     {
-        public List<KfsScrubberUploadJobRecord> Jobs { get; set; }
+        public List<KfsScrubberJobViewModel> Jobs { get; set; }
         
         public JobsFilterModel Filter { get; set; }
     }

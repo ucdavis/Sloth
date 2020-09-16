@@ -125,6 +125,12 @@ namespace Sloth.Web
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                     o.SerializerSettings.Converters.Add(new StringEnumConverter());
                 });
+
+#if DEBUG
+            // Enable recompiling views without restarting app
+            services.AddControllersWithViews()
+                .AddRazorRuntimeCompilation();
+#endif
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -155,6 +161,7 @@ namespace Sloth.Web
             }
 
             app.UseStaticFiles();
+            app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();

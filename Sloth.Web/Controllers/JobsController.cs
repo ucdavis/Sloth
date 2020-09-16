@@ -13,6 +13,7 @@ using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Web.Logging;
 using Sloth.Web.Models.JobViewModels;
+using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Services;
 
 namespace Sloth.Web.Controllers
@@ -52,8 +53,14 @@ namespace Sloth.Web.Controllers
             {
                 Filter = filter,
                 Jobs = await _dbContext.KfsScrubberUploadJobRecords
-                    .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc)
+                    .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc
+                                                  && (!filter.HasTransactions || r.Transactions.Count > 0))
                     .OrderBy(j => j.RanOn)
+                    .Select(r => new KfsScrubberJobViewModel
+                    {
+                        Job = r,
+                        TransactionCount = r.Transactions.Count
+                    })
                     .ToListAsync()
             };
 
@@ -64,7 +71,19 @@ namespace Sloth.Web.Controllers
         {
             var record = await _dbContext.KfsScrubberUploadJobRecords
                 .Include(r => r.Logs)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .Include(r => r.Transactions)
+                .ThenInclude(t => t.Transfers)
+                .Select(r => new KfsScrubberJobViewModel()
+                {
+                    Job = r,
+                    TransactionsTable = new TransactionsTableViewModel()
+                    {
+                        Transactions = r.Transactions,
+                        HasWebhooks = r.Transactions.Any(t => t.Source.Team.WebHooks.Any())
+                    },
+                    TransactionCount = r.Transactions.Count
+                })
+                .FirstOrDefaultAsync();
 
             return View(record);
         }
@@ -101,7 +120,7 @@ namespace Sloth.Web.Controllers
                 {
                     // schedule methods
                     log.Information("Starting Job");
-                    await kfsScrubberUploadJob.UploadScrubber(log);
+                    await kfsScrubberUploadJob.UploadScrubber(log, record);
                 }
                 finally
                 {
@@ -124,13 +143,14 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync(i => i.Id == integrationId);
 
             // log run
-            var record = new KfsScrubberUploadJobRecord()
+            var record = new CybersourceBankReconcileJobRecord()
             {
-                Name   = KfsScrubberUploadJob.JobName,
+                Name   = CybersourceBankReconcileJob.JobName,
                 RanOn  = DateTime.UtcNow,
                 Status = "Running",
+                ProcessedDate = date
             };
-            _dbContext.KfsScrubberUploadJobRecords.Add(record);
+            _dbContext.CybersourceBankReconcileJobRecords.Add(record);
             await _dbContext.SaveChangesAsync();
 
             // build custom logger
@@ -146,7 +166,7 @@ namespace Sloth.Web.Controllers
                 // schedule methods
                 log.Information("Starting Job");
 
-                await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, log);
+                await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, record, log);
             }
             finally
             {
@@ -155,7 +175,7 @@ namespace Sloth.Web.Controllers
                 await _dbContext.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(KfsScrubberUploadDetails), new { id = record.Id });
+            return RedirectToAction(nameof(CybersourceBankReconcileDetails), new { id = record.Id });
         }
 
         public async Task<IActionResult> CybersourceBankReconcile(JobsFilterModel filter = null)
@@ -175,10 +195,16 @@ namespace Sloth.Web.Controllers
                 Filter = filter,
                 Jobs = await _dbContext.CybersourceBankReconcileJobRecords
                     .Where(r =>
-                        (r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
+                        ((r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
                         || (r.RanOn > fromUtc && r.RanOn <= throughUtc))
+                        && (!filter.HasTransactions || r.Transactions.Count > 0))
                     .OrderBy(r => r.ProcessedDate)
                     .ThenBy(r => r.RanOn)
+                    .Select(r => new CybersourceBankReconcileJobViewModel
+                    {
+                        Job = r,
+                        TransactionCount = r.Transactions.Count
+                    })
                     .ToListAsync()
             };
 
@@ -187,11 +213,25 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> CybersourceBankReconcileDetails(string id)
         {
-            var record = await _dbContext.CybersourceBankReconcileJobRecords
+            var viewModel = await _dbContext.CybersourceBankReconcileJobRecords
+                .Where(r => r.Id == id)
                 .Include(r => r.Logs)
-                .FirstOrDefaultAsync(r => r.Id == id);
+                .Include(r => r.Transactions)
+                .ThenInclude(t => t.Transfers)
+                .AsNoTracking()
+                .Select(r => new CybersourceBankReconcileJobViewModel
+                {
+                    Job = r,
+                    TransactionsTable = new TransactionsTableViewModel()
+                    {
+                        Transactions = r.Transactions,
+                        HasWebhooks = r.Transactions.Any(t => t.Source.Team.WebHooks.Any())
+                    },
+                    TransactionCount = r.Transactions.Count
+                })
+                .FirstOrDefaultAsync();
 
-            return View(record);
+            return View(viewModel);
         }
 
         [HttpPost]
@@ -227,7 +267,7 @@ namespace Sloth.Web.Controllers
                 {
                     // call methods
                     log.Information("Starting Job");
-                    await cybersourceBankReconcileJob.ProcessReconcile(date, log);
+                    await cybersourceBankReconcileJob.ProcessReconcile(date, record, log);
                 }
                 finally
                 {

@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -18,9 +20,11 @@ namespace Sloth.Core.Services
 {
     public interface ICyberSourceBankReconcileService
     {
-        Task ProcessIntegration(Integration integration, DateTime date, ILogger log = null);
+        Task ProcessIntegration(Integration integration, DateTime date, CybersourceBankReconcileJobRecord jobRecord,
+            ILogger log = null);
 
-        Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date, ILogger log = null);
+        Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null);
     }
 
     public class CyberSourceBankReconcileService : ICyberSourceBankReconcileService
@@ -29,50 +33,22 @@ namespace Sloth.Core.Services
         private readonly ISecretsService _secretsService;
         private readonly IWebHookService _webHookService;
         private readonly CybersourceOptions _options;
+        private readonly IStorageService _storageService;
 
-        public CyberSourceBankReconcileService(SlothDbContext context, ISecretsService secretsService, IWebHookService webHookService, IOptions<CybersourceOptions> options)
+        public CyberSourceBankReconcileService(SlothDbContext context, ISecretsService secretsService,
+            IWebHookService webHookService, IOptions<CybersourceOptions> options, IStorageService storageService)
         {
             _context = context;
             _secretsService = secretsService;
             _webHookService = webHookService;
             _options = options.Value;
+            _storageService = storageService;
 
             // TODO validate options
         }
 
-        public async Task ProcessIntegration(Integration integration, DateTime date, ILogger log = null)
-        {
-            if (log == null)
-            {
-                log = Log.Logger;
-            }
-
-            log = log.ForContext("integration", integration.Id);
-            
-            // fetch password secret
-            var password = await _secretsService.GetSecret(integration.ReportPasswordKey);
-
-            // create client
-            var client = new ReportClient(_options.IsProduction, integration.MerchantId,
-                integration.ReportUsername,
-                password);
-
-            // fetch report
-            var report = await client.GetPaymentBatchDetailReport(date);
-
-            var count = report.Requests?.Length ?? 0;
-
-            log.Information("Report found with {count} records.", new { count });
-
-            if (count < 1)
-            {
-                return;
-            }
-
-            await ProcessReport(report, integration, log);
-        }
-
-        public async Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date, ILogger log = null)
+        public async Task ProcessIntegration(Integration integration, DateTime date,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null)
         {
             if (log == null)
             {
@@ -90,21 +66,55 @@ namespace Sloth.Core.Services
                 password);
 
             // fetch report
-            var report = await client.GetOneTimePaymentBatchDetailReport(reportName, date);
+            var (report, reportXml) = await client.GetPaymentBatchDetailReport(date);
 
             var count = report.Requests?.Length ?? 0;
 
-            log.Information("Report found with {count} records.", new { count });
+            log.Information("Report found with {count} records.", new {count});
 
             if (count < 1)
             {
                 return;
             }
 
-            await ProcessReport(report, integration, log);
+            await ProcessReport(report, reportXml, integration, jobRecord, log);
         }
 
-        private async Task ProcessReport(Report report, Integration integration, ILogger log)
+        public async Task ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null)
+        {
+            if (log == null)
+            {
+                log = Log.Logger;
+            }
+
+            log = log.ForContext("integration", integration.Id);
+
+            // fetch password secret
+            var password = await _secretsService.GetSecret(integration.ReportPasswordKey);
+
+            // create client
+            var client = new ReportClient(_options.IsProduction, integration.MerchantId,
+                integration.ReportUsername,
+                password);
+
+            // fetch report
+            var (report, reportXml) = await client.GetOneTimePaymentBatchDetailReport(reportName, date);
+
+            var count = report.Requests?.Length ?? 0;
+
+            log.Information("Report found with {count} records.", new {count});
+
+            if (count < 1)
+            {
+                return;
+            }
+
+            await ProcessReport(report, reportXml, integration, jobRecord, log);
+        }
+
+        private async Task ProcessReport(Report report, string reportXml, Integration integration,
+            CybersourceBankReconcileJobRecord jobRecord, ILogger log)
         {
             using (var tran = await _context.Database.BeginTransactionAsync())
             {
@@ -115,7 +125,8 @@ namespace Sloth.Core.Services
                     {
                         // look for existing transaction
                         var transaction =
-                            _context.Transactions.FirstOrDefault(t => t.ProcessorTrackingNumber == deposit.RequestID);
+                            await _context.Transactions.FirstOrDefaultAsync(t =>
+                                t.ProcessorTrackingNumber == deposit.RequestID);
                         if (transaction != null)
                         {
                             log.ForContext("tracking_number", deposit.MerchantReferenceNumber)
@@ -147,13 +158,14 @@ namespace Sloth.Core.Services
 
                         transaction = new Transaction()
                         {
-                            Source                  = integration.Source,
-                            Status                  = TransactionStatuses.Scheduled,
-                            DocumentNumber          = documentNumber,
-                            KfsTrackingNumber       = kfsTrackingNumber,
-                            MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
-                            ProcessorTrackingNumber = deposit.RequestID,
-                            TransactionDate         = deposit.LocalizedRequestDate,
+                            Source                              = integration.Source,
+                            Status                              = TransactionStatuses.Scheduled,
+                            DocumentNumber                      = documentNumber,
+                            KfsTrackingNumber                   = kfsTrackingNumber,
+                            MerchantTrackingNumber              = deposit.MerchantReferenceNumber,
+                            ProcessorTrackingNumber             = deposit.RequestID,
+                            TransactionDate                     = deposit.LocalizedRequestDate,
+                            CybersourceBankReconcileJobRecordId = jobRecord.Id
                         };
 
                         // move money out of clearing
@@ -217,6 +229,26 @@ namespace Sloth.Core.Services
                     log.Error(ex, ex.Message);
                     tran.Rollback();
                 }
+            }
+
+            try
+            {
+                // save copy to blob storage
+                var filename = $"{report.Name}.{report.OrganizationID}.{DateTime.UtcNow:yyyyMMddHHmmssffff}.xml";
+                log.ForContext("container", _options.ReportBlobContainer)
+                    .Information("Uploading {filename} to Blob Storage", filename);
+                await using var memoryStream = new MemoryStream();
+                await using var writer = new StreamWriter(memoryStream);
+                await writer.WriteAsync(reportXml);
+                await writer.FlushAsync();
+                memoryStream.Position = 0;
+                await _storageService.PutBlobAsync(memoryStream, _options.ReportBlobContainer, filename);
+                //TODO: store uri.AbsoluteUri;
+            }
+            catch (Exception ex)
+            {
+                log.ForContext("container", _options.ReportBlobContainer)
+                    .Error(ex, ex.Message);
             }
         }
     }

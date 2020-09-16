@@ -51,7 +51,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
                 var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
 
                 // call methods
-                uploadScrubberJob.UploadScrubber(_log).GetAwaiter().GetResult();
+                uploadScrubberJob.UploadScrubber(_log, jobRecord).GetAwaiter().GetResult();
             }
             finally
             {
