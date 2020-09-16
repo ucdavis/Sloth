@@ -1,11 +1,13 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;
+using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
@@ -76,6 +78,7 @@ namespace Sloth.Web.Controllers
             });
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpPost]
         public async Task<IActionResult> CreateUserFromDirectory(string query)
         {

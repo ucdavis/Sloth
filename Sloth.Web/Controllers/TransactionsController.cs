@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.TransactionViewModels;
+using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
+    [Authorize(Policy = PolicyCodes.TeamApprover)]
     public class TransactionsController : SuperController
     {
         private readonly IWebHookService WebHookService;
