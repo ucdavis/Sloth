@@ -161,14 +161,13 @@ namespace Sloth.Core.Services
                         transaction = new Transaction()
                         {
                             Source                              = integration.Source,
-                            Status                              = TransactionStatuses.Scheduled,
                             DocumentNumber                      = documentNumber,
                             KfsTrackingNumber                   = kfsTrackingNumber,
                             MerchantTrackingNumber              = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber             = deposit.RequestID,
                             TransactionDate                     = deposit.LocalizedRequestDate,
                             CybersourceBankReconcileJobRecordId = jobRecord.Id
-                        };
+                        }.SetStatus(TransactionStatuses.Scheduled);
 
                         // move money out of clearing
                         var clearing = new Transfer()

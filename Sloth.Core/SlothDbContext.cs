@@ -46,6 +46,8 @@ namespace Sloth.Core
 
         public DbSet<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
 
+        public DbSet<TransactionStatusEvent> TransactionStatusEvents { get; set; }
+
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
             const string sql = "SELECT NEXT VALUE FOR KFS_Tracking_Number_Seq AS KfsTrackingNumber";

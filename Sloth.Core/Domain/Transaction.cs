@@ -4,6 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
@@ -13,6 +16,7 @@ namespace Sloth.Core.Models
         public Transaction()
         {
             Transfers = new List<Transfer>();
+            StatusEvents = new List<TransactionStatusEvent>();
         }
 
         public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -25,7 +29,8 @@ namespace Sloth.Core.Models
         [NotMapped]
         public string CreatorName => Creator?.UserName;
 
-        public string Status { get; set; }
+        // Status updates must go through SetStatus to ensure StatusEvents are properly updated
+        public string Status { get; private set; }
 
         [JsonIgnore]
         [Required]
@@ -136,11 +141,30 @@ namespace Sloth.Core.Models
         [DisplayName("Kfs Scrubber Upload Job Record Id")]
         public string KfsScrubberUploadJobRecordId { get; set; }
 
+        public IList<TransactionStatusEvent> StatusEvents { get; set; }
+
         public void AddReversalTransaction(Transaction transaction)
         {
             // setup bidirectional relationship
             this.ReversalTransaction = transaction;
             transaction.ReversalOfTransaction = this;
+        }
+
+        public Transaction SetStatus(string status, [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            StatusEvents.Add(new TransactionStatusEvent
+            {
+                TransactionId = Id,
+                Status = status,
+                EventDate = DateTime.UtcNow,
+                EventDetails =
+                    $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}"
+            });
+
+            Status = status;
+
+            return this;
         }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
@@ -155,6 +179,12 @@ namespace Sloth.Core.Models
                 .HasOne(t => t.ReversalOfTransaction)
                 .WithOne()
                 .HasForeignKey<Transaction>(t => t.ReversalOfTransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transaction>()
+                .HasMany(t => t.StatusEvents)
+                .WithOne(e => e.Transaction)
+                .HasForeignKey(e => e.TransactionId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
