@@ -16,6 +16,7 @@ namespace Sloth.Core.Models
         public Transaction()
         {
             Transfers = new List<Transfer>();
+            StatusEvents = new List<TransactionStatusEvent>();
         }
 
         public string Id { get; set; } = Guid.NewGuid().ToString();
@@ -152,7 +153,7 @@ namespace Sloth.Core.Models
         public Transaction SetStatus(string status, [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
-            var previousStatusEvent = StatusEvents?
+            var previousStatusEvent = StatusEvents
                 .Where(e => e.ValidToDate == null)
                 .OrderByDescending(e => e.ValidFromDate)
                 .FirstOrDefault();
@@ -161,8 +162,6 @@ namespace Sloth.Core.Models
 
             if (previousStatusEvent != null)
                 previousStatusEvent.ValidToDate = statusChangeDate;
-
-            StatusEvents ??= new List<TransactionStatusEvent>();
 
             var statusChange = "";
 
