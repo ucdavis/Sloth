@@ -21,5 +21,3 @@ GO
 CREATE NONCLUSTERED INDEX [IX_TransactionStatusEvents_EventDate] ON [dbo].[TransactionStatusEvents] ([EventDate] ASC)
 
 GO
-
-CREATE NONCLUSTERED INDEX [IX_TransactionStatusEvents_EventDetails] ON [dbo].[TransactionStatusEvents] ([EventDetails] ASC)
