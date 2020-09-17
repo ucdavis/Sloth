@@ -3,8 +3,7 @@ CREATE TABLE [dbo].[TransactionStatusEvents]
     [Id] NVARCHAR(450) NOT NULL PRIMARY KEY, 
     [TransactionId] NVARCHAR(450) NOT NULL,
     [Status] NVARCHAR(50) NOT NULL, 
-    [ValidFromDate] DATETIME2 NOT NULL, 
-    [ValidToDate] DATETIME2 NULL, 
+    [EventDate] DATETIME2 NOT NULL, 
     [EventDetails] NVARCHAR(450) NOT NULL, 
     CONSTRAINT [FK_TransactionStatusEvents_Transactions] FOREIGN KEY ([TransactionId]) REFERENCES [Transactions]([Id])
 )
@@ -19,11 +18,7 @@ CREATE NONCLUSTERED INDEX [IX_TransactionStatusEvents_Status] ON [dbo].[Transact
 
 GO
 
-CREATE NONCLUSTERED INDEX [IX_TransactionStatusEvents_ValidFromDate] ON [dbo].[TransactionStatusEvents] ([ValidFromDate] ASC)
-
-GO
-
-CREATE NONCLUSTERED INDEX [IX_TransactionStatusEvents_ValidToDate] ON [dbo].[TransactionStatusEvents] ([ValidToDate] ASC)
+CREATE NONCLUSTERED INDEX [IX_TransactionStatusEvents_EventDate] ON [dbo].[TransactionStatusEvents] ([EventDate] ASC)
 
 GO
 

@@ -153,30 +153,13 @@ namespace Sloth.Core.Models
         public Transaction SetStatus(string status, [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
-            var previousStatusEvent = StatusEvents
-                .Where(e => e.ValidToDate == null)
-                .OrderByDescending(e => e.ValidFromDate)
-                .FirstOrDefault();
-
-            var statusChangeDate = DateTime.UtcNow;
-
-            if (previousStatusEvent != null)
-                previousStatusEvent.ValidToDate = statusChangeDate;
-
-            var statusChange = "";
-
-            if (StatusEvents.Count > 0)
-                statusChange = Status == status ? "Status not changed" : "Status changed";
-            else
-                statusChange = "Status assigned";
-
             StatusEvents.Add(new TransactionStatusEvent
             {
                 TransactionId = Id,
                 Status = status,
-                ValidFromDate = statusChangeDate,
+                EventDate = DateTime.UtcNow,
                 EventDetails =
-                    $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}, ({statusChange})"
+                    $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}"
             });
 
             Status = status;
