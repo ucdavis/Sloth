@@ -116,6 +116,7 @@ namespace Sloth.Web.Controllers
             // fetch transactions
             var transactions = await DbContext.Transactions
                 .Include(t => t.Transfers)
+                .Include(t => t.StatusEvents)
                 .Where(t => t.Source.Team.Slug == TeamSlug)
                 .Where(t => t.Status == TransactionStatuses.PendingApproval)
                 .ToListAsync();
@@ -149,6 +150,7 @@ namespace Sloth.Web.Controllers
             var transaction = await DbContext.Transactions
                 .Include(t => t.Scrubber)
                 .Include(t => t.Transfers)
+                .Include(t => t.StatusEvents)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             //TODO: return error messages and redirect

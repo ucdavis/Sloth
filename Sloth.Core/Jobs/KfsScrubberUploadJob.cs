@@ -33,6 +33,7 @@ namespace Sloth.Core.Jobs
                     .Include(t => t.Source)
                         .ThenInclude(s => s.Team)
                     .Include(t => t.ReversalOfTransaction)
+                    .Include(t => t.StatusEvents)
                     .ToListAsync();
 
                 if (!transactions.Any())
