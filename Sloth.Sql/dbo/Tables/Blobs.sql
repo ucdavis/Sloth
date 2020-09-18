@@ -6,7 +6,7 @@ CREATE TABLE [dbo].[Blobs]
     [Description] NVARCHAR(450) NOT NULL, 
     [Container] NVARCHAR(450) NOT NULL, 
     [MediaType] NVARCHAR(450) NOT NULL, 
-    [Uploaded] DATETIME2 NOT NULL
+    [UploadedDate] DATETIME2 NOT NULL
 )
 
 GO
@@ -15,7 +15,7 @@ CREATE INDEX [IX_Blobs_FileName] ON [dbo].[Blobs] ([FileName] ASC)
 
 GO
 
-CREATE INDEX [IX_Blobs_Uploaded] ON [dbo].[Blobs] ([Uploaded] ASC)
+CREATE INDEX [IX_Blobs_UploadedDate] ON [dbo].[Blobs] ([UploadedDate] ASC)
 
 GO
 
