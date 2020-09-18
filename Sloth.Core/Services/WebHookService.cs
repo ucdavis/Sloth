@@ -6,8 +6,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog;
+using Sloth.Core.Configuration;
 using Sloth.Core.Models;
 using Sloth.Core.Models.WebHooks;
 
@@ -25,10 +27,12 @@ namespace Sloth.Core.Services
     public class WebHookService : IWebHookService
     {
         private readonly SlothDbContext _dbContext;
+        private readonly WebHookServiceOptions _options;
 
-        public WebHookService(SlothDbContext dbContext)
+        public WebHookService(SlothDbContext dbContext, IOptions<WebHookServiceOptions> options)
         {
             _dbContext = dbContext;
+            _options = options.Value;
         }
 
         public async Task SendWebHooksForTeam(Team team, WebHookPayload payload)
@@ -36,7 +40,7 @@ namespace Sloth.Core.Services
             // fetch webhooks for this team and ship the payload
             var hooks = await _dbContext.WebHooks.Where(w => w.Team.Id == team.Id).ToListAsync();
 
-            var millisecondsDelay = 1000;
+            var retryDelay = _options.RetryDelaySeconds * 1000;
 
             foreach (var hook in hooks)
             {
@@ -50,8 +54,8 @@ namespace Sloth.Core.Services
                     // SendWebHook on all hooks to ensure requests are persisted.
 
                     // apply increasing delay after each failed call
-                    await Task.Delay(millisecondsDelay);
-                    millisecondsDelay = Math.Max(millisecondsDelay * 2, 32_000);
+                    await Task.Delay(retryDelay);
+                    retryDelay = Math.Max(retryDelay * 2, _options.MaxRetryDelaySeconds * 1000);
                 }
             }
         }
@@ -84,7 +88,7 @@ namespace Sloth.Core.Services
                 .Include(r => r.WebHook)
                 .ToListAsync();
 
-            var millisecondsDelay = 1000;
+            var retryDelay = _options.RetryDelaySeconds * 1000;
 
             foreach (var webHookRequest in pendingRequests)
             {
@@ -98,8 +102,8 @@ namespace Sloth.Core.Services
                     // SendWebHook on all hooks to ensure requests are persisted.
 
                     // apply increasing delay after each failed call
-                    await Task.Delay(millisecondsDelay);
-                    millisecondsDelay = Math.Max(millisecondsDelay * 2, 32_000);
+                    await Task.Delay(retryDelay);
+                    retryDelay = Math.Max(retryDelay * 2, _options.MaxRetryDelaySeconds * 1000);
                 }
             }
         }

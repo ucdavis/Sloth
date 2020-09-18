@@ -77,6 +77,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<CybersourceOptions>(Configuration.GetSection("Cybersource"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
+            services.Configure<WebHookServiceOptions>(Configuration.GetSection("WebHooks"));
 
             // db service
             services.AddDbContext<SlothDbContext>(options =>
