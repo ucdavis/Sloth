@@ -17,15 +17,15 @@ namespace Sloth.Core.Models
         public string Payload { get; set; }
 
         [DisplayName("Response Status")]
-        public int ResponseStatus { get; set; }
+        public int? ResponseStatus { get; set; }
 
         [DisplayName("Response Body")]
         public string ResponseBody { get; set; }
 
         [DisplayName("Request Count")]
-        public int RequestCount { get; set; }
+        public int? RequestCount { get; set; }
 
         [DisplayName("Last Request Date")]
-        public DateTime LastRequestDate { get; set; }
+        public DateTime? LastRequestDate { get; set; }
     }
 }

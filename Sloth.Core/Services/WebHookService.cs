@@ -19,7 +19,7 @@ namespace Sloth.Core.Services
 
         Task<HttpResponseMessage> SendWebHook(WebHook webHook, WebHookPayload webHookPayload, bool persist);
 
-        Task ResendFailedWebHooks();
+        Task ResendPendingWebHookRequests();
     }
 
     public class WebHookService : IWebHookService
@@ -74,9 +74,41 @@ namespace Sloth.Core.Services
             _dbContext.WebHookRequests.Add(webHookRequest);
             await _dbContext.SaveChangesAsync();
 
+            return await SendPersistentWebHookRequest(webHook, webHookRequest);
+        }
+
+        public async Task ResendPendingWebHookRequests()
+        {
+            var pendingRequests = await _dbContext.WebHookRequests
+                .Where(r => r.ResponseStatus != 200)
+                .Include(r => r.WebHook)
+                .ToListAsync();
+
+            var millisecondsDelay = 1000;
+
+            foreach (var webHookRequest in pendingRequests)
+            {
+                try
+                {
+                    await SendPersistentWebHookRequest(webHookRequest.WebHook, webHookRequest);
+                }
+                catch (Exception)
+                {
+                    // Okay to swallow exception since it has already been logged.  Also important to call
+                    // SendWebHook on all hooks to ensure requests are persisted.
+
+                    // apply increasing delay after each failed call
+                    await Task.Delay(millisecondsDelay);
+                    millisecondsDelay = Math.Max(millisecondsDelay * 2, 32_000);
+                }
+            }
+        }
+
+        private async Task<HttpResponseMessage> SendPersistentWebHookRequest(WebHook webHook, WebHookRequest webHookRequest)
+        {
             try
             {
-                var httpResponse = await SendHttpRequest(webHook, payloadData);
+                var httpResponse = await SendHttpRequest(webHook, webHookRequest.Payload);
 
                 webHookRequest.ResponseStatus = (int) httpResponse.StatusCode;
                 webHookRequest.ResponseBody = await httpResponse.Content.ReadAsStringAsync();
@@ -87,7 +119,7 @@ namespace Sloth.Core.Services
             {
                 const string errorMessage = "An error occurred while calling WebHook";
 
-                webHookRequest.ResponseStatus = (int)HttpStatusCode.InternalServerError;
+                webHookRequest.ResponseStatus = (int) HttpStatusCode.InternalServerError;
                 webHookRequest.ResponseBody = errorMessage;
 
                 Log.ForContext("webhook", webHook, true)
@@ -100,11 +132,6 @@ namespace Sloth.Core.Services
             {
                 await _dbContext.SaveChangesAsync();
             }
-        }
-
-        public Task ResendFailedWebHooks()
-        {
-            throw new NotImplementedException();
         }
 
         private async Task<HttpResponseMessage> SendHttpRequest(WebHook webHook, string payloadData)
