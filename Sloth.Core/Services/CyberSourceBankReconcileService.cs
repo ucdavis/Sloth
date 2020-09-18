@@ -205,7 +205,7 @@ namespace Sloth.Core.Services
                         // push webhook for this reconcile
                         try
                         {
-                            await _webHookService.SendBankReconcileWebHook(integration.Team,
+                            await _webHookService.SendWebHooksForTeam(integration.Team,
                                 new BankReconcileWebHookPayload()
                                 {
                                     KfsTrackingNumber       = kfsTrackingNumber,

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Core.Models.WebHooks;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.WebHookViewModels;
@@ -112,7 +113,7 @@ namespace Sloth.Web.Controllers
 
         [HttpPost]
         [IgnoreAntiforgeryToken]
-        public async Task<IActionResult> SendTest(string id)
+        public async Task<IActionResult> SendTest(string id, [FromQuery] bool? persist)
         {
             var webhook = await DbContext.WebHooks.FirstOrDefaultAsync(i => i.Id == id);
             if (webhook == null)
@@ -120,7 +121,13 @@ namespace Sloth.Web.Controllers
                 return NotFound();
             }
 
-            var result = await _webHookService.TestWebHook(webhook);
+            var payload = new TestWebHookPayload()
+            {
+                HookId = webhook.Id,
+            };
+
+
+            var result = await _webHookService.SendWebHook(webhook, payload, persist ?? false);
 
             // ship result
             return new JsonResult(new

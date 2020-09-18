@@ -48,6 +48,8 @@ namespace Sloth.Core
 
         public DbSet<TransactionStatusEvent> TransactionStatusEvents { get; set; }
 
+        public DbSet<WebHookRequest> WebHookRequests { get; set; }
+
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
             const string sql = "SELECT NEXT VALUE FOR KFS_Tracking_Number_Seq AS KfsTrackingNumber";
@@ -140,6 +142,7 @@ namespace Sloth.Core
             CybersourceBankReconcileJobRecord.OnModelCreating(modelBuilder);
             KfsScrubberUploadJobRecord.OnModelCreating(modelBuilder);
             Blob.OnModelCreating(modelBuilder);
+            WebHook.OnModelCreating(modelBuilder);
         }
     }
 }

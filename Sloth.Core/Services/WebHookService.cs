@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,9 +15,11 @@ namespace Sloth.Core.Services
 {
     public interface IWebHookService
     {
-        Task SendBankReconcileWebHook(Team team, BankReconcileWebHookPayload payload);
+        Task SendWebHooksForTeam(Team team, WebHookPayload payload);
 
-        Task<HttpResponseMessage> TestWebHook(WebHook webHook);
+        Task<HttpResponseMessage> SendWebHook(WebHook webHook, WebHookPayload webHookPayload, bool persist);
+
+        Task ResendFailedWebHooks();
     }
 
     public class WebHookService : IWebHookService
@@ -28,43 +31,96 @@ namespace Sloth.Core.Services
             _dbContext = dbContext;
         }
 
-        public async Task SendBankReconcileWebHook(Team team, BankReconcileWebHookPayload payload)
+        public async Task SendWebHooksForTeam(Team team, WebHookPayload payload)
         {
             // fetch webhooks for this team and ship the payload
             var hooks = await _dbContext.WebHooks.Where(w => w.Team.Id == team.Id).ToListAsync();
 
+            var millisecondsDelay = 1000;
+
             foreach (var hook in hooks)
             {
-                await SendWebHookPayload(hook, payload);
+                try
+                {
+                    await SendWebHook(hook, payload, true);
+                }
+                catch (Exception)
+                {
+                    // Okay to swallow exception since it has already been logged.  Also important to call
+                    // SendWebHook on all hooks to ensure requests are persisted.
+
+                    // apply increasing delay after each failed call
+                    await Task.Delay(millisecondsDelay);
+                    millisecondsDelay = Math.Max(millisecondsDelay * 2, 32_000);
+                }
             }
         }
 
-        public Task<HttpResponseMessage> TestWebHook(WebHook webHook)
+        public async Task<HttpResponseMessage> SendWebHook(WebHook webHook, WebHookPayload payload, bool persist)
         {
-            var payload = new TestWebHookPayload()
+            var payloadData = JsonConvert.SerializeObject(payload);
+
+            if (!persist)
+                return await SendHttpRequest(webHook, payloadData);
+
+            var webHookRequest = new WebHookRequest
             {
-                HookId = webHook.Id,
+                WebHookId = webHook.Id,
+                LastRequestDate = DateTime.UtcNow,
+                Payload = payloadData,
+                RequestCount = 1
             };
-            return SendWebHookPayload(webHook, payload);
+
+            _dbContext.WebHookRequests.Add(webHookRequest);
+            await _dbContext.SaveChangesAsync();
+
+            try
+            {
+                var httpResponse = await SendHttpRequest(webHook, payloadData);
+
+                webHookRequest.ResponseStatus = (int) httpResponse.StatusCode;
+                webHookRequest.ResponseBody = await httpResponse.Content.ReadAsStringAsync();
+
+                return httpResponse;
+            }
+            catch (Exception ex)
+            {
+                const string errorMessage = "An error occurred while calling WebHook";
+
+                webHookRequest.ResponseStatus = (int)HttpStatusCode.InternalServerError;
+                webHookRequest.ResponseBody = errorMessage;
+
+                Log.ForContext("webhook", webHook, true)
+                    .ForContext("request", webHookRequest, true)
+                    .Error(ex, errorMessage);
+
+                throw;
+            }
+            finally
+            {
+                await _dbContext.SaveChangesAsync();
+            }
         }
 
-        private async Task<HttpResponseMessage> SendWebHookPayload(WebHook webHook, WebHookPayload payload)
+        public Task ResendFailedWebHooks()
         {
-            using (var client = new HttpClient())
-            {
-                var data = JsonConvert.SerializeObject(payload);
+            throw new NotImplementedException();
+        }
 
-                var body = new StringContent(data, Encoding.UTF8, "application/json");
+        private async Task<HttpResponseMessage> SendHttpRequest(WebHook webHook, string payloadData)
+        {
+            using var client = new HttpClient();
 
-                var response = await client.PostAsync(webHook.Url, body);
+            var body = new StringContent(payloadData, Encoding.UTF8, "application/json");
 
-                // log response
-                Log.ForContext("webhook", webHook, true)
-                    .ForContext("response", response, true)
-                    .Information("Sent webhook");
+            var response = await client.PostAsync(webHook.Url, body);
 
-                return response;
-            }
+            // log response
+            Log.ForContext("webhook", webHook, true)
+                .ForContext("response", response, true)
+                .Information("Sent webhook");
+
+            return response;
         }
     }
 }

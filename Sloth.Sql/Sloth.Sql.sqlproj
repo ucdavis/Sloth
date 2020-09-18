@@ -95,5 +95,6 @@
     <Build Include="dbo\Tables\TransactionStatusEvents.sql" />
     <Build Include="dbo\Tables\Blobs.sql" />
     <Build Include="dbo\Tables\CybersourceBankReconcileJobBlobs.sql" />
+    <Build Include="dbo\Tables\WebHookRequests.sql" />
   </ItemGroup>
 </Project>

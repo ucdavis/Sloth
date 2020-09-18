@@ -272,7 +272,7 @@ namespace Sloth.Web.Controllers
                 return NotFound();
             }
 
-            await WebHookService.SendBankReconcileWebHook(transaction.Source.Team, new BankReconcileWebHookPayload()
+            await WebHookService.SendWebHooksForTeam(transaction.Source.Team, new BankReconcileWebHookPayload()
             {
                 KfsTrackingNumber = transaction.KfsTrackingNumber,
                 MerchantTrackingNumber = transaction.MerchantTrackingNumber,
