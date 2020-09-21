@@ -27,5 +27,11 @@ namespace Sloth.Core.Models
 
         [DisplayName("Last Request Date")]
         public DateTime? LastRequestDate { get; set; }
+
+        public bool Persist { get; set; }
+
+        public WebHookRequestResendJobRecord WebHookRequestResendJob { get; set; }
+
+        public string WebHookRequestResendJobId { get; set; }
     }
 }

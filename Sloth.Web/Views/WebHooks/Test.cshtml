@@ -31,7 +31,7 @@
                 .done(function(result) {
                     console.log(result);
 
-                    $('#resultStatusCode').val(result.statusCode);
+                    $('#resultStatusCode').val(result.responseStatus);
                     $('#resultResponse code').text(result.response);
 
                     if (result.response.startsWith('{')) {

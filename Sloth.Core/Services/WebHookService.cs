@@ -17,11 +17,11 @@ namespace Sloth.Core.Services
 {
     public interface IWebHookService
     {
-        Task SendWebHooksForTeam(Team team, WebHookPayload payload);
+        Task<List<WebHookRequest>> SendWebHooksForTeam(Team team, WebHookPayload payload, bool persist = true);
 
-        Task<HttpResponseMessage> SendWebHook(WebHook webHook, WebHookPayload webHookPayload, bool persist);
+        Task<WebHookRequest> SendWebHook(WebHook webHook, WebHookPayload webHookPayload, bool persist = true);
 
-        Task ResendPendingWebHookRequests();
+        Task<List<WebHookRequest>> ResendPendingWebHookRequests();
     }
 
     public class WebHookService : IWebHookService
@@ -35,18 +35,21 @@ namespace Sloth.Core.Services
             _options = options.Value;
         }
 
-        public async Task SendWebHooksForTeam(Team team, WebHookPayload payload)
+        public async Task<List<WebHookRequest>> SendWebHooksForTeam(Team team, WebHookPayload payload, bool persist = true)
         {
             // fetch webhooks for this team and ship the payload
             var hooks = await _dbContext.WebHooks.Where(w => w.Team.Id == team.Id).ToListAsync();
 
             var retryDelay = _options.RetryDelaySeconds * 1000;
 
+            var requests = new List<WebHookRequest>();
+
             foreach (var hook in hooks)
             {
                 try
                 {
-                    await SendWebHook(hook, payload, true);
+                    var request = await SendWebHook(hook, payload, persist);
+                    requests.Add(request);
                 }
                 catch (Exception)
                 {
@@ -58,33 +61,35 @@ namespace Sloth.Core.Services
                     retryDelay = Math.Max(retryDelay * 2, _options.MaxRetryDelaySeconds * 1000);
                 }
             }
+
+            return requests;
         }
 
-        public async Task<HttpResponseMessage> SendWebHook(WebHook webHook, WebHookPayload payload, bool persist)
+        public async Task<WebHookRequest> SendWebHook(WebHook webHook, WebHookPayload payload, bool persist = true)
         {
             var payloadData = JsonConvert.SerializeObject(payload);
-
-            if (!persist)
-                return await SendHttpRequest(webHook, payloadData);
 
             var webHookRequest = new WebHookRequest
             {
                 WebHookId = webHook.Id,
                 LastRequestDate = DateTime.UtcNow,
                 Payload = payloadData,
-                RequestCount = 1
+                RequestCount = 0,
+                Persist = persist
             };
 
             _dbContext.WebHookRequests.Add(webHookRequest);
             await _dbContext.SaveChangesAsync();
 
-            return await SendPersistentWebHookRequest(webHook, webHookRequest);
+            await SendWebHookRequest(webHook, webHookRequest);
+
+            return webHookRequest;
         }
 
-        public async Task ResendPendingWebHookRequests()
+        public async Task<List<WebHookRequest>> ResendPendingWebHookRequests()
         {
             var pendingRequests = await _dbContext.WebHookRequests
-                .Where(r => r.ResponseStatus != 200)
+                .Where(r => r.ResponseStatus != 200 && r.Persist)
                 .Include(r => r.WebHook)
                 .ToListAsync();
 
@@ -94,7 +99,7 @@ namespace Sloth.Core.Services
             {
                 try
                 {
-                    await SendPersistentWebHookRequest(webHookRequest.WebHook, webHookRequest);
+                    await SendWebHookRequest(webHookRequest.WebHook, webHookRequest);
                 }
                 catch (Exception)
                 {
@@ -106,18 +111,29 @@ namespace Sloth.Core.Services
                     retryDelay = Math.Max(retryDelay * 2, _options.MaxRetryDelaySeconds * 1000);
                 }
             }
+
+            return pendingRequests;
         }
 
-        private async Task<HttpResponseMessage> SendPersistentWebHookRequest(WebHook webHook, WebHookRequest webHookRequest)
+        private async Task SendWebHookRequest(WebHook webHook, WebHookRequest webHookRequest)
         {
             try
             {
-                var httpResponse = await SendHttpRequest(webHook, webHookRequest.Payload);
+                webHookRequest.RequestCount = (webHookRequest.RequestCount ?? 0) + 1;
+
+                using var client = new HttpClient();
+
+                var body = new StringContent(webHookRequest.Payload, Encoding.UTF8, "application/json");
+
+                var httpResponse = await client.PostAsync(webHook.Url, body);
+
+                // log response
+                Log.ForContext("webhook", webHook, true)
+                    .ForContext("response", httpResponse, true)
+                    .Information("Sent webhook");
 
                 webHookRequest.ResponseStatus = (int) httpResponse.StatusCode;
                 webHookRequest.ResponseBody = await httpResponse.Content.ReadAsStringAsync();
-
-                return httpResponse;
             }
             catch (Exception ex)
             {
@@ -136,22 +152,6 @@ namespace Sloth.Core.Services
             {
                 await _dbContext.SaveChangesAsync();
             }
-        }
-
-        private async Task<HttpResponseMessage> SendHttpRequest(WebHook webHook, string payloadData)
-        {
-            using var client = new HttpClient();
-
-            var body = new StringContent(payloadData, Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync(webHook.Url, body);
-
-            // log response
-            Log.ForContext("webhook", webHook, true)
-                .ForContext("response", response, true)
-                .Information("Sent webhook");
-
-            return response;
         }
     }
 }

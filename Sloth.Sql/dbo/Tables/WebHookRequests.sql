@@ -7,7 +7,10 @@ CREATE TABLE [dbo].[WebHookRequests]
     [ResponseBody] NVARCHAR(MAX) NULL, 
     [RequestCount] INT NULL, 
     [LastRequestDate] DATETIME2 NULL, 
-    CONSTRAINT [FK_WebHookRequests_WebHooks_WebHookId] FOREIGN KEY ([WebHookId]) REFERENCES [WebHooks]([Id])
+    [Persist] BIT NOT NULL DEFAULT 1, 
+    [WebHookRequestResendJobId] NVARCHAR(450) NULL, 
+    CONSTRAINT [FK_WebHookRequests_WebHooks_WebHookId] FOREIGN KEY ([WebHookId]) REFERENCES [WebHooks]([Id]), 
+    CONSTRAINT [FK_WebHookRequests_WebHookRequestResendJobRecords_WebHookRequestResendJobId] FOREIGN KEY ([WebHookRequestResendJobId]) REFERENCES [WebHookRequestResendJobRecords]([Id])
 )
 
 GO
@@ -21,3 +24,7 @@ CREATE INDEX [IX_WebHookRequests_ResponseStatus] ON [dbo].[WebHookRequests] ([Re
 GO
 
 CREATE INDEX [IX_WebHookRequests_LastRequestDate] ON [dbo].[WebHookRequests] ([LastRequestDate])
+
+GO
+
+CREATE INDEX [IX_WebHookRequests_WebHookRequestResendJobId] ON [dbo].[WebHookRequests] ([WebHookRequestResendJobId])

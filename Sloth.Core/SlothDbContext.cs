@@ -50,6 +50,8 @@ namespace Sloth.Core
 
         public DbSet<WebHookRequest> WebHookRequests { get; set; }
 
+        public DbSet<WebHookRequestResendJobRecord> WebHookRequestResendJobRecords { get; set; }
+
         public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
             const string sql = "SELECT NEXT VALUE FOR KFS_Tracking_Number_Seq AS KfsTrackingNumber";

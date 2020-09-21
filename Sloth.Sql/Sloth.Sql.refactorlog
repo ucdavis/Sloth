@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="308f06b7-cff4-4f47-83e1-8115c872b388" ChangeDateTime="09/21/2020 18:41:39">
+    <Property Name="ElementName" Value="[dbo].[WebHookRequests].[WebHooksResendJobId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[WebHookRequests]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="WebHookRequestResendJobId" />
+  </Operation>
+</Operations>

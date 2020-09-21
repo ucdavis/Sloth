@@ -132,8 +132,8 @@ namespace Sloth.Web.Controllers
             // ship result
             return new JsonResult(new
             {
-                result.StatusCode,
-                Response = await result.Content.ReadAsStringAsync(),
+                result.ResponseStatus,
+                Response = result.ResponseBody,
             });
         }
     }

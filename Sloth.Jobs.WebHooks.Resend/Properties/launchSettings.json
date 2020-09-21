@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Sloth.Jobs.WebHooks.Resend": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

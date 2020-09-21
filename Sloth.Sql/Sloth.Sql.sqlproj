@@ -96,5 +96,9 @@
     <Build Include="dbo\Tables\Blobs.sql" />
     <Build Include="dbo\Tables\CybersourceBankReconcileJobBlobs.sql" />
     <Build Include="dbo\Tables\WebHookRequests.sql" />
+    <Build Include="dbo\Tables\WebHookRequestResendJobRecords.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="Sloth.Sql.refactorlog" />
   </ItemGroup>
 </Project>
