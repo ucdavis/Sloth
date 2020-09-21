@@ -133,7 +133,7 @@ namespace Sloth.Core.Services
 
                 using var client = new HttpClient();
 
-                var body = new StringContent(webHookRequest.Payload, Encoding.UTF8, "application/json");
+                using var body = new StringContent(webHookRequest.Payload, Encoding.UTF8, "application/json");
 
                 var httpResponse = await client.PostAsync(webHook.Url, body);
 
