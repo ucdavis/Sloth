@@ -38,7 +38,7 @@ namespace Sloth.Core.Services
         public async Task<List<WebHookRequest>> SendWebHooksForTeam(Team team, WebHookPayload payload, bool persist = true)
         {
             // fetch webhooks for this team and ship the payload
-            var hooks = await _dbContext.WebHooks.Where(w => w.Team.Id == team.Id).ToListAsync();
+            var hooks = await _dbContext.WebHooks.Where(w => w.Team.Id == team.Id && w.IsActive).ToListAsync();
 
             var retryDelay = _options.RetryDelaySeconds * 1000;
 
@@ -78,6 +78,16 @@ namespace Sloth.Core.Services
                 Persist = persist
             };
 
+            if (!webHook.IsActive)
+            {
+                webHookRequest.ResponseStatus = (int) HttpStatusCode.BadRequest;
+                webHookRequest.ResponseBody = "Requested WebHook is not enabled";
+
+                _dbContext.WebHookRequests.Add(webHookRequest);
+                await _dbContext.SaveChangesAsync();
+                return webHookRequest;
+            }
+
             _dbContext.WebHookRequests.Add(webHookRequest);
             await _dbContext.SaveChangesAsync();
 
@@ -89,7 +99,7 @@ namespace Sloth.Core.Services
         public async Task<List<WebHookRequest>> ResendPendingWebHookRequests()
         {
             var pendingRequests = await _dbContext.WebHookRequests
-                .Where(r => r.ResponseStatus != 200 && r.Persist)
+                .Where(r => r.ResponseStatus != 200 && r.Persist && r.WebHook.IsActive)
                 .Include(r => r.WebHook)
                 .ToListAsync();
 
