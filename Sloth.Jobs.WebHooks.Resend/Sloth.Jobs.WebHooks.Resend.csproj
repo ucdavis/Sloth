@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Sloth.Core\Sloth.Core.csproj" />
-    <ProjectReference Include="..\Sloth.Integrations.Cybersource\Sloth.Integrations.Cybersource.csproj" />
     <ProjectReference Include="..\Sloth.Jobs.Core\Sloth.Jobs.Core.csproj" />
   </ItemGroup>
 

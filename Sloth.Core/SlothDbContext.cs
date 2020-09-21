@@ -145,6 +145,7 @@ namespace Sloth.Core
             KfsScrubberUploadJobRecord.OnModelCreating(modelBuilder);
             Blob.OnModelCreating(modelBuilder);
             WebHook.OnModelCreating(modelBuilder);
+            WebHookRequestResendJobRecord.OnModelCreating(modelBuilder);
         }
     }
 }

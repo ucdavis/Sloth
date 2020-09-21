@@ -70,7 +70,6 @@ namespace Sloth.Jobs.WebHooks.Resend
             IServiceCollection services = new ServiceCollection();
 
             // options files
-            services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<WebHookServiceOptions>(Configuration.GetSection("WebHooks"));
 
             // db service
