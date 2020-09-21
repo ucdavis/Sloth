@@ -95,6 +95,15 @@ steps:
     projects: './sloth.jobs.kfs.scrubberupload/sloth.jobs.kfs.scrubberupload.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
 
+- task: DotNetCoreCLI@2
+  displayName: 'Assemble Sloth.Jobs.WebHooks.Resend w/ Web'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    zipAfterPublish: false
+    projects: './sloth.jobs.webhooks.resend/sloth.jobs.webhooks.resend.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifacts'
   inputs:
