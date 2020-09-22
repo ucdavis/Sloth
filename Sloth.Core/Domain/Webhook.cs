@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
@@ -20,5 +22,16 @@ namespace Sloth.Core.Models
         public string Url { get; set; }
 
         public string ContentType { get; set; }
+
+        public IList<WebHookRequest> WebHookrequests { get; set; }
+
+        public static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<WebHook>()
+                .HasMany(w => w.WebHookrequests)
+                .WithOne(r => r.WebHook)
+                .HasForeignKey(r => r.WebHookId)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
     }
 }

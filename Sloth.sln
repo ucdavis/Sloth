@@ -32,6 +32,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.Kfs.ScrubberUplo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.Core", "Sloth.Jobs.Core\Sloth.Jobs.Core.csproj", "{60693A8F-3E5C-4879-B159-3A46D4B25482}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.WebHooks.Resend", "Sloth.Jobs.WebHooks.Resend\Sloth.Jobs.WebHooks.Resend.csproj", "{8B2DE509-F577-457B-A1CD-9E2C122455DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -76,6 +78,10 @@ Global
 		{60693A8F-3E5C-4879-B159-3A46D4B25482}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60693A8F-3E5C-4879-B159-3A46D4B25482}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{60693A8F-3E5C-4879-B159-3A46D4B25482}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B2DE509-F577-457B-A1CD-9E2C122455DD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B2DE509-F577-457B-A1CD-9E2C122455DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B2DE509-F577-457B-A1CD-9E2C122455DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B2DE509-F577-457B-A1CD-9E2C122455DD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,6 +90,7 @@ Global
 		{609AE699-4CF5-46EF-A7C5-52F0290DCDDE} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 		{1BA6F247-5BC5-4031-BFE8-0C4F3739C358} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 		{60693A8F-3E5C-4879-B159-3A46D4B25482} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
+		{8B2DE509-F577-457B-A1CD-9E2C122455DD} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {24A52AFC-C6F1-46E3-B01C-59D9D1977B9F}

@@ -69,6 +69,7 @@ namespace Sloth.Web
             services.Configure<IamDirectorySearchServiceOptions>(Configuration.GetSection("IAM"));
             services.Configure<KfsScrubberOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
+            services.Configure<WebHookServiceOptions>(Configuration.GetSection("WebHooks"));
 
 
             // add infrastructure services
