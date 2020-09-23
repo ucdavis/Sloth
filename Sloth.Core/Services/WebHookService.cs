@@ -99,7 +99,10 @@ namespace Sloth.Core.Services
         public async Task<List<WebHookRequest>> ResendPendingWebHookRequests()
         {
             var pendingRequests = await _dbContext.WebHookRequests
-                .Where(r => r.ResponseStatus != 200 && r.Persist && r.WebHook.IsActive)
+                .Where(r => r.ResponseStatus != 200
+                            && r.Persist
+                            && r.WebHook.IsActive
+                            && r.LastRequestDate < DateTime.UtcNow.AddMinutes(-_options.MinFetchAgeMinutes))
                 .Include(r => r.WebHook)
                 .ToListAsync();
 
@@ -130,6 +133,7 @@ namespace Sloth.Core.Services
             try
             {
                 webHookRequest.RequestCount = (webHookRequest.RequestCount ?? 0) + 1;
+                webHookRequest.LastRequestDate = DateTime.UtcNow;
 
                 using var client = new HttpClient();
 
