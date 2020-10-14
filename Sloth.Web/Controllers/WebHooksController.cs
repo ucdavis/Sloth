@@ -50,6 +50,7 @@ namespace Sloth.Web.Controllers
             var target = new WebHook
             {
                 Url         = model.Url,
+                IsActive    = model.IsActive,
                 ContentType = model.ContentType,
                 Team        = team,
             };
