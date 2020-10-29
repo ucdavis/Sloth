@@ -195,6 +195,7 @@
                     <th></th>
                     <th>Active</th>
                     <th>Test</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -210,14 +211,17 @@
                         <td>
                             <a asp-controller="WebHooks" asp-action="Test" asp-route-id="@w.Id">Test</a>
                         </td>
+                        <td>
+                            <a asp-controller="WebHooks" asp-action="Edit" asp-route-id="@w.Id" class="btn btn-primary btn-sm">
+                                Edit
+                            </a>
+                        </td>
                     </tr>
                 }
                 </tbody>
             </table>
-
         </div>
     </div>
-
 
     <div id="add-user-modal" class="modal fade">
         <div class="modal-dialog" role="document">

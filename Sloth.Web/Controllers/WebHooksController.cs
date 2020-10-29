@@ -23,7 +23,7 @@ namespace Sloth.Web.Controllers
             : base(userManager, dbContext)
         {
             _webHookService = webHookService;
-        } 
+        }
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -50,6 +50,7 @@ namespace Sloth.Web.Controllers
             var target = new WebHook
             {
                 Url         = model.Url,
+                IsActive    = model.IsActive,
                 ContentType = model.ContentType,
                 Team        = team,
             };
@@ -68,6 +69,7 @@ namespace Sloth.Web.Controllers
             var model = new EditWebHookViewModel()
             {
                 Url = webhook.Url,
+                IsActive = webhook.IsActive,
             };
 
             return View(model);
@@ -93,6 +95,7 @@ namespace Sloth.Web.Controllers
             // update webhook
             webhook.ContentType = model.ContentType;
             webhook.Url = model.Url;
+            webhook.IsActive = model.IsActive;
 
             await DbContext.SaveChangesAsync();
 
