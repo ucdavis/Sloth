@@ -99,6 +99,7 @@ namespace Sloth.Web
                         }
                     }
                 })
+                .UseSerilog()
                 .UseStartup<Startup>()
                 .Build();
     }

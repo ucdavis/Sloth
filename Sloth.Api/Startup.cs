@@ -156,9 +156,9 @@ namespace Sloth.Api
 
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
+            app.UseSerilogRequestLogging();
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<ApiKeyMiddleware>();
-            app.UseMiddleware<LoggingIdentityMiddleware>();
 
             if (env.IsDevelopment())
             {
@@ -169,6 +169,7 @@ namespace Sloth.Api
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseMiddleware<LoggingIdentityMiddleware>();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.UseCors(CorsPolicyAllowAnyOrgin);
 

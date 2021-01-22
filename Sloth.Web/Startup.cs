@@ -148,8 +148,8 @@ namespace Sloth.Web
 
             appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
+            app.UseSerilogRequestLogging();
             app.UseMiddleware<CorrelationIdMiddleware>();
-            app.UseMiddleware<LoggingIdentityMiddleware>();
 
             if (env.IsDevelopment())
             {
@@ -165,6 +165,7 @@ namespace Sloth.Web
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
+            app.UseMiddleware<LoggingIdentityMiddleware>();
             app.UseAuthorization();
 
             app.UseEndpoints(routes =>
