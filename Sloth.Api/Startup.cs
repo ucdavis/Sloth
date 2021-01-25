@@ -29,12 +29,12 @@ namespace Sloth.Api
     {
         private readonly string CorsPolicyAllowAnyOrgin = "CorsPolicyAllowAnyOrgin";
 
-        public Startup(IConfigurationRoot configuration)
+        public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -131,14 +131,9 @@ namespace Sloth.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(
-            IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IHostApplicationLifetime appLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.ConfigureStackifyLogging(Configuration);
-
-            appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
             app.UseSerilogRequestLogging();
             app.UseMiddleware<CorrelationIdMiddleware>();

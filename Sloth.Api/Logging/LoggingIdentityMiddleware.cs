@@ -24,7 +24,8 @@ namespace Sloth.Api.Logging
             var claim = context.User.Identities.SelectMany(i => i.Claims)
                 .Where(c => c.Value != null)
                 .Select(c => c.Value)
-                .FirstOrDefault();
+                .FirstOrDefault()
+                ?? "Unknown"; // execution shouldn't get this far, since it would be blocked by Authorization middleware
 
             using (_logger.BeginScope(new Dictionary<string, object>()
             {

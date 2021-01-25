@@ -2,6 +2,7 @@ using System;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Serilog;
 using Sloth.Api.Logging;
 
@@ -30,14 +31,29 @@ namespace Sloth.Api
 
             LoggingConfiguration.Setup(configuration);
 
-            var host = BuildWebHost(args);
-            host.Run();
+            var host = CreateHostBuilder(args).Build();
+
+            try
+            {
+                Log.Information("Starting up");
+                host.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application start-up failed");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
                 .UseSerilog()
-                .UseStartup<Startup>()
-                .Build();
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }

@@ -123,14 +123,9 @@ namespace Sloth.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(
-            IApplicationBuilder app,
-            IWebHostEnvironment env,
-            IHostApplicationLifetime appLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             app.ConfigureStackifyLogging(Configuration);
-
-            appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
 
             app.UseSerilogRequestLogging();
             app.UseMiddleware<CorrelationIdMiddleware>();
