@@ -1,7 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Logging;
 
 namespace Sloth.Api.Logging
@@ -19,11 +21,15 @@ namespace Sloth.Api.Logging
 
         public async Task Invoke(HttpContext context)
         {
-            var user = context.User.Identity.Name;
+            var claim = context.User.Identities.SelectMany(i => i.Claims)
+                .Where(c => c.Value != null)
+                .Select(c => c.Value)
+                .FirstOrDefault()
+                ?? "Unknown"; // execution shouldn't get this far, since it would be blocked by Authorization middleware
 
             using (_logger.BeginScope(new Dictionary<string, object>()
             {
-                { "User", user }
+                { "User", $"Api-{claim}" }
             }))
             {
                 await _next(context);

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
+using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.MSSqlServer;
 using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
 using StackifyLib;
@@ -41,15 +42,32 @@ namespace Sloth.Web.Logging
         {
             if (_configuration == null) throw new InvalidOperationException("Call Setup() before requesting a Logger Configuration"); ;
 
+            var loggingSection = _configuration.GetSection("Stackify");
+
             // standard logger
             var logConfig = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                // .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning) // uncomment this to hide EF core general info logs
+                .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                 .Enrich.FromLogContext()
                 .Enrich.WithExceptionDetails()
+                .Enrich.WithProperty("Application", loggingSection.GetValue<string>("AppName"))
+                .Enrich.WithProperty("AppEnvironment", loggingSection.GetValue<string>("Environment"))
                 .Enrich.WithProperty("Source", "Sloth.Web");
 
             // various sinks
             logConfig = logConfig
+                .WriteTo.Console()
                 .WriteToStackifyCustom();
+
+            // add in elastic search sink if the uri is valid
+            if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out var elasticUri))
+            {
+                logConfig = logConfig.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
+                {
+                    IndexFormat = "aspnet-sloth-{0:yyyy.MM.dd}"
+                });
+            }
 
             return logConfig;
         }

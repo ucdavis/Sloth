@@ -29,24 +29,12 @@ namespace Sloth.Api
     {
         private readonly string CorsPolicyAllowAnyOrgin = "CorsPolicyAllowAnyOrgin";
 
-        public Startup(IWebHostEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            if (env.IsDevelopment())
-            {
-                // For more details on using the user secret store see https://go.microsoft.com/fwlink/?LinkID=532709
-                builder.AddUserSecrets<Startup>();
-            }
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -143,22 +131,13 @@ namespace Sloth.Api
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(
-            IApplicationBuilder app,
-            IWebHostEnvironment env,
-            ILoggerFactory loggerFactory,
-            IHostApplicationLifetime appLifetime)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // setup logging
-            LoggingConfiguration.Setup(Configuration);
             app.ConfigureStackifyLogging(Configuration);
-            loggerFactory.AddSerilog();
 
-            appLifetime.ApplicationStopped.Register(Log.CloseAndFlush);
-
+            app.UseSerilogRequestLogging();
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<ApiKeyMiddleware>();
-            app.UseMiddleware<LoggingIdentityMiddleware>();
 
             if (env.IsDevelopment())
             {
@@ -169,6 +148,7 @@ namespace Sloth.Api
             app.UseRouting();
 
             app.UseAuthorization();
+            app.UseMiddleware<LoggingIdentityMiddleware>();
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
             app.UseCors(CorsPolicyAllowAnyOrgin);
 

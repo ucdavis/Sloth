@@ -8,9 +8,14 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Serilog;
+using Serilog.Events;
+using Serilog.Exceptions;
+using Serilog.Sinks.Elasticsearch;
 using Sloth.Core;
 using Sloth.Core.Data;
 using Sloth.Core.Models;
+using Sloth.Web.Logging;
 using Sloth.Web.Models;
 
 namespace Sloth.Web
@@ -19,7 +24,26 @@ namespace Sloth.Web
     {
         public static void Main(string[] args)
         {
-            var host = BuildWebHost(args);
+            var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            var isDevelopment = string.Equals(environment, "development", StringComparison.OrdinalIgnoreCase);
+
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(System.IO.Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{environment}.json", optional: true)
+                .AddEnvironmentVariables();
+
+            //only add secrets in development or when debugging locally in Production mode...
+            if (isDevelopment || string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_LOAD_SECRETS"), "True", StringComparison.OrdinalIgnoreCase))
+            {
+                builder.AddUserSecrets<Program>();
+            }
+
+            var configuration = builder.Build();
+
+            LoggingConfiguration.Setup(configuration);
+
+            var host = CreateHostBuilder(args).Build();
 
             using (var scope = host.Services.CreateScope())
             {
@@ -37,27 +61,27 @@ namespace Sloth.Web
                 Task.Run(() => dbInitializer.Initialize()).Wait();
             }
 
-            host.Run();
+            try
+            {
+                Log.Information("Starting up");
+                host.Run();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application start-up failed");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostContext, config) =>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .UseSerilog()
+                .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    // Extend default builder to allow loading user secrets when debugging locally in Production mode
-                    var env = hostContext.HostingEnvironment;
-
-                    if (!env.IsDevelopment() && string.Equals(Environment.GetEnvironmentVariable("ASPNETCORE_LOAD_SECRETS"), "True", StringComparison.OrdinalIgnoreCase))
-                    {
-                        var appAssembly = Assembly.Load(new AssemblyName(env.ApplicationName));
-
-                        if (appAssembly != null)
-                        {
-                            config.AddUserSecrets(appAssembly, optional: true);
-                        }
-                    }
-                })
-                .UseStartup<Startup>()
-                .Build();
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
