@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Models.WebHooks;
@@ -195,7 +196,10 @@ namespace Sloth.Web.Controllers
                 return BadRequest("Cannot reverse transaction again");
             }
 
+            await using var tran = await DbContext.Database.BeginTransactionAsync();
             var user = await UserManager.GetUserAsync(User);
+
+            var documentNumber = await DbContext.GetNextDocumentNumber(tran.GetDbTransaction());
 
             // create new transaction
             var reversal = new Transaction
@@ -203,6 +207,7 @@ namespace Sloth.Web.Controllers
                 Source                  = transaction.Source,
                 Creator                 = user,
                 TransactionDate         = DateTime.UtcNow,
+                DocumentNumber          = documentNumber,
                 KfsTrackingNumber       = transaction.KfsTrackingNumber,
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
                 MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
@@ -243,6 +248,8 @@ namespace Sloth.Web.Controllers
             // save relationship
             transaction.AddReversalTransaction(reversal);
             await DbContext.SaveChangesAsync();
+
+            await tran.CommitAsync();
 
             return RedirectToAction("Details", new { id = reversal.Id });
         }
