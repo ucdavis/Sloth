@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
 using Sloth.Core.Models;
+using Sloth.Core.Utilities;
 using Sloth.Xml;
 
 namespace Sloth.Core.Extensions
@@ -12,7 +13,7 @@ namespace Sloth.Core.Extensions
     {
         public static string ToXml(this Scrubber scrubber)
         {
-            var sw = new StringWriter();
+            var sw = new StringWriterWithEncoding(Encoding.UTF8);
             ToXml(scrubber, sw);
             return sw.ToString();
         }

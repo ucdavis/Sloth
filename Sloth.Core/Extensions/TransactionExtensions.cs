@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Sloth.Core.Models;
+using Sloth.Core.Utilities;
 
 namespace Sloth.Core.Extensions
 {
@@ -9,7 +11,7 @@ namespace Sloth.Core.Extensions
     {
         public static string ToXml(this Transaction transaction)
         {
-            var sw = new StringWriter();
+            var sw = new StringWriterWithEncoding(Encoding.UTF8);
             ToXml(transaction, sw);
             return sw.ToString();
         }
