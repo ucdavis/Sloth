@@ -21,6 +21,7 @@ namespace Sloth.Core.Services
         private readonly ISecretsService _secretsService;
 
         private readonly string _host;
+        private readonly int _port;
         private readonly string _storageContainer;
 
         public KfsScrubberService(IOptions<KfsScrubberOptions> options, IStorageService storageService, ISecretsService secretsService)
@@ -29,6 +30,7 @@ namespace Sloth.Core.Services
             _secretsService = secretsService;
 
             _host = options.Value.Host;
+            _port = int.Parse(options.Value.Port);
             _storageContainer = options.Value.ScrubberBlobContainer;
         }
 
@@ -76,7 +78,7 @@ namespace Sloth.Core.Services
         private async Task<SftpClient> GetClient(string username, string passwordKeyName)
         {
             var key = await GetPrivateKey(passwordKeyName);
-            return new SftpClient(_host, 22, username, key);
+            return new SftpClient(_host, _port, username, key);
         }
 
         private async Task<PrivateKeyFile> GetPrivateKey(string passwordKeyName)
@@ -90,6 +92,7 @@ namespace Sloth.Core.Services
     public class KfsScrubberOptions
     {
         public string Host { get; set; }
+        public string Port { get; set; }
         public string ScrubberBlobContainer { get; set; }
     }
 }
