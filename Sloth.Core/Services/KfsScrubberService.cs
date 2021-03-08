@@ -48,23 +48,6 @@ namespace Sloth.Core.Services
             await sw.FlushAsync();
             await ms.FlushAsync();
 
-            Blob blob = null;
-
-            try
-            {
-                // save copy of file online
-                logger.ForContext("container", _storageContainer)
-                    .Information("Uploading {filename} to Blob Storage", filename);
-                ms.Seek(0, SeekOrigin.Begin);
-                blob = await _storageService.PutBlobAsync(ms, _storageContainer, filename, "Kfs Scrubber",
-                    MediaTypeNames.Application.Xml);
-            }
-            catch (Exception ex)
-            {
-                logger.ForContext("container", _storageContainer)
-                    .Error(ex, ex.Message);
-            }
-
             // upload scrubber
             var ftplogger = logger
                 .ForContext("ftphost", _host)
@@ -85,6 +68,23 @@ namespace Sloth.Core.Services
             {
                 ftplogger.Error(ex, $"Failed to upload scrubber to KFS ftp server: {ex.Message}");
                 throw;
+            }
+
+            Blob blob = null;
+
+            try
+            {
+                // save copy of file online
+                logger.ForContext("container", _storageContainer)
+                    .Information("Uploading {filename} to Blob Storage", filename);
+                ms.Seek(0, SeekOrigin.Begin);
+                blob = await _storageService.PutBlobAsync(ms, _storageContainer, filename, "Kfs Scrubber",
+                    MediaTypeNames.Application.Xml);
+            }
+            catch (Exception ex)
+            {
+                logger.ForContext("container", _storageContainer)
+                    .Error(ex, ex.Message);
             }
 
             return blob;
