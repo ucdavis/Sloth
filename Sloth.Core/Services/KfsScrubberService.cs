@@ -66,11 +66,26 @@ namespace Sloth.Core.Services
             }
 
             // upload scrubber
-            using var client = await GetClient(username, passwordKeyName);
-            client.Connect();
+            var ftplogger = logger
+                .ForContext("ftphost", _host)
+                .ForContext("ftpport", _port)
+                .ForContext("ftpusername", username);
 
-            ms.Seek(0, SeekOrigin.Begin);
-            await Task.Factory.FromAsync(client.BeginUploadFile(ms, filename), client.EndUploadFile);
+            try
+            {
+                ftplogger.Information("Connecting to KFS ftp server");
+                using var client = await GetClient(username, passwordKeyName);
+                client.Connect();
+
+                ftplogger.Information("Uploading scrubber to KFS ftp server");
+                ms.Seek(0, SeekOrigin.Begin);
+                await Task.Factory.FromAsync(client.BeginUploadFile(ms, filename), client.EndUploadFile);
+            }
+            catch (Exception ex)
+            {
+                ftplogger.Error(ex, $"Failed to upload scrubber to KFS ftp server: {ex.Message}");
+                throw;
+            }
 
             return blob;
         }
