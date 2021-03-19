@@ -138,11 +138,11 @@ namespace Sloth.Api.Controllers
             // validate amounts
             var creditTotal = transaction.Transfers
                 .Where(t => t.Direction == Transfer.CreditDebit.Credit)
-                .Sum(t => Math.Round(t.Amount));
+                .Sum(t => Math.Round(t.Amount, 2));
 
             var debitTotal = transaction.Transfers
                 .Where(t => t.Direction == Transfer.CreditDebit.Debit)
-                .Sum(t => Math.Round(t.Amount));
+                .Sum(t => Math.Round(t.Amount, 2));
 
             if (creditTotal != debitTotal)
             {
