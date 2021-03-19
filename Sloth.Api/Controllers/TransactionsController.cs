@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -136,6 +137,19 @@ namespace Sloth.Api.Controllers
             }
 
             // validate amounts
+            var badDecimalAmounts = transaction.Transfers
+                .Where(t => t.Amount != Math.Round(t.Amount, 2))
+                .Select(t => t.Amount.ToString(CultureInfo.InvariantCulture)).ToArray();
+
+            if (badDecimalAmounts.Any())
+            {
+                return new BadRequestObjectResult(new
+                {
+                    Message = "Credit/Debit amount(s) with more than two decimal places",
+                    Amounts = string.Join(", ", badDecimalAmounts)
+                });
+            }
+
             var creditTotal = transaction.Transfers
                 .Where(t => t.Direction == Transfer.CreditDebit.Credit)
                 .Sum(t => t.Amount);
