@@ -54,9 +54,9 @@ namespace Sloth.Core.Data
                 {
                     new User()
                     {
-                        UserName = "jpknoll",
-                        Email = "jpknoll@ucdavis.edu",
-                        FullName = "John Knoll",
+                        UserName = "jsylvest",
+                        Email = "jsylvestre@ucdavis.edu",
+                        FullName = "Jason Sylvestre",
                     },
                 };
 
