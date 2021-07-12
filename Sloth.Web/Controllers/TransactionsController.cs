@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Sloth.Core;
+using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Models.WebHooks;
 using Sloth.Core.Resources;
@@ -229,8 +230,8 @@ namespace Sloth.Web.Controllers
                     Chart          = transfer.Chart,
                     Description    = transfer.Description,
                     Direction      = direction,
-                    FiscalPeriod   = transfer.FiscalPeriod,
-                    FiscalYear     = transfer.FiscalYear,
+                    FiscalPeriod   = DateTime.UtcNow.GetFiscalPeriod(),
+                    FiscalYear     = DateTime.UtcNow.GetFinancialYear(),
                     ObjectCode     = transfer.ObjectCode,
                     ObjectType     = transfer.ObjectType,
                     Project        = transfer.Project,

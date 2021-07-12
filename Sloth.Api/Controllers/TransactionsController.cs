@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Sloth.Api.Helpers;
 using Sloth.Api.Models;
 using Sloth.Core;
+using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
