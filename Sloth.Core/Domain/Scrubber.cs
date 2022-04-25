@@ -42,6 +42,33 @@ namespace Sloth.Core.Models
 
         public Blob Blob { get; set; }
 
+        public string RequestStatus { get;set;} = string.Empty; //AE status 
+        /*
+PENDING
+
+Request has been submitted to the server, but not validated or processed.
+INPROCESS
+
+Request has been picked up for processing
+ERROR
+
+There was an error processing the request after it was picked up.
+PROCESSED
+
+Request has been processed, but the callback has not been completed.
+COMPLETE
+
+If Callback URL Provided: Request has been processed, and the callback was successfully contacted. Or, request has been processed, and no callback URL was provided.
+STALE
+
+If Callback URL Provided: Request has been processed, but repeated attempts to contact the callback have failed and no more will be tried.
+REJECTED
+
+There was a validation error in the request payload data.
+         */
+        public DateTime? LastStatusDateTime { get; set; }
+        public DateTime? ProcessedDateTime { get; set;}
+        public string ErrorMessages { get; set; } = string.Empty;
 
     }
 }
