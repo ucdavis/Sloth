@@ -217,12 +217,11 @@ namespace Sloth.Core.Models
         public string ReferenceId { get; set; }
 
         #region Helpers
-
         // Example: "3110-12100-0100322-410030-00-000-AR06603901-000000-0000-000000-000000"
         public string FullAeglSegment()
         {
             //Last 3 fields GL_INTER_ENTITY Flex1 and Flex2. Not being used.
-            return $"{AeEntity}-{AeFund}-{AeDepartment}-{AeAccount}-{AePurpose}-{AeProject}-{AeProgram}-{AeActivity}-0000-000000-000000";
+            return $"{AeEntity}-{AeFund}-{AeDepartment}-{AeAccount}-{AePurpose}-{AeProgram}-{AeProject}-{AeActivity}-0000-000000-000000";
         }
 
         /// <summary>
