@@ -12,6 +12,10 @@ namespace Sloth.Core.Models
             AeProgram = "000";
             AeActivity = "000000";
         }
+        public Transfer(string glString)
+        {
+            GlSegmentFromString(glString);
+        }
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [JsonIgnore]
@@ -240,7 +244,7 @@ namespace Sloth.Core.Models
         /// </summary>
         /// <param name="glSegment"></param>
         /// <returns></returns>
-        public bool QlSegmentFromString(string glSegment)
+        public bool GlSegmentFromString(string glSegment)
         {
             if (string.IsNullOrWhiteSpace(glSegment))
             {
