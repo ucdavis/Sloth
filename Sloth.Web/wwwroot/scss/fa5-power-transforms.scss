@@ -1,5 +1,7 @@
+@use "sass:math";
+
 $base-width: 1.25em;
-$base-width-half: $base-width / 2;
+$base-width-half: $base-width * 0.5;
 
 /*
  * BACKGROUND COLORS
@@ -72,25 +74,25 @@ $bg-nav-pills-active-color: #337ab7;
 	 */
     @for $i from 1 through 8 {
         & [data-fa-transform*='up-#{$i}'] {
-            top: -($i / 8 * 50%);
+            top: -($i * 0.125 * 50%);
         }
     }
 
     @for $i from 1 through 8 {
         & [data-fa-transform*='down-#{$i}'] {
-            top: ($i / 8 * 50%);
+            top: ($i * 0.125 * 50%);
         }
     }
 
     @for $i from 1 through 8 {
         & [data-fa-transform*='right-#{$i}'] {
-            left: ($i / 8 * 50%);
+            left: ($i * 0.125 * 50%);
         }
     }
 
     @for $i from 1 through 8 {
         & [data-fa-transform*='left-#{$i}'] {
-            left: -($i / 8 * 50%);
+            left: -($i * 0.125 * 50%);
         }
     }
 }
@@ -130,7 +132,7 @@ $bg-nav-pills-active-color: #337ab7;
 	 */
     @for $i from 1 through 16 {
         &[data-fa-transform*='shrink-#{$i}'] {
-            font-size: 1em - $i / 16;
+            font-size: 1em - math.div($i, 16);
         }
     }
     /*
@@ -138,7 +140,7 @@ $bg-nav-pills-active-color: #337ab7;
 	 */
     @for $i from 1 through 16 {
         &[data-fa-transform*='grow-#{$i}'] {
-            font-size: 1em + $i / 16;
+            font-size: 1em + math.div($i, 16);
         }
     }
     /*
