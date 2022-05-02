@@ -18,6 +18,86 @@ namespace Sloth.Core.Models
         [Required]
         public decimal Amount { get; set; }
 
+
+        /// <summary>
+        /// Required: Entity to which to charge a transaction.
+        /// ErpEntityCode
+        /// All values are exactly 4 characters matching the regex pattern: [0-9]{3}[0-9AB]
+        /// </summary>
+        [MaxLength(4)]
+        [RegularExpression("[0-9]{3}[0-9AB]")]
+        //[Required] We can't really have this as required if it is a POET instead of GL
+        public string AeEntity { get; set; }
+
+        /// <summary>
+        /// Required: Funding source to which to charge a transaction.
+        /// ErpFundCode
+        /// All values are exactly 5 characters matching the regex pattern: [0-9A-Z][0-9]{3}[0-9A-Z]
+        /// </summary>
+        //[Required] We can't really have this as required if it is a POET instead of GL
+        [MaxLength(5)]
+        [RegularExpression("[0-9A-Z][0-9]{3}[0-9A-Z]")]
+        public string AeFund { get; set; }
+
+        /// <summary>
+        /// Required: Financial department to which to charge a transaction.
+        /// ErpDepartmentCode
+        /// All values are exactly 7 characters matching the regex pattern: [0-9P][0-9]{5}[0-9A-F]
+        /// </summary>
+        //[Required] We can't really have this as required if it is a POET instead of GL
+        [MaxLength(7)]
+        [RegularExpression("[0-9P][0-9]{5}[0-9A-F]")]
+        public string AeDepartment { get; set; }
+
+        /// <summary>
+        /// Required: Nature of the transaction, expense, income, liability, etc...
+        /// ErpAccountCode
+        /// All values are exactly 6 characters matching the regex pattern: [0-9]{5}[0-9A-EX]
+        /// </summary>
+        //[Required] We can't really have this as required if it is a POET instead of GL
+        [MaxLength(6)]
+        [RegularExpression("[0-9]{5}[0-9A-EX]")]
+        public string AeAccount { get; set; }
+
+        /// <summary>
+        /// Required for Expenses: Functional purpose of the expense.
+        /// ErpPurposeCode
+        /// All values are exactly 2 characters matching the regex pattern: [0-9][0-9A-Z]
+        /// </summary>
+        //[Required] We can't really have this as required if it is a POET instead of GL
+        [MaxLength(2)]
+        [RegularExpression("[0-9][0-9A-Z]")]
+        public string AePurpose { get; set; }
+
+        /// <summary>
+        /// Optional:
+        /// ErpProjectCode
+        /// All values are exactly 10 characters matching the regex pattern: [0-9A-Z]{10}
+        /// </summary>
+        [MaxLength(10)]
+        [RegularExpression("[0-9A-Z]{10}")]
+        public string AeProject { get; set; }
+
+        /// <summary>
+        /// Optional
+        /// ErpProgramCode
+        /// All values are exactly 3 characters matching the regex pattern: [0-9A-Z]{3}
+        /// </summary>
+        [MaxLength(3)]
+        [RegularExpression("[0-9A-Z]{3}")]
+        public string AeProgram { get; set; }
+
+        /// <summary>
+        /// Optional
+        /// ErpActivityCode
+        /// All values are exactly 6 characters matching the regex pattern: [0-9X]{5}[0-9AB]
+        /// </summary>
+        [MaxLength(6)]
+        [RegularExpression("[0-9X]{5}[0-9AB]")]
+        public string AeActivity { get; set; }
+
+        //AeFlex1 and AeFlex2 : Unused: For future UCOP Reporting Requirements. Always 000000
+
         /// <summary>
         /// Chart Code associated with transaction.
         /// </summary>
