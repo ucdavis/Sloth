@@ -219,10 +219,50 @@ namespace Sloth.Core.Models
         #region Helpers
 
         // Example: "3110-12100-0100322-410030-00-000-AR06603901-000000-0000-000000-000000"
-        public string FullAeQlSegment()
+        public string FullAeglSegment()
         {
-            //Last 2 fields are Flex1 and Flex2. Not being used.
-            return $"{AeEntity}-{AeFund}-{AeDepartment}-{AeAccount}-{AePurpose}-{AeProject}-{AeProgram}-{AeActivity}-000000-000000";
+            //Last 3 fields GL_INTER_ENTITY Flex1 and Flex2. Not being used.
+            return $"{AeEntity}-{AeFund}-{AeDepartment}-{AeAccount}-{AePurpose}-{AeProject}-{AeProgram}-{AeActivity}-0000-000000-000000";
+        }
+
+        /// <summary>
+        /// `const GL_SEGMENT_STRING_REGEX = new RegExp(^
+        /// ${GL_ENTITY_REGEX.source}-
+        /// ${GL_FUND_REGEX.source}-
+        /// ${GL_FIN_DEPT_REGEX.source}-
+        /// ${GL_ACCOUNT_REGEX.source}-
+        /// ${GL_PURPOSE_REGEX.source}-
+        /// ${GL_PROGRAM_REGEX.source}-
+        /// ${GL_PROJECT_REGEX.source}-
+        /// ${GL_ACTIVITY_REGEX.source}-
+        /// ${GL_INTER_ENTITY_REGEX.source}-
+        /// ${GL_FLEX1_REGEX.source}-
+        /// ${GL_FLEX2_REGEX.source}$);`
+        /// </summary>
+        /// <param name="glSegment"></param>
+        /// <returns></returns>
+        public bool QlSegmentFromString(string glSegment)
+        {
+            if (string.IsNullOrWhiteSpace(glSegment))
+            {
+                return false;
+            }
+            var fields = glSegment.Split("-");
+            if(fields.Length != 11)
+            {
+                return false;
+            }
+            AeEntity = fields[0];
+            AeFund = fields[1];
+            AeDepartment = fields[2];
+            AeAccount = fields[3];
+            AePurpose = fields[4];
+            AeProgram = fields[5];
+            AeProject = fields[6];            
+            AeActivity = fields[7];
+
+
+            return true;
         }
 
         public string FullAccountToString()
