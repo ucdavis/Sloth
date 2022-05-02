@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace Sloth.Core.Models
@@ -15,6 +16,7 @@ namespace Sloth.Core.Models
         /// Dollar amount associated with the transaction
         /// </summary>
         [Range(typeof(decimal), "0.01", "1000000000")]
+        [Column(TypeName = "decimal(18,2)")]
         [Required]
         public decimal Amount { get; set; }
 
