@@ -6,6 +6,12 @@ namespace Sloth.Core.Models
 {
     public class Transfer
     {
+        public Transfer()
+        {
+            AeProject = "00";
+            AeProgram = "000";
+            AeActivity = "000000";
+        }
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
         [JsonIgnore]
@@ -211,6 +217,14 @@ namespace Sloth.Core.Models
         public string ReferenceId { get; set; }
 
         #region Helpers
+
+        // Example: "3110-12100-0100322-410030-00-000-AR06603901-000000-0000-000000-000000"
+        public string FullAeQlSegment()
+        {
+            //Last 2 fields are Flex1 and Flex2. Not being used.
+            return $"{AeEntity}-{AeFund}-{AeDepartment}-{AeAccount}-{AePurpose}-{AeProject}-{AeProgram}-{AeActivity}-000000-000000";
+        }
+
         public string FullAccountToString()
         {
             var result = Chart + "-" + Account;
