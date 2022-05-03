@@ -14,6 +14,7 @@ namespace Sloth.Test.Api
             await using var app = new SlothApi();
 
             await TestHelper.InitializeCommonDatabase(app);
+
             var client = TestHelper.GetAuthenticatedSlothApiClient(app);
 
             var response = await client.GetAsync("/v1/transactions");
