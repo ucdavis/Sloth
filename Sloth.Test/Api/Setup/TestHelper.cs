@@ -32,10 +32,4 @@ public static class TestHelper
         dbTestInit.CreateTestSources();
         dbTestInit.CreateTestTransactions();
     }
-
-    public static SlothDbContext GetDbContext(SlothApi app)
-    {
-        using var scope = app.Services.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<SlothDbContext>();
-    }
 }
