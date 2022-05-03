@@ -53,7 +53,7 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveUserFromRole(string userId, string role)
         {
-            Log.Warning($"System Admin removed: user: {userId} role: {role}");
+            
             if(role != Roles.SystemAdmin)
             {
                 return BadRequest();
@@ -68,6 +68,8 @@ namespace Sloth.Web.Controllers
 
             // Remove from role
             await _userManager.RemoveFromRoleAsync(user, role);
+
+            Log.Warning($"System Admin removed: user: {userId} role: {role}");
 
             return RedirectToAction(nameof(Index));
         }
