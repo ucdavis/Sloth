@@ -14,7 +14,7 @@ public class SlothApi : WebApplicationFactory<Sloth.Api.Startup>
 {
     protected override IHost CreateHost(IHostBuilder builder)
     {
-        // TODO: change to SQLite https://docs.microsoft.com/en-us/ef/core/testing/testing-without-the-database#sqlite-in-memory
+        // Can't use SQlite because it doesn't support sequences
         var root = new InMemoryDatabaseRoot();
 
         var projectDir = Directory.GetCurrentDirectory();
