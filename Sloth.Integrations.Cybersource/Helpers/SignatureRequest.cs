@@ -36,6 +36,7 @@ namespace Sloth.Integrations.Cybersource.Helpers
 
         private string GetHttpSignRequestTarget()
         {
+            // TODO: EscapeUriString is obsolete -- need to determine format of TargetUri and try to use that directly instead
             return Method.ToString().ToLower() + " " + Uri.EscapeUriString(TargetUri.PathAndQuery);
         }
 
