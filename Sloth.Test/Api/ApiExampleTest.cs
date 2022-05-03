@@ -23,8 +23,7 @@ namespace Sloth.Test.Api
             var txns = JsonConvert.DeserializeObject<List<Transaction>>(await response.Content.ReadAsStringAsync());
 
             // should return our single txn with 2 transfers
-            //Assert.Single(txns);
-            //Assert.Equal(2, txns[0].Transfers.Count);
+            txns.ShouldNotBeNull();
             txns.Count.ShouldBe(1);
             txns[0].Transfers.Count.ShouldBe(2);
         }
@@ -42,8 +41,6 @@ namespace Sloth.Test.Api
             var txn = JsonConvert.DeserializeObject<Transaction>(await response.Content.ReadAsStringAsync());
 
             // should return our single txn with 2 transfers
-            //Assert.Equal(DbTestData.ProcessorTrackingNumber, txn.ProcessorTrackingNumber);
-            //Assert.Equal(2, txn.Transfers.Count);
             txn.ProcessorTrackingNumber.ShouldBe(DbTestData.ProcessorTrackingNumber);
             txn.Transfers.Count.ShouldBe(2);
         }
