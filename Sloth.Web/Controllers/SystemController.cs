@@ -54,9 +54,17 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> RemoveUserFromRole(string userId, string role)
         {
             Log.Warning($"System Admin removed: user: {userId} role: {role}");
+            if(role != Roles.SystemAdmin)
+            {
+                return BadRequest();
+            }
             // find user
             var user = await _dbContext.Users
                 .FirstOrDefaultAsync(u => u.UserName == userId);
+            if(user == null)
+            {
+                return NotFound();
+            }
 
             // Remove from role
             await _userManager.RemoveFromRoleAsync(user, role);
