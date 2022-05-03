@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Sloth.Core;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
@@ -52,6 +53,7 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveUserFromRole(string userId, string role)
         {
+            Log.Warning($"System Admin removed: user: {userId} role: {role}");
             // find user
             var user = await _dbContext.Users
                 .FirstOrDefaultAsync(u => u.UserName == userId);
