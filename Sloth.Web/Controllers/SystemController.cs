@@ -48,5 +48,18 @@ namespace Sloth.Web.Controllers
                 success = true
             });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveUserFromRole(string userId, string role)
+        {
+            // find user
+            var user = await _dbContext.Users
+                .FirstOrDefaultAsync(u => u.UserName == userId);
+
+            // Remove from role
+            await _userManager.RemoveFromRoleAsync(user, role);
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
