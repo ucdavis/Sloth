@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
@@ -160,6 +161,41 @@ namespace Sloth.Web.Controllers
             {
                 success = true
             });
+        }
+
+        [Authorize(Policy = PolicyCodes.TeamAdmin)]
+        [HttpPost]
+        public async Task<IActionResult> RemoveUserFromRole(string teamId, string userId, string roleId)
+        {
+
+            // fetch team from db
+            var team = await DbContext.Teams
+                .Include(a => a.UserTeamRoles)
+                .ThenInclude(a => a.Role)
+                .SingleAsync(t => t.Id == teamId && t.Slug == TeamSlug);
+
+
+            // find user
+            var user = await DbContext.Users
+                .FirstOrDefaultAsync(u => u.Id == userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            var utr = team.UserTeamRoles.SingleOrDefault(a => a.UserId == userId && a.RoleId == roleId);
+
+            if (utr == null)
+            {
+                return NotFound();
+            }
+
+            team.UserTeamRoles.Remove(utr);
+
+            await DbContext.SaveChangesAsync();
+
+            Log.Warning($"Team User Role removed: team: {team.Name} user: {user.UserName} role: {utr.Role.Name}");
+
+            return RedirectToAction("Details", new { id = team.Id });
         }
 
         [Authorize(Policy = PolicyCodes.TeamAdmin)]
