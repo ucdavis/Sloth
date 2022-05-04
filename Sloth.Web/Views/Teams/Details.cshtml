@@ -44,6 +44,7 @@
                     <th>Username</th>
                     <th>Email</th>
                     <th>Role</th>
+                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -54,6 +55,14 @@
                         <td>@userRole.User.UserName</td>
                         <td>@userRole.User.Email</td>
                         <td>@userRole.Role.Name</td>
+                        <td>
+                            <form asp-action="RemoveUserFromRole">
+                                <input name="teamId" value="@userRole.TeamId" hidden="hidden">
+                                <input name="userId" value="@userRole.UserId" hidden="hidden">
+                                <input name="roleId" value="@userRole.RoleId" hidden="hidden">
+                                <button type="submit" class="btn btn-danger">Remove</button>
+                            </form>
+                        </td>
                     </tr>
                 }
                 </tbody>
@@ -441,6 +450,7 @@
                         username,
                         email,
                         rolename,
+                        "Added",
                     ]).draw();
 
                     $('#add-user-modal').modal('hide');

@@ -21,7 +21,6 @@ using Sloth.Api.Swagger;
 using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Services;
-using StackifyLib;
 
 namespace Sloth.Api
 {
@@ -133,8 +132,6 @@ namespace Sloth.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.ConfigureStackifyLogging(Configuration);
-
             app.UseSerilogRequestLogging();
             app.UseMiddleware<CorrelationIdMiddleware>();
             app.UseMiddleware<ApiKeyMiddleware>();

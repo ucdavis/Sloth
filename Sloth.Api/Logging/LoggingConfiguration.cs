@@ -7,8 +7,6 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.MSSqlServer;
-using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
-using StackifyLib;
 
 namespace Sloth.Api.Logging
 {
@@ -57,8 +55,7 @@ namespace Sloth.Api.Logging
 
             // various sinks
             logConfig = logConfig
-                .WriteTo.Console()
-                .WriteToStackifyCustom();
+                .WriteTo.Console();
 
             // add in elastic search sink if the uri is valid
             if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out var elasticUri))
@@ -82,16 +79,6 @@ namespace Sloth.Api.Logging
                 .WriteToSqlCustom();
         }
 
-        private static LoggerConfiguration WriteToStackifyCustom(this LoggerConfiguration logConfig)
-        {
-            if (!_loggingSetup)
-            {
-                _configuration.ConfigureStackifyLogging();
-            }
-
-            return logConfig.WriteTo.Stackify();
-        }
-
         private static LoggerConfiguration WriteToSqlCustom(this LoggerConfiguration logConfig)
         {
             var columnOptions = new ColumnOptions();
@@ -113,7 +100,7 @@ namespace Sloth.Api.Logging
             return logConfig
                 .WriteTo.MSSqlServer(
                     connectionString: _configuration.GetConnectionString("DefaultConnection"),
-                    sinkOptions: new SinkOptions { TableName = "Logs" },
+                    sinkOptions: new MSSqlServerSinkOptions { TableName = "Logs" },
                     restrictedToMinimumLevel: LogEventLevel.Information,
                     columnOptions: columnOptions
                 );

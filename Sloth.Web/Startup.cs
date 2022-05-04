@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Constraints;
 using Microsoft.AspNetCore.SpaServices;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,8 +29,6 @@ using Sloth.Web.Models;
 using Sloth.Web.Resources;
 using Sloth.Web.Services;
 using SpaCliMiddleware;
-using StackifyLib;
-using IHostingEnvironment = Microsoft.AspNetCore.Hosting.IHostingEnvironment;
 
 namespace Sloth.Web
 {
@@ -108,7 +105,6 @@ namespace Sloth.Web
             services.AddScoped<IAuthorizationHandler, VerifyTeamPermissionHandler>();
 
             services.AddMvc()
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
                 .AddNewtonsoftJson(o =>
                 {
                     o.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
@@ -125,14 +121,11 @@ namespace Sloth.Web
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.ConfigureStackifyLogging(Configuration);
-
             app.UseSerilogRequestLogging();
             app.UseMiddleware<CorrelationIdMiddleware>();
 
             if (env.IsDevelopment())
             {
-                app.UseBrowserLink();
                 app.UseDeveloperExceptionPage();
             }
             else

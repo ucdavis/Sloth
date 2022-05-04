@@ -15,11 +15,21 @@ variables:
   buildConfiguration: 'Release'
 
 steps:
-#ensure we're using an up-to-date sdk
+
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '3.1.x'
+    version: '6.0.x'
+
+- task: NodeTool@0
+  inputs:
+    versionSpec: '14.x'
+
+- task: Npm@1
+  displayName: 'Install Npm Packages'
+  inputs:
+    command: 'install'
+    workingDir: './Sloth.Web'
 
 - task: DotNetCoreCLI@2
   displayName: Restore nuget packages
@@ -27,35 +37,6 @@ steps:
     command: restore
     projects: '**/*.csproj'
     workingDirectory: $(Build.SourcesDirectory)
-
-# No need to build if we are just going to publish
-# - task: DotNetCoreCLI@2
-#   displayName: 'Build Sloth.Api'
-#   inputs:
-#     command: 'build'
-#     projects: './sloth.api/sloth.api.csproj'
-#     arguments: '--configuration $(buildConfiguration)'
-
-# - task: DotNetCoreCLI@2
-#   displayName: 'Build Sloth.Web'
-#   inputs:
-#     command: 'build'
-#     projects: './sloth.web/sloth.web.csproj'
-#     arguments: '--configuration $(buildConfiguration)'
-
-# - task: DotNetCoreCLI@2
-#   displayName: 'Build Sloth.Jobs.CyberSource.BankReconcile'
-#   inputs:
-#     command: 'build'
-#     projects: './sloth.jobs.cybersource.bankreconcile/sloth.jobs.cybersource.bankreconcile.csproj'
-#     arguments: '--configuration $(buildConfiguration)'
-
-# - task: DotNetCoreCLI@2
-#   displayName: 'Build Sloth.Jobs.Kfs.ScrubberUpload'
-#   inputs:
-#     command: 'build'
-#     projects: './sloth.jobs.kfs.scrubberupload/sloth.jobs.kfs.scrubberupload.csproj'
-#     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Assemble Sloth.Api'
