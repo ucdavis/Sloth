@@ -1,3 +1,4 @@
+using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,12 @@ public static class TestHelper
         using var scope = app.Services.CreateScope();
 
         using var dbContext = scope.ServiceProvider.GetRequiredService<SlothDbContext>();
+
+        if(dbContext.Database.ProviderName != "Microsoft.EntityFrameworkCore.InMemory")
+        {
+            throw new Exception("Not In Memory");
+        }
+
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
