@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
@@ -170,6 +171,7 @@ namespace Sloth.Web.Controllers
             // fetch team from db
             var team = await DbContext.Teams
                 .Include(a => a.UserTeamRoles)
+                .ThenInclude(a => a.Role)
                 .SingleAsync(t => t.Id == teamId && t.Slug == TeamSlug);
 
 
@@ -191,6 +193,7 @@ namespace Sloth.Web.Controllers
 
             await DbContext.SaveChangesAsync();
 
+            Log.Warning($"Team User Role removed: team: {team.Name} user: {user.UserName} role: {utr.Role.Name}");
 
             return RedirectToAction("Details", new { id = team.Id });
         }
