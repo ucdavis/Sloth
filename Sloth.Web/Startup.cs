@@ -182,21 +182,17 @@ namespace Sloth.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                if (env.IsDevelopment())
-                {
-                    routes.MapToSpaCliProxy(
-                        "{*path}",
-                        options: new SpaOptions { SourcePath = "wwwroot/dist" },
-                        npmScript: "devpack",
-                        port: /*default(int)*/ 8080, // Allow webpack to find own port
-                        regex: "Project is running",
-                        forceKill: true, // kill anything running on our webpack port
-                        useProxy: true, // proxy webpack requests back through our aspnet server
-                        runner: ScriptRunnerType.Npm
-                    );
-                }
-
             });
+
+            if (env.IsDevelopment())
+            {
+                app.UseSpa(spa =>
+                {
+                    spa.Options.SourcePath = "wwwroot";
+                    spa.UseSpaCli("devpack", forceKill: true);
+                });
+
+            }
         }
     }
 }
