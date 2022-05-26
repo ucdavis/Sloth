@@ -1,13 +1,14 @@
 const path = require("path");
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
+const OptimizeCssAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const bundleOutputDir = "./wwwroot/dist";
 
 module.exports = (env) => {
   const isDevBuild = !(env && env.prod);
+  console.log("dev build?", isDevBuild);
   return [
     {
       stats: { modules: false },
@@ -22,7 +23,12 @@ module.exports = (env) => {
         filename: "site.js",
         publicPath: "dist/",
       },
-      mode: isDevBuild ? 'development' : 'production',
+      devServer: {
+        devMiddleware: {
+          publicPath: "/dev",
+        },
+      },
+      mode: isDevBuild ? "development" : "production",
       module: {
         rules: [
           {
@@ -42,12 +48,12 @@ module.exports = (env) => {
           ? []
           : [
               new TerserPlugin({
-                cache: true,
                 parallel: true,
-                sourceMap: true
+                terserOptions: {
+                  sourceMap: true,
+                },
               }),
-              new OptimizeCssAssetsPlugin({})
-            ]
+            ],
       },
       plugins: [
         new MiniCssExtractPlugin({
@@ -61,3 +67,4 @@ module.exports = (env) => {
     },
   ];
 };
+

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Constraints;
-using Microsoft.AspNetCore.SpaServices;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +28,6 @@ using Sloth.Web.Logging;
 using Sloth.Web.Models;
 using Sloth.Web.Resources;
 using Sloth.Web.Services;
-using SpaCliMiddleware;
 
 namespace Sloth.Web
 {
@@ -182,21 +181,17 @@ namespace Sloth.Web
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                if (env.IsDevelopment())
-                {
-                    routes.MapToSpaCliProxy(
-                        "{*path}",
-                        options: new SpaOptions { SourcePath = "wwwroot/dist" },
-                        npmScript: "devpack",
-                        port: /*default(int)*/ 8080, // Allow webpack to find own port
-                        regex: "Project is running",
-                        forceKill: true, // kill anything running on our webpack port
-                        useProxy: true, // proxy webpack requests back through our aspnet server
-                        runner: ScriptRunnerType.Npm
-                    );
-                }
-
             });
+
+            if (env.IsDevelopment())
+            {
+                app.UseSpa(spa =>
+                {
+                    spa.Options.SourcePath = "wwwroot";
+                    spa.Options.DevServerPort = 8080;
+                    spa.UseReactDevelopmentServer("devpack");
+                });
+            }
         }
     }
 }
