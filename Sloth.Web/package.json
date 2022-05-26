@@ -5,7 +5,7 @@
   "scripts": {
     "start": "ASPNETCORE_ENVIRONMENT=Development dotnet watch run",
     "debug": "ASPNETCORE_ENVIRONMENT=Development dotnet watch run",
-    "devpack": "echo project is running at ... && webpack serve",
+    "devpack": "echo 'Starting the development server' && webpack serve --env dev",
     "webpack": "node node_modules/webpack/bin/webpack.js --env dev --watch",
     "build": "webpack --env prod",
     "test": "karma start",
