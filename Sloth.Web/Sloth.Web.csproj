@@ -31,7 +31,7 @@
     <PackageReference Include="Humanizer" Version="2.14.1" />
     <PackageReference Include="ietws" Version="0.2.4" />
 
-    <PackageReference Include="SSH.NET" Version="2020.0.1" />
+    <PackageReference Include="SSH.NET" Version="2020.0.2" />
   </ItemGroup>
 
   <ItemGroup>
