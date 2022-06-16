@@ -63,7 +63,7 @@ namespace Sloth.Web.Logging
             {
                 logConfig = logConfig.WriteTo.Elasticsearch(new ElasticsearchSinkOptions(elasticUri)
                 {
-                    IndexFormat = "aspnet-sloth-{0:yyyy.MM.dd}"
+                    IndexFormat = "aspnet-sloth-{0:yyyy.MM}"
                 });
             }
 
