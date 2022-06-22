@@ -113,9 +113,7 @@ namespace Sloth.Web.Controllers
         {
             await _signInManager.SignOutAsync();
 
-            var provider = "UCDavis";
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, Url.Action("Index", "Home"));
-            return SignOut(properties, provider);
+            return RedirectToAction("LoggedOut", "Home");
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

@@ -54,6 +54,11 @@ namespace Sloth.Web.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        public IActionResult LoggedOut() {
+            return Content("You have been successfully logged out.  You can now close this window.");
+        }
+
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
