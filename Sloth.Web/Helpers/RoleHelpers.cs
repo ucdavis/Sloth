@@ -4,15 +4,18 @@ using Microsoft.AspNetCore.Http;
 
 namespace Sloth.Web.Helpers
 {
-    public static class RoleHelpers {
-        public static bool IsInTeamRole(this HttpContext context, string role) {
-            var roles = context.Items["TeamRoles"] as string[];
+    public static class RoleHelpers
+    {
+        public static bool HasTeamRole(this HttpContext context, params string[] roles)
+        {
+            var teamRoles = context.Items["TeamRoles"] as string[];
 
-            if (roles == null) {
+            if (teamRoles == null || roles == null)
+            {
                 return false;
             }
 
-            return roles.Contains(role);
-        } 
+            return roles.Any(r => roles.Contains(r));
+        }
     }
 }
