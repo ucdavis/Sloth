@@ -86,7 +86,7 @@ namespace Sloth.Web.Controllers
             DbContext.Teams.Add(team);
             await DbContext.SaveChangesAsync();
 
-            return RedirectToAction("Details", new { id = team.Id });
+            return RedirectToAction("TeamIndex", "Home", new { team = team.Slug });
         }
 
         [Authorize(Policy = PolicyCodes.TeamAdmin)]
