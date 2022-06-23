@@ -15,7 +15,7 @@ namespace Sloth.Web.Helpers
                 return false;
             }
 
-            return roles.Any(r => roles.Contains(r));
+            return teamRoles.Any(r => roles.Contains(r));
         }
     }
 }
