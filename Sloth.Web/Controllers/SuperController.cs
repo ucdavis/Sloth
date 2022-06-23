@@ -46,6 +46,13 @@ namespace Sloth.Web.Controllers
                 .ToList();
         }
 
+        protected async Task<string[]> GetRolesForTeam(string team) {
+            var roles = await DbContext.UserTeamRoles
+                .Where(p => p.Team.Slug == team).Select(a=>a.Role.Name).ToArrayAsync();
+
+            return roles;
+        }
+
         protected string TeamSlug => ControllerContext.RouteData.Values["team"] as string;
     }
 }

@@ -34,6 +34,8 @@ namespace Sloth.Core
 
         public DbSet<TeamRole> TeamRoles { get; set; }
 
+        public DbSet<UserTeamRole> UserTeamRoles { get; set; }
+
         public DbSet<CybersourceBankReconcileJobRecord> CybersourceBankReconcileJobRecords { get; set; }
 
         public DbSet<KfsScrubberUploadJobRecord> KfsScrubberUploadJobRecords { get; set; }

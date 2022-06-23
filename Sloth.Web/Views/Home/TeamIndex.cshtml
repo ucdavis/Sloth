@@ -34,7 +34,9 @@
                             <dd class="col-6">$@approvalAmount.ToString("F2")</dd>
                         </dl>
                     </p>
-                    <a asp-controller="Transactions" asp-action="NeedApproval" class="btn btn-primary">View Transactions</a>
+                    @if (Context.HasTeamRole(TeamRole.Approver)) {
+                        <a asp-controller="Transactions" asp-action="NeedApproval" class="btn btn-primary">View Transactions</a>
+                    }
                 </div>
             </div>
         </div>

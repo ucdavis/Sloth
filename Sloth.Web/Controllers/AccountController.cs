@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Sloth.Core.Models;
+using Sloth.Core.Resources;
 using Sloth.Core.Services;
 
 namespace Sloth.Web.Controllers
@@ -86,6 +87,15 @@ namespace Sloth.Web.Controllers
             return RedirectToLocal(returnUrl);
         }
 
+        [Authorize(Roles = Roles.SystemAdmin)]
+        public async Task<IActionResult> Emulate(string id) {
+            var user = await _userManager.FindByNameAsync(id);
+
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return RedirectToAction("Index", "Home");
+        }
+
         private async Task ProcessUCDavisInfo(ExternalLoginInfo info)
         {
             var kerb = info.Principal.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -113,9 +123,7 @@ namespace Sloth.Web.Controllers
         {
             await _signInManager.SignOutAsync();
 
-            var provider = "UCDavis";
-            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, Url.Action("Index", "Home"));
-            return SignOut(properties, provider);
+            return RedirectToAction("LoggedOut", "Home");
         }
 
         private IActionResult RedirectToLocal(string returnUrl)

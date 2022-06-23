@@ -13,7 +13,7 @@
       <div class="nav-login">
         <a class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
           <img class="profile-pic" src="https://www.gravatar.com/avatar/@(user.EmailHash)?s=40" alt="profile pic" />
-          @user.UserName
+          @user.FullName
         </a>
         <div class="dropdown-menu">
           <a class="dropdown-item" href="@Url.Action("Manage", "Users")">
