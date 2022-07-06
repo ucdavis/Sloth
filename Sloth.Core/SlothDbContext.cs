@@ -146,7 +146,9 @@ namespace Sloth.Core
             CybersourceBankReconcileJobRecord.OnModelCreating(modelBuilder);
             KfsScrubberUploadJobRecord.OnModelCreating(modelBuilder);
             Blob.OnModelCreating(modelBuilder);
+            TransactionStatusEvent.OnModelCreating(modelBuilder);
             WebHook.OnModelCreating(modelBuilder);
+            WebHookRequest.OnModelCreating(modelBuilder);
             WebHookRequestResendJobRecord.OnModelCreating(modelBuilder);
         }
     }

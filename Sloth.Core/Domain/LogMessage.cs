@@ -35,6 +35,15 @@ namespace Sloth.Core.Models
                 .ToTable("Logs");
 
             modelBuilder.Entity<LogMessage>()
+                .HasIndex(l => l.Source);
+
+            modelBuilder.Entity<LogMessage>()
+                .HasIndex(l => l.CorrelationId);
+
+            modelBuilder.Entity<LogMessage>()
+                .HasIndex(l => new { l.JobName, l.JobId });
+
+            modelBuilder.Entity<LogMessage>()
                 .Property(l => l.Properties)
                 .HasColumnType("xml");
         }

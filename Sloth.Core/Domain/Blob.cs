@@ -32,6 +32,15 @@ namespace Sloth.Core.Models
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Blob>()
+                .HasIndex(b => b.Uri);
+
+            modelBuilder.Entity<Blob>()
+                .HasIndex(b => b.FileName);
+
+            modelBuilder.Entity<Blob>()
+                .HasIndex(b => b.UploadedDate);
+
+            modelBuilder.Entity<Blob>()
                 .HasMany(blob => blob.Scrubbers)
                 .WithOne(s => s.Blob)
                 .HasForeignKey(s => s.BlobId)

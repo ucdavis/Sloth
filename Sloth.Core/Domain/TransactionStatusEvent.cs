@@ -22,5 +22,15 @@ namespace Sloth.Core.Models
 
         public Transaction Transaction { get; set; }
 
+        public static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TransactionStatusEvent>()
+                .HasIndex(l => l.Status);
+
+            modelBuilder.Entity<TransactionStatusEvent>()
+                .HasIndex(l => l.EventDate);
+
+        }
+
     }
 }
