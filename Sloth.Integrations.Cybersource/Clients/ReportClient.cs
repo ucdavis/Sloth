@@ -70,7 +70,7 @@ namespace Sloth.Integrations.Cybersource.Clients
             var client = GetApiClient();
 
             // build request
-            var request = new RestRequest(uri, Method.GET);
+            var request = new RestRequest(uri, Method.Get);
             request.AddQueryParameter("organizationId", _merchantId);
             request.AddQueryParameter("reportDate", date.ToString("yyyy-MM-dd"));
             request.AddQueryParameter("reportName", reportName);
@@ -102,7 +102,7 @@ namespace Sloth.Integrations.Cybersource.Clients
         /// Get configured http client
         /// </summary>
         /// <returns></returns>
-        private IRestClient GetApiClient()
+        private RestClient GetApiClient()
         {
             var baseUrl = _isProduction
                 ? "https://api.cybersource.com"
@@ -112,7 +112,7 @@ namespace Sloth.Integrations.Cybersource.Clients
             return client;
         }
 
-        private void AddApiKeyAuthenticationHeaders(IRestClient client, IRestRequest request)
+        private void AddApiKeyAuthenticationHeaders(RestClient client, RestRequest request)
         {
             // parse out request values
             var method = request.Method;
@@ -140,7 +140,7 @@ namespace Sloth.Integrations.Cybersource.Clients
             request.AddHeader("Signature", signature);
 
             // add body digest header if necessary
-            if (method == Method.POST || method == Method.PUT || method == Method.PATCH)
+            if (method == Method.Post || method == Method.Put || method == Method.Patch)
             {
                 request.AddHeader("Digest", signer.GetDigest());
             }
