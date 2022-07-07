@@ -34,8 +34,6 @@ namespace Sloth.Api.Controllers.v2
             _kfsService = kfsService;
         }
 
-        // TODO: make sure it's only for the current person's team
-
         /// <summary>
         /// Fetch Top 1 Transaction
         /// </summary>
@@ -108,7 +106,7 @@ namespace Sloth.Api.Controllers.v2
         public async Task<IList<Transaction>> GetByKfsKey(string id)
         {
             var teamId = GetTeamId();
-            
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 return new List<Transaction>();
@@ -142,6 +140,14 @@ namespace Sloth.Api.Controllers.v2
             {
                 return new BadRequestObjectResult(ModelState);
             }
+
+            // TODO: for AE
+            // make sure financial string is set
+            // validate financial string
+
+            // verify amounts, same as before
+
+            // create new transaction, same as before
 
             // validate accounts
             foreach (var t in transaction.Transfers)
