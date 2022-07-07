@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Sloth.Api.Attributes;
 using Sloth.Api.Errors;
-using Sloth.Api.Helpers;
 using Sloth.Api.Models;
 using Sloth.Core;
 using Sloth.Core.Extensions;
@@ -34,17 +34,21 @@ namespace Sloth.Api.Controllers.v2
             _kfsService = kfsService;
         }
 
+        // TODO: make sure it's only for the current person's team
+
         /// <summary>
-        /// Fetch Top 1 Transactions
+        /// Fetch Top 1 Transaction
         /// </summary>
         [HttpGet]
         [ProducesResponseType(typeof(IList<Transaction>), 200)]
         public async Task<IList<Transaction>> Get()
         {
+            var teamId = GetTeamId();
+
             var transactions = await _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
                 .Include(t => t.Creator)
                 .Include(t => t.Transfers)
-                .Include(t => t.Scrubber)
                 .Take(1)
                 .AsNoTracking()
                 .ToListAsync();
@@ -53,7 +57,7 @@ namespace Sloth.Api.Controllers.v2
         }
 
         /// <summary>
-        /// Fetch Transactions by Id
+        /// Fetch Transaction by Id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -61,10 +65,12 @@ namespace Sloth.Api.Controllers.v2
         [ProducesResponseType(typeof(Transaction), 200)]
         public async Task<Transaction> Get(string id)
         {
+            var teamId = GetTeamId();
+
             var transaction = await _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
                 .Include(t => t.Creator)
                 .Include(t => t.Transfers)
-                .Include(t => t.Scrubber)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
@@ -80,10 +86,12 @@ namespace Sloth.Api.Controllers.v2
         [ProducesResponseType(typeof(Transaction), 200)]
         public async Task<Transaction> GetByProcessorId(string id)
         {
+            var teamId = GetTeamId();
+
             var transaction = await _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
                 .Include(t => t.Creator)
                 .Include(t => t.Transfers)
-                .Include(t => t.Scrubber)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.ProcessorTrackingNumber == id);
 
@@ -99,21 +107,26 @@ namespace Sloth.Api.Controllers.v2
         [ProducesResponseType(typeof(IList<Transaction>), 200)]
         public async Task<IList<Transaction>> GetByKfsKey(string id)
         {
+            var teamId = GetTeamId();
+            
             if (string.IsNullOrWhiteSpace(id))
             {
                 return new List<Transaction>();
             }
 
             var transactions = await _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
                 .Include(t => t.Creator)
                 .Include(t => t.Transfers)
-                .Include(t => t.Scrubber)
                 .Where(t => t.KfsTrackingNumber == id)
                 .AsNoTracking()
                 .ToListAsync();
 
             return transactions;
         }
+
+
+        // TODO: update to AE
 
         /// <summary>
         /// Create a Transaction with a list of Transfers
@@ -236,6 +249,10 @@ namespace Sloth.Api.Controllers.v2
 
                 return new JsonResult(transactionToCreate); 
             }
+        }
+        
+        private string GetTeamId() {
+            return User.FindFirst(ClaimTypes.PrimaryGroupSid).Value;
         }
     }
 }

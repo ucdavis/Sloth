@@ -109,9 +109,23 @@ namespace Sloth.Api
 
                 c.SwaggerDoc("v2", new OpenApiInfo
                 {
-                    Title = "Sloth API v2",
+                    Title = "Sloth API v2 (Aggie Enterprise)",
                     Version = "v2",
                     Description = "Scrubber Loader & Online Transaction Hub",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Application Support",
+                        Email = "apprequests@caes.ucdavis.edu"
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "MIT",
+                        Url = new Uri("https://github.com/ucdavis/Sloth/blob/master/LICENSE")
+                    },
+                    Extensions =
+                    {
+                        { "ProjectUrl", new OpenApiString("https://github.com/ucdavis/Sloth/") }
+                    }
                 });
 
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
