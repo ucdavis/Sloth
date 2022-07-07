@@ -12,7 +12,7 @@ namespace Sloth.Integrations.Cybersource.Helpers
     {
         private readonly string SignatureAlgorithm = "HmacSHA256";
 
-        
+
         public SignatureRequest()
         {
             SignedDateTime = DateTime.UtcNow.ToString("r");
@@ -93,7 +93,7 @@ namespace Sloth.Integrations.Cybersource.Helpers
             };
 
             // include the digest if necessary
-            if (Method == Method.POST || Method == Method.PUT || Method == Method.PATCH)
+            if (Method == Method.Post || Method == Method.Put || Method == Method.Patch)
             {
                 var digest = GetDigest();
                 result.Add("digest", digest);

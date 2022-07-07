@@ -33,5 +33,15 @@ namespace Sloth.Core.Models
         public WebHookRequestResendJobRecord WebHookRequestResendJob { get; set; }
 
         public string WebHookRequestResendJobId { get; set; }
+
+        public static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<WebHookRequest>()
+                .HasIndex(l => l.ResponseStatus);
+
+            modelBuilder.Entity<WebHookRequest>()
+                .HasIndex(l => l.LastRequestDate);
+
+        }
     }
 }
