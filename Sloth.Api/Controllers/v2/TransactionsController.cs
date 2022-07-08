@@ -26,12 +26,12 @@ namespace Sloth.Api.Controllers.v2
     public class TransactionsController : Controller
     {
         private readonly SlothDbContext _context;
-        private readonly IKfsService _kfsService;
+        private readonly IAggieEnterpriseService _aggieEnterpriseService;
 
-        public TransactionsController(SlothDbContext context, IKfsService kfsService)
+        public TransactionsController(SlothDbContext context, IAggieEnterpriseService aggieEnterpriseService)
         {
             _context = context;
-            _kfsService = kfsService;
+            _aggieEnterpriseService = aggieEnterpriseService;
         }
 
         /// <summary>
@@ -123,6 +123,20 @@ namespace Sloth.Api.Controllers.v2
             return transactions;
         }
 
+        // TODO: just for testing, remove later
+
+        /// <summary>
+        /// Validate Financial Segment String
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("validate/{id}")]
+        [ProducesResponseType(typeof(bool), 200)]
+        public async Task<bool> ValidateFinancialSegmentString(string id)
+        {
+            return await _aggieEnterpriseService.IsAccountValid(id);
+        }
+
 
         // TODO: update to AE
 
@@ -141,26 +155,30 @@ namespace Sloth.Api.Controllers.v2
                 return new BadRequestObjectResult(ModelState);
             }
 
-            // TODO: for AE
-            // make sure financial string is set
-            // validate financial string
-
-            // verify amounts, same as before
-
-            // create new transaction, same as before
-
+            // TODO: currently just validating fake string, need to update to AE
             // validate accounts
             foreach (var t in transaction.Transfers)
             {
-                if (!await _kfsService.IsAccountValid(t.Chart, t.Account))
+                if (!await _aggieEnterpriseService.IsAccountValid("coa-here", true))
                 {
+                    // TODO: do we want to return the error message if invalid?
                     return new BadRequestObjectResult(new
                     {
-                        Message = "Invalid Chart/Account",
-                        Chart = t.Chart,
-                        Account = t.Account
+                        Message = "Invalid Chart String",
+                        FinancialSegmentString = "COA here"
                     });
                 }
+            }
+
+            // valid fiscal period consistency
+            var fiscalPeriodCount = transaction.Transfers.Select(t=> new { t.FiscalPeriod, t.FiscalYear }).Distinct().Count();
+            
+            // we only allow a single fiscal period per transaction
+            if (fiscalPeriodCount != 1) {
+                return new BadRequestObjectResult(new
+                {
+                    Message = "Invalid Fiscal Periods - must be the same for all transfers"
+                });
             }
 
             // validate amounts
@@ -208,6 +226,8 @@ namespace Sloth.Api.Controllers.v2
                 });
             }
 
+            // TODO: financial info needs to be update to AE
+            // create final transaction
             var transactionToCreate = new Transaction
             {
                 MerchantTrackingNumber  = transaction.MerchantTrackingNumber,

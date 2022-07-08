@@ -42,12 +42,14 @@ namespace Sloth.Api
             // add configuration
             services.AddSingleton(Configuration);
             services.Configure<AppSettings>(Configuration);
+            services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
             // add infrastructure services
             services.AddSingleton<IKfsService, KfsService>();
+            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
