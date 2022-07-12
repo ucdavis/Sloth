@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 using Sloth.Core;
 using Sloth.Core.Models;
 
-namespace Sloth.Api.Controllers
+namespace Sloth.Api.Controllers.v1
 {
     public class ScrubbersController : SuperController
     {

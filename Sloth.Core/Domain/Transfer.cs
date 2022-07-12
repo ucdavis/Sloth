@@ -21,23 +21,21 @@ namespace Sloth.Core.Models
         public decimal Amount { get; set; }
 
         /// <summary>
-        /// Chart Code associated with transaction.
+        /// KFS: Chart Code associated with transaction.
         /// </summary>
         [MaxLength(1)]
-        [Required]
         public string Chart { get; set; }
 
         /// <summary>
-        /// Account used in the general ledger to post transactions.
+        /// KFS: Account used in the general ledger to post transactions.
         /// Accounts are specific to a Chart Code.
         /// </summary>
         [MaxLength(7)]
         [RegularExpression("[A-Z0-9]*")]
-        [Required]
         public string Account { get; set; }
 
         /// <summary>
-        /// Sub-Account is an optional accounting unit attribute.
+        /// KFS: Sub-Account is an optional accounting unit attribute.
         /// Chart Code and Account are part of Sub-Account key.
         /// </summary>
         [MaxLength(5)]
@@ -45,18 +43,17 @@ namespace Sloth.Core.Models
         public string SubAccount { get; set; }
 
         /// <summary>
-        /// Object codes represent all income, expense, asset, liability and fund balance classification
+        /// KFS: Object codes represent all income, expense, asset, liability and fund balance classification
         ///  that are assigned to transactions and help identify the nature of the transaction.
         /// Object Codes are specific to a Chart Code.
         /// </summary>
         [MaxLength(4)]
         [RegularExpression("[A-Z0-9]*")]
-        [Required]
         [Display(Name = "Object Code")]
         public string ObjectCode { get; set; }
 
         /// <summary>
-        /// Sub-Object is an optional accounting unit attribute that allows finer 
+        /// KFS: Sub-Object is an optional accounting unit attribute that allows finer
         ///  distinctions within a particular object code on an account.
         /// Sub-Object codes are specific to a Chart Code, Account and Object Code combination.
         /// </summary>
@@ -65,12 +62,20 @@ namespace Sloth.Core.Models
         public string SubObjectCode { get; set; }
 
         /// <summary>
-        /// Object Type defines the general use of an object code; such as income, asset, expense, or liability.
+        /// KFS: Object Type defines the general use of an object code; such as income, asset, expense, or liability.
         /// Not a required field as the General Ledger will derives the value from the Object Code.
         /// It is recommended not to include these values.
         /// </summary>
         [MaxLength(2)]
         public string ObjectType { get; set; }
+
+        /// <summary>
+        /// Aggie Enterprise: Full COA string (GL or PPM)
+        /// To use Aggie Enterprise, fill out this field instead of Chat, Account, etc.
+        /// </summary>
+        [MaxLength(128)]
+        [Display(Name = "Aggie Enterprise COA String")]
+        public string FinancialSegmentString { get; set; }
 
         /// <summary>
         /// A sequential number for a transaction in document number set.
@@ -94,7 +99,7 @@ namespace Sloth.Core.Models
         public CreditDebit Direction { get; set; }
 
         /// <summary>
-        /// Fiscal Year in which the feed will post.
+        /// KFS: Fiscal Year in which the feed will post.
         /// It is recommended to include the fiscal year in all records.
         /// Entries will default during general ledger processing based on run date.
         /// </summary>
@@ -103,17 +108,23 @@ namespace Sloth.Core.Models
         public int? FiscalYear { get; set; }
 
         /// <summary>
-        /// Fiscal Year in which the feed will post to the General Ledger.
+        /// KFS: Fiscal Year in which the feed will post to the General Ledger.
         /// It is highly recommended to include the fiscal period in all records.
-        /// 
+        ///
         /// Feed systems are generally only allowed to submit files for accounting periods 1-12.
-        /// 
+        ///
         /// If the fiscal year/period combination referenced on lines in the file is not open for posting,
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>
         [Range(1, 12)]
         [Display(Name = "Fiscal Period")]
         public int? FiscalPeriod { get; set; }
+
+        /// <summary>
+        /// Aggie Enterprise: Optional: The accounting date of the transfer. Will be defaulted to today's date if not provided.
+        /// </summary>
+        [Display(Name = "Accounting Date")]
+        public DateTime? AccountingDate { get; set; }
 
         /// <summary>
         /// Project is an optional accounting unit attribute that allows assignment of an identifier

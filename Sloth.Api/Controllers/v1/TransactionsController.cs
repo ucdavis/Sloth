@@ -14,7 +14,7 @@ using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
 
-namespace Sloth.Api.Controllers
+namespace Sloth.Api.Controllers.v1
 {
     public class TransactionsController : SuperController
     {

@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -41,12 +42,14 @@ namespace Sloth.Api
             // add configuration
             services.AddSingleton(Configuration);
             services.Configure<AppSettings>(Configuration);
+            services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
 
             // add infrastructure services
             services.AddSingleton<IKfsService, KfsService>();
+            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
@@ -106,6 +109,30 @@ namespace Sloth.Api
                     }
                 });
 
+                c.SwaggerDoc("v2", new OpenApiInfo
+                {
+                    Title = "Sloth API v2 (Aggie Enterprise)",
+                    Version = "v2",
+                    Description = "Scrubber Loader & Online Transaction Hub",
+                    Contact = new OpenApiContact
+                    {
+                        Name = "Application Support",
+                        Email = "apprequests@caes.ucdavis.edu"
+                    },
+                    License = new OpenApiLicense
+                    {
+                        Name = "MIT",
+                        Url = new Uri("https://github.com/ucdavis/Sloth/blob/master/LICENSE")
+                    },
+                    Extensions =
+                    {
+                        { "ProjectUrl", new OpenApiString("https://github.com/ucdavis/Sloth/") }
+                    }
+                });
+
+                c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+                c.DocInclusionPredicate((docName, apiDesc) => apiDesc.GroupName == docName);
+
                 var xmlFilePath = Path.Combine(AppContext.BaseDirectory, "Sloth.Api.xml");
                 c.IncludeXmlComments(xmlFilePath);
 
@@ -156,6 +183,7 @@ namespace Sloth.Api
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Sloth API v1");
+                c.SwaggerEndpoint("/swagger/v2/swagger.json", "Sloth API V2");
             });
         }
     }
