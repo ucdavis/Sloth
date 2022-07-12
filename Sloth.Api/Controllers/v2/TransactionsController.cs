@@ -4,13 +4,14 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AggieEnterpriseApi.Validation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Sloth.Api.Attributes;
 using Sloth.Api.Errors;
-using Sloth.Api.Models;
+using Sloth.Api.Models.v2;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
@@ -155,29 +156,27 @@ namespace Sloth.Api.Controllers.v2
                 return new BadRequestObjectResult(ModelState);
             }
 
-            // TODO: currently just validating fake string, need to update to AE
             // validate accounts
             foreach (var t in transaction.Transfers)
             {
-                if (!await _aggieEnterpriseService.IsAccountValid("coa-here", true))
+                if (!await _aggieEnterpriseService.IsAccountValid(t.FinancialSegmentString, true))
                 {
-                    // TODO: do we want to return the error message if invalid?
                     return new BadRequestObjectResult(new
                     {
                         Message = "Invalid Chart String",
-                        FinancialSegmentString = "COA here"
+                        t.FinancialSegmentString
                     });
                 }
             }
 
             // valid fiscal period consistency
-            var fiscalPeriodCount = transaction.Transfers.Select(t=> new { t.FiscalPeriod, t.FiscalYear }).Distinct().Count();
-            
+            var accountingDateCount = transaction.Transfers.Select(t=> t.AccountingDate).Distinct().Count();
+
             // we only allow a single fiscal period per transaction
-            if (fiscalPeriodCount != 1) {
+            if (accountingDateCount != 1) {
                 return new BadRequestObjectResult(new
                 {
-                    Message = "Invalid Fiscal Periods - must be the same for all transfers"
+                    Message = "Invalid Accounting Date - must be the same for all transfers"
                 });
             }
 
@@ -238,19 +237,12 @@ namespace Sloth.Api.Controllers.v2
                 TransactionDate         = transaction.TransactionDate,
                 Transfers               = transaction.Transfers.Select(t => new Transfer()
                 {
-                    Account       = t.Account,
                     Amount        = t.Amount,
-                    Chart         = t.Chart,
+                    FinancialSegmentString = t.FinancialSegmentString,
                     Description   = t.Description,
                     Direction     = t.Direction,
-                    FiscalPeriod  = t.FiscalPeriod ?? DateTime.UtcNow.GetFiscalPeriod(),
-                    FiscalYear    = t.FiscalYear ?? DateTime.UtcNow.GetFinancialYear(),
-                    ObjectCode    = t.ObjectCode,
-                    ObjectType    = t.ObjectType,
-                    Project       = t.Project,
+                    AccountingDate = t.AccountingDate,
                     ReferenceId   = t.ReferenceId,
-                    SubAccount    = t.SubAccount,
-                    SubObjectCode = t.SubObjectCode,
                 }).ToList(),
             };
 
@@ -258,27 +250,27 @@ namespace Sloth.Api.Controllers.v2
                 ? TransactionStatuses.Scheduled
                 : TransactionStatuses.PendingApproval);
 
-            using (var tran = _context.Database.BeginTransaction())
+            await using var txn = await _context.Database.BeginTransactionAsync();
+
+            // create document number
+            transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(txn.GetDbTransaction());
+
+            // create kfs number if necessary
+            if (string.IsNullOrWhiteSpace(transactionToCreate.KfsTrackingNumber))
             {
-                // create document number
-                transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
-
-                // create kfs number if necessary
-                if (string.IsNullOrWhiteSpace(transactionToCreate.KfsTrackingNumber))
-                {
-                    transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
-                } 
-
-                _context.Transactions.Add(transactionToCreate);
-                await _context.SaveChangesAsync();
-                tran.Commit();
-
-                return new JsonResult(transactionToCreate); 
+                transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(txn.GetDbTransaction());
             }
+
+            _context.Transactions.Add(transactionToCreate);
+            await _context.SaveChangesAsync();
+
+            await txn.CommitAsync();
+
+            return new JsonResult(transactionToCreate);
         }
-        
+
         private string GetTeamId() {
-            return User.FindFirst(ClaimTypes.PrimaryGroupSid).Value;
+            return User.FindFirst(ClaimTypes.PrimaryGroupSid)?.Value;
         }
     }
 }

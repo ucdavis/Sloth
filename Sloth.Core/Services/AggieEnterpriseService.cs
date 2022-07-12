@@ -1,12 +1,10 @@
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json;
 using Sloth.Core.Configuration;
-using Sloth.Core.Extensions;
 using AggieEnterpriseApi;
 using AggieEnterpriseApi.Extensions;
+using AggieEnterpriseApi.Validation;
 
 namespace Sloth.Core.Services
 {
@@ -26,15 +24,25 @@ namespace Sloth.Core.Services
 
         public async Task<bool> IsAccountValid(string financialSegmentString, bool validateCVRs = true)
         {
-            // TODO -- should we first determine if structure is correct before calling api?
+            var segmentStringType = FinancialChartValidation.GetFinancialChartStringType(financialSegmentString);
 
-            // TODO -- determine if financial string is GL or PPM and call the correct API (or update AE nuget to do it?)
-            // TODO: assuming GL string for now
-            var result = await _aggieClient.GlValidateChartstring.ExecuteAsync(financialSegmentString, validateCVRs);
+            if (segmentStringType == FinancialChartStringType.Gl)
+            {
+                var result =
+                    await _aggieClient.GlValidateChartstring.ExecuteAsync(financialSegmentString, validateCVRs);
 
-            var data = result.ReadData();
+                var data = result.ReadData();
 
-            return data.GlValidateChartstring.ValidationResponse.Valid;
+                return data.GlValidateChartstring.ValidationResponse.Valid;
+            }
+
+            if (segmentStringType == FinancialChartStringType.Ppm)
+            {
+                // TODO: validate PPM once it's available in the API
+                throw new NotImplementedException();
+            }
+
+            return false;
         }
     }
 }
