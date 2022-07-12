@@ -1,13 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Jobs;
-using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Jobs.Core;
 
@@ -42,6 +39,8 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
                 var journalJob = provider.GetService<AggieEnterpriseJournalJob>();
 
                 // call methods
+
+                // 1. upload all scheduled transactions
                 journalJob?.UploadTransactions(_log).GetAwaiter().GetResult();
 
                 // TODO: another method for checking journal statuses
