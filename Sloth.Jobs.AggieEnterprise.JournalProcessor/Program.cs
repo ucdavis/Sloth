@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,11 +11,11 @@ using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Jobs.Core;
 
-namespace Sloth.Jobs.Kfs.ScrubberUpload
+namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
 {
     public class Program : JobBase
     {
-        private static ILogger _log;
+        private static ILogger _log = null!;
 
         public static void Main(string[] args)
         {
@@ -23,43 +23,33 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             Configure();
 
             // TODO: create new record for new job type
-            // log run
-            var jobRecord = new KfsScrubberUploadJobRecord()
-            {
-                Name   = KfsScrubberUploadJob.JobName,
-                RanOn  = DateTime.UtcNow,
-                Status = "Running",
-            };
+            // log record to new table, add UX to show status and results
 
+            // log run
             _log = Log.Logger
-                .ForContext("jobname", jobRecord.Name)
-                .ForContext("jobid", jobRecord.Id);
+                .ForContext("jobname", AggieEnterpriseJournalJob.JobName);
+                // .ForContext("jobid", jobRecord.Id);
 
             var assembyName = typeof(Program).Assembly.GetName();
             _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
 
             // setup di
             var provider = ConfigureServices();
-            var dbContext = provider.GetService<SlothDbContext>();
-
-            // save log to db
-            dbContext.KfsScrubberUploadJobRecords.Add(jobRecord);
-            dbContext.SaveChanges();
 
             try
             {
                 // create job service
-                var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
+                var journalJob = provider.GetService<AggieEnterpriseJournalJob>();
 
                 // call methods
-                uploadScrubberJob.UploadScrubber(_log, jobRecord).GetAwaiter().GetResult();
+                journalJob?.UploadTransactions(_log).GetAwaiter().GetResult();
+
+                // TODO: another method for checking journal statuses
             }
             finally
             {
                 // record status
                 _log.Information("Finished");
-                jobRecord.Status = "Finished";
-                dbContext.SaveChanges();
             }
         }
 
@@ -78,10 +68,8 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             );
 
             // required services
-            services.AddTransient<IKfsScrubberService, KfsScrubberService>();
-            services.AddTransient<IStorageService, StorageService>();
-            services.AddTransient<ISecretsService, SecretsService>();
-            services.AddTransient<KfsScrubberUploadJob>();
+            services.AddTransient<IAggieEnterpriseService, AggieEnterpriseService>();
+            services.AddTransient<AggieEnterpriseJournalJob>();
 
             services.AddSingleton(_log);
 
