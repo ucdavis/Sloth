@@ -57,9 +57,7 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
             IServiceCollection services = new ServiceCollection();
 
             // options files
-            services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
-            services.Configure<KfsScrubberOptions>(Configuration.GetSection("Kfs"));
-            services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
+            services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
 
             // db service
             services.AddDbContext<SlothDbContext>(options =>
