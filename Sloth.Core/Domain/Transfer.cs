@@ -73,6 +73,8 @@ namespace Sloth.Core.Models
         /// Aggie Enterprise: Full COA string (GL or PPM)
         /// To use Aggie Enterprise, fill out this field instead of Chat, Account, etc.
         /// </summary>
+        [MaxLength(128)]
+        [Display(Name = "Aggie Enterprise COA String")]
         public string FinancialSegmentString { get; set; }
 
         /// <summary>
