@@ -20,10 +20,15 @@ namespace Sloth.Core.Services
     public class AggieEnterpriseService : IAggieEnterpriseService
     {
         private readonly IAggieEnterpriseClient _aggieClient;
+        private readonly string _journalSource;
+        private readonly string _journalCategory;
 
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
             _aggieClient = AggieEnterpriseApi.GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
+
+            _journalSource = options.Value.JournalSource;
+            _journalCategory = options.Value.JournalCategory;
         }
 
         public async Task<bool> IsAccountValid(string financialSegmentString, bool validateCVRs = true)
@@ -108,8 +113,8 @@ namespace Sloth.Core.Services
                 },
                 Payload = new GlJournalInput
                 {
-                    JournalSourceName = "UCD SLOTH", // TODO: centrally set, so add to config settings
-                    JournalCategoryName = "UCD Recharge", // TODO: config too
+                    JournalSourceName = _journalSource,
+                    JournalCategoryName = _journalCategory,
                     // TODO: should we add anything for journal name/desc/ref?  how does it work with batching?
                     AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
                     JournalLines = lines
