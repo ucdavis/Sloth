@@ -115,7 +115,7 @@ namespace Sloth.Core.Services
                 {
                     ConsumerTrackingId = transaction.Id,
                     ConsumerReferenceId = source.Name,
-                    ConsumerNotes = transaction.Description.Substring(0, 240), // TODO: tbd -- link back to sloth?  short desc?  240 chars max.
+                    ConsumerNotes = transaction.Description?.Substring(0, 240), // TODO: tbd -- link back to sloth?  short desc?  240 chars max.
                     BoundaryApplicationName = "Sloth",
                     BatchRequest = true // always want to batch requests to promote thin ledger
                 },
