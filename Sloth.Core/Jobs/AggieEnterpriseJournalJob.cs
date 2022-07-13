@@ -47,63 +47,55 @@ namespace Sloth.Core.Jobs
                 var groups = transactions.GroupBy(t => t.Source);
                 foreach (var group in groups)
                 {
-                    try
+                    var source = group.Key;
+                    var groupedTransactions = group.ToList();
+
+                    log.Information("Processing {TransactionCount} transactions for {SourceName}",
+                        groupedTransactions.Count, source.Name);
+
+                    // loop through grouped transactions and upload to Aggie Enterprise, saving status of each
+                    foreach (var transaction in groupedTransactions)
                     {
-                        var source = group.Key;
-                        var groupedTransactions = group.ToList();
-
-                        log.Information("Processing {TransactionCount} transactions for {SourceName}",
-                            groupedTransactions.Count, source.Name);
-
-                        // loop through grouped transactions and upload to Aggie Enterprise, saving status of each
-                        foreach (var transaction in groupedTransactions)
+                        try
                         {
-                            try
+                            var result = await _aggieEnterpriseService.CreateJournal(source, transaction);
+                            var requestStatus = result.GlJournalRequest.RequestStatus;
+
+                            // here we will store the result of the transaction upload
+                            var journalRequest = new JournalRequest
+                                { Transactions = new[] { transaction }, Source = source };
+
+                            if (requestStatus.RequestId.HasValue &&
+                                requestStatus.RequestStatus == RequestStatus.Pending)
                             {
-                                var result = await _aggieEnterpriseService.CreateJournal(source, transaction);
-                                var requestStatus = result.GlJournalRequest.RequestStatus;
+                                // success, update transaction status to uploaded
+                                transaction.SetStatus(TransactionStatuses.Processing);
 
-                                // here we will store the result of the transaction upload
-                                var journalRequest = new JournalRequest
-                                    { Transactions = new[] { transaction }, Source = source };
+                                journalRequest.RequestId = requestStatus.RequestId.Value;
+                                journalRequest.Status = requestStatus.RequestStatus.ToString();
 
-                                if (requestStatus.RequestId.HasValue &&
-                                    requestStatus.RequestStatus == RequestStatus.Pending)
-                                {
-                                    // success, update transaction status to uploaded
-                                    transaction.SetStatus(TransactionStatuses.Processing);
-
-                                    journalRequest.RequestId = requestStatus.RequestId.Value;
-                                    journalRequest.Status = requestStatus.RequestStatus.ToString();
-
-                                    // save journal request
-                                    _context.JournalRequests.Add(journalRequest);
-                                }
-                                else if (requestStatus.RequestId.HasValue &&
-                                         requestStatus.RequestStatus == RequestStatus.Rejected)
-                                {
-                                    // failure, update transaction status to rejected
-                                    transaction.SetStatus(TransactionStatuses.Rejected);
-
-                                    journalRequest.RequestId = requestStatus.RequestId.Value;
-                                    journalRequest.Status = requestStatus.RequestStatus.ToString();
-                                }
-
-                                // TODO: These are likely the only two statuses possible for a new request, but confirm
-
-                                // save changes
-                                await _context.SaveChangesAsync();
+                                // save journal request
+                                _context.JournalRequests.Add(journalRequest);
                             }
-                            catch (Exception ex)
+                            else if (requestStatus.RequestId.HasValue &&
+                                     requestStatus.RequestStatus == RequestStatus.Rejected)
                             {
-                                log.Error(ex, "Error creating journal for transaction {TransactionId}", transaction.Id);
+                                // failure, update transaction status to rejected
+                                transaction.SetStatus(TransactionStatuses.Rejected);
+
+                                journalRequest.RequestId = requestStatus.RequestId.Value;
+                                journalRequest.Status = requestStatus.RequestStatus.ToString();
                             }
+
+                            // TODO: These are likely the only two statuses possible for a new request, but confirm
+
+                            // save changes
+                            await _context.SaveChangesAsync();
                         }
-                    }
-                    catch (Exception ex)
-                    {
-                        log.Error(ex, ex.Message);
-                        log.Error("Aggie Enterprise Upload error for source {SourceName}", group.Key.Name);
+                        catch (Exception ex)
+                        {
+                            log.Error(ex, "Error creating journal for transaction {TransactionId}", transaction.Id);
+                        }
                     }
                 }
             }
