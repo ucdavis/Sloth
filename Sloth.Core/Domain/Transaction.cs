@@ -92,7 +92,7 @@ namespace Sloth.Core.Models
         /// </summary>
         [MinLength(1)]
         [MaxLength(10)]
-        [DisplayName("Kfs Tracking Number")]  
+        [DisplayName("Kfs Tracking Number")]
         public string KfsTrackingNumber { get; set; }
 
         /// <summary>
@@ -106,6 +106,9 @@ namespace Sloth.Core.Models
 
         [JsonIgnore]
         public Scrubber Scrubber { get; set; }
+
+        [JsonIgnore]
+        public JournalRequest JournalRequest { get; set; }
 
         [JsonIgnore]
         [DisplayName("Reversal for Transaction")]

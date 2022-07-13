@@ -22,6 +22,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             // setup env
             Configure();
 
+            // TODO: create new record for new job type
             // log run
             var jobRecord = new KfsScrubberUploadJobRecord()
             {

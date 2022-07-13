@@ -85,6 +85,15 @@ steps:
     projects: './sloth.jobs.webhooks.resend/sloth.jobs.webhooks.resend.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
 
+- task: DotNetCoreCLI@2
+  displayName: 'Assemble Sloth.Jobs.AggieEnterprise.JournalProcessor'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    zipAfterPublish: false
+    projects: './Sloth.Jobs.AggieEnterprise.JournalProcessor/Sloth.Jobs.AggieEnterprise.JournalProcessor.csproj'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifacts'
   inputs:
