@@ -52,8 +52,6 @@ namespace Sloth.Core.Jobs
                         var source = group.Key;
                         var groupedTransactions = group.ToList();
 
-                        var originCode = source.OriginCode;
-
                         log.Information("Processing {TransactionCount} transactions for {SourceName}",
                             groupedTransactions.Count, source.Name);
 
