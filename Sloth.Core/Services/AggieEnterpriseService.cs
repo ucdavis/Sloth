@@ -108,8 +108,8 @@ namespace Sloth.Core.Services
                 },
                 Payload = new GlJournalInput
                 {
-                    JournalSourceName = "BOUNDARY_APP_1", // TODO: centrally set, so add to config settings
-                    JournalCategoryName = "INTERCOMPANY_REVENUE", // TODO: config too
+                    JournalSourceName = "UCD SLOTH", // TODO: centrally set, so add to config settings
+                    JournalCategoryName = "UCD Recharge", // TODO: config too
                     // TODO: should we add anything for journal name/desc/ref?  how does it work with batching?
                     AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
                     JournalLines = lines
