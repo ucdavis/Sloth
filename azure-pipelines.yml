@@ -91,7 +91,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     zipAfterPublish: false
-    projects: './Sloth.Jobs.AggieEnterprise.JournalProcessor/Sloth.Jobs.AggieEnterprise.JournalProcessor'
+    projects: './Sloth.Jobs.AggieEnterprise.JournalProcessor/Sloth.Jobs.AggieEnterprise.JournalProcessor.csproj'
     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
 
 - task: PublishBuildArtifacts@1
