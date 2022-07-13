@@ -68,6 +68,14 @@ namespace Sloth.Core.Services
 
             foreach (var transfer in transaction.Transfers)
             {
+                // first, we need to re-verify the FinancialSegmentString is valid
+                var isValid = await IsAccountValid(transfer.FinancialSegmentString);
+
+                if (!isValid)
+                {
+                    throw new ArgumentException("Invalid financial segment string: " + transfer.FinancialSegmentString);
+                }
+
                 var line = new GlJournalLineInput
                 {
                     ExternalSystemIdentifier = transfer.ReferenceId,
@@ -83,19 +91,19 @@ namespace Sloth.Core.Services
                     line.DebitAmount = transfer.Amount;
                 }
 
-                var segmentString = FinancialChartValidation.GetFinancialChartStringType(transfer.FinancialSegmentString);
+                var segmentStringType = FinancialChartValidation.GetFinancialChartStringType(transfer.FinancialSegmentString);
 
-                if (segmentString == FinancialChartStringType.Gl)
+                if (segmentStringType == FinancialChartStringType.Gl)
                 {
                     line.GlSegmentString = transfer.FinancialSegmentString;
                 }
-                else if (segmentString == FinancialChartStringType.Ppm)
+                else if (segmentStringType == FinancialChartStringType.Ppm)
                 {
                     line.PpmSegmentString = transfer.FinancialSegmentString;
                 }
                 else
                 {
-                    throw new ArgumentException("Invalid financial segment string");
+                    throw new ArgumentException("Invalid financial segment string" + transfer.FinancialSegmentString);
                 }
 
                 lines.Add(line);
