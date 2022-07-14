@@ -31,7 +31,7 @@ namespace Sloth.Core.Extensions
 
             if (max <= 0)
             {
-                throw new ArgumentOutOfRangeException();
+                return String.Empty;
             }
 
             return value.Substring(0, max);
