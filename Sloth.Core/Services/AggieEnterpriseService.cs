@@ -15,6 +15,7 @@ namespace Sloth.Core.Services
     {
         Task<bool> IsAccountValid(string financialSegmentString, bool validateCVRs = true);
         Task<IGlJournalRequestResult> CreateJournal(Source source, Transaction transaction);
+        Task<IGlJournalRequestStatusResult> GetJournalStatus(Transaction transaction);
     }
 
     public class AggieEnterpriseService : IAggieEnterpriseService
@@ -132,6 +133,16 @@ namespace Sloth.Core.Services
             };
 
             var result = await _aggieClient.GlJournalRequest.ExecuteAsync(request);
+
+            return result.ReadData();
+        }
+
+        public async Task<IGlJournalRequestStatusResult> GetJournalStatus(Transaction transaction)
+        {
+            // for AE, transaction ID is the journal request ID
+            var requestId = transaction.Id;
+
+            var result = await _aggieClient.GlJournalRequestStatus.ExecuteAsync(requestId);
 
             return result.ReadData();
         }
