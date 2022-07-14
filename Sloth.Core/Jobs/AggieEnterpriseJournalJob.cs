@@ -50,7 +50,7 @@ namespace Sloth.Core.Jobs
                     var source = group.Key;
                     var groupedTransactions = group.ToList();
 
-                    log.Information("Processing {TransactionCount} transactions for {SourceName}",
+                    log.Information("Uploading {TransactionCount} transactions for {SourceName}",
                         groupedTransactions.Count, source.Name);
 
                     // loop through grouped transactions and upload to Aggie Enterprise, saving status of each
@@ -101,7 +101,81 @@ namespace Sloth.Core.Jobs
             }
             catch (Exception ex)
             {
-                log.Error(ex, ex.Message);
+                log.Error(ex, "Error uploading transactions");
+            }
+        }
+
+        /// <summary>
+        /// Find all transactions that have a status of "Processing" and have an associated journal request.
+        /// Query the Aggie Enterprise API to determine the status of those requests and move into appropriate status.
+        /// </summary>
+        public async Task ResolveProcessingJournals(ILogger log)
+        {
+            try
+            {
+                // fetch staged transactions with FinancialSegmentString populated
+                var transactions = await _context.Transactions
+                    .Where(t => t.Status == TransactionStatuses.Processing)
+                    .Where(t => t.JournalRequest != null)
+                    .Include(t => t.Source.Team)
+                    .ToListAsync();
+
+                if (!transactions.Any())
+                {
+                    log.Information("No scheduled transactions found");
+                    return;
+                }
+
+                var groups = transactions.GroupBy(t => t.Source.Team);
+                foreach (var group in groups)
+                {
+                    var team = group.Key;
+                    var groupedTransactions = group.ToList();
+
+                    log.Information("Checking status of {TransactionCount} transactions for team {TeamName}",
+                        groupedTransactions.Count, team.Name);
+
+                    // loop through grouped transactions and determine status of each
+                    foreach (var transaction in groupedTransactions)
+                    {
+                        try
+                        {
+                            var result = await _aggieEnterpriseService.GetJournalStatus(transaction);
+
+                            if (result?.GlJournalRequestStatus == null)
+                            {
+                                log.Error("Error getting status of journal request for transaction {TransactionId}",
+                                    transaction.Id);
+                            }
+                            else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
+                                     RequestStatus.Rejected)
+                            {
+                                // failure, update transaction status to rejected
+                                transaction.SetStatus(TransactionStatuses.Rejected);
+                            }
+                            else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
+                                     RequestStatus.Complete)
+                            {
+                                // success, update transaction status to uploaded
+                                transaction.SetStatus(TransactionStatuses.Completed);
+                            }
+                            else
+                            {
+                                // still processing, do nothing
+                                // TODO: if not processing we might want to log, just in case we get a weird response
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            log.Error(ex, "Error checking status of journal for transaction {TransactionId}",
+                                transaction.Id);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex, "Error processing journal statuses");
             }
         }
     }
