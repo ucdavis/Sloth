@@ -124,6 +124,7 @@ namespace Sloth.Core.Services
                     JournalSourceName = _journalSource,
                     JournalCategoryName = _journalCategory,
                     JournalName = "Sloth Recharges",
+                    JournalReference = source.Team.Name,
                     // TODO: should we add anything for journal name/desc/ref?  how does it work with batching?
                     AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
                     JournalLines = lines
