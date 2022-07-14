@@ -52,8 +52,24 @@ namespace Sloth.Core.Extensions
             {
                 return value;
             }
+        }
 
+        public static string SafeRegexRemoveNot(this string value, string regEx = @"[^0-9a-zA-Z\.\-\' ]+")
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return value;
+            }
 
+            try
+            {
+                var matches = SafeRegexRemove(value, regEx);
+                return Regex.Replace(value, $"[{matches}]", string.Empty);
+            }
+            catch (Exception)
+            {
+                return value;
+            }
         }
     }
 }
