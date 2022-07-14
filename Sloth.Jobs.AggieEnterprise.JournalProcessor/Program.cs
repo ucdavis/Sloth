@@ -43,7 +43,8 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
                 // 1. upload all scheduled transactions
                 journalJob?.UploadTransactions(_log).GetAwaiter().GetResult();
 
-                // TODO: another method for checking journal statuses
+                // 2. check journal status for pending transactions
+                journalJob?.ResolveProcessingJournals(_log).GetAwaiter().GetResult();
             }
             finally
             {
