@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace Sloth.Core.Extensions
@@ -54,6 +55,8 @@ namespace Sloth.Core.Extensions
             }
         }
 
+
+
         public static string SafeRegexRemoveNot(this string value, string regEx = @"[^0-9a-zA-Z\.\-\' ]+")
         {
             if (string.IsNullOrWhiteSpace(value))
@@ -64,6 +67,11 @@ namespace Sloth.Core.Extensions
             try
             {
                 var matches = SafeRegexRemove(value, regEx);
+                if (String.IsNullOrWhiteSpace(matches))
+                {
+                    return value;
+                }
+                matches = String.Join("", matches.Distinct().ToArray());
                 return Regex.Replace(value, $"[{matches}]", string.Empty);
             }
             catch (Exception)
