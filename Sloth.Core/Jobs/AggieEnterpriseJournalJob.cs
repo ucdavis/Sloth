@@ -141,7 +141,7 @@ namespace Sloth.Core.Jobs
                     {
                         try
                         {
-                            var result = await _aggieEnterpriseService.GetJournalStatus(transaction);
+                            var result = await _aggieEnterpriseService.GetJournalStatus(transaction.JournalRequest.RequestId.ToString());
 
                             if (result?.GlJournalRequestStatus == null)
                             {
