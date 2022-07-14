@@ -80,7 +80,7 @@ namespace Sloth.Core.Services
                 var line = new GlJournalLineInput
                 {
                     ExternalSystemIdentifier = transfer.ReferenceId,
-                    ExternalSystemReference = transfer.Id
+                    ExternalSystemReference = transfer.Id.Substring(0,25) // max length is 25 so need to cutoff
                 };
 
                 if (transfer.Direction == Transfer.CreditDebit.Credit)
