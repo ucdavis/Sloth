@@ -117,6 +117,7 @@ namespace Sloth.Core.Jobs
                 var transactions = await _context.Transactions
                     .Where(t => t.Status == TransactionStatuses.Processing)
                     .Where(t => t.JournalRequest != null)
+                    .Include(t=>t.JournalRequest)
                     .Include(t => t.Source.Team)
                     .ToListAsync();
 
@@ -152,18 +153,24 @@ namespace Sloth.Core.Jobs
                             {
                                 // failure, update transaction status to rejected
                                 transaction.SetStatus(TransactionStatuses.Rejected);
+                                // TODO: do we want to save any metadata about request?
+                                transaction.JournalRequest.Status = result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
                                      RequestStatus.Complete)
                             {
                                 // success, update transaction status to uploaded
                                 transaction.SetStatus(TransactionStatuses.Completed);
+                                transaction.JournalRequest.Status = result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
                             }
                             else
                             {
                                 // still processing, do nothing
                                 // TODO: if not processing we might want to log, just in case we get a weird response
                             }
+
+                            // save changes
+                            await _context.SaveChangesAsync();
                         }
                         catch (Exception ex)
                         {
