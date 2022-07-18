@@ -53,5 +53,18 @@ namespace Sloth.Core.Services
                 return await _aggieEnterpriseService.IsAccountValid(accountString, validateCVRs);
             }
         }
+
+        public static bool IsKfsAccount(string accountString)
+        {
+            if(accountString.Length == 7)
+            {
+                return true;
+            }
+            if(accountString.Count(a => a == '-') <=3 )
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

@@ -169,7 +169,7 @@ namespace Sloth.Core.Services
                             CybersourceBankReconcileJobRecordId = jobRecord.Id
                         }.SetStatus(TransactionStatuses.Scheduled);
 
-                        if (integration.ClearingAccount.Length > 8)
+                        if (!AccountValidationService.IsKfsAccount(integration.ClearingAccount))
                         {
                             // move money out of clearing
                             var clearing = new Transfer()
