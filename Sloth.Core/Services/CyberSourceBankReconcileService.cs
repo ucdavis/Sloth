@@ -169,29 +169,57 @@ namespace Sloth.Core.Services
                             CybersourceBankReconcileJobRecordId = jobRecord.Id
                         }.SetStatus(TransactionStatuses.Scheduled);
 
-                        // move money out of clearing
-                        var clearing = new Transfer()
+                        if (integration.ClearingAccount.Length > 8)
                         {
-                            Chart       = "3",
-                            Account     = integration.ClearingAccount,
-                            Direction   = Transfer.CreditDebit.Debit,
-                            Amount      = amount,
-                            Description = "Cybersource Deposit",
-                            ObjectCode  = ObjectCodes.Income,
-                        };
-                        transaction.Transfers.Add(clearing);
+                            // move money out of clearing
+                            var clearing = new Transfer()
+                            {
+                                FinancialSegmentString = integration.ClearingAccount,
+                                Direction = Transfer.CreditDebit.Debit,
+                                Amount = amount,
+                                Description = "Cybersource Deposit",
+                            };
+                            transaction.Transfers.Add(clearing);
 
-                        // move money into holding
-                        var holding = new Transfer()
+                            // move money into holding
+                            var holding = new Transfer()
+                            {
+                                FinancialSegmentString = integration.HoldingAccount,
+                                Direction = Transfer.CreditDebit.Credit,
+                                Amount = amount,
+                                Description = "Cybersource Deposit",     
+                            };
+                            transaction.Transfers.Add(holding);                            
+                        }
+                        else
                         {
-                            Chart       = "3",
-                            Account     = integration.HoldingAccount,
-                            Direction   = Transfer.CreditDebit.Credit,
-                            Amount      = amount,
-                            Description = "Cybersource Deposit",
-                            ObjectCode  = ObjectCodes.Income,
-                        };
-                        transaction.Transfers.Add(holding);
+                            // move money out of clearing
+                            var clearing = new Transfer()
+                            {
+                                Chart = "3",
+                                Account = integration.ClearingAccount,
+                                Direction = Transfer.CreditDebit.Debit,
+                                Amount = amount,
+                                Description = "Cybersource Deposit",
+                                ObjectCode = ObjectCodes.Income,
+                            };
+                            transaction.Transfers.Add(clearing);
+
+                            // move money into holding
+                            var holding = new Transfer()
+                            {
+                                Chart = "3",
+                                Account = integration.HoldingAccount,
+                                Direction = Transfer.CreditDebit.Credit,
+                                Amount = amount,
+                                Description = "Cybersource Deposit",
+                                ObjectCode = ObjectCodes.Income,
+                            };
+                            transaction.Transfers.Add(holding);
+
+                        }
+
+
 
                         var errors = _context.ValidateModel(transaction);
                         if (errors.Any())
