@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Sloth.Core.Configuration;
 using AggieEnterpriseApi;
 using AggieEnterpriseApi.Extensions;
+using AggieEnterpriseApi.Types;
 using AggieEnterpriseApi.Validation;
 using Sloth.Core.Models;
 using Sloth.Core.Extensions;
@@ -49,8 +50,16 @@ namespace Sloth.Core.Services
 
             if (segmentStringType == FinancialChartStringType.Ppm)
             {
-                // TODO: validate PPM once it's available in the API
-                throw new NotImplementedException();
+                // there is no validate ppm string, but we can validate by segments
+                var segments = FinancialChartValidation.GetPpmSegments(financialSegmentString);
+
+                var result =
+                    await _aggieClient.PpmSegmentsValidate.ExecuteAsync(ConvertToPpmSegmentInput(segments),
+                        accountingDate: null);
+
+                var data = result.ReadData();
+
+                return data.PpmSegmentsValidate.ValidationResponse.Valid;
             }
 
             return false;
@@ -81,7 +90,7 @@ namespace Sloth.Core.Services
                 var line = new GlJournalLineInput
                 {
                     ExternalSystemIdentifier = transfer.ReferenceId,
-                    ExternalSystemReference = transfer.Id.Substring(0,25) // max length is 25 so need to cutoff
+                    ExternalSystemReference = transfer.Id.Substring(0, 25) // max length is 25 so need to cutoff
                 };
 
                 if (transfer.Direction == Transfer.CreditDebit.Credit)
@@ -93,7 +102,8 @@ namespace Sloth.Core.Services
                     line.DebitAmount = transfer.Amount;
                 }
 
-                var segmentStringType = FinancialChartValidation.GetFinancialChartStringType(transfer.FinancialSegmentString);
+                var segmentStringType =
+                    FinancialChartValidation.GetFinancialChartStringType(transfer.FinancialSegmentString);
 
                 if (segmentStringType == FinancialChartStringType.Gl)
                 {
@@ -117,8 +127,10 @@ namespace Sloth.Core.Services
                 {
                     ConsumerTrackingId = transaction.Id,
                     ConsumerReferenceId = source.Name,
-                    ConsumerNotes = transaction.Description?.Substring(0, 240), // TODO: tbd -- link back to sloth?  short desc?  240 chars max.
-                    BoundaryApplicationName = "Sloth",
+                    ConsumerNotes =
+                        transaction.Description
+                            ?.Substring(0, 240), // TODO: tbd -- link back to sloth?  short desc?  240 chars max.
+                    BoundaryApplicationName = source.Name,
                     // TODO: Seems to kill the API if specified, so don't specify for now.
                     // BatchRequest = true // always want to batch requests to promote thin ledger
                 },
@@ -149,6 +161,19 @@ namespace Sloth.Core.Services
             var result = await _aggieClient.GlJournalRequestStatus.ExecuteAsync(requestId);
 
             return result.ReadData();
+        }
+
+        private PpmSegmentInput ConvertToPpmSegmentInput(PpmSegments segments)
+        {
+            return new PpmSegmentInput
+            {
+                Award = segments.Award,
+                Organization = segments.Organization,
+                Project = segments.Project,
+                Task = segments.Task,
+                ExpenditureType = segments.ExpenditureType,
+                FundingSource = segments.FundingSource,
+            };
         }
     }
 }
