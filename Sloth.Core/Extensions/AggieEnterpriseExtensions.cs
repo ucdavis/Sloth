@@ -9,7 +9,7 @@ namespace Sloth.Core.Extensions
             // Erp names can only contain letters, numbers, hyphen, spaces and underscores.
             const string regexStr = @"[^0-9a-zA-Z\ \_\-\']+";
 
-            return value.SafeTruncate(maxLength).SafeRegexRemove(regexStr);
+            return value.SafeRegexRemove(regexStr).SafeTruncate(maxLength);
         }
 
         public static string StripToErpDescription(this string value, int maxLength = Int32.MaxValue)
@@ -17,7 +17,7 @@ namespace Sloth.Core.Extensions
             //  limited to letters, numbers, hyphen, underscore, spaces, and periods.
             const string regexStr = @"[^0-9a-zA-Z\ \.\-\_']+";
 
-            return value.SafeTruncate(maxLength).SafeRegexRemove(regexStr);
+            return value.SafeRegexRemove(regexStr).SafeTruncate(maxLength);
         }
 
         public static string StripToGlReferenceField(this string value, int maxLength = Int32.MaxValue)
@@ -25,7 +25,7 @@ namespace Sloth.Core.Extensions
             //  limited to letters, numbers, hyphen, and underscore
             const string regexStr = @"[^0-9a-zA-Z\-\_']+";
 
-            return value.SafeTruncate(maxLength).SafeRegexRemove(regexStr);
+            return value.SafeRegexRemove(regexStr).SafeTruncate(maxLength);
         }
     }
 }
