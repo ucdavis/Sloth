@@ -53,23 +53,15 @@
         </div>
         <div class="form-group">
             @Html.LabelFor(x => x.ClearingAccount)
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">3 - </span>
-                </div>
-                @Html.TextBoxFor(x => x.ClearingAccount, new { @class = "form-control" })
-            </div>
+            @Html.TextBoxFor(x => x.ClearingAccount, new { @class = "form-control" })
             <span asp-validation-for="ClearingAccount" class="text-danger"></span>
+            <small id="emailHelp" class="form-text text-muted">Full GL or PPM string for Aggie Enterprise, or provide just the 7-digit Account Number for KFS</small>
         </div>
         <div class="form-group">
             @Html.LabelFor(x => x.HoldingAccount)
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <span class="input-group-text">3 - </span>
-                </div>
-                @Html.TextBoxFor(x => x.HoldingAccount, new { @class = "form-control" })
-            </div>
+            @Html.TextBoxFor(x => x.HoldingAccount, new { @class = "form-control" })
             <span asp-validation-for="HoldingAccount" class="text-danger"></span>
+            <small id="emailHelp" class="form-text text-muted">Full GL or PPM string for Aggie Enterprise, or provide just the 7-digit Account Number for KFS</small>
         </div>
         <div class="d-flex justify-content-end align-items-end">
             <input type="submit" value="Save" class="btn btn-primary" />

@@ -30,8 +30,12 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         public string ReportPasswordKey { get; set; }
 
+        [Required]
+        [MaxLength(128)]
         public string ClearingAccount { get; set; }
 
+        [Required]
+        [MaxLength(128)]
         public string HoldingAccount { get; set; }
 
         public IList<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
