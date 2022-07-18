@@ -169,29 +169,7 @@ namespace Sloth.Core.Services
                             CybersourceBankReconcileJobRecordId = jobRecord.Id
                         }.SetStatus(TransactionStatuses.Scheduled);
 
-                        if (!AccountValidationService.IsKfsAccount(integration.ClearingAccount))
-                        {
-                            // move money out of clearing
-                            var clearing = new Transfer()
-                            {
-                                FinancialSegmentString = integration.ClearingAccount,
-                                Direction = Transfer.CreditDebit.Debit,
-                                Amount = amount,
-                                Description = "Cybersource Deposit",
-                            };
-                            transaction.Transfers.Add(clearing);
-
-                            // move money into holding
-                            var holding = new Transfer()
-                            {
-                                FinancialSegmentString = integration.HoldingAccount,
-                                Direction = Transfer.CreditDebit.Credit,
-                                Amount = amount,
-                                Description = "Cybersource Deposit",     
-                            };
-                            transaction.Transfers.Add(holding);                            
-                        }
-                        else
+                        if (AccountValidationService.IsKfsAccount(integration.ClearingAccount))
                         {
                             // move money out of clearing
                             var clearing = new Transfer()
@@ -215,8 +193,29 @@ namespace Sloth.Core.Services
                                 Description = "Cybersource Deposit",
                                 ObjectCode = ObjectCodes.Income,
                             };
-                            transaction.Transfers.Add(holding);
+                            transaction.Transfers.Add(holding);                         
+                        }
+                        else
+                        {
+                            // move money out of clearing (Aggie Enterprise Financial String)
+                            var clearing = new Transfer()
+                            {
+                                FinancialSegmentString = integration.ClearingAccount,
+                                Direction = Transfer.CreditDebit.Debit,
+                                Amount = amount,
+                                Description = "Cybersource Deposit",
+                            };
+                            transaction.Transfers.Add(clearing);
 
+                            // move money into holding
+                            var holding = new Transfer()
+                            {
+                                FinancialSegmentString = integration.HoldingAccount,
+                                Direction = Transfer.CreditDebit.Credit,
+                                Amount = amount,
+                                Description = "Cybersource Deposit",
+                            };
+                            transaction.Transfers.Add(holding);
                         }
 
 
