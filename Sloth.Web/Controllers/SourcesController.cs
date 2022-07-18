@@ -10,10 +10,11 @@ using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.SourceViewModels;
+using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
-    [Authorize(Roles = Roles.SystemAdmin)]
+    [Authorize(Policy = PolicyCodes.TeamAdmin)]
     public class SourcesController : SuperController
     {
         private readonly ISecretsService _secretsService;
