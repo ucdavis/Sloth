@@ -10,10 +10,11 @@ using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.SourceViewModels;
+using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
-    [Authorize(Roles = Roles.SystemAdmin)]
+    [Authorize(Policy = PolicyCodes.TeamAdmin)]
     public class SourcesController : SuperController
     {
         private readonly ISecretsService _secretsService;
@@ -49,9 +50,17 @@ namespace Sloth.Web.Controllers
                 return View(model);
             }
 
+            // assume if we have a chart, we are using KFS
+            var isKfs = !string.IsNullOrWhiteSpace(model.Chart);
+
             // create new secret
             var secretId = Guid.NewGuid().ToString("D");
-            await _secretsService.UpdateSecret(secretId, model.KfsFtpPasswordKey);
+
+            if (isKfs)
+            {
+                // only create secret if we are using KFS
+                await _secretsService.UpdateSecret(secretId, model.KfsFtpPasswordKey);
+            }
 
             var source = new Source()
             {

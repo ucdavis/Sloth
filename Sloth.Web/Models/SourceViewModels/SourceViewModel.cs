@@ -22,14 +22,12 @@ namespace Sloth.Web.Models.SourceViewModels
         /// Chart of Accounts Code associated with Org Code
         /// </summary>
         [MaxLength(2)]
-        [Required]
         public string Chart { get; set; }
 
         /// <summary>
         /// Financial System Organization responsible for GL Feed.
         /// </summary>
         [MaxLength(4)]
-        [Required]
         [Display(Name = "Organization Code")]
         public string OrganizationCode { get; set; }
 
@@ -39,7 +37,6 @@ namespace Sloth.Web.Models.SourceViewModels
         /// </summary>
         [MinLength(2)]
         [MaxLength(2)]
-        [Required]
         [Display(Name = "Origin Code")]
         public string OriginCode { get; set; }
 
@@ -47,7 +44,6 @@ namespace Sloth.Web.Models.SourceViewModels
         /// Financial System document type associated with the feed.
         /// Feed systems will be authorized to use a specific value based on transactions.
         /// </summary>
-        [Required]
         [Display(Name = "Document Type")]
         public string DocumentType { get; set; }
 

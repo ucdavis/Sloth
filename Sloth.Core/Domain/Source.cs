@@ -24,14 +24,12 @@ namespace Sloth.Core.Models
         /// Chart of Accounts Code associated with Org Code
         /// </summary>
         [MaxLength(2)]
-        [Required]
         public string Chart { get; set; }
 
         /// <summary>
         /// Financial System Organization responsible for GL Feed.
         /// </summary>
         [MaxLength(4)]
-        [Required]
         [Display(Name = "Organization Code")]
         public string OrganizationCode { get; set; }
 
@@ -41,7 +39,6 @@ namespace Sloth.Core.Models
         /// </summary>
         [MinLength(2)]
         [MaxLength(2)]
-        [Required]
         public string OriginCode { get; set; }
 
         /// <summary>
@@ -50,7 +47,6 @@ namespace Sloth.Core.Models
         /// </summary>
         [MinLength(4)]
         [MaxLength(4)]
-        [Required]
         public string DocumentType { get; set; }
 
         [JsonIgnore]
