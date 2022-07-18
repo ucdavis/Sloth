@@ -89,8 +89,8 @@ namespace Sloth.Core.Services
 
                 var line = new GlJournalLineInput
                 {
-                    ExternalSystemIdentifier = transfer.ReferenceId,
-                    ExternalSystemReference = transfer.Id.Substring(0, 25) // max length is 25 so need to cutoff
+                    ExternalSystemIdentifier = transfer.ReferenceId.StripToGlReferenceField(10),
+                    ExternalSystemReference = transfer.Id.StripToGlReferenceField(25)
                 };
 
                 if (transfer.Direction == Transfer.CreditDebit.Credit)
@@ -125,22 +125,20 @@ namespace Sloth.Core.Services
             {
                 Header = new ActionRequestHeaderInput
                 {
-                    ConsumerTrackingId = transaction.Id,
-                    ConsumerReferenceId = source.Name,
+                    ConsumerTrackingId = transaction.Id.SafeTruncate(80),
+                    ConsumerReferenceId = source.Name.SafeTruncate(80),
                     ConsumerNotes =
-                        transaction.Description
-                            ?.Substring(0, 240), // TODO: tbd -- link back to sloth?  short desc?  240 chars max.
-                    BoundaryApplicationName = source.Name,
+                        transaction.Description.SafeTruncate(240),
+                    BoundaryApplicationName = source.Name.SafeTruncate(80),
                     // TODO: Seems to kill the API if specified, so don't specify for now.
                     // BatchRequest = true // always want to batch requests to promote thin ledger
                 },
                 Payload = new GlJournalInput
                 {
-                    JournalSourceName = _journalSource,
-                    JournalCategoryName = _journalCategory,
-                    JournalName = "Sloth Recharges",
-                    JournalReference = source.Team.Name.SafeRegexRemove(@"[^A-Za-z0-9_-]+").SafeTruncate(25),
-                    // TODO: should we add anything for journal name/desc/ref?  how does it work with batching?
+                    JournalSourceName = _journalSource.SafeTruncate(80),
+                    JournalCategoryName = _journalCategory.SafeTruncate(80),
+                    JournalName = source.Name.StripToErpName(100),
+                    JournalReference = source.Team.Name.StripToErpDescription(240),
                     AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
                     JournalLines = lines
                 }
