@@ -23,118 +23,17 @@
 }
 
 <h2>@ViewBag.Title</h2>
-
-<div class="row">
-    <div class="col-sm">
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.Id)</strong><br />
-            <span>@Model.Id</span>
-        </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.TransactionDate)</strong><br />
-            <span>@Model.TransactionDate</span>
-        </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</strong><br />
-            <span>@Model.KfsTrackingNumber</span>
-        </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.DocumentNumber)</strong><br />
-            <span>@Model.DocumentNumber</span>
-        </div>
-    </div>
-    <div class="col-sm">
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.ProcessorTrackingNumber)</strong><br />
-            <span>@Model.ProcessorTrackingNumber</span>
-        </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.MerchantTrackingNumber)</strong><br />
-            <span>@Model.MerchantTrackingNumber</span>
-        </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.Status)</strong><br />
-            <span>@Model.Status</span>
-        </div>
-        @{
-            if (isUrlValid)
-            {
-                <div class="form-group">
-                    <strong>@Html.DisplayNameFor(x => x.MerchantTrackingUrl)</strong><br />
-                    <span>
-                        <a href="@Html.Raw(merchantUrl.ToString())" target="_blank">@merchantUrl.ToString()</a>
-                    </span>
-                </div>
-            }
-        }
-
-    </div>
-</div>
-
-<table id="transfers" class="table table-striped table-bordered table-hover" style="width: 100%">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Id)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Amount)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Direction)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Description)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Account)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].ObjectCode)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].FiscalYear)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].FiscalPeriod)</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var t in Model.Transfers)
-        {
-            <tr>
-                <td>@t.Id</td>
-                <td class="text-right">@t.Amount.ToString("C")</td>
-                <td class="text-center">
-                    <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
-                </td>
-                <td>@t.Description</td>
-                <td style="white-space:nowrap">@t.FullAccountToString()</td>
-                <td>@t.FullObjectToString()</td>
-                <td>@t.FiscalYear</td>
-                <td>@t.FiscalPeriod</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<div class="card my-3">
-    <div class="card-header d-flex justify-content-between align-items-center cursor-pointer collapsed" type="button" data-toggle="collapse" data-target="#transactionXml">
-        <span>Show XML</span>
-        <i class="fa fa-fw fa-expand"></i>
-    </div>
-    <pre id="transactionXml" class="collapse my-0">
-<code class="language-markup">
-@Model.ToXml()
-</code>
-</pre>
-</div>
-
-
-@if (Model.Status == TransactionStatuses.PendingApproval)
+@if(String.IsNullOrWhiteSpace(Model.Transfers[0].FinancialSegmentString))
 {
-    <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Id" method="post">
-        <div class="d-flex justify-content-end align-items-center">
-            <button type="submit" class="btn btn-small btn-primary">Approve</button>
-        </div>
-    </form>
+    <partial name="_KfsDetails" model="Model" />
+}
+else
+{
+    <partial name="_AeDetails" model="Model" />
 }
 
-@if (Model.Status == TransactionStatuses.Completed && !Model.HasReversal)
-{
-    <form asp-controller="Transactions" asp-action="CreateReversal" asp-route-id="@Model.Id" method="post">
-        <div class="d-flex justify-content-end align-items-center">
-            <button type="submit" class="btn btn-small btn-primary">Reverse Transaction</button>
-        </div>
-    </form>
-}
 
-@section AdditionalScripts {
+ @section AdditionalScripts {
     <script src="~/js/prism.js"></script>
     <script>
         $('#transfers').DataTable({
