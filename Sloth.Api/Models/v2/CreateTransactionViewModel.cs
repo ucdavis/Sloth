@@ -10,13 +10,21 @@ namespace Sloth.Api.Models.v2
         public CreateTransactionViewModel()
         {
             AutoApprove = false;
+            ValidateFinancialSegmentStrings = true;
             Transfers = new List<CreateTransferViewModel>();
         }
 
         /// <summary>
         /// Auto approve this transaction for upload to KFS
+        /// Defaults to false
         /// </summary>
         public bool AutoApprove { get; set; }
+
+        /// <summary>
+        /// Run full validation on the financial segment strings
+        /// Defaults to true
+        /// </summary>
+        public bool ValidateFinancialSegmentStrings { get; set; }
 
         /// <summary>
         /// Tracking Number created by the merchant accountant
