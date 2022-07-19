@@ -40,7 +40,15 @@
                 <td>@t.ProcessorTrackingNumber</td>
                 <td><a asp-controller="Transactions" asp-action="Index" asp-route-trackingNum="@t.MerchantTrackingNumber">@t.MerchantTrackingNumber</a></td>
                 <td>@description</td>
-                <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
+                @if (String.IsNullOrWhiteSpace(firstDebit.FinancialSegmentString))
+                {
+                    <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
+                }
+                else
+                {
+                    <td>See Details</td>
+                }
+                
                 <td class="text-center">
                     <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize()</span>
                 </td>
