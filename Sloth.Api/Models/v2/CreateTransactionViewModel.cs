@@ -48,12 +48,6 @@ namespace Sloth.Api.Models.v2
         public string KfsTrackingNumber { get; set; }
 
         /// <summary>
-        /// Date the transaction occurred.
-        /// </summary>
-        [Required]
-        public DateTime TransactionDate { get; set; }
-
-        /// <summary>
         /// Source of the transactions
         /// e.g. CyberSource
         /// </summary>
