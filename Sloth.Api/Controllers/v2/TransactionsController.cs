@@ -149,7 +149,7 @@ namespace Sloth.Api.Controllers.v2
         [HttpPost]
         [ProducesResponseType(typeof(Transaction), 200)]
         [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
-        public async Task<IActionResult> Post([FromBody]CreateTransactionViewModel transaction)
+        public async Task<IActionResult> Post([FromBody] CreateTransactionViewModel transaction)
         {
             if (!ModelState.IsValid)
             {
@@ -159,21 +159,40 @@ namespace Sloth.Api.Controllers.v2
             // validate accounts
             foreach (var t in transaction.Transfers)
             {
-                if (!await _aggieEnterpriseService.IsAccountValid(t.FinancialSegmentString, true))
+                if (transaction.ValidateFinancialSegmentStrings)
                 {
-                    return new BadRequestObjectResult(new
+                    // do full segment validation via the API
+                    if (!await _aggieEnterpriseService.IsAccountValid(t.FinancialSegmentString, true))
                     {
-                        Message = "Invalid Chart String",
-                        t.FinancialSegmentString
-                    });
+                        return new BadRequestObjectResult(new
+                        {
+                            Message = "Invalid Chart String",
+                            t.FinancialSegmentString
+                        });
+                    }
+                }
+                else
+                {
+                    // skip full validation, but still ensure the account format is correct
+                    if (FinancialChartValidation.GetFinancialChartStringType(t.FinancialSegmentString) ==
+                        FinancialChartStringType.Invalid)
+                    {
+                        return new BadRequestObjectResult(new
+                        {
+                            Message = "Invalid Chart String Format",
+                            t.FinancialSegmentString
+                        });
+                    }
                 }
             }
 
+
             // valid fiscal period consistency
-            var accountingDateCount = transaction.Transfers.Select(t=> t.AccountingDate).Distinct().Count();
+            var accountingDateCount = transaction.Transfers.Select(t => t.AccountingDate).Distinct().Count();
 
             // we only allow a single fiscal period per transaction
-            if (accountingDateCount != 1) {
+            if (accountingDateCount != 1)
+            {
                 return new BadRequestObjectResult(new
                 {
                     Message = "Invalid Accounting Date - must be the same for all transfers"
@@ -204,7 +223,8 @@ namespace Sloth.Api.Controllers.v2
 
             if (creditTotal != debitTotal)
             {
-                return new BadRequestObjectResult(new {
+                return new BadRequestObjectResult(new
+                {
                     Message = "Credit/Debit Amounts don't match",
                     Credits = creditTotal,
                     Debits = debitTotal,
@@ -229,20 +249,20 @@ namespace Sloth.Api.Controllers.v2
             // create final transaction
             var transactionToCreate = new Transaction
             {
-                MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
+                MerchantTrackingNumber = transaction.MerchantTrackingNumber,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
-                MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
-                KfsTrackingNumber       = transaction.KfsTrackingNumber,
-                Source                  = source,
-                TransactionDate         = transaction.TransactionDate,
-                Transfers               = transaction.Transfers.Select(t => new Transfer()
+                MerchantTrackingUrl = transaction.MerchantTrackingUrl,
+                KfsTrackingNumber = transaction.KfsTrackingNumber,
+                Source = source,
+                TransactionDate = DateTime.UtcNow,
+                Transfers = transaction.Transfers.Select(t => new Transfer()
                 {
-                    Amount        = t.Amount,
+                    Amount = t.Amount,
                     FinancialSegmentString = t.FinancialSegmentString,
-                    Description   = t.Description,
-                    Direction     = t.Direction,
+                    Description = t.Description,
+                    Direction = t.Direction,
                     AccountingDate = t.AccountingDate,
-                    ReferenceId   = t.ReferenceId,
+                    ReferenceId = t.ReferenceId,
                 }).ToList(),
             };
 
@@ -269,7 +289,8 @@ namespace Sloth.Api.Controllers.v2
             return new JsonResult(transactionToCreate);
         }
 
-        private string GetTeamId() {
+        private string GetTeamId()
+        {
             return User.FindFirst(ClaimTypes.PrimaryGroupSid)?.Value;
         }
     }
