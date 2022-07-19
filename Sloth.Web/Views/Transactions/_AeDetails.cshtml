@@ -61,6 +61,7 @@
             <th>@Html.DisplayNameFor(x => x.Transfers[0].Amount)</th>
             <th>@Html.DisplayNameFor(x => x.Transfers[0].Direction)</th>
             <th>@Html.DisplayNameFor(x => x.Transfers[0].Description)</th>
+            <th>@Html.DisplayNameFor(x => x.Transfers[0].AccountingDate)</th>
             <th>@Html.DisplayNameFor(x => x.Transfers[0].Account)</th>
 
         </tr>
@@ -75,6 +76,7 @@
                     <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
                 </td>
                 <td>@t.Description</td>
+                <td>@t.AccountingDate</td>
                 <td style="white-space:nowrap">@t.FinancialSegmentString</td>
             </tr>
         }
