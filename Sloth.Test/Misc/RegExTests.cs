@@ -14,7 +14,13 @@ namespace Sloth.Test.Misc
         [Theory]
         [InlineData("Aggie Enterprise", "AggieEnterprise")]
         [InlineData("Aggie*&^%&^%&^$&^%$Enterprise", "AggieEnterprise")]
-        public void TestStripToGlReferenceField(string passed, string expected)
+        [InlineData("123456789012345678901234567890", "1234567890123456789012345")]
+        [InlineData("abcdefghijklmnop", "abcdefghijklmnop")]
+        [InlineData("ABCDEFGHIJKLMNOP", "ABCDEFGHIJKLMNOP")]
+        [InlineData("qrstuvwkyz", "qrstuvwkyz")]
+        [InlineData("QRSTUVWKYZ", "QRSTUVWKYZ")]
+        [InlineData("__--'", "__--")]
+        public void TestStripToGlReferenceField25(string passed, string expected)
         {
             var rtValue = passed.StripToGlReferenceField(25);
             rtValue.ShouldBe(expected);
