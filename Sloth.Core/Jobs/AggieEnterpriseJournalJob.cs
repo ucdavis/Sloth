@@ -63,7 +63,7 @@ namespace Sloth.Core.Jobs
 
                             // here we will store the result of the transaction upload
                             var journalRequest = new JournalRequest
-                                { Transactions = new[] { transaction }, Source = source };
+                            { Transactions = new[] { transaction }, Source = source };
 
                             if (requestStatus.RequestId.HasValue &&
                                 requestStatus.RequestStatus == RequestStatus.Pending)
@@ -117,7 +117,7 @@ namespace Sloth.Core.Jobs
                 var transactions = await _context.Transactions
                     .Where(t => t.Status == TransactionStatuses.Processing)
                     .Where(t => t.JournalRequest != null)
-                    .Include(t=>t.JournalRequest)
+                    .Include(t => t.JournalRequest)
                     .Include(t => t.Source.Team)
                     .ToListAsync();
 
@@ -149,11 +149,10 @@ namespace Sloth.Core.Jobs
                                     transaction.Id);
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
-                                     RequestStatus.Rejected)
+                                     RequestStatus.Rejected || result.GlJournalRequestStatus.RequestStatus.RequestStatus == RequestStatus.Error)
                             {
-                                // failure, update transaction status to rejected
                                 transaction.SetStatus(TransactionStatuses.Rejected);
-                                // TODO: do we want to save any metadata about request?
+                                // TODO: do we want to save any metadata about request? if not, we'll need to pull status from API
                                 transaction.JournalRequest.Status = result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
