@@ -62,7 +62,7 @@ namespace Sloth.Test.Misc
         [InlineData("ABCDEFGHIJKLMNOP", "ABCDEFGHIJKLMNOP")]
         [InlineData("qrstuvwkyz", "qrstuvwkyz")]
         [InlineData("QRSTUVWKYZ", "QRSTUVWKYZ")]
-        [InlineData("__--.'", "__--.")]
+        [InlineData("__--.'", "__--")]
         [InlineData("!@#$%^&*()+=~;:<>,.?[]{}|Meh'", "Meh")]
         public void TestStripToErpName25(string passed, string expected)
         {
