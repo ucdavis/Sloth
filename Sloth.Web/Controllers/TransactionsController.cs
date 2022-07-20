@@ -135,6 +135,7 @@ namespace Sloth.Web.Controllers
         {
             var transaction = await DbContext.Transactions
                 .Include(t => t.Scrubber)
+                .Include(t => t.JournalRequest)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
                 .Include(t => t.Transfers)
