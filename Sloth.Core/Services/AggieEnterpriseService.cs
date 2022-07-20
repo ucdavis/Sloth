@@ -138,7 +138,7 @@ namespace Sloth.Core.Services
                     JournalSourceName = _journalSource.SafeTruncate(80),
                     JournalCategoryName = _journalCategory.SafeTruncate(80),
                     JournalName = source.Name.StripToErpName(100),
-                    JournalReference = source.Team.Name.StripToErpDescription(240),
+                    JournalReference = source.Team.Name.StripToGlReferenceField(25),
                     AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
                     JournalLines = lines
                 }
