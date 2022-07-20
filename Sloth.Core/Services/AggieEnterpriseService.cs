@@ -8,6 +8,7 @@ using AggieEnterpriseApi;
 using AggieEnterpriseApi.Extensions;
 using AggieEnterpriseApi.Types;
 using AggieEnterpriseApi.Validation;
+using Serilog;
 using Sloth.Core.Models;
 using Sloth.Core.Extensions;
 
@@ -143,6 +144,9 @@ namespace Sloth.Core.Services
                     JournalLines = lines
                 }
             };
+
+            Log.ForContext("request", request).Information("Creating GL journal request for {TransactionId}",
+                transaction.Id);
 
             var result = await _aggieClient.GlJournalRequest.ExecuteAsync(request);
 
