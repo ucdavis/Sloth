@@ -19,7 +19,7 @@
         </div>
         <div class="form-group">
             <strong>@Html.DisplayNameFor(x => x.TransactionDate)</strong><br />
-            <span>@Model.TransactionDate</span>
+            <span>@Model.TransactionDate.ToPacificTime()</span>
         </div>
         <div class="form-group">
             <strong>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</strong><br />

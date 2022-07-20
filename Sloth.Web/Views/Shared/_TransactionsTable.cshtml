@@ -1,6 +1,7 @@
 @using Humanizer
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Routing
+@using Sloth.Core.Extensions
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
 @model Sloth.Web.Models.TransactionViewModels.TransactionsTableViewModel
@@ -34,7 +35,7 @@
 
             <tr>
                 <th scope="row">@t.Id</th>
-                <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate</td>
+                <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate.ToPacificTime()</td>
                 <td>@t.KfsTrackingNumber</td>
                 <td>@t.DocumentNumber</td>
                 <td>@t.ProcessorTrackingNumber</td>
