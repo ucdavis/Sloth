@@ -173,8 +173,10 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateReversal(string id)
+        public async Task<IActionResult> CreateReversal(string id, decimal reversalAmount)
         {
+            reversalAmount = Math.Round(reversalAmount, 2);
+
             var transaction = await DbContext.Transactions
                 .Include(t => t.Scrubber)
                 .Include(t => t.Source)
@@ -198,6 +200,21 @@ namespace Sloth.Web.Controllers
                 return BadRequest("Cannot reverse transaction again");
             }
 
+            if (reversalAmount < 0.01m)
+            {
+                return BadRequest("Reversal amount must be greater than 0");
+            }
+
+            var totalAmount = transaction.Transfers
+                .Where(t => t.Direction == Transfer.CreditDebit.Credit)
+                .Sum(t => t.Amount);
+            if (reversalAmount > totalAmount)
+            {
+                return BadRequest("Cannot reverse more than the total amount of the transaction.");
+            }
+
+            var percentage = reversalAmount / totalAmount;
+
             await using var tran = await DbContext.Database.BeginTransactionAsync();
             var user = await UserManager.GetUserAsync(User);
 
@@ -219,6 +236,13 @@ namespace Sloth.Web.Controllers
             // add reversal transfers
             foreach (var transfer in transaction.Transfers)
             {
+                var amount = Math.Round(transfer.Amount * percentage, 2);
+                // don't create a transfer if it rounds to less than one cent
+                if (amount < 0.01m)
+                {
+                    continue;
+                }
+
                 // same info, except reverse direction
                 var direction = transfer.Direction == Transfer.CreditDebit.Credit
                     ? Transfer.CreditDebit.Debit
@@ -226,25 +250,26 @@ namespace Sloth.Web.Controllers
 
                 reversal.Transfers.Add(new Transfer
                 {
-                    Amount         = transfer.Amount,
-                    Account        = transfer.Account,
-                    Chart          = transfer.Chart,
-                    Description    = transfer.Description,
-                    Direction      = direction,
-                    FiscalPeriod   = DateTime.UtcNow.GetFiscalPeriod(),
-                    FiscalYear     = DateTime.UtcNow.GetFinancialYear(),
-                    ObjectCode     = transfer.ObjectCode,
-                    ObjectType     = transfer.ObjectType,
-                    Project        = transfer.Project,
-                    ReferenceId    = transfer.ReferenceId,
-                    SequenceNumber = transfer.SequenceNumber,
-                    SubAccount     = transfer.SubAccount,
-                    SubObjectCode  = transfer.SubObjectCode,
+                    Amount                 = amount,
+                    Account                = transfer.Account,
+                    Chart                  = transfer.Chart,
+                    Description            = transfer.Description,
+                    Direction              = direction,
+                    FiscalPeriod           = DateTime.UtcNow.GetFiscalPeriod(),
+                    FiscalYear             = DateTime.UtcNow.GetFinancialYear(),
+                    ObjectCode             = transfer.ObjectCode,
+                    ObjectType             = transfer.ObjectType,
+                    Project                = transfer.Project,
+                    ReferenceId            = transfer.ReferenceId,
+                    SequenceNumber         = transfer.SequenceNumber,
+                    FinancialSegmentString = transfer.FinancialSegmentString,
+                    SubAccount             = transfer.SubAccount,
+                    SubObjectCode          = transfer.SubObjectCode,
                 });
             }
 
             // save transaction to establish id
-            await DbContext.Transactions.AddAsync(reversal); 
+            await DbContext.Transactions.AddAsync(reversal);
             await DbContext.SaveChangesAsync();
 
             // save relationship

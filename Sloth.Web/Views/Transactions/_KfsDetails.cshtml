@@ -114,9 +114,11 @@
 
 @if (Model.Status == TransactionStatuses.Completed && !Model.HasReversal)
 {
+    var amount = Model.Transfers.Where(x => x.Direction == Transfer.CreditDebit.Credit).Sum(x => x.Amount);
     <form asp-controller="Transactions" asp-action="CreateReversal" asp-route-id="@Model.Id" method="post">
-        <div class="d-flex justify-content-end align-items-center">
-            <button type="submit" class="btn btn-small btn-primary">Reverse Transaction</button>
+        <div class="d-flex mb-2">
+            <input type="text" class="ml-auto p2" id="reversal-amount" name="reversalAmount" placeholder="reversal amount" value="@amount"/>
+            <button type="submit" class="p2 btn btn-small btn-primary">Reverse Transaction</button>
         </div>
     </form>
 }
