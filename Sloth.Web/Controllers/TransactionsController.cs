@@ -268,6 +268,20 @@ namespace Sloth.Web.Controllers
                 });
             }
 
+            var totalReversalCredit = reversal.Transfers
+                .Where(t => t.Direction == Transfer.CreditDebit.Credit)
+                .Sum(t => t.Amount);
+            var totalReversalDebit = reversal.Transfers
+                .Where(t => t.Direction == Transfer.CreditDebit.Debit)
+                .Sum(t => t.Amount);
+
+            if (totalReversalCredit != totalReversalDebit)
+            {
+                await tran.RollbackAsync();
+                ErrorMessage = "Reversal's credit total does not match debit dotal.";
+                return RedirectToAction("Details", new { id });
+            }
+
             // save transaction to establish id
             await DbContext.Transactions.AddAsync(reversal);
             await DbContext.SaveChangesAsync();
