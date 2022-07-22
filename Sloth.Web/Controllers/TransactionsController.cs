@@ -191,18 +191,21 @@ namespace Sloth.Web.Controllers
             // you can only reverse a completed transaction
             if (transaction.Status != TransactionStatuses.Completed)
             {
-                return BadRequest("Cannot reverse incomplete transaction.");
+                ErrorMessage = "Cannot reverse incomplete transaction";
+                return RedirectToAction("Details", new { id });
             }
 
             // you can only reverse a transaction once
             if (transaction.HasReversal)
             {
-                return BadRequest("Cannot reverse transaction again");
+                ErrorMessage = "Cannot reverse transaction again";
+                return RedirectToAction("Details", new { id });
             }
 
             if (reversalAmount < 0.01m)
             {
-                return BadRequest("Reversal amount must be greater than 0");
+                ErrorMessage = "Reversal amount must be greater than 0";
+                return RedirectToAction("Details", new { id });
             }
 
             var totalAmount = transaction.Transfers
@@ -210,7 +213,8 @@ namespace Sloth.Web.Controllers
                 .Sum(t => t.Amount);
             if (reversalAmount > totalAmount)
             {
-                return BadRequest("Cannot reverse more than the total amount of the transaction.");
+                ErrorMessage = "Cannot reverse more than the total amount of the transaction";
+                return RedirectToAction("Details", new { id });
             }
 
             var percentage = reversalAmount / totalAmount;
@@ -278,7 +282,7 @@ namespace Sloth.Web.Controllers
             if (totalReversalCredit != totalReversalDebit)
             {
                 await tran.RollbackAsync();
-                ErrorMessage = "Reversal's credit total does not match debit dotal.";
+                ErrorMessage = "Reversal's credit total does not match debit dotal";
                 return RedirectToAction("Details", new { id });
             }
 
@@ -292,6 +296,7 @@ namespace Sloth.Web.Controllers
 
             await tran.CommitAsync();
 
+            Message = "Reversal created successfully";
             return RedirectToAction("Details", new { id = reversal.Id });
         }
 
