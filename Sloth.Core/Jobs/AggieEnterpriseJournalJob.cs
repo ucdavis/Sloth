@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AggieEnterpriseApi;
@@ -21,6 +22,24 @@ namespace Sloth.Core.Jobs
         {
             _context = context;
             _aggieEnterpriseService = aggieEnterpriseService;
+        }
+
+        public class AggieEnterpriseJournalJobDetails
+        {
+            public AggieEnterpriseJournalJobDetails()
+            {
+                TransactionRunStatuses = new List<TransactionRunStatus>();
+            }
+
+            public List<TransactionRunStatus> TransactionRunStatuses { get; set; }
+
+            public int TransactionsProcessedCount => TransactionRunStatuses.Count;
+
+            public class TransactionRunStatus
+            {
+                public string TransactionId { get; set; }
+                public string Action { get; set; }
+            }
         }
 
         public async Task UploadTransactions(ILogger log)
@@ -63,7 +82,7 @@ namespace Sloth.Core.Jobs
 
                             // here we will store the result of the transaction upload
                             var journalRequest = new JournalRequest
-                            { Transactions = new[] { transaction }, Source = source };
+                                { Transactions = new[] { transaction }, Source = source };
 
                             if (requestStatus.RequestId.HasValue &&
                                 requestStatus.RequestStatus == RequestStatus.Pending)
@@ -111,6 +130,15 @@ namespace Sloth.Core.Jobs
         /// </summary>
         public async Task ResolveProcessingJournals(ILogger log)
         {
+            var jobRun = new JobRecord
+                { Name = "AggieEnterpriseJournalJob.ResolveProcessingJournals", Status = JobRecord.Statuses.Running };
+
+            _context.JobRecords.Add(jobRun);
+
+            await _context.SaveChangesAsync();
+
+            var jobDetails = new AggieEnterpriseJournalJobDetails();
+
             try
             {
                 // fetch staged transactions with FinancialSegmentString populated
@@ -139,33 +167,47 @@ namespace Sloth.Core.Jobs
                     // loop through grouped transactions and determine status of each
                     foreach (var transaction in groupedTransactions)
                     {
+                        var transactionRunStatus = new AggieEnterpriseJournalJobDetails.TransactionRunStatus { TransactionId = transaction.Id };
+
                         try
                         {
-                            var result = await _aggieEnterpriseService.GetJournalStatus(transaction.JournalRequest.RequestId.ToString());
+                            var result =
+                                await _aggieEnterpriseService.GetJournalStatus(transaction.JournalRequest.RequestId
+                                    .ToString());
 
                             if (result?.GlJournalRequestStatus == null)
                             {
                                 log.Error("Error getting status of journal request for transaction {TransactionId}",
                                     transaction.Id);
+
+                                transactionRunStatus.Action = "Error";
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
-                                     RequestStatus.Rejected || result.GlJournalRequestStatus.RequestStatus.RequestStatus == RequestStatus.Error)
+                                     RequestStatus.Rejected ||
+                                     result.GlJournalRequestStatus.RequestStatus.RequestStatus == RequestStatus.Error)
                             {
                                 transaction.SetStatus(TransactionStatuses.Rejected);
                                 // TODO: do we want to save any metadata about request? if not, we'll need to pull status from API
-                                transaction.JournalRequest.Status = result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
+                                transaction.JournalRequest.Status =
+                                    result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
+
+                                transactionRunStatus.Action = TransactionStatuses.Rejected;
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
                                      RequestStatus.Complete)
                             {
                                 // success, update transaction status to uploaded
                                 transaction.SetStatus(TransactionStatuses.Completed);
-                                transaction.JournalRequest.Status = result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
+                                transaction.JournalRequest.Status =
+                                    result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
+
+                                transactionRunStatus.Action = TransactionStatuses.Completed;
                             }
                             else
                             {
                                 // still processing, do nothing
                                 // TODO: if not processing we might want to log, just in case we get a weird response
+                                transactionRunStatus.Action = TransactionStatuses.Processing;
                             }
 
                             // save changes
@@ -175,7 +217,11 @@ namespace Sloth.Core.Jobs
                         {
                             log.Error(ex, "Error checking status of journal for transaction {TransactionId}",
                                 transaction.Id);
+
+                            transactionRunStatus.Action = "Error";
                         }
+
+                        jobDetails.TransactionRunStatuses.Add(transactionRunStatus);
                     }
                 }
             }
@@ -183,6 +229,11 @@ namespace Sloth.Core.Jobs
             {
                 log.Error(ex, "Error processing journal statuses");
             }
+
+            jobRun.Status = JobRecord.Statuses.Success;
+            jobRun.SetDetails(jobDetails);
+
+            await _context.SaveChangesAsync();
         }
     }
 }
