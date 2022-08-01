@@ -7,7 +7,7 @@ using Sloth.Core.Domain;
 
 namespace Sloth.Core.Models
 {
-    public class CybersourceBankReconcileJobRecord : JobRecord
+    public class CybersourceBankReconcileJobRecord : JobRecordBase
     {
         [Display(Name = "Processed Date")]
         public DateTime ProcessedDate { get; set; }

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Sloth.Core.Models
 {
-    public abstract class JobRecord
+    public abstract class JobRecordBase
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
