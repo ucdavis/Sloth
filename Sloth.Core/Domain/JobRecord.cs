@@ -32,6 +32,13 @@ namespace Sloth.Core.Models
             Details = JsonConvert.SerializeObject(details);
         }
 
+        public void SetCompleted(string status, object details)
+        {
+            EndedAt = DateTime.UtcNow;
+            Status = status;
+            SetDetails(details);
+        }
+
         // list of possible statuses
         public static class Statuses
         {

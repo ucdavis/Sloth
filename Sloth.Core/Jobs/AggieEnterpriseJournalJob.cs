@@ -44,6 +44,15 @@ namespace Sloth.Core.Jobs
 
         public async Task UploadTransactions(ILogger log)
         {
+            var jobRun = new JobRecord
+                { Name = "AggieEnterpriseJournalJob.UploadTransactions", Status = JobRecord.Statuses.Running };
+
+            _context.JobRecords.Add(jobRun);
+
+            await _context.SaveChangesAsync();
+
+            var jobDetails = new AggieEnterpriseJournalJobDetails();
+
             try
             {
                 // fetch staged transactions with FinancialSegmentString populated
@@ -75,6 +84,9 @@ namespace Sloth.Core.Jobs
                     // loop through grouped transactions and upload to Aggie Enterprise, saving status of each
                     foreach (var transaction in groupedTransactions)
                     {
+                        var transactionRunStatus = new AggieEnterpriseJournalJobDetails.TransactionRunStatus
+                            { TransactionId = transaction.Id };
+
                         try
                         {
                             var result = await _aggieEnterpriseService.CreateJournal(source, transaction);
@@ -95,6 +107,9 @@ namespace Sloth.Core.Jobs
 
                                 // save journal request
                                 _context.JournalRequests.Add(journalRequest);
+
+                                transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
+                                ;
                             }
                             else if (requestStatus.RequestId.HasValue &&
                                      requestStatus.RequestStatus == RequestStatus.Rejected)
@@ -104,6 +119,9 @@ namespace Sloth.Core.Jobs
 
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
+
+                                transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
+                                ;
                             }
 
                             // TODO: These are likely the only two statuses possible for a new request, but confirm
@@ -114,7 +132,10 @@ namespace Sloth.Core.Jobs
                         catch (Exception ex)
                         {
                             log.Error(ex, "Error creating journal for transaction {TransactionId}", transaction.Id);
+                            transactionRunStatus.Action = "Error";
                         }
+
+                        jobDetails.TransactionRunStatuses.Add(transactionRunStatus);
                     }
                 }
             }
@@ -122,6 +143,10 @@ namespace Sloth.Core.Jobs
             {
                 log.Error(ex, "Error uploading transactions");
             }
+
+            jobRun.SetCompleted(JobRecord.Statuses.Success, jobDetails);
+
+            await _context.SaveChangesAsync();
         }
 
         /// <summary>
@@ -167,7 +192,8 @@ namespace Sloth.Core.Jobs
                     // loop through grouped transactions and determine status of each
                     foreach (var transaction in groupedTransactions)
                     {
-                        var transactionRunStatus = new AggieEnterpriseJournalJobDetails.TransactionRunStatus { TransactionId = transaction.Id };
+                        var transactionRunStatus = new AggieEnterpriseJournalJobDetails.TransactionRunStatus
+                            { TransactionId = transaction.Id };
 
                         try
                         {
@@ -230,8 +256,7 @@ namespace Sloth.Core.Jobs
                 log.Error(ex, "Error processing journal statuses");
             }
 
-            jobRun.Status = JobRecord.Statuses.Success;
-            jobRun.SetDetails(jobDetails);
+            jobRun.SetCompleted(JobRecord.Statuses.Success, jobDetails);
 
             await _context.SaveChangesAsync();
         }
