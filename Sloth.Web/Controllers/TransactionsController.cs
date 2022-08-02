@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Serilog;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
@@ -79,7 +80,7 @@ namespace Sloth.Web.Controllers
                 }
 
                 result.TeamMerchantIds =
-                    teamMerchantIds.Select(i => new SelectListItem() {Value = i, Text = i}).ToList();
+                    teamMerchantIds.Select(i => new SelectListItem() { Value = i, Text = i }).ToList();
             }
 
             result.TransactionsTable = new TransactionsTableViewModel()
@@ -227,13 +228,13 @@ namespace Sloth.Web.Controllers
             // create new transaction
             var reversal = new Transaction
             {
-                Source                  = transaction.Source,
-                Creator                 = user,
-                TransactionDate         = DateTime.UtcNow,
-                DocumentNumber          = documentNumber,
-                KfsTrackingNumber       = transaction.KfsTrackingNumber,
-                MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
-                MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
+                Source = transaction.Source,
+                Creator = user,
+                TransactionDate = DateTime.UtcNow,
+                DocumentNumber = documentNumber,
+                KfsTrackingNumber = transaction.KfsTrackingNumber,
+                MerchantTrackingNumber = transaction.MerchantTrackingNumber,
+                MerchantTrackingUrl = transaction.MerchantTrackingUrl,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
             }.SetStatus(TransactionStatuses.Scheduled);
 
@@ -254,36 +255,45 @@ namespace Sloth.Web.Controllers
 
                 reversal.Transfers.Add(new Transfer
                 {
-                    Amount                 = amount,
-                    Account                = transfer.Account,
-                    Chart                  = transfer.Chart,
-                    Description            = transfer.Description,
-                    Direction              = direction,
-                    FiscalPeriod           = DateTime.UtcNow.GetFiscalPeriod(),
-                    FiscalYear             = DateTime.UtcNow.GetFinancialYear(),
-                    ObjectCode             = transfer.ObjectCode,
-                    ObjectType             = transfer.ObjectType,
-                    Project                = transfer.Project,
-                    ReferenceId            = transfer.ReferenceId,
-                    SequenceNumber         = transfer.SequenceNumber,
+                    Amount = amount,
+                    Account = transfer.Account,
+                    Chart = transfer.Chart,
+                    Description = transfer.Description,
+                    Direction = direction,
+                    FiscalPeriod = DateTime.UtcNow.GetFiscalPeriod(),
+                    FiscalYear = DateTime.UtcNow.GetFinancialYear(),
+                    ObjectCode = transfer.ObjectCode,
+                    ObjectType = transfer.ObjectType,
+                    Project = transfer.Project,
+                    ReferenceId = transfer.ReferenceId,
+                    SequenceNumber = transfer.SequenceNumber,
                     FinancialSegmentString = transfer.FinancialSegmentString,
-                    SubAccount             = transfer.SubAccount,
-                    SubObjectCode          = transfer.SubObjectCode,
+                    SubAccount = transfer.SubAccount,
+                    SubObjectCode = transfer.SubObjectCode,
                 });
             }
 
-            var totalReversalCredit = reversal.Transfers
-                .Where(t => t.Direction == Transfer.CreditDebit.Credit)
-                .Sum(t => t.Amount);
-            var totalReversalDebit = reversal.Transfers
-                .Where(t => t.Direction == Transfer.CreditDebit.Debit)
-                .Sum(t => t.Amount);
+            var reversalCredits = reversal.Transfers.Where(t => t.Direction == Transfer.CreditDebit.Credit).ToArray();
+            var reversalDebits = reversal.Transfers.Where(t => t.Direction == Transfer.CreditDebit.Debit).ToArray();
+            var totalReversalCredit = reversalCredits.Sum(t => t.Amount);
+            var totalReversalDebit = reversalDebits.Sum(t => t.Amount);
 
-            if (totalReversalCredit != totalReversalDebit)
+            /// adjust for rounding error
+            if (totalReversalDebit > totalReversalCredit)
             {
-                await tran.RollbackAsync();
-                ErrorMessage = "Reversal's credit total does not match debit dotal";
-                return RedirectToAction("Details", new { id });
+                var centIncrements = (int)Math.Round((totalReversalDebit - totalReversalCredit) * 100);
+                for (var i = 0; i < centIncrements; i++)
+                {
+                    reversalCredits[i % reversalCredits.Length].Amount += 0.01m;
+                }
+            }
+            else if (totalReversalCredit > totalReversalDebit)
+            {
+                var centIncrements = (int)Math.Round((totalReversalCredit - totalReversalDebit) * 100);
+                for (var i = 0; i < centIncrements; i++)
+                {
+                    reversalDebits[i % reversalDebits.Length].Amount += 0.01m;
+                }
             }
 
             // save transaction to establish id
