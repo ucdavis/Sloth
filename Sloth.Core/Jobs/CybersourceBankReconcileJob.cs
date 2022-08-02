@@ -54,7 +54,8 @@ namespace Sloth.Core.Jobs
 
             foreach (var integration in integrations)
             {
-                Log.Information("Starting integration for {Integration}", integration.Team.Name);
+                log.ForContext("TeamName", integration.Team.Name);
+                log.Information("Starting integration for {TeamName}");
                 CybersourceBankReconcileJobBlob jobBlob = null;
                 try
                 {
@@ -64,7 +65,8 @@ namespace Sloth.Core.Jobs
                 {
                     log.Error(ex, ex.Message);
                 }
-                Log.Information("Completed integration for {Integration}", integration.Team.Name);
+                log.Information("Completed integration for {TeamName}");
+
                 if (jobBlob != null)
                     yield return jobBlob;
             }
