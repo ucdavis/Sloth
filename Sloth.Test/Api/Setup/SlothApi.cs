@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Sloth.Core;
 using Sloth.Core.Models;
+using Sloth.Test.Helpers;
 
 public class SlothApi : WebApplicationFactory<Sloth.Api.Startup>
 {
