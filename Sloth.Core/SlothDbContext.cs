@@ -26,6 +26,8 @@ namespace Sloth.Core
 
         public DbSet<Source> Sources { get; set; }
 
+        public DbSet<JobRecord> JobRecords { get; set; }
+
         public DbSet<JournalRequest> JournalRequests { get; set; }
 
         public DbSet<Transaction> Transactions { get; set; }

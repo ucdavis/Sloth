@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
-    public class KfsScrubberUploadJobRecord : JobRecord
+    public class KfsScrubberUploadJobRecord : JobRecordBase
     {
         public IList<Transaction> Transactions { get; set; }
 
