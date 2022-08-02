@@ -1,6 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json;
+using System.Text.Json;
 
 namespace Sloth.Core.Models
 {
@@ -29,7 +29,7 @@ namespace Sloth.Core.Models
         public void SetDetails(object details)
         {
             // convert to json string and store
-            Details = JsonConvert.SerializeObject(details);
+            Details = JsonSerializer.Serialize(details);
         }
 
         public void SetCompleted(string status, object details)

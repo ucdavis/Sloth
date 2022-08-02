@@ -121,7 +121,6 @@ namespace Sloth.Core.Jobs
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
-                                ;
                             }
 
                             // TODO: These are likely the only two statuses possible for a new request, but confirm
