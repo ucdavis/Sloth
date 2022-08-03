@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>    
+  <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AspNetCore.TestHelpers" Version="1.1.14"/>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.6" />
@@ -23,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Sloth.Api\Sloth.Api.csproj" />
     <ProjectReference Include="..\Sloth.Core\Sloth.Core.csproj" />
+    <ProjectReference Include="..\Sloth.Web\Sloth.Web.csproj" />
     <ProjectReference Include="..\Sloth.Xml\Sloth.Xml.csproj" />
   </ItemGroup>
 

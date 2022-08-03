@@ -128,6 +128,27 @@
                 </div>
             </div>
         }
+        @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string ?? TempData["ErrorMessage"] as string))
+        {
+            <div class="container">
+                <div class="row mb-1">
+                    @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
+                    {
+                        <div class="col alert alert-info">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            @TempData["Message"]
+                        </div>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
+                    {
+                        <div class="col alert alert-danger">
+                            <button type="button" class="close" data-dismiss="alert">×</button>
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+                </div>
+            </div>
+        }
         @RenderBody()
     </div>
     <footer class="border-top py-3">

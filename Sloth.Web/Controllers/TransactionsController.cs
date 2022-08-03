@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Serilog;
 using Sloth.Core;
 using Sloth.Core.Extensions;
 using Sloth.Core.Models;
@@ -79,7 +80,7 @@ namespace Sloth.Web.Controllers
                 }
 
                 result.TeamMerchantIds =
-                    teamMerchantIds.Select(i => new SelectListItem() {Value = i, Text = i}).ToList();
+                    teamMerchantIds.Select(i => new SelectListItem() { Value = i, Text = i }).ToList();
             }
 
             result.TransactionsTable = new TransactionsTableViewModel()
@@ -173,8 +174,10 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateReversal(string id)
+        public async Task<IActionResult> CreateReversal(string id, decimal reversalAmount)
         {
+            reversalAmount = Math.Round(reversalAmount, 2);
+
             var transaction = await DbContext.Transactions
                 .Include(t => t.Scrubber)
                 .Include(t => t.Source)
@@ -189,14 +192,33 @@ namespace Sloth.Web.Controllers
             // you can only reverse a completed transaction
             if (transaction.Status != TransactionStatuses.Completed)
             {
-                return BadRequest("Cannot reverse incomplete transaction.");
+                ErrorMessage = "Cannot reverse incomplete transaction";
+                return RedirectToAction("Details", new { id });
             }
 
             // you can only reverse a transaction once
             if (transaction.HasReversal)
             {
-                return BadRequest("Cannot reverse transaction again");
+                ErrorMessage = "Cannot reverse transaction again";
+                return RedirectToAction("Details", new { id });
             }
+
+            if (reversalAmount < 0.01m)
+            {
+                ErrorMessage = "Reversal amount must be greater than 0";
+                return RedirectToAction("Details", new { id });
+            }
+
+            var totalAmount = transaction.Transfers
+                .Where(t => t.Direction == Transfer.CreditDebit.Credit)
+                .Sum(t => t.Amount);
+            if (reversalAmount > totalAmount)
+            {
+                ErrorMessage = "Cannot reverse more than the total amount of the transaction";
+                return RedirectToAction("Details", new { id });
+            }
+
+            var percentage = reversalAmount / totalAmount;
 
             await using var tran = await DbContext.Database.BeginTransactionAsync();
             var user = await UserManager.GetUserAsync(User);
@@ -206,19 +228,26 @@ namespace Sloth.Web.Controllers
             // create new transaction
             var reversal = new Transaction
             {
-                Source                  = transaction.Source,
-                Creator                 = user,
-                TransactionDate         = DateTime.UtcNow,
-                DocumentNumber          = documentNumber,
-                KfsTrackingNumber       = transaction.KfsTrackingNumber,
-                MerchantTrackingNumber  = transaction.MerchantTrackingNumber,
-                MerchantTrackingUrl     = transaction.MerchantTrackingUrl,
+                Source = transaction.Source,
+                Creator = user,
+                TransactionDate = DateTime.UtcNow,
+                DocumentNumber = documentNumber,
+                KfsTrackingNumber = transaction.KfsTrackingNumber,
+                MerchantTrackingNumber = transaction.MerchantTrackingNumber,
+                MerchantTrackingUrl = transaction.MerchantTrackingUrl,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
             }.SetStatus(TransactionStatuses.Scheduled);
 
             // add reversal transfers
             foreach (var transfer in transaction.Transfers)
             {
+                var amount = Math.Round(transfer.Amount * percentage, 2);
+                // don't create a transfer if it rounds to less than one cent
+                if (amount < 0.01m)
+                {
+                    continue;
+                }
+
                 // same info, except reverse direction
                 var direction = transfer.Direction == Transfer.CreditDebit.Credit
                     ? Transfer.CreditDebit.Debit
@@ -226,25 +255,49 @@ namespace Sloth.Web.Controllers
 
                 reversal.Transfers.Add(new Transfer
                 {
-                    Amount         = transfer.Amount,
-                    Account        = transfer.Account,
-                    Chart          = transfer.Chart,
-                    Description    = transfer.Description,
-                    Direction      = direction,
-                    FiscalPeriod   = DateTime.UtcNow.GetFiscalPeriod(),
-                    FiscalYear     = DateTime.UtcNow.GetFinancialYear(),
-                    ObjectCode     = transfer.ObjectCode,
-                    ObjectType     = transfer.ObjectType,
-                    Project        = transfer.Project,
-                    ReferenceId    = transfer.ReferenceId,
+                    Amount = amount,
+                    Account = transfer.Account,
+                    Chart = transfer.Chart,
+                    Description = transfer.Description,
+                    Direction = direction,
+                    FiscalPeriod = DateTime.UtcNow.GetFiscalPeriod(),
+                    FiscalYear = DateTime.UtcNow.GetFinancialYear(),
+                    ObjectCode = transfer.ObjectCode,
+                    ObjectType = transfer.ObjectType,
+                    Project = transfer.Project,
+                    ReferenceId = transfer.ReferenceId,
                     SequenceNumber = transfer.SequenceNumber,
-                    SubAccount     = transfer.SubAccount,
-                    SubObjectCode  = transfer.SubObjectCode,
+                    FinancialSegmentString = transfer.FinancialSegmentString,
+                    SubAccount = transfer.SubAccount,
+                    SubObjectCode = transfer.SubObjectCode,
                 });
             }
 
+            var reversalCredits = reversal.Transfers.Where(t => t.Direction == Transfer.CreditDebit.Credit).ToArray();
+            var reversalDebits = reversal.Transfers.Where(t => t.Direction == Transfer.CreditDebit.Debit).ToArray();
+            var totalReversalCredit = reversalCredits.Sum(t => t.Amount);
+            var totalReversalDebit = reversalDebits.Sum(t => t.Amount);
+
+            /// adjust for rounding error
+            if (totalReversalDebit > totalReversalCredit)
+            {
+                var centIncrements = (int)Math.Round((totalReversalDebit - totalReversalCredit) * 100);
+                for (var i = 0; i < centIncrements; i++)
+                {
+                    reversalCredits[i % reversalCredits.Length].Amount += 0.01m;
+                }
+            }
+            else if (totalReversalCredit > totalReversalDebit)
+            {
+                var centIncrements = (int)Math.Round((totalReversalCredit - totalReversalDebit) * 100);
+                for (var i = 0; i < centIncrements; i++)
+                {
+                    reversalDebits[i % reversalDebits.Length].Amount += 0.01m;
+                }
+            }
+
             // save transaction to establish id
-            await DbContext.Transactions.AddAsync(reversal); 
+            await DbContext.Transactions.AddAsync(reversal);
             await DbContext.SaveChangesAsync();
 
             // save relationship
@@ -253,6 +306,7 @@ namespace Sloth.Web.Controllers
 
             await tran.CommitAsync();
 
+            Message = "Reversal created successfully";
             return RedirectToAction("Details", new { id = reversal.Id });
         }
 

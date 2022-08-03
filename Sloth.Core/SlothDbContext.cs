@@ -18,47 +18,47 @@ namespace Sloth.Core
         {
         }
 
-        public DbSet<ApiKey> ApiKeys { get; set; }
+        public virtual DbSet<ApiKey> ApiKeys { get; set; }
 
-        public DbSet<Integration> Integrations { get; set; }
+        public virtual DbSet<Integration> Integrations { get; set; }
 
-        public DbSet<Scrubber> Scrubbers { get; set; }
+        public virtual DbSet<Scrubber> Scrubbers { get; set; }
 
-        public DbSet<Source> Sources { get; set; }
+        public virtual DbSet<Source> Sources { get; set; }
 
-        public DbSet<JobRecord> JobRecords { get; set; }
+        public virtual DbSet<JobRecord> JobRecords { get; set; }
 
-        public DbSet<JournalRequest> JournalRequests { get; set; }
+        public virtual DbSet<JournalRequest> JournalRequests { get; set; }
 
-        public DbSet<Transaction> Transactions { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
 
-        public DbSet<Transfer> Transfers { get; set; }
+        public virtual DbSet<Transfer> Transfers { get; set; }
 
-        public DbSet<Team> Teams { get; set; }
+        public virtual DbSet<Team> Teams { get; set; }
 
-        public DbSet<TeamRole> TeamRoles { get; set; }
+        public virtual DbSet<TeamRole> TeamRoles { get; set; }
 
-        public DbSet<UserTeamRole> UserTeamRoles { get; set; }
+        public virtual DbSet<UserTeamRole> UserTeamRoles { get; set; }
 
-        public DbSet<CybersourceBankReconcileJobRecord> CybersourceBankReconcileJobRecords { get; set; }
+        public virtual DbSet<CybersourceBankReconcileJobRecord> CybersourceBankReconcileJobRecords { get; set; }
 
-        public DbSet<KfsScrubberUploadJobRecord> KfsScrubberUploadJobRecords { get; set; }
+        public virtual DbSet<KfsScrubberUploadJobRecord> KfsScrubberUploadJobRecords { get; set; }
 
-        public DbSet<LogMessage> Logs { get; set; }
+        public virtual DbSet<LogMessage> Logs { get; set; }
 
-        public DbSet<WebHook> WebHooks { get; set; }
+        public virtual DbSet<WebHook> WebHooks { get; set; }
 
-        public DbSet<Blob> Blobs { get; set; }
+        public virtual DbSet<Blob> Blobs { get; set; }
 
-        public DbSet<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
+        public virtual DbSet<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
 
-        public DbSet<TransactionStatusEvent> TransactionStatusEvents { get; set; }
+        public virtual DbSet<TransactionStatusEvent> TransactionStatusEvents { get; set; }
 
-        public DbSet<WebHookRequest> WebHookRequests { get; set; }
+        public virtual DbSet<WebHookRequest> WebHookRequests { get; set; }
 
-        public DbSet<WebHookRequestResendJobRecord> WebHookRequestResendJobRecords { get; set; }
+        public virtual DbSet<WebHookRequestResendJobRecord> WebHookRequestResendJobRecords { get; set; }
 
-        public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
+        public virtual async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
             const string sql = "SELECT NEXT VALUE FOR KFS_Tracking_Number_Seq AS KfsTrackingNumber";
 
@@ -84,7 +84,7 @@ namespace Sloth.Core
             }
         }
 
-        public async Task<string> GetNextDocumentNumber(DbTransaction transaction = null)
+        public virtual async Task<string> GetNextDocumentNumber(DbTransaction transaction = null)
         {
             const string sql = "SELECT NEXT VALUE FOR Document_Number_Seq AS DocumentNumber";
 

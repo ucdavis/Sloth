@@ -24,6 +24,12 @@ namespace Sloth.Web.Controllers
             DbContext = dbContext;
         }
 
+        [TempData(Key = "Message")]
+        public string Message { get; set; }
+
+        [TempData(Key = "ErrorMessage")]
+        public string ErrorMessage { get; set; }
+
         protected async Task<IReadOnlyList<Team>> GetUsersAdminTeams()
         {
             if (User.IsInRole(Roles.SystemAdmin))
