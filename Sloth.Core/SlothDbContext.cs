@@ -26,6 +26,8 @@ namespace Sloth.Core
 
         public virtual DbSet<Source> Sources { get; set; }
 
+        public virtual DbSet<JobRecord> JobRecords { get; set; }
+
         public virtual DbSet<JournalRequest> JournalRequests { get; set; }
 
         public virtual DbSet<Transaction> Transactions { get; set; }
@@ -56,7 +58,7 @@ namespace Sloth.Core
 
         public virtual DbSet<WebHookRequestResendJobRecord> WebHookRequestResendJobRecords { get; set; }
 
-        public async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
+        public virtual async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
             const string sql = "SELECT NEXT VALUE FOR KFS_Tracking_Number_Seq AS KfsTrackingNumber";
 

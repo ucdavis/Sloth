@@ -90,7 +90,7 @@ namespace Sloth.Core.Services
 
                 var line = new GlJournalLineInput
                 {
-                    ExternalSystemIdentifier = transfer.ReferenceId.StripToGlReferenceField(10),
+                    ExternalSystemIdentifier = transaction.KfsTrackingNumber.StripToGlReferenceField(10),
                     ExternalSystemReference = transfer.Id.StripToGlReferenceField(25)
                 };
 

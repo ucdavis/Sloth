@@ -7,7 +7,7 @@ using Sloth.Core.Domain;
 
 namespace Sloth.Core.Models
 {
-    public class WebHookRequestResendJobRecord : JobRecord
+    public class WebHookRequestResendJobRecord : JobRecordBase
     {
         public IList<WebHookRequest> WebHookRequests { get; set; }
 

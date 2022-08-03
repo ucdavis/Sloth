@@ -54,15 +54,19 @@ namespace Sloth.Core.Jobs
 
             foreach (var integration in integrations)
             {
+                var innerLog = log.ForContext("TeamName", integration.Team.Name);
+                innerLog.Information("Starting integration for {TeamName}");
                 CybersourceBankReconcileJobBlob jobBlob = null;
                 try
                 {
-                    jobBlob = await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, log);
+                    jobBlob = await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, innerLog);                    
                 }
                 catch (Exception ex)
                 {
-                    log.Error(ex, ex.Message);
+                    innerLog.Error(ex, ex.Message);
                 }
+                innerLog.Information("Completed integration for {TeamName}");
+
                 if (jobBlob != null)
                     yield return jobBlob;
             }
