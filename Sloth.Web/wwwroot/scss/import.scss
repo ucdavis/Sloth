@@ -10,10 +10,8 @@ $theme-colors: (
 @import "bootstrap/scss/bootstrap";
 @import "@ucdavis/gunrockin/sass/_typography.scss";
 
-$bg-primary: #f7f7f7;
-$bg-secondary: #f7fafc;
+$bg-primary: transparentize($primary-color, 0.96);
 $danger: $merlot;
 $error-color: $danger;
 
-$borders-secondary: #e5eaef;
-$primary-light: #ebf1ee;
+$borders-sloth: #e6e7e9;

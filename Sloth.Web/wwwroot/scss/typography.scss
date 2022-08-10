@@ -4,56 +4,23 @@ h3,
 h4 {
   color: $primary-color;
 }
-// h1 {
-//   font-weight: 600;
-//   font-size: 1.8rem;
-//   header & {
-//     color: #fff;
-//   }
-//   a {
-//     text-decoration: underline;
-//   }
-// }
-// h2 {
-//   font-size: 1.6rem;
-// }
-// h3 {
-//   font-size: 1.4rem;
-// }
-// h4 {
-//   font-size: 1.2rem;
-//   color: $secondary-font;
-// }
-// h5 {
-//   text-transform: uppercase;
-//   color: $primary-color;
-//   font-size: 1.2rem;
-//   font-family: $sans-bold;
-// }
-// p {
-//   font-size: 1rem;
-//   &.subtitle {
-//     margin-bottom: 0;
-//   }
-//   &.lede {
-//     font-size: 1.1rem;
-//     font-family: $sans-bold;
-//   }
-//   &.discreet {
-//     font-style: italic;
-//     color: $secondary-font;
-//   }
-// }
-// label {
-//   font-size: 1.2rem;
-//   text-transform: capitalize;
-// }
-// a {
-//   color: $primary-color;
-//   &:hover {
-//     color: darken($primary-color, 4);
-//   }
-// }
-// label {
-//   text-transform: none !important;
-// }
+h1 {
+  font-weight: 600;
+  font-size: 1.8rem;
+  header & {
+    color: #fff;
+  }
+  a {
+    text-decoration: underline;
+  }
+}
+h2 {
+  font-size: 1.6rem;
+}
+h3 {
+  font-size: 1.4rem;
+}
+h4 {
+  font-size: 1.2rem;
+  color: $secondary-font;
+}
