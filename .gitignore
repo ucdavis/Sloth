@@ -53,6 +53,9 @@ TestResult.xml
 [Rr]eleasePS/
 dlldata.c
 
+# OS X temporary files that should never be committed
+.DS_Store
+
 # DNX
 project.lock.json
 artifacts/

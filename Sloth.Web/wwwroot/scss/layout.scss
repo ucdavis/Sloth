@@ -1,0 +1,76 @@
+// html,
+// body {
+//   height: 100%;
+// }
+// body {
+//   display: flex;
+//   flex-direction: column;
+//   background-color: $bg-primary;
+// }
+// .page-wrap {
+//   flex: 1 0 auto;
+// }
+// .card-wrapper {
+//   border-top: 24px solid $primary-color;
+//   border-radius: 4px;
+//   background-color: #fff;
+//   border-left: 1px solid $borders;
+//   border-right: 1px solid $borders;
+//   border-bottom: 1px solid $borders;
+//   box-shadow: $box-shadow;
+//   &.no-green {
+//     border-top: 16px solid #fff;
+//   }
+//   &.gray-top {
+//     border-top: 8px solid rgba(0, 0, 0, 0.03);
+//   }
+//   .card-content {
+//     padding: 1% 2%;
+//   }
+//   h2 {
+//     color: $primary-color;
+//     font-size: 1.5rem;
+//     font-family: $sans-bold;
+//   }
+// }
+// .card-green-bg {
+//   background: transparentize($primary-color, 0.9);
+//   border-top: 1px solid $borders;
+//   &.green-bg-border {
+//     border-bottom: 1px solid $borders;
+//   }
+// }
+
+// .container {
+//   padding: 0;
+//   width: 98%;
+//   max-width: 1440px;
+//   @include breakpoint(sm) {
+//     width: 96%;
+//   }
+//   @include breakpoint(md) {
+//     width: 90%;
+//   }
+//   @include breakpoint(lg) {
+//     width: 86%;
+//   }
+// }
+// header {
+//   background-color: $primary-color;
+//   color: #fff;
+//   padding: 1% 0;
+//   a {
+//     color: #fff;
+//     &:hover {
+//       color: rgba(255, 255, 255, 0.9);
+//       text-decoration: none;
+//     }
+//   }
+// }
+
+// .right-side {
+//   margin-top: 31px;
+// }
+// footer {
+//   margin-top: 50px;
+// }

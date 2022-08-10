@@ -1,0 +1,19 @@
+@import "bootstrap/scss/_functions";
+@import "bootstrap/scss/_variables";
+@import "@ucdavis/gunrockin/sass/gunrockin.scss";
+$primary-color: $delta;
+$secondary-color: $delta;
+$theme-colors: (
+  primary: $primary-color,
+  secondary: $secondary-color,
+);
+@import "bootstrap/scss/bootstrap";
+@import "@ucdavis/gunrockin/sass/_typography.scss";
+
+$bg-primary: #f7f7f7;
+$bg-secondary: #f7fafc;
+$danger: $merlot;
+$error-color: $danger;
+
+$borders-secondary: #e5eaef;
+$primary-light: #ebf1ee;
