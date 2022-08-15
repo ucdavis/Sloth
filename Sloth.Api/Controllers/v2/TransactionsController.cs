@@ -255,6 +255,7 @@ namespace Sloth.Api.Controllers.v2
                 KfsTrackingNumber = transaction.KfsTrackingNumber,
                 Source = source,
                 TransactionDate = DateTime.UtcNow,
+                Description = transaction.Description,
                 Transfers = transaction.Transfers.Select(t => new Transfer()
                 {
                     Amount = t.Amount,

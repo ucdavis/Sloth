@@ -61,6 +61,8 @@ namespace Sloth.Api.Models.v2
         [Required]
         public string SourceType { get; set; }
 
+        public string Description { get; set; }
+
         [ListMinLength(2)]
         [Required]
         public IList<CreateTransferViewModel> Transfers { get; set; }
