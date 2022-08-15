@@ -17,6 +17,7 @@ using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Resources;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Sloth.Web.Controllers
 {
@@ -144,7 +145,27 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.ReversalOfTransaction)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            return View(transaction);
+            var relatedTransactions = await DbContext.Transactions
+                .Include(a => a.Source)
+                    .ThenInclude(a => a.Team)
+                .Include(t => t.Transfers)
+                .Where(a => a.Id != transaction.Id && a.Source.Team.Slug == TeamSlug &&
+                    (
+                        a.KfsTrackingNumber == transaction.KfsTrackingNumber ||
+                        (a.ProcessorTrackingNumber != null && a.ProcessorTrackingNumber == transaction.ProcessorTrackingNumber) ||
+                        a.MerchantTrackingNumber == transaction.MerchantTrackingNumber
+                    )
+                ).ToListAsync();
+
+            var model = new TransactionDetailsViewModel()
+            {
+                Transaction = transaction,
+                RelatedTransactions = new TransactionsTableViewModel{
+                    Transactions = relatedTransactions
+                }
+            };
+
+            return View(model);
         }
 
         [HttpPost]
