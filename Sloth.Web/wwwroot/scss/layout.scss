@@ -81,3 +81,32 @@ footer {
 .body-content {
   padding-top: 2rem;
 }
+.filters-wrapper {
+  margin-bottom: 3%;
+  .status-filter {
+    margin-left: 8px;
+  }
+}
+
+table.sloth-table {
+  border: 1px solid $borders-sloth;
+  th {
+    vertical-align: top;
+    font-family: $sans-bold;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    border-bottom: 1px solid $borders-sloth;
+  }
+  tbody {
+    tr {
+      border-left: 1px solid $borders-sloth !important;
+      border-right: 1px solid $borders-sloth !important;
+      &:last-child td {
+        border-bottom: none;
+      }
+    }
+    td {
+      border-bottom: 1px solid $borders-sloth;
+    }
+  }
+}

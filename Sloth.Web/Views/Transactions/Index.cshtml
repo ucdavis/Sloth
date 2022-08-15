@@ -10,20 +10,20 @@
         </div>
         <h2>@ViewBag.Title</h2>
         <h3>Filters</h3>
-        <div class="row justify-content-between">
+        <div class="row justify-content-between filters-wrapper">
             <div class="col-4">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="Nov 11 2021" aria-label="">
                     <span class="input-group-text">to</span>
                     <input type="text" class="form-control" placeholder="Dec 12 2023" aria-label="">
+                     <select class="form-select status-filter" aria-label="Default select example">
+                    <option selected>Status</option>
+                    <option value="1">One</option>
+                    <option value="2">Two</option>
+                    <option value="3">Three</option>
+                    </select>
                 </div>
-                <select class="form-select" aria-label="Default select example">
-                <option selected>Status</option>
-                <option value="1">One</option>
-                <option value="2">Two</option>
-                <option value="3">Three</option>
-                </select>
-                <button type="button" class="btn btn-light">Apply filter</button>
+                <button type="button" class="btn btn-light mt-1">Apply filter</button>
             </div>
             <div class="col-4">
                 <input class="form-control" type="search" placeholder="Search Table"  aria-label="Search Table">
