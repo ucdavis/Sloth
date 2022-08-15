@@ -32,6 +32,10 @@
             var firstDebit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Debit);
             var firstCredit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Credit);
             var description = firstDebit.Description;
+            if(!string.IsNullOrWhiteSpace(t.Description))
+            {
+                description = t.Description;
+            }
 
             <tr>
                 <th scope="row">@t.Id</th>

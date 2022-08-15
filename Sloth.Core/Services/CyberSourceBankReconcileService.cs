@@ -166,7 +166,9 @@ namespace Sloth.Core.Services
                             MerchantTrackingNumber              = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber             = deposit.RequestID,
                             TransactionDate                     = deposit.LocalizedRequestDate,
-                            CybersourceBankReconcileJobRecordId = jobRecord.Id
+                            CybersourceBankReconcileJobRecordId = jobRecord.Id,
+                            Description                         = "Cybersource Deposit"
+
                         }.SetStatus(TransactionStatuses.Scheduled);
 
                         if (AccountValidationService.IsKfsAccount(integration.ClearingAccount))
