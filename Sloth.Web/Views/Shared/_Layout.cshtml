@@ -73,7 +73,7 @@
             <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
                 <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
             </form></div>
-        <div class="col text-right profile-bar">Cal</div>
+        <div class="col text-right profile-bar"><partial name="_LoginPartial" /></div>
         </div>
         
         </div>
@@ -89,11 +89,11 @@
                     @if (!string.IsNullOrEmpty(teamSlug))
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Transactions" asp-action="Index">Transactions</a>
+                            <a class="nav-link" asp-controller="Transactions" asp-action="Index"><partial name="_TransactionsSvgPartial" />Transactions</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Scrubbers" asp-action="Index">Scrubbers</a>
+                            <a class="nav-link" asp-controller="Scrubbers" asp-action="Index"><partial name="_ScrubberSvgPartial" />Scrubbers</a>
                         </li>
                         @if (Context.HasTeamRole(TeamRole.Admin)) {
                             <li class="nav-item">
@@ -106,7 +106,7 @@
                     @if (User.IsInRole(Roles.SystemAdmin))
                     {
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
+                            <a class="nav-link" asp-controller="Jobs" asp-action="Index"><partial name="_JobsSvgPartial" />Jobs</a>
                         </li>
                     }
 
@@ -117,7 +117,7 @@
                         </li>
                     }
                 </ul>
-                <partial name="_LoginPartial" />
+                
             </div>
         </div>
     </div>

@@ -1,6 +1,14 @@
 #alt-color {
-  fill: $secondary-font;
+  fill: $primary-font;
 }
 #primary-color {
   fill: $primary-color;
+}
+.navbar {
+  & .nav-link:hover svg {
+    #alt-color,
+    #primary-color {
+      fill: $primary-color;
+    }
+  }
 }
