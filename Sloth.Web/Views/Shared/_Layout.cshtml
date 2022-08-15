@@ -69,11 +69,21 @@
     <div class="search-wrapper">
         <div class="container">
         <div class="row justify-content-between">
-        <div class="col search-bar">
-            <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
+        <div class="col-6 d-flex search-bar">
+            <div class="col-3 team-chooser"><select class="form-select" aria-label="Default select example">
+            <option selected>Harvest</option>
+            <option value="1">Anlab</option>
+            <option value="2">Whatever</option>
+            </select></div>
+            <div class="col-9">
+                <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
                 <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
-            </form></div>
-        <div class="col text-right profile-bar"><partial name="_LoginPartial" /></div>
+            </form>
+            </div>
+            
+            
+            </div>
+        <div class="col-6 text-right profile-bar"><partial name="_LoginPartial" /></div>
         </div>
         
         </div>

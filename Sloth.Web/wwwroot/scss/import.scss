@@ -2,7 +2,7 @@
 @import "bootstrap/scss/_variables";
 @import "@ucdavis/gunrockin/sass/gunrockin.scss";
 $primary-color: $delta;
-$secondary-color: $delta;
+$secondary-color: #dbab0c;
 $theme-colors: (
   primary: $primary-color,
   secondary: $secondary-color,
@@ -15,3 +15,7 @@ $danger: $merlot;
 $error-color: $danger;
 
 $borders-sloth: #e6e7e9;
+:root {
+  --bs-btn-hover-border-color: #e6e7e9;
+  --bs-btn-active-border-color: #e6e7e9;
+}

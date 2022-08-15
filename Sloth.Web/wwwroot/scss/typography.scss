@@ -16,11 +16,11 @@ h1 {
 }
 h2 {
   font-size: 1.6rem;
+  color: $primary-color;
+  font-family: $sans-bold;
 }
 h3 {
-  font-size: 1.4rem;
-}
-h4 {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: $secondary-font;
+  text-transform: uppercase;
 }
