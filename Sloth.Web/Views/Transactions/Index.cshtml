@@ -37,9 +37,7 @@
                 </div>
                 <button type="button" class="btn btn-light mt-1">Apply filter</button>
             </div>
-            <div class="col-4">
-                <input class="form-control" type="search" placeholder="Search Table"  aria-label="Search Table">
-            </div>
+
         </div>
         
 
@@ -95,6 +93,10 @@
                 { "targets": [-1], "orderable": false },
             ],
             order: [[1, 'desc']],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
         });
 
         // setup datepickers
