@@ -93,6 +93,10 @@ namespace Sloth.Web.Controllers
                     .AnyAsync(w => w.Team.Slug == TeamSlug)
             };
 
+            result.PendingApprovalCount = await DbContext.Transactions
+                .Where(t => t.Source.Team.Slug == TeamSlug && t.Status == TransactionStatuses.PendingApproval)
+                .CountAsync();
+
             return View("Index", result);
         }
 
