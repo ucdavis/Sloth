@@ -1,13 +1,14 @@
 @using Sloth.Core.Extensions
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
-@model Transaction
+@using Sloth.Web.Models.TransactionViewModels
+@model TransactionDetailsViewModel
 
 @{
     ViewBag.Title = "Transaction Details";
 
     Uri merchantUrl;
-    var isUrlValid = Uri.TryCreate(Model.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
+    var isUrlValid = Uri.TryCreate(Model.Transaction.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
 }
 
 @section AdditionalStyles {
@@ -23,13 +24,19 @@
 }
 
 <h2>@ViewBag.Title</h2>
-@if(String.IsNullOrWhiteSpace(Model.Transfers[0].FinancialSegmentString))
+@if(String.IsNullOrWhiteSpace(Model.Transaction.Transfers[0].FinancialSegmentString))
 {
-    <partial name="_KfsDetails" model="Model" />
+    <partial name="_KfsDetails" model="Model.Transaction" />
 }
 else
 {
-    <partial name="_AeDetails" model="Model" />
+    <partial name="_AeDetails" model="Model.Transaction" />
+}
+
+@if (Model.RelatedTransactions.Transactions.Any())
+{
+    <h3>Related Transactions</h3>
+    <partial name="_TransactionsTable" model="Model.RelatedTransactions" />
 }
 
 
@@ -43,7 +50,22 @@ else
             "paging": false,
             "info": false,
             //"searching": false,
-            "order": [[1, 'desc'],[2, 'desc']]
+            "order": [[1, 'desc'],[2, 'desc']],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+        });
+        const table = $('#transactionsTable').DataTable({
+            "columnDefs": [
+                { "targets": 0, "visible": false },
+                { "targets": [-1], "orderable": false },
+            ],
+            order: [[1, 'desc']],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
         });
     </script>
 }
