@@ -12,5 +12,7 @@ namespace Sloth.Web.Models.TransactionViewModels
         public TransactionsFilterModel Filter { get; set; }
 
         public TransactionsTableViewModel TransactionsTable { get; set; }
+
+        public int PendingApprovalCount { get; set; }
     }
 }

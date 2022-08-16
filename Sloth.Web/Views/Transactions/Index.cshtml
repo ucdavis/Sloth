@@ -5,9 +5,21 @@
 }
 
     <div class="container">
-        <div class="alert alert-warning" role="alert">
-        There are N pending transaction, <a href="#">click here</a> to view them
-        </div>
+    @if (Model.PendingApprovalCount > 0)
+    {
+        @if (Context.HasTeamRole(TeamRole.Approver))
+        {
+            <div class="alert alert-warning" role="alert">
+                There are @Model.PendingApprovalCount @(Model.PendingApprovalCount > 1 ? "transactions" : "transaction") pending approval, <a asp-controller="Transactions" asp-action="NeedApproval">click here</a> <span> to view them</span>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                <span>There are @Model.PendingApprovalCount @(Model.PendingApprovalCount > 1 ? "transactions" : "transaction") pending approval</span>
+            </div>
+        }
+    }
         <h2>@ViewBag.Title</h2>
         <h3>Filters</h3>
         <div class="row justify-content-between filters-wrapper">
