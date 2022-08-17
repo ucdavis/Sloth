@@ -9,57 +9,81 @@
     Uri merchantUrl;
     var isUrlValid = Uri.TryCreate(Model.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
 }
-
-
-<div class="row">
-    <div class="col-sm">
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.Id)</strong><br />
+<div class="row txn-detail-wrapper">
+  <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Id)</span>
+        </div>
+        <div class="txn-detail-result">
             <span>@Model.Id</span>
         </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.TransactionDate)</strong><br />
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.TransactionDate)</span>
+        </div>
+        <div class="txn-detail-result">
             <span>@Model.TransactionDate.ToPacificTime()</span>
         </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</strong><br />
+    </div>
+     <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</span>
+        </div>
+        <div class="txn-detail-result">
             <span>@Model.KfsTrackingNumber</span>
         </div>
-        @if (Model.JournalRequest != null)
+    </div>
+     @if (Model.JournalRequest != null)
         {
-            <div class="form-group">
-                <strong>@Html.DisplayNameFor(x => x.JournalRequest.RequestId)</strong><br />
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>@Html.DisplayNameFor(x => x.JournalRequest.RequestId)</span>
+            </div>
+            <div class="txn-detail-result">
                 <span>@Model.JournalRequest.RequestId</span>
             </div>
+        </div>
         }
-    </div>
-    <div class="col-sm">
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.ProcessorTrackingNumber)</strong><br />
-            <span>@Model.ProcessorTrackingNumber</span>
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>@Html.DisplayNameFor(x => x.ProcessorTrackingNumber)</span>
+            </div>
+            <div class="txn-detail-result">
+                <span>@Model.ProcessorTrackingNumber</span>
+            </div>
         </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.MerchantTrackingNumber)</strong><br />
-            <span>@Model.MerchantTrackingNumber</span>
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>@Html.DisplayNameFor(x => x.MerchantTrackingNumber)</span>
+            </div>
+            <div class="txn-detail-result">
+                <span>@Model.MerchantTrackingNumber</span>
+            </div>
         </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.Status)</strong><br />
-            <span>@Model.Status</span>
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>@Html.DisplayNameFor(x => x.Status)</span>
+            </div>
+            <div class="txn-detail-result">
+                <span class="badge badge-completed">@Model.Status</span>
+            </div>
         </div>
-        @{
+         @{
             if (isUrlValid)
             {
-                <div class="form-group">
-                    <strong>@Html.DisplayNameFor(x => x.MerchantTrackingUrl)</strong><br />
-                    <span>
-                        <a href="@Html.Raw(merchantUrl.ToString())" target="_blank">@merchantUrl.ToString()</a>
-                    </span>
-                </div>
+                <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>@Html.DisplayNameFor(x => x.MerchantTrackingUrl)</span>
+            </div>
+            <div class="txn-detail-result">
+                <span><a href="@Html.Raw(merchantUrl.ToString())" target="_blank">@merchantUrl.ToString()</a></span>
+            </div>
+        </div>
             }
         }
-
-    </div>
 </div>
+
 
 <table id="transfers" class="table sloth-table" style="width: 100%">
     <thead>

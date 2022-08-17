@@ -23,7 +23,10 @@
     </style>
 } *@
 <div class="container">
-<h2>@ViewBag.Title</h2>
+    
+        <h2>@ViewBag.Title</h2>
+    
+
 @if(String.IsNullOrWhiteSpace(Model.Transaction.Transfers[0].FinancialSegmentString))
 {
     <partial name="_KfsDetails" model="Model.Transaction" />
@@ -32,11 +35,35 @@ else
 {
     <partial name="_AeDetails" model="Model.Transaction" />
 }
+<div class="row mt-5">
+    <h2>Activity Timeline</h2>
+    <div class="txn-timeline-row">
+        <div class="txn-timeline-date">
+            <span>01/08/2023 16:14:00</span>
+        </div>
+        <div class="txn-timeline-result">
+            <span>Brian McEligot changed status to</span> <span class="badge badge-processing">Processing</span>
+        </div>
+    </div>
+    <div class="txn-timeline-row">
+        <div class="txn-timeline-date">
+            <span>01/08/2023 16:14:00</span>
+        </div>
+        <div class="txn-timeline-result">
+            <span>Brian McEligot changed status to</span> <span class="badge badge-processing">Processing</span>
+        </div>
+    </div>
+    
+    
+</div>
 
 @if (Model.RelatedTransactions.Transactions.Any())
 {
-    <h3>Related Transactions</h3>
+    <div class="row mt-5">
+    <h2>Related Transactions</h2>
     <partial name="_TransactionsTable" model="Model.RelatedTransactions" />
+    </div>
+    
 }
 
 </div>

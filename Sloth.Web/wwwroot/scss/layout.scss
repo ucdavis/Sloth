@@ -110,3 +110,30 @@ table.sloth-table {
     }
   }
 }
+// txn detail
+.txn-detail-label {
+  display: inline-block;
+  width: 266px;
+  padding-right: 24px;
+  font-size: 0.9rem;
+  color: $secondary-font;
+  text-transform: uppercase;
+}
+.txn-detail-result {
+  display: inline-block;
+  font-size: 0.9rem;
+}
+.txn-timeline-row {
+  margin-bottom: 8px;
+  .txn-timeline-date {
+    display: inline-block;
+    width: 200px;
+    padding-right: 24px;
+    color: $secondary-font;
+    font-size: 1.2rem;
+  }
+  .txn-timeline-result {
+    display: inline-block;
+    font-size: 1.2rem;
+  }
+}
