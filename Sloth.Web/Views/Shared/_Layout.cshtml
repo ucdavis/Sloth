@@ -73,6 +73,7 @@
 
         <div class="col-6 d-flex search-bar">
             <div class="col-3 team-chooser"><select class="form-select" aria-label="Default select example">
+            <option value="">-- Choose team --</option>
             @foreach (var item in teams)
             {
                 if (item.Slug == teamSlug)
@@ -83,7 +84,7 @@
                 {
                     <option value=@item.Slug>@item.Name</option>
                 }
-                                }
+            }
             </select></div>
             <div class="col-9">
                 <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
