@@ -24,7 +24,7 @@
         @foreach (var team in Model)
         {
             <li>
-                <td><a href="@Url.Action("TeamIndex", "Home", new { team = team.Slug })">@team.Name</a>
+                <td><a href="@Url.Action("Index", "Transactions", new { team = team.Slug })">@team.Name</a></td>
             </li>
         }
     </ul>
