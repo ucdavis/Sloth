@@ -97,6 +97,9 @@ namespace Sloth.Web.Controllers
                 .Where(t => t.Source.Team.Slug == TeamSlug && t.Status == TransactionStatuses.PendingApproval)
                 .CountAsync();
 
+            var team = await DbContext.Teams.FirstAsync(t => t.Slug == TeamSlug);
+            ViewBag.Title = $"Transactions - {team.Name}";
+
             return View("Index", result);
         }
 
