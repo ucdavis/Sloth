@@ -149,6 +149,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Transfers)
                 .Include(t => t.ReversalTransaction)
                 .Include(t => t.ReversalOfTransaction)
+                .Include(t => t.StatusEvents)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             var relatedTransactions = await DbContext.Transactions
