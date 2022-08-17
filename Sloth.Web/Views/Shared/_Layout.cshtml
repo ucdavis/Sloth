@@ -14,6 +14,7 @@
 
     var teams = user.GetTeams().ToList();
 
+
     var trackingNum = "";
 
     if (string.Equals("transactions", controller, StringComparison.OrdinalIgnoreCase)
@@ -69,11 +70,20 @@
     <div class="search-wrapper">
         <div class="container">
         <div class="row justify-content-between">
+
         <div class="col-6 d-flex search-bar">
             <div class="col-3 team-chooser"><select class="form-select" aria-label="Default select example">
-            <option selected>Harvest</option>
-            <option value="1">Anlab</option>
-            <option value="2">Whatever</option>
+            @foreach (var item in teams)
+            {
+                if (item.Slug == teamSlug)
+                {
+                    <option selected value=@item.Slug>@item.Name</option>
+                }
+                else
+                {
+                    <option value=@item.Slug>@item.Name</option>
+                }
+                                }
             </select></div>
             <div class="col-9">
                 <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
