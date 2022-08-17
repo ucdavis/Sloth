@@ -14,6 +14,7 @@
 
     var teams = user.GetTeams().ToList();
 
+
     var trackingNum = "";
 
     if (string.Equals("transactions", controller, StringComparison.OrdinalIgnoreCase)
@@ -69,13 +70,23 @@
     <div class="search-wrapper">
         <div class="container">
         <div class="row justify-content-between">
+
         <div class="col-6 d-flex search-bar">
-            <div class="col-3 team-chooser"><select class="form-select" aria-label="Default select example">
-            <option selected>Harvest</option>
-            <option value="1">Anlab</option>
-            <option value="2">Whatever</option>
+            <div class="col-5 team-chooser"><select id="team-select" class="form-select" aria-label="Default select example">
+            <option value="">-- Choose team --</option>
+            @foreach (var item in teams)
+            {
+                if (item.Slug == teamSlug)
+                {
+                    <option selected value=@item.Slug data-slug=@item.Slug>@item.Name</option>
+                }
+                else
+                {
+                    <option value=@item.Slug data-slug=@item.Slug>@item.Name</option>
+                }
+            }
             </select></div>
-            <div class="col-9">
+            <div class="col-7">
                 <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
                 <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
             </form>
@@ -184,6 +195,7 @@
         </div>
     </footer>
 
+
     <environment names="Development">
         <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
         <!-- JavaScript Bundle with Popper -->
@@ -200,6 +212,21 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
     </environment>
+
+    <script type="text/javascript">
+        $('#team-select').on('change', function (e) {
+            var optionSelected = $("option:selected", this);
+            var valueSelected = this.value;
+            if(valueSelected !== "")
+            {
+                window.location = "/" + valueSelected + "/transactions";
+            }
+            else
+            {
+                window.location = "/Teams";
+            }
+        });
+    </script>
 
     <partial name="_DataTableScripts" />
 
