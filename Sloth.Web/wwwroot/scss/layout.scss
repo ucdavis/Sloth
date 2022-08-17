@@ -110,19 +110,23 @@ table.sloth-table {
     }
   }
 }
-// txn detail
-.txn-detail-label {
-  display: inline-block;
-  width: 266px;
-  padding-right: 24px;
-  font-size: 0.9rem;
-  color: $secondary-font;
-  text-transform: uppercase;
+// txn detail page
+.txn-detail-row {
+  margin-bottom: 4px;
+  .txn-detail-label {
+    display: inline-block;
+    width: 266px;
+    padding-right: 24px;
+    font-size: 1rem;
+    color: $secondary-font;
+    text-transform: uppercase;
+  }
+  .txn-detail-result {
+    display: inline-block;
+    font-size: 1rem;
+  }
 }
-.txn-detail-result {
-  display: inline-block;
-  font-size: 0.9rem;
-}
+
 .txn-timeline-row {
   margin-bottom: 8px;
   .txn-timeline-date {
