@@ -39,6 +39,7 @@ namespace Sloth.Core.Jobs
             {
                 public string TransactionId { get; set; }
                 public string Action { get; set; }
+                public string Message { get; set; }
             }
         }
 
@@ -114,6 +115,8 @@ namespace Sloth.Core.Jobs
                             else if (requestStatus.RequestId.HasValue &&
                                      requestStatus.RequestStatus == RequestStatus.Rejected)
                             {
+                                // TODO: show rejection reason in SetStatus
+
                                 // failure, update transaction status to rejected
                                 transaction.SetStatus(TransactionStatuses.Rejected);
 
@@ -127,6 +130,14 @@ namespace Sloth.Core.Jobs
 
                             // save changes
                             await _context.SaveChangesAsync();
+                        }
+                        catch (ArgumentException ex)
+                        {
+                            log.Error(ex, "Error creating journal for transaction {TransactionId}", transaction.Id);
+                            transactionRunStatus.Action = "Error";
+
+                            // failure because of txn args, do not retry
+                            transaction.SetStatus(TransactionStatuses.Rejected, ex.Message);
                         }
                         catch (Exception ex)
                         {
