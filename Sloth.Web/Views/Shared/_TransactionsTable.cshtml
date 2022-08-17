@@ -43,7 +43,7 @@
                 <td>@t.KfsTrackingNumber</td>
                 <td>@t.DocumentNumber</td>
                 <td>@t.ProcessorTrackingNumber</td>
-                <td><a asp-controller="Transactions" asp-action="Index" asp-route-trackingNum="@t.MerchantTrackingNumber">@t.MerchantTrackingNumber</a></td>
+                <td>@t.MerchantTrackingNumber</td>
                 <td>@description</td>
                 @* @if (String.IsNullOrWhiteSpace(firstDebit.FinancialSegmentString))
                 {
