@@ -90,9 +90,8 @@
         const table = $('#transactionsTable').DataTable({
             "columnDefs": [
                 { "targets": 0, "visible": false },
-                { "targets": [-1], "orderable": false },
             ],
-            order: [[1, 'desc']],
+            order: [[2, 'desc']],
             language: {
                 searchPlaceholder: "Search Table",
                 search: "",
@@ -102,7 +101,7 @@
         // setup datepickers
         $('#filter-date-range').datepicker({
             inputs: $('#filter-date-range input'),
-            keepEmptyValues: true,
+            keepEmptyValues: true,  
         });
 
         $("body").on("click",
