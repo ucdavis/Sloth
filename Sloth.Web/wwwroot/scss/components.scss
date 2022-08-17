@@ -1,6 +1,3 @@
-.text-right {
-  text-align: right;
-}
 .form-control:focus,
 .form-select:focus {
   border-color: $primary-color;
@@ -29,9 +26,6 @@
     color: $primary-color;
   }
 }
-.mt-1 {
-  margin-top: 1rem;
-}
 .badge {
   font-family: $sans-bold;
   font-size: 0.8rem;
@@ -56,4 +50,16 @@
 .badge-cancelled {
   color: $tertiary-font;
   background-color: transparentize($tertiary-font, 0.8);
+}
+.badge-default {
+  color: $tertiary-font;
+  background-color: transparentize($tertiary-font, 0.8);
+}
+.badge-credit {
+  color: $sage;
+  background-color: transparentize($sage, 0.8);
+}
+.badge-debit {
+  color: $recpool;
+  background-color: transparentize($recpool, 0.8);
 }

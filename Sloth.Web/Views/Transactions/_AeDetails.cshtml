@@ -61,7 +61,7 @@
     </div>
 </div>
 
-<table id="transfers" class="table table-striped table-bordered table-hover" style="width: 100%">
+<table id="transfers" class="table sloth-table" style="width: 100%">
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(x => x.Transfers[0].Id)</th>
@@ -78,8 +78,8 @@
         {
             <tr>
                 <td>@t.Id</td>
-                <td class="text-right">@t.Amount.ToString("C")</td>
-                <td class="text-center">
+                <td>@t.Amount.ToString("C")</td>
+                <td>
                     <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
                 </td>
                 <td>@t.Description</td>

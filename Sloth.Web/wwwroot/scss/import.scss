@@ -7,7 +7,7 @@ $theme-colors: (
   primary: $primary-color,
   secondary: $secondary-color,
 );
-@import "bootstrap/scss/bootstrap";
+@import "~bootstrap/scss/bootstrap";
 @import "@ucdavis/gunrockin/sass/_typography.scss";
 
 $bg-primary: transparentize($primary-color, 0.96);

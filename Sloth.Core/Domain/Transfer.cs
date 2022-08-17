@@ -183,13 +183,13 @@ namespace Sloth.Core.Models
             switch (direction)
             {
                 case CreditDebit.Credit:
-                    return "badge-success";
+                    return "badge-credit";
 
                 case CreditDebit.Debit:
-                    return "badge-primary";
+                    return "badge-debit";
 
                 default:
-                    return "badge-secondary";
+                    return "badge-default";
             }
         }
     }

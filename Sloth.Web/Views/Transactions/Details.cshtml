@@ -11,7 +11,7 @@
     var isUrlValid = Uri.TryCreate(Model.Transaction.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
 }
 
-@section AdditionalStyles {
+@* @section AdditionalStyles {
     <link href="~/css/prism.css" rel="stylesheet" />
 
     <style>
@@ -21,8 +21,8 @@
             background-color: white;
         }
     </style>
-}
-
+} *@
+<div class="container">
 <h2>@ViewBag.Title</h2>
 @if(String.IsNullOrWhiteSpace(Model.Transaction.Transfers[0].FinancialSegmentString))
 {
@@ -38,6 +38,8 @@ else
     <h3>Related Transactions</h3>
     <partial name="_TransactionsTable" model="Model.RelatedTransactions" />
 }
+
+</div>
 
 
  @section AdditionalScripts {
