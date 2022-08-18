@@ -1,3 +1,4 @@
+@using Humanizer
 @using Sloth.Core.Extensions
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
@@ -66,7 +67,7 @@
                 <span>@Html.DisplayNameFor(x => x.Status)</span>
             </div>
             <div class="txn-detail-result">
-                <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize()</span>
+                <span class="badge @(TransactionStatuses.GetBadgeClass(Model.Status))">@Model.Status.Humanize(LetterCasing.Title)</span>
             </div>
         </div>
          @{
