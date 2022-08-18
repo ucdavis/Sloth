@@ -66,7 +66,7 @@
                 <span>@Html.DisplayNameFor(x => x.Status)</span>
             </div>
             <div class="txn-detail-result">
-                <span class="badge badge-completed">@Model.Status</span>
+                <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize()</span>
             </div>
         </div>
          @{
