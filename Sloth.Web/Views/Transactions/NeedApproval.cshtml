@@ -10,8 +10,8 @@
         .Where(x => x.Direction == Transfer.CreditDebit.Credit)
         .Sum(x => x.Amount);
 }
-
-<div class="row mb-2">
+<div class="container">
+<div class="row">
     <div class="col">
         <h2>@ViewBag.Title</h2>
     </div>
@@ -45,11 +45,13 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <form id="approvalAllForm" asp-action="ApprovalAll">
                     @Html.AntiForgeryToken()
-                    <button type="button" id="approvalAllSubmit" class="btn btn-primary">Approval All <i class="fa fa-thumbs-o-up" aria-hidden="true"></i></button>
+                    <button type="button" id="approvalAllSubmit" class="btn mb-2 btn-primary">Approval All <i class="fa fa-thumbs-o-up" aria-hidden="true"></i></button>
                 </form>
             </div>
         </div>
     </div>
+</div>
+
 </div>
 
 @section AdditionalScripts {
