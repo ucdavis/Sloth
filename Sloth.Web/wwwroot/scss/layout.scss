@@ -111,6 +111,9 @@ table.sloth-table {
   }
 }
 // txn detail page
+.txn-detail-wrapper {
+  margin-bottom: 4%;
+}
 .txn-detail-row {
   margin-bottom: 4px;
   .txn-detail-label {
@@ -126,9 +129,7 @@ table.sloth-table {
     font-size: 1rem;
   }
 }
-
 .txn-timeline-row {
-  margin-bottom: 8px;
   .txn-timeline-date {
     display: inline-block;
     width: 200px;
