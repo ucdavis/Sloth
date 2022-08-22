@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AggieEnterpriseApi" Version="0.2.34" />
+    <PackageReference Include="AggieEnterpriseApi" Version="0.2.56" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.13.0" />
     <PackageReference Include="AzureActiveDirectorySearcher" Version="1.0.0" />
     <PackageReference Include="ietws" Version="0.2.12" />

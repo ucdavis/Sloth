@@ -51,16 +51,13 @@ namespace Sloth.Core.Services
 
             if (segmentStringType == FinancialChartStringType.Ppm)
             {
-                // there is no validate ppm string, but we can validate by segments
-                var segments = FinancialChartValidation.GetPpmSegments(financialSegmentString);
 
                 var result =
-                    await _aggieClient.PpmSegmentsValidate.ExecuteAsync(ConvertToPpmSegmentInput(segments),
-                        accountingDate: null);
+                    await _aggieClient.PpmStringSegmentsValidate.ExecuteAsync(financialSegmentString);
 
                 var data = result.ReadData();
 
-                return data.PpmSegmentsValidate.ValidationResponse.Valid;
+                return data.PpmStringSegmentsValidate.ValidationResponse.Valid;
             }
 
             return false;

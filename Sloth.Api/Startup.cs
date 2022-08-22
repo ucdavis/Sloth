@@ -133,9 +133,6 @@ namespace Sloth.Api
                 c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
                 c.DocInclusionPredicate((docName, apiDesc) => apiDesc.GroupName == docName);
 
-                var xmlFilePath = Path.Combine(AppContext.BaseDirectory, "Sloth.Api.xml");
-                c.IncludeXmlComments(xmlFilePath);
-
                 var securityScheme = new OpenApiSecurityScheme
                 {
                     Reference = new OpenApiReference
