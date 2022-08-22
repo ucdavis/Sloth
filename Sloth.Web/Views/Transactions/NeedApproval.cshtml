@@ -54,6 +54,15 @@
 
 </div>
 
+@section AdditionalStyles{
+    <style>
+
+        #transactionsTable tbody tr {
+            cursor: pointer;
+        }
+    </style>
+}
+
 @section AdditionalScripts {
     <script>
         $('#transactionsTable').DataTable({
@@ -70,6 +79,11 @@
 
         $('#approvalAllSubmit').click(function() {
             $('#approvalAllForm').submit();
+        });
+
+
+        $("#transactionsTable tbody").on("click", "tr", function () {
+            window.location = $(this).data("href");
         });
     </script>
 }
