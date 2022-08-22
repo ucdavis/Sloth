@@ -53,8 +53,7 @@ namespace Sloth.Core.Services
             {
 
                 var result =
-                    await _aggieClient.PpmStringSegmentsValidate.ExecuteAsync(financialSegmentString,
-                        accountingDate: null);
+                    await _aggieClient.PpmStringSegmentsValidate.ExecuteAsync(financialSegmentString);
 
                 var data = result.ReadData();
 
