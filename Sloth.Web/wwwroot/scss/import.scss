@@ -5,14 +5,14 @@ $primary-color: $delta;
 $secondary-color: #dbab0c;
 $theme-colors: (
   primary: $primary-color,
-  secondary: $secondary-color,
+  secondary: #e6e7e9,
+  danger: $merlot,
+  success: $redwood,
 );
 @import "~bootstrap/scss/bootstrap";
 @import "@ucdavis/gunrockin/sass/_typography.scss";
 
 $bg-primary: transparentize($primary-color, 0.96);
-$danger: $merlot;
-$error-color: $danger;
 
 $borders-sloth: #e6e7e9;
 :root {

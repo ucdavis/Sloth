@@ -1,3 +1,6 @@
+.form-group {
+  margin-bottom: 16px;
+}
 .form-control:focus,
 .form-select:focus {
   border-color: $primary-color;
@@ -62,4 +65,7 @@
 .badge-debit {
   color: $recpool;
   background-color: transparentize($recpool, 0.8);
+}
+.btn {
+  font-family: $sans-bold;
 }

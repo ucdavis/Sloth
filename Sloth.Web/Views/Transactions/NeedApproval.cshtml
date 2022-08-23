@@ -16,7 +16,7 @@
         <h2>@ViewBag.Title</h2>
     </div>
     <div class="col d-flex justify-content-end align-items-end">
-        <button id="approvalAll" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#approvalAllModal">Approval All <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
+        <button id="approvalAll" class="btn mb-2 btn-primary" data-bs-toggle="modal" data-bs-target="#approvalAllModal">Approve All <i class="fa fa-thumbs-o-up" aria-hidden="true"></i>
         </button>
     </div>
 </div>
@@ -45,7 +45,7 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <form id="approvalAllForm" asp-action="ApprovalAll">
                     @Html.AntiForgeryToken()
-                    <button type="button" id="approvalAllSubmit" class="btn mb-2 btn-primary">Approval All <i class="fa fa-thumbs-o-up" aria-hidden="true"></i></button>
+                    <button type="button" id="approvalAllSubmit" class="btn mb-2 btn-primary">Approve All <i class="fa fa-thumbs-o-up" aria-hidden="true"></i></button>
                 </form>
             </div>
         </div>
