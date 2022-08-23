@@ -88,11 +88,12 @@ footer {
   }
 }
 table.active-table {
-  tbody tr {
-    &:hover {
-      background-color: $bg-primary;
+    tbody tr {
+        &:hover {
+            background-color: $bg-primary;
+            cursor: pointer;
+        }
     }
-  }
 }
 table.sloth-table {
   border: 1px solid $borders-sloth;
