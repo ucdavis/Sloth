@@ -11,7 +11,7 @@
     var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
 }
 
-<table id="transactionsTable" class="table sloth-table">
+<table id="transactionsTable" class="table sloth-table active-table">
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Id)</th>

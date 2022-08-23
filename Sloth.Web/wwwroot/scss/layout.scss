@@ -87,7 +87,13 @@ footer {
     margin-left: 8px;
   }
 }
-
+table.active-table {
+  tbody tr {
+    &:hover {
+      background-color: $bg-primary;
+    }
+  }
+}
 table.sloth-table {
   border: 1px solid $borders-sloth;
   th {
