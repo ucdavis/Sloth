@@ -130,15 +130,19 @@ table.sloth-table {
   }
 }
 .txn-timeline-row {
+  margin-bottom: 6px;
   .txn-timeline-date {
     display: inline-block;
     width: 200px;
     padding-right: 24px;
     color: $secondary-font;
     font-size: 1.2rem;
+    vertical-align: top;
   }
   .txn-timeline-result {
     display: inline-block;
     font-size: 1.2rem;
+    max-width: 850px;
+    line-height: 1.5;
   }
 }
