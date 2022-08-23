@@ -1,3 +1,4 @@
+@using Humanizer
 @using Sloth.Core.Extensions
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
@@ -24,26 +25,21 @@ else
 {
     <partial name="_AeDetails" model="Model.Transaction" />
 }
+
+
 <div class="row mt-5">
     <h2>Activity Timeline</h2>
-    <div class="txn-timeline-row">
-        <div class="txn-timeline-date">
-            <span>01/08/2023 16:14:00</span>
+    @foreach (var activity in Model.Transaction.StatusEvents.OrderBy(a => a.EventDate))
+    {
+        <div class="txn-timeline-row">
+            <div class="txn-timeline-date">
+                <span>@activity.EventDate.ToPacificTime().ToString("g")</span>
+            </div>
+            <div class="txn-timeline-result">
+                    <span class="badge @(TransactionStatuses.GetBadgeClass(activity.Status))">@activity.Status.Humanize(LetterCasing.Title)</span> <span>@activity.EventDetails</span>
+            </div>
         </div>
-        <div class="txn-timeline-result">
-            <span>Brian McEligot changed status to</span> <span class="badge badge-processing">Processing</span>
-        </div>
-    </div>
-    <div class="txn-timeline-row">
-        <div class="txn-timeline-date">
-            <span>01/08/2023 16:14:00</span>
-        </div>
-        <div class="txn-timeline-result">
-            <span>Brian McEligot changed status to</span> <span class="badge badge-processing">Processing</span>
-        </div>
-    </div>
-    
-    
+    } 
 </div>
 
 @if (Model.RelatedTransactions.Transactions.Any())

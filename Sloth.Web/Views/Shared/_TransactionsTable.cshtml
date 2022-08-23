@@ -37,7 +37,7 @@
             <tr data-href="/@teamSlug/Transactions/Details/@t.Id">
                 <th scope="row">@t.Id</th>
                 <td>
-                    <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize()</span>
+                    <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize(LetterCasing.Title)</span>
                 </td>
                 <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate.ToPacificTime()</td>
                 <td>@t.KfsTrackingNumber</td>
