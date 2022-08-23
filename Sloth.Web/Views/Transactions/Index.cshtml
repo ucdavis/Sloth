@@ -2,6 +2,7 @@
 
 
 
+
     <div class="container">
     @if (Model.PendingApprovalCount > 0)
     {
@@ -83,6 +84,15 @@
         <partial name="_TransactionsTable" model="Model.TransactionsTable" />
     </div>
 
+@section AdditionalStyles{
+    <style>
+
+        #transactionsTable tbody tr {
+            cursor: pointer;
+        }
+    </style>
+}
+
 @section AdditionalScripts {
     <script>
         const table = $('#transactionsTable').DataTable({
@@ -94,12 +104,17 @@
                 searchPlaceholder: "Search Table",
                 search: "",
             },
+
         });
 
-        // setup datepickers
-        $('#filter-date-range').datepicker({
-            inputs: $('#filter-date-range input'),
-            keepEmptyValues: true,  
+         //setup datepickers
+        //$('#filter-date-range').datepicker({
+        //    inputs: $('#filter-date-range input'),
+        //    keepEmptyValues: true,  
+        //});
+
+        $("#transactionsTable tbody").on("click", "tr", function () {
+            window.location = $(this).data("href");
         });
 
         $("body").on("click",

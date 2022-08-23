@@ -153,7 +153,7 @@ namespace Sloth.Core.Models
             transaction.ReversalOfTransaction = this;
         }
 
-        public Transaction SetStatus(string status, [CallerMemberName] string memberName = "",
+        public Transaction SetStatus(string status, string details = "", [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
             StatusEvents.Add(new TransactionStatusEvent
@@ -162,7 +162,7 @@ namespace Sloth.Core.Models
                 Status = status,
                 EventDate = DateTime.UtcNow,
                 EventDetails =
-                    $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}"
+                    $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}. {details}",
             });
 
             Status = status;

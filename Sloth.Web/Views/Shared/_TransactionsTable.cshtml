@@ -34,7 +34,7 @@
             var firstCredit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Credit);
             var description = firstDebit.Description;
 
-            <tr>
+            <tr data-href="/@teamSlug/Transactions/Details/@t.Id">
                 <th scope="row">@t.Id</th>
                 <td>
                     <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize()</span>
