@@ -378,7 +378,7 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Search(TransactionsFilterModel filter = null)
         {
-            if (string.IsNullOrWhiteSpace(filter.TrackingNum))
+            if (string.IsNullOrWhiteSpace(filter?.TrackingNum))
             {
                 return RedirectToAction("Index");
             }
@@ -404,7 +404,7 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction("Details", new { txns.Id });
             }
 
-            Message = "Search Returned no results";
+            ErrorMessage = "Search Returned no results";
             return RedirectToAction("Index", new {filter});
 
 
