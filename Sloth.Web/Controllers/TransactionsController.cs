@@ -17,7 +17,6 @@ using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Resources;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Sloth.Web.Controllers
 {
