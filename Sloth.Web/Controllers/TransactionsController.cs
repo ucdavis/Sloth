@@ -375,6 +375,50 @@ namespace Sloth.Web.Controllers
             return Ok();
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Search(TransactionsFilterModel filter = null)
+        {
+            if (string.IsNullOrWhiteSpace(filter?.TrackingNum))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var txns = await DbContext.Transactions.Where(t => t.Source.Team.Slug == TeamSlug
+                                && (t.ProcessorTrackingNumber == filter.TrackingNum
+                                    || t.KfsTrackingNumber == filter.TrackingNum
+                                    || t.MerchantTrackingNumber == filter.TrackingNum)).OrderBy(a => a.TransactionDate).ToListAsync();
+            if (txns == null || txns.Count <= 0)
+            {
+                ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
+                return RedirectToAction("Index");
+
+            }
+
+            if (txns.Any(a => a.ProcessorTrackingNumber == filter.TrackingNum))
+            {
+                Message = $"Processor Tracking Number found: {filter.TrackingNum}";
+                return RedirectToAction("Details", new {id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id});
+            }
+
+
+            if (txns.Any(a => a.KfsTrackingNumber == filter.TrackingNum))
+            {
+                Message = $"KFS Tracking Number found: {filter.TrackingNum}";
+                return RedirectToAction("Details", new { txns.First(a => a.KfsTrackingNumber == filter.TrackingNum).Id });
+            }
+
+
+            if (txns.Any(a => a.MerchantTrackingNumber == filter.TrackingNum))
+            {
+                Message = $"Merchant Tracking Number found: {filter.TrackingNum}";
+                return RedirectToAction("Details", new { txns.First(a => a.MerchantTrackingNumber == filter.TrackingNum).Id });
+            }
+
+            ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
+            return RedirectToAction("Index");
+
+        }
+
 
         private static void SanitizeTransactionsFilter(TransactionsFilterModel model)
         {
