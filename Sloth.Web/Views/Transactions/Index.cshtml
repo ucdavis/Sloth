@@ -26,24 +26,24 @@
         {
         <h3>Filters</h3>
         <form class="row" id="invoiceFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
-        <div class="row justify-content-between filters-wrapper">
-            <div class="col-4">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Nov 11 2021" aria-label="">
-                    <span class="input-group-text">to</span>
-                    <input type="text" class="form-control" placeholder="Dec 12 2023" aria-label="">
-                    <select class="form-select status-filter" aria-label="Default select example">
-                        <option selected>Status</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
-                    </select>
+            <div class="row justify-content-between filters-wrapper">
+                <div class="col-4">
+                    <div id="filter-date-range" class="input-group">
+                        <input name="from" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.From" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                        <span class="input-group-text">to</span>
+                        <input name="to" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.To" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                        <select class="form-select status-filter" aria-label="Default select example">
+                            <option selected>Status</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-light mt-1">Apply filter</button>
                 </div>
 
-                <button type="submit" class="btn btn-light mt-1">Apply filter</button>
             </div>
-
-        </div>
         </form>
 
 
