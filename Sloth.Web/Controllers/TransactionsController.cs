@@ -383,30 +383,39 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction("Index");
             }
 
-            var txns = await DbContext.Transactions.Where(a => a.Source.Team.Slug == TeamSlug && a.ProcessorTrackingNumber == filter.TrackingNum).FirstOrDefaultAsync();
-            if(txns != null)
+            var txns = await DbContext.Transactions.Where(t => t.Source.Team.Slug == TeamSlug
+                                && (t.ProcessorTrackingNumber == filter.TrackingNum
+                                    || t.KfsTrackingNumber == filter.TrackingNum
+                                    || t.MerchantTrackingNumber == filter.TrackingNum)).OrderBy(a => a.TransactionDate).ToListAsync();
+            if (txns == null || txns.Count <= 0)
+            {
+                ErrorMessage = "Search Returned no results";
+                return RedirectToAction("Index");
+
+            }
+
+            if (txns.Any(a => a.ProcessorTrackingNumber == filter.TrackingNum))
             {
                 Message = "Processor Tracking Number found";
-                return RedirectToAction("Details", new {id = txns.Id});
+                return RedirectToAction("Details", new {id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id});
             }
 
-            txns = await DbContext.Transactions.Where(a => a.Source.Team.Slug == TeamSlug && a.KfsTrackingNumber == filter.TrackingNum).OrderBy(a => a.TransactionDate).FirstOrDefaultAsync();
-            if (txns != null)
+
+            if (txns.Any(a => a.KfsTrackingNumber == filter.TrackingNum))
             {
                 Message = "KFS Tracking Number found";
-                return RedirectToAction("Details", new { txns.Id });
+                return RedirectToAction("Details", new { txns.First(a => a.KfsTrackingNumber == filter.TrackingNum).Id });
             }
 
-            txns = await DbContext.Transactions.Where(a => a.Source.Team.Slug == TeamSlug && a.MerchantTrackingNumber == filter.TrackingNum).OrderBy(a => a.TransactionDate).FirstOrDefaultAsync();
-            if (txns != null)
+
+            if (txns.Any(a => a.MerchantTrackingNumber == filter.TrackingNum))
             {
                 Message = "Merchant Tracking Number found";
-                return RedirectToAction("Details", new { txns.Id });
+                return RedirectToAction("Details", new { txns.First(a => a.MerchantTrackingNumber == filter.TrackingNum).Id });
             }
 
             ErrorMessage = "Search Returned no results";
-            return RedirectToAction("Index", new {filter});
-
+            return RedirectToAction("Index");
 
         }
 
