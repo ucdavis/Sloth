@@ -17,6 +17,7 @@ using Sloth.Core.Services;
 using Sloth.Web.Identity;
 using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Resources;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Sloth.Web.Controllers
 {
@@ -373,6 +374,41 @@ namespace Sloth.Web.Controllers
             });
 
             return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Search(TransactionsFilterModel filter = null)
+        {
+            if (string.IsNullOrWhiteSpace(filter.TrackingNum))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var txns = await DbContext.Transactions.Where(a => a.Source.Team.Slug == TeamSlug && a.ProcessorTrackingNumber == filter.TrackingNum).FirstOrDefaultAsync();
+            if(txns != null)
+            {
+                Message = "Processor Tracking Number found";
+                return RedirectToAction("Details", new {id = txns.Id});
+            }
+
+            txns = await DbContext.Transactions.Where(a => a.Source.Team.Slug == TeamSlug && a.KfsTrackingNumber == filter.TrackingNum).OrderBy(a => a.TransactionDate).FirstOrDefaultAsync();
+            if (txns != null)
+            {
+                Message = "KFS Tracking Number found";
+                return RedirectToAction("Details", new { txns.Id });
+            }
+
+            txns = await DbContext.Transactions.Where(a => a.Source.Team.Slug == TeamSlug && a.MerchantTrackingNumber == filter.TrackingNum).OrderBy(a => a.TransactionDate).FirstOrDefaultAsync();
+            if (txns != null)
+            {
+                Message = "Merchant Tracking Number found";
+                return RedirectToAction("Details", new { txns.Id });
+            }
+
+            Message = "Search Returned no results";
+            return RedirectToAction("Index", new {filter});
+
+
         }
 
 

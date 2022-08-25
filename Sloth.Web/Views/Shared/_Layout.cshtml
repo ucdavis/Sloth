@@ -87,7 +87,7 @@
             }
             </select></div>
             <div class="col-7">
-                <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
+                <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="post">
                 <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
             </form>
             </div>
