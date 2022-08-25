@@ -22,8 +22,6 @@
         <h2>@ViewBag.Title</h2>
         
 
-        @if (string.IsNullOrWhiteSpace(Model.Filter.TrackingNum))
-        {
         <h3>Filters</h3>
         <form class="row" id="invoiceFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
             <div class="row justify-content-between filters-wrapper">
@@ -48,7 +46,6 @@
 
 
 
-            <div class="row justify-content-between">
 @*                 
                 <div class="col-6">
                     <h3>Filters</h3>
@@ -84,8 +81,6 @@
                         </div>
                     </form>
                 </div> *@
-            </div>
-        }
 
         <partial name="_TransactionsTable" model="Model.TransactionsTable" />
     </div>
