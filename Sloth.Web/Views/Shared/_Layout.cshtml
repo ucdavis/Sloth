@@ -86,12 +86,14 @@
                 }
             }
             </select></div>
-            <div class="col-7">
-                <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
-                <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
-            </form>
-            </div>
-            
+            @if (!string.IsNullOrEmpty(teamSlug))
+            {
+                <div class="col-7">
+                    <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="post">
+                        <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
+                    </form>
+                </div>
+            }
             
             </div>
         <div class="col-4 text-end profile-bar"><partial name="_LoginPartial" /></div>
@@ -146,15 +148,17 @@
                     @if (!string.IsNullOrWhiteSpace(ViewBag?.Message))
                     {
                         <div class="col alert alert-info">
-                            <button type="button" class="close" data-bs-dismiss="alert">×</button>
                             @ViewBag.Message
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            
                         </div>
                     }
                     @if (!string.IsNullOrWhiteSpace(ViewBag?.ErrorMessage))
                     {
                         <div class="col alert alert-danger">
-                            <button type="button" class="close" data-bs-dismiss="alert">×</button>
                             @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            
                         </div>
                     }
                 </div>
@@ -167,15 +171,17 @@
                     @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
                     {
                         <div class="col alert alert-info">
-                            <button type="button" class="close" data-bs-dismiss="alert">×</button>
                             @TempData["Message"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            
                         </div>
                     }
                     @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
                     {
                         <div class="col alert alert-danger">
-                            <button type="button" class="close" data-bs-dismiss="alert">×</button>
                             @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            
                         </div>
                     }
                 </div>

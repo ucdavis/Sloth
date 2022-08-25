@@ -8,7 +8,7 @@
     {
         @if (Context.HasTeamRole(TeamRole.Approver))
         {
-            <div class="alert alert-warning text-center" role="alert">
+            <div class="alert alert-warning" role="alert">
                 There are @Model.PendingApprovalCount @(Model.PendingApprovalCount > 1 ? "transactions" : "transaction") pending approval, <a asp-controller="Transactions" asp-action="NeedApproval">click here</a> <span> to view them</span>
             </div>
         }
@@ -20,29 +20,32 @@
         }
     }
         <h2>@ViewBag.Title</h2>
-        <h3>Filters</h3>
-        <div class="row justify-content-between filters-wrapper">
-            <div class="col-4">
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Nov 11 2021" aria-label="">
-                    <span class="input-group-text">to</span>
-                    <input type="text" class="form-control" placeholder="Dec 12 2023" aria-label="">
-                     <select class="form-select status-filter" aria-label="Default select example">
-                    <option selected>Status</option>
-                    <option value="1">One</option>
-                    <option value="2">Two</option>
-                    <option value="3">Three</option>
-                    </select>
-                </div>
-                <button type="button" class="btn btn-light mt-1">Apply filter</button>
-            </div>
-
-        </div>
         
 
-        @if (string.IsNullOrWhiteSpace(Model.Filter.TrackingNum))
-        {
-            <div class="row justify-content-between">
+        <h3>Filters</h3>
+        <form class="row" id="invoiceFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
+            <div class="row justify-content-between filters-wrapper">
+                <div class="col-4">
+                    <div id="filter-date-range" class="input-group">
+                        <input name="from" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.From" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                        <span class="input-group-text">to</span>
+                        <input name="to" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.To" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                        <select class="form-select status-filter" aria-label="Default select example">
+                            <option selected>Status</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-light mt-1">Apply filter</button>
+                </div>
+
+            </div>
+        </form>
+
+
+
 @*                 
                 <div class="col-6">
                     <h3>Filters</h3>
@@ -78,8 +81,6 @@
                         </div>
                     </form>
                 </div> *@
-            </div>
-        }
 
         <partial name="_TransactionsTable" model="Model.TransactionsTable" />
     </div>
@@ -100,10 +101,10 @@
         });
 
          //setup datepickers
-        //$('#filter-date-range').datepicker({
-        //    inputs: $('#filter-date-range input'),
-        //    keepEmptyValues: true,  
-        //});
+        $('#filter-date-range').datepicker({
+            inputs: $('#filter-date-range input'),
+            keepEmptyValues: true,  
+        });
 
         $("#transactionsTable tbody").on("click", "tr", function () {
             window.location = $(this).data("href");
