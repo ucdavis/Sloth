@@ -389,32 +389,32 @@ namespace Sloth.Web.Controllers
                                     || t.MerchantTrackingNumber == filter.TrackingNum)).OrderBy(a => a.TransactionDate).ToListAsync();
             if (txns == null || txns.Count <= 0)
             {
-                ErrorMessage = "Search Returned no results";
+                ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
                 return RedirectToAction("Index");
 
             }
 
             if (txns.Any(a => a.ProcessorTrackingNumber == filter.TrackingNum))
             {
-                Message = "Processor Tracking Number found";
+                Message = $"Processor Tracking Number found: {filter.TrackingNum}";
                 return RedirectToAction("Details", new {id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id});
             }
 
 
             if (txns.Any(a => a.KfsTrackingNumber == filter.TrackingNum))
             {
-                Message = "KFS Tracking Number found";
+                Message = $"KFS Tracking Number found: {filter.TrackingNum}";
                 return RedirectToAction("Details", new { txns.First(a => a.KfsTrackingNumber == filter.TrackingNum).Id });
             }
 
 
             if (txns.Any(a => a.MerchantTrackingNumber == filter.TrackingNum))
             {
-                Message = "Merchant Tracking Number found";
+                Message = $"Merchant Tracking Number found: {filter.TrackingNum}";
                 return RedirectToAction("Details", new { txns.First(a => a.MerchantTrackingNumber == filter.TrackingNum).Id });
             }
 
-            ErrorMessage = "Search Returned no results";
+            ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
             return RedirectToAction("Index");
 
         }
