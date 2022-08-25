@@ -86,12 +86,14 @@
                 }
             }
             </select></div>
-            <div class="col-7">
-                <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="post">
-                <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
-            </form>
-            </div>
-            
+            @if (!string.IsNullOrEmpty(teamSlug))
+            {
+                <div class="col-7">
+                    <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="post">
+                        <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
+                    </form>
+                </div>
+            }
             
             </div>
         <div class="col-4 text-end profile-bar"><partial name="_LoginPartial" /></div>
