@@ -8,6 +8,8 @@ $theme-colors: (
   secondary: #e6e7e9,
   danger: $merlot,
   success: $redwood,
+  info: $tahoe,
+  warning: $secondary-color,
 );
 @import "~bootstrap/scss/bootstrap";
 @import "@ucdavis/gunrockin/sass/_typography.scss";

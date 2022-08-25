@@ -7,27 +7,20 @@
   box-shadow: 0 0 0 0.25rem rgb(0 84 76 / 25%);
 }
 .alert {
-  color: $primary-color;
-  font-family: $sans-bold;
   a {
-    text-decoration: underline;
+    font-family: $sans-bold;
+    color: inherit;
   }
-  border-radius: 4px;
-  padding: 8px 16px;
 }
-.alert-warning {
-  background-color: transparentize($secondary-color, 0.85);
-  color: $secondary-color;
-  border-color: $secondary-color;
-  a {
-    color: $secondary-color;
-    &:hover {
-      color: lighten($secondary-color, 5);
-    }
-  }
-  i {
-    color: $primary-color;
-  }
+button.btn-close {
+  width: 0.5rem;
+  height: 0.5rem;
+  opacity: 0.4;
+  width: 0.5rem;
+  height: 0.5rem;
+  opacity: 0.4;
+  float: right;
+  margin-top: 4px;
 }
 .badge {
   font-family: $sans-bold;
