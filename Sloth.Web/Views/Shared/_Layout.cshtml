@@ -146,15 +146,17 @@
                     @if (!string.IsNullOrWhiteSpace(ViewBag?.Message))
                     {
                         <div class="col alert alert-info">
-                            <button type="button" class="close" data-bs-dismiss="alert">×</button>
                             @ViewBag.Message
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            
                         </div>
                     }
                     @if (!string.IsNullOrWhiteSpace(ViewBag?.ErrorMessage))
                     {
                         <div class="col alert alert-danger">
-                            <button type="button" class="close" data-bs-dismiss="alert">×</button>
                             @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            
                         </div>
                     }
                 </div>
@@ -167,15 +169,17 @@
                     @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
                     {
                         <div class="col alert alert-info">
-                            <button type="button" class="close" data-bs-dismiss="alert">×</button>
                             @TempData["Message"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            
                         </div>
                     }
                     @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
                     {
                         <div class="col alert alert-danger">
-                            <button type="button" class="close" data-bs-dismiss="alert">×</button>
                             @TempData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            
                         </div>
                     }
                 </div>

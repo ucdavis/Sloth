@@ -8,7 +8,7 @@
     {
         @if (Context.HasTeamRole(TeamRole.Approver))
         {
-            <div class="alert alert-warning text-center" role="alert">
+            <div class="alert alert-warning" role="alert">
                 There are @Model.PendingApprovalCount @(Model.PendingApprovalCount > 1 ? "transactions" : "transaction") pending approval, <a asp-controller="Transactions" asp-action="NeedApproval">click here</a> <span> to view them</span>
             </div>
         }
