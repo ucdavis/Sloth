@@ -65,6 +65,10 @@
             ]
         });
 
+        $("#transactionsTable tbody").on("click", "tr", function () {
+            window.location = $(this).data("href");
+        });
+
         $("body").on("click",
             "#transactionsTable tbody tr #callWebHook",
             function(e) {
