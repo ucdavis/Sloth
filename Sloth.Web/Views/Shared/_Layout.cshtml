@@ -23,7 +23,33 @@
         trackingNum = HttpContextAccessor.HttpContext.Request.Query["trackingNum"];
     }
 
+
+
+    var activeMenu = string.Empty;
+    switch (controller.ToLower())
+    {
+        case "transactions":
+            activeMenu = "Transactions";
+            break;
+        case "jobs":
+            activeMenu = "Jobs";
+            break;
+        case "scrubbers":
+            activeMenu = "Scrubbers";
+            break;
+        case "teams":
+        case "sources":
+        case "integrations":
+        case "webhooks":
+            activeMenu = "Settings";
+            break;
+        default:
+            activeMenu = String.Empty;
+            break;
+    }
+
 }
+
 
 <!DOCTYPE html>
 <html>
@@ -111,16 +137,16 @@
                         @if (!string.IsNullOrEmpty(teamSlug))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Transactions" asp-action="Index"><partial name="_TransactionsSvgPartial" />Transactions</a>
+                                <a class="nav-link @(activeMenu == "Transactions" ? "active" : "")" asp-controller="Transactions" asp-action="Index"><partial name="_TransactionsSvgPartial" />Transactions</a>
                             </li>
 
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Scrubbers" asp-action="Index"><partial name="_ScrubberSvgPartial" />Scrubbers</a>
+                                <a class="nav-link @(activeMenu == "Scrubbers" ? "active" : "")" asp-controller="Scrubbers" asp-action="Index"><partial name="_ScrubberSvgPartial" />Scrubbers</a>
                             </li>
                             @if (Context.HasTeamRole(TeamRole.Admin))
                             {
                                 <li class="nav-item">
-                                    <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug"><partial name="_SettingSvgPartial" /> Settings</a>
+                                    <a class="nav-link @(activeMenu == "Settings" ? "active" : "")" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug"><partial name="_SettingSvgPartial" /> Settings</a>
                                 </li>
                             }
                         }
@@ -129,7 +155,7 @@
                         @if (User.IsInRole(Roles.SystemAdmin))
                         {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Jobs" asp-action="Index"><partial name="_JobsSvgPartial" />Jobs</a>
+                                <a class="nav-link @(activeMenu == "Jobs" ? "active" : "")" asp-controller="Jobs" asp-action="Index"><partial name="_JobsSvgPartial" />Jobs</a>
                             </li>
                         }
 
