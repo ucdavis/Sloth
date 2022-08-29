@@ -132,18 +132,21 @@
 
 @if (Model.Transaction.Status == TransactionStatuses.PendingApproval)
 {
+    var canApprove = Context.HasTeamRole(TeamRole.Approver);
     <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Transaction.Id" method="post">
         <div>
-            <button type="submit" class="btn btn-primary">Approve Transaction</button>
+            <button type="submit" class="btn btn-primary" @(!canApprove ? "Disabled" : "")>Approve Transaction</button>
         </div>
     </form>
 }
 
+
 @if (Model.Transaction.Status == TransactionStatuses.Completed && Model.HasWebhooks)
 {
+    var canCallWebhook = Context.HasTeamRole(TeamRole.Admin);
     <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
         <div>
-            <button type="submit" class="btn btn-warning">Call Webhook</button>
+            <button type="submit" class="btn btn-warning" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
         </div>
     </form>
 }
@@ -151,7 +154,7 @@
 @if (Model.Transaction.Status == TransactionStatuses.Completed && !Model.Transaction.HasReversal)
 {
     var reversalAmount = Model.Transaction.Transfers.Where(x => x.Direction == Transfer.CreditDebit.Credit).Sum(x => x.Amount);
-
+    var canReverse = Context.HasTeamRole(TeamRole.Admin);
 
     <form asp-controller="Transactions" asp-action="CreateReversal" asp-route-id="@Model.Transaction.Id" method="post" class="form-inline row">
         <label for="reversalAmount">Reversal Amount</label>
@@ -160,11 +163,11 @@
                 <div class="input-group-prepend">
                     <div class="input-group-text">$</div>
                 </div>
-                <input type="text" class="form-control" id="reversalAmount" name="reversalAmount" value="@reversalAmount" />
+                <input type="text" class="form-control" id="reversalAmount" name="reversalAmount" value="@reversalAmount" @(!canReverse ? "Disabled" : "") />
             </div>
         </div>
         <div class="col">
-            <button type="submit" class="btn btn-primary">Reverse Transaction</button>
+            <button type="submit" class="btn btn-primary" @(!canReverse ? "Disabled" : "")>Reverse Transaction</button>
         </div>
 
 
