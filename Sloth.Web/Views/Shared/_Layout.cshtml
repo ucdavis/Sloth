@@ -54,143 +54,147 @@
 </head>
 <body>
     <div class="page-wrap">
-<header>
-        <div class="container">
-            <div class="row justify-content-between">
-            <div class="col"><a asp-area="" asp-controller="Home" asp-action="Index">
-                <img src="~/images/ucdavissloth-logo.svg" alt="logo" />
-               
-            </a>
-            </div>
-            <div class="col-2 text-end"><img src="~/images/sloth-svg.svg" alt="logo" /></div>
-            </div>
-        </div>
-        
-    </header>
-    <div class="search-wrapper">
-        <div class="container">
-        <div class="row justify-content-between">
+        <header>
+            <div class="container">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <a asp-area="" asp-controller="Home" asp-action="Index">
+                            <img src="~/images/ucdavissloth-logo.svg" alt="logo" />
 
-        <div class="col-8 d-flex search-bar">
-            <div class="col-3 team-chooser"><select id="team-select" class="form-select" aria-label="Default select example">
-            <option value="">-- Choose team --</option>
-            @foreach (var item in teams)
-            {
-                if (item.Slug == teamSlug)
-                {
-                    <option selected value=@item.Slug data-slug=@item.Slug>@item.Name</option>
-                }
-                else
-                {
-                    <option value=@item.Slug data-slug=@item.Slug>@item.Name</option>
-                }
-            }
-            </select></div>
-            @if (!string.IsNullOrEmpty(teamSlug))
-            {
-                <div class="col-7">
-                    <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="post">
-                        <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
-                    </form>
+                        </a>
+                    </div>
+                    <div class="col-2 text-end"><img src="~/images/sloth-svg.svg" alt="logo" /></div>
                 </div>
-            }
-            
             </div>
-        <div class="col-4 text-end profile-bar"><partial name="_LoginPartial" /></div>
-        </div>
-        
-        </div>
-    </div>
-    <div class="navbar">
-        <div class="container">
-            <div id="navbarNav">
-                <ul class="navbar-nav">
-                    @if (!string.IsNullOrEmpty(teamSlug))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Transactions" asp-action="Index"><partial name="_TransactionsSvgPartial" />Transactions</a>
-                        </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Scrubbers" asp-action="Index"><partial name="_ScrubberSvgPartial" />Scrubbers</a>
-                        </li>
-                        @if (Context.HasTeamRole(TeamRole.Admin)) {
+        </header>
+        <div class="search-wrapper">
+            <div class="container">
+                <div class="row justify-content-between">
+
+                    <div class="col-8 d-flex search-bar">
+                        <div class="col-3 team-chooser">
+                            <select id="team-select" class="form-select" aria-label="Default select example">
+                                <option value="">-- Choose team --</option>
+                                @foreach (var item in teams)
+                                {
+                                    if (item.Slug == teamSlug)
+                                    {
+                                        <option selected value=@item.Slug data-slug=@item.Slug>@item.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value=@item.Slug data-slug=@item.Slug>@item.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        @if (!string.IsNullOrEmpty(teamSlug))
+                        {
+                            <div class="col-7">
+                                <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="post">
+                                    <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
+                                </form>
+                            </div>
+                        }
+
+                    </div>
+                    <div class="col-4 text-end profile-bar"><partial name="_LoginPartial" /></div>
+                </div>
+
+            </div>
+        </div>
+        <div class="navbar">
+            <div class="container">
+                <div id="navbarNav">
+                    <ul class="navbar-nav">
+                        @if (!string.IsNullOrEmpty(teamSlug))
+                        {
                             <li class="nav-item">
-                                <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug"><partial name="_SettingSvgPartial" /> Settings</a>
+                                <a class="nav-link" asp-controller="Transactions" asp-action="Index"><partial name="_TransactionsSvgPartial" />Transactions</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Scrubbers" asp-action="Index"><partial name="_ScrubberSvgPartial" />Scrubbers</a>
+                            </li>
+                            @if (Context.HasTeamRole(TeamRole.Admin))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug"><partial name="_SettingSvgPartial" /> Settings</a>
+                                </li>
+                            }
+                        }
+
+
+                        @if (User.IsInRole(Roles.SystemAdmin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Jobs" asp-action="Index"><partial name="_JobsSvgPartial" />Jobs</a>
                             </li>
                         }
-                    }
 
-   
-                    @if (User.IsInRole(Roles.SystemAdmin))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Jobs" asp-action="Index"><partial name="_JobsSvgPartial" />Jobs</a>
-                        </li>
-                    }
+                        @if (!string.IsNullOrEmpty(teamSlug))
+                        {
+                            <li class="nav-item">
 
-                    @if (!string.IsNullOrEmpty(teamSlug))
-                    {
-                        <li class="nav-item">
-                            
-                        </li>
-                    }
-                </ul>
-                
+                            </li>
+                        }
+                    </ul>
+
+                </div>
             </div>
         </div>
-    </div>
-    <div class="body-content">
-        @if (!string.IsNullOrWhiteSpace(ViewBag?.Message ?? ViewBag?.ErrorMessage))
-        {
-            <div class="container">
-                <div class="row mb-1">
-                    @if (!string.IsNullOrWhiteSpace(ViewBag?.Message))
-                    {
-                        <div class="col alert alert-info">
-                            @ViewBag.Message
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            
-                        </div>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(ViewBag?.ErrorMessage))
-                    {
-                        <div class="col alert alert-danger">
-                            @ViewBag.ErrorMessage
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            
-                        </div>
-                    }
+        <div class="body-content">
+            @if (!string.IsNullOrWhiteSpace(ViewBag?.Message ?? ViewBag?.ErrorMessage))
+            {
+                <div class="container">
+                    <div class="row mb-1">
+                        @if (!string.IsNullOrWhiteSpace(ViewBag?.Message))
+                        {
+                            <div class="col alert alert-info">
+                                @ViewBag.Message
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(ViewBag?.ErrorMessage))
+                        {
+                            <div class="col alert alert-danger">
+                                @ViewBag.ErrorMessage
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                            </div>
+                        }
+                    </div>
                 </div>
-            </div>
-        }
-        @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string ?? TempData["ErrorMessage"] as string))
-        {
-            <div class="container">
-                <div class="row mb-1">
-                    @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
-                    {
-                        <div class="col alert alert-info">
-                            @TempData["Message"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            
-                        </div>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
-                    {
-                        <div class="col alert alert-danger">
-                            @TempData["ErrorMessage"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            
-                        </div>
-                    }
+            }
+            @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string ?? TempData["ErrorMessage"] as string))
+            {
+                <div class="container">
+                    <div class="row mb-1">
+                        @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
+                        {
+                            <div class="col alert alert-info">
+                                @TempData["Message"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
+                        {
+                            <div class="col alert alert-danger">
+                                @TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                            </div>
+                        }
+                    </div>
                 </div>
-            </div>
-        }
-        @RenderBody()
+            }
+            @RenderBody()
+        </div>
     </div>
-    </div>
-    
+
     <footer class="border-top py-3">
         <div class="text-center">
             <p>&copy; - The Regents of the University of California, Davis campus. All rights reserved</p>
@@ -220,12 +224,10 @@
         $('#team-select').on('change', function (e) {
             var optionSelected = $("option:selected", this);
             var valueSelected = this.value;
-            if(valueSelected !== "")
-            {
+            if (valueSelected !== "") {
                 window.location = "/" + valueSelected + "/transactions";
             }
-            else
-            {
+            else {
                 window.location = "/Teams";
             }
         });
