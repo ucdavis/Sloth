@@ -9,6 +9,5 @@ namespace Sloth.Web.Models.TransactionViewModels
     {
         public IList<Transaction> Transactions { get; set; }
 
-        //public bool HasWebhooks { get; set; }
     }
 }
