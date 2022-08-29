@@ -51,9 +51,7 @@ namespace Sloth.Web.Controllers
                 Scrubber = scrubber,
                 TransactionsTable = new TransactionsTableViewModel()
                 {
-                    Transactions = scrubber.Transactions,
-                    HasWebhooks = await DbContext.WebHooks
-                        .AnyAsync(w => w.Team.Slug == TeamSlug)
+                    Transactions = scrubber.Transactions
                 }
             };
 

@@ -88,9 +88,7 @@ namespace Sloth.Web.Controllers
                 Transactions = await query
                     .Include(t => t.Transfers)
                     .AsNoTracking()
-                    .ToListAsync(),
-                HasWebhooks = await DbContext.WebHooks
-                    .AnyAsync(w => w.Team.Slug == TeamSlug)
+                    .ToListAsync()
             };
 
             result.PendingApprovalCount = await DbContext.Transactions
@@ -112,9 +110,7 @@ namespace Sloth.Web.Controllers
                     .Where(t => t.Source.Team.Slug == TeamSlug)
                     .Where(t => t.Status == TransactionStatuses.PendingApproval)
                     .AsNoTracking()
-                    .ToListAsync(),
-                HasWebhooks = await DbContext.WebHooks
-                    .AnyAsync(w => w.Team.Slug == TeamSlug)
+                    .ToListAsync()
             };
 
             return View(transactionsTable);
@@ -167,6 +163,10 @@ namespace Sloth.Web.Controllers
             var model = new TransactionDetailsViewModel()
             {
                 Transaction = transaction,
+                HasWebhooks = await DbContext.WebHooks
+                    .AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive),
+
+
                 RelatedTransactions = new TransactionsTableViewModel
                 {
                     Transactions = relatedTransactions
@@ -346,22 +346,26 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Source)
                 .ThenInclude(s => s.Team)
                 .SingleOrDefaultAsync(t => t.Id == id);
-
+           
             if (transaction == null)
             {
-                return NotFound();
+                ErrorMessage = "Transaction not found.";
+                return RedirectToAction("Index");
             }
 
             if (transaction.Source.Team.Slug != TeamSlug)
             {
-                return Forbid();
+                ErrorMessage = $"Team Mismatch {transaction.Source.Team.Slug} not {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+                
             }
 
-            var hasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug);
+            var hasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive);
 
             if (!hasWebhooks)
             {
-                return NotFound();
+                ErrorMessage = "Active Webhook not found for team.";
+                return RedirectToAction("Details", new {id=transaction.Id});
             }
 
             await WebHookService.SendWebHooksForTeam(transaction.Source.Team, new BankReconcileWebHookPayload()
@@ -372,7 +376,9 @@ namespace Sloth.Web.Controllers
                 TransactionDate = transaction.TransactionDate
             });
 
-            return Ok();
+            Message = "Webhook called.";
+
+            return RedirectToAction("Details", new { id = transaction.Id });
         }
 
         [HttpPost]
