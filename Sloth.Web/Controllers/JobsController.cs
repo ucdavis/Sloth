@@ -79,8 +79,7 @@ namespace Sloth.Web.Controllers
                     Job = r,
                     TransactionsTable = new TransactionsTableViewModel()
                     {
-                        Transactions = r.Transactions,
-                        HasWebhooks = r.Transactions.Any(t => t.Source.Team.WebHooks.Any())
+                        Transactions = r.Transactions
                     },
                     TransactionCount = r.Transactions.Count
                 })
@@ -233,8 +232,7 @@ namespace Sloth.Web.Controllers
                     Job = r,
                     TransactionsTable = new TransactionsTableViewModel()
                     {
-                        Transactions = r.Transactions,
-                        HasWebhooks = r.Transactions.Any(t => t.Source.Team.WebHooks.Any())
+                        Transactions = r.Transactions
                     },
                     TransactionCount = r.Transactions.Count
                 })

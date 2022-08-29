@@ -9,10 +9,12 @@ namespace Sloth.Web.Models.TransactionViewModels
         {
             RelatedTransactions = new TransactionsTableViewModel();
             RelatedTransactions.Transactions = new List<Transaction>();
-            RelatedTransactions.HasWebhooks = false;
+            //RelatedTransactions.HasWebhooks = false;
         }
 
         public Transaction Transaction { get; set; }
         public TransactionsTableViewModel RelatedTransactions { get; set; }
+
+        public bool HasWebhooks { get; set; } = false;
     }
 }
