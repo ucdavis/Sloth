@@ -1,16 +1,43 @@
 @using Sloth.Core.Extensions
+@using Sloth.Core.Resources
+@using Sloth.Web.Identity
+@inject ApplicationUserManager UserManager
+
 @model Sloth.Core.Models.User
 @{
     ViewBag.Title = "Profile";
 }
 
 @section AdditionalStyles
-{
+    {
 }
 
-<h2>@ViewBag.Title</h2>
+    <h2>@ViewBag.Title</h2>
+
+    <div>
+        <div>@Model.UserName</div>
+        <div>
+            @Model.FullName
+        </div>
+        <div>@Model.Email</div>
+    </div>
+
+@if (User.IsInRole(Roles.SystemAdmin))
+{
+    <h1>You have the System Role</h1>
+}
+
+@foreach (var teamRoles in Model.UserTeamRoles)
+{
+    <h3>@teamRoles.Team.Name</h3>
+    @foreach (var role in Model.UserTeamRoles.Where(a => a.TeamId == teamRoles.TeamId))
+    {
+        <h4>@role.Role.Name</h4>
+    }
+    <hr />
+}
 
 
 @section AdditionalScripts
-{
+    {
 }
