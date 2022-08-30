@@ -88,12 +88,12 @@ footer {
   }
 }
 table.active-table {
-    tbody tr {
-        &:hover {
-            background-color: $bg-primary;
-            cursor: pointer;
-        }
+  tbody tr {
+    &:hover {
+      background-color: $bg-primary;
+      cursor: pointer;
     }
+  }
 }
 table.sloth-table {
   border: 1px solid $borders-sloth;
@@ -151,6 +151,21 @@ table.sloth-table {
     font-size: 1.2rem;
     max-width: 850px;
     line-height: 1.5;
+  }
+}
+.profile-label-wrapper {
+  margin-bottom: 6px;
+  .profile-label {
+    display: inline-block;
+    width: 150px;
+    padding-right: 16px;
+    font-size: 1rem;
+    color: $secondary-font;
+    text-transform: uppercase;
+  }
+  .profile-label-result {
+    display: inline-block;
+    font-size: 1.2rem;
   }
 }
 .team-settings {
