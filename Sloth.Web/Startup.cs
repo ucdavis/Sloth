@@ -104,7 +104,7 @@ namespace Sloth.Web
                 o.AddPolicy(PolicyCodes.TeamManager,
                     policy => policy.Requirements.Add(new VerifyTeamPermission(TeamRole.Admin, TeamRole.Manager)));
 
-                o.AddPolicy(PolicyCodes.TeamManager,
+                o.AddPolicy(PolicyCodes.TeamAnyRole,
                     policy => policy.Requirements.Add(new VerifyTeamPermission(TeamRole.Admin, TeamRole.Approver, TeamRole.Manager)));
 
             });
