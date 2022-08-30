@@ -4,9 +4,11 @@
     ViewBag.Title = "Scrubbers";
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="container">
+    <div class="row">
+        <h2>@ViewBag.Title</h2>
 
-<table id="scrubbersTable" class="table table-bordered" style="width:100%">
+<table id="scrubbersTable" class="table sloth-table">
     <thead>
     <tr>
         <th>@Html.DisplayNameFor(x => x.Id)</th>
@@ -23,7 +25,7 @@
             <td>@t.Source.OrganizationCode</td>
             <td data-sort="@t.BatchDate.Ticks">@t.BatchDate</td>
             <td style="width:10%">
-                <a class="btn btn-primary btn-sm" href="@Url.Action("Details", new { id = t.Id })">
+                <a class="btn btn-link btn-sm" href="@Url.Action("Details", new { id = t.Id })">
                     <div class="fa fa-arrow-right"></div>
                 </a>
             </td>
@@ -31,6 +33,9 @@
     }
     </tbody>
 </table>
+    </div>
+</div>
+
 
 
 @section AdditionalScripts {
