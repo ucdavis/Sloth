@@ -8,31 +8,31 @@
     <div class="row">
         <h2>@ViewBag.Title</h2>
 
-<table id="scrubbersTable" class="table sloth-table">
-    <thead>
-    <tr>
-        <th>@Html.DisplayNameFor(x => x.Id)</th>
-        <th>@Html.DisplayNameFor(x => x.Source.OrganizationCode)</th>
-        <th>@Html.DisplayNameFor(x => x.BatchDate)</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var t in Model)
-    {
-        <tr>
-            <th scope="row">@t.Id</th>
-            <td>@t.Source.OrganizationCode</td>
-            <td data-sort="@t.BatchDate.Ticks">@t.BatchDate</td>
-            <td style="width:10%">
-                <a class="btn btn-link btn-sm" href="@Url.Action("Details", new { id = t.Id })">
-                    <div class="fa fa-arrow-right"></div>
-                </a>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+        <table id="scrubbersTable" class="table sloth-table active-table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.Id)</th>
+                    <th>@Html.DisplayNameFor(x => x.Source.OrganizationCode)</th>
+                    <th>@Html.DisplayNameFor(x => x.BatchDate)</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var t in Model)
+                {
+                    <tr>
+                        <th scope="row">@t.Id</th>
+                        <td>@t.Source.OrganizationCode</td>
+                        <td data-sort="@t.BatchDate.Ticks">@t.BatchDate</td>
+                        <td style="width:10%">
+                            <a class="btn btn-link btn-sm" href="@Url.Action("Details", new { id = t.Id })">
+                                <div class="fa fa-arrow-right"></div>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
