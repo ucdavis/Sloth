@@ -40,6 +40,12 @@
 
 @section AdditionalScripts {
     <script>
-        $('#scrubbersTable').DataTable({});
+        $('#scrubbersTable').DataTable({
+            order: [[2, 'desc']],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+        });
     </script>
 }

@@ -5,12 +5,32 @@
     ViewBag.Title = "Scrubber Details";
 }
 
+<div class="container">
+    <h2>@ViewBag.Title</h2>
+
+    <dl class="row">
+        <div class="col>
+            <dt>@Html.DisplayNameFor(x => x.Scrubber.Id)</dt>
+            <dd>@Model.Scrubber.Id</dd>
+        </div>
+        <div class="col>
+            <dt>@Html.DisplayNameFor(x => x.Scrubber.Uri)</dt>
+            <dd>@Model.Scrubber.Uri</dd>
+        </div>
+    </dl>
+
+    <partial name="_TransactionsTable" model="Model.TransactionsTable" />
+
+    <pre><code class="language-markup">@Model.Scrubber.ToXml()</code></pre>
+</div>
+
 @section AdditionalStyles
-    {
+{
     <link href="~/css/prism.css" rel="stylesheet" />
 
     <style>
-        pre.code-toolbar > .toolbar a, pre.code-toolbar > .toolbar button, pre.code-toolbar > .toolbar span {
+        pre.code-toolbar > .toolbar a, pre.code-toolbar > .toolbar button, pre.code-toolbar > .toolbar span
+        {
             color: black;
             font-size: 16px;
             background-color: white;
@@ -18,36 +38,26 @@
     </style>
 }
 
-    <div class="container">
-        <h2>@ViewBag.Title</h2>
-
-        <dl class="row">
-            <div class="col>
-            <dt>@Html.DisplayNameFor(x => x.Scrubber.Id)</dt>
-            <dd>@Model.Scrubber.Id</dd>
-        </div>
-        <div class="col>
-                <dt>@Html.DisplayNameFor(x => x.Scrubber.Uri)</dt>
-                <dd>@Model.Scrubber.Uri</dd>
-            </div>
-        </dl>
-
-        <partial name="_TransactionsTable" model="Model.TransactionsTable" />
-
-        <pre><code class="language-markup">@Model.Scrubber.ToXml()</code></pre>
-    </div>
-
-    @section AdditionalScripts
-    {
+@section AdditionalScripts
+{
     <script src="~/js/prism.js"></script>
     <script>
-        $('#transactions').dataTable({
+        $('#transactionsTable').dataTable({
             "columnDefs": [
                 {
                     "targets": 0,
                     "visible": false,
                 }
-            ]
+            ],
+            order: [[2, 'desc']],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+        });
+
+        $("#transactionsTable tbody").on("click", "tr", function () {
+            window.location = $(this).data("href");
         });
     </script>
 }
