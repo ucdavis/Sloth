@@ -20,7 +20,7 @@ using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
-    [Authorize(Policy = PolicyCodes.TeamAnyRole)]
+    
     public class TransactionsController : SuperController
     {
         private readonly IWebHookService WebHookService;
@@ -30,7 +30,9 @@ namespace Sloth.Web.Controllers
             WebHookService = webHookService;
         }
 
+
         // GET: /<controller>/
+        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> Index(TransactionsFilterModel filter = null)
         {
             if (filter == null)
@@ -137,6 +139,7 @@ namespace Sloth.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> Details(string id)
         {
             var transaction = await DbContext.Transactions
@@ -344,7 +347,7 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = PolicyCodes.TeamApprover)]
+        [Authorize(Policy = PolicyCodes.TeamManager)]
         public async Task<IActionResult> CallWebHook(string id)
         {
             var transaction = await DbContext.Transactions
@@ -387,6 +390,7 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> Search(TransactionsFilterModel filter = null)
         {
             if (string.IsNullOrWhiteSpace(filter?.TrackingNum))
