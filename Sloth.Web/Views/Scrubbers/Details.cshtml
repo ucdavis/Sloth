@@ -6,7 +6,7 @@
 }
 
 @section AdditionalStyles
-{
+    {
     <link href="~/css/prism.css" rel="stylesheet" />
 
     <style>
@@ -18,27 +18,27 @@
     </style>
 }
 
-<div class="container">
-    <h2>@ViewBag.Title</h2>
+    <div class="container">
+        <h2>@ViewBag.Title</h2>
 
-    <dl class="row">
-        <div class="col>
+        <dl class="row">
+            <div class="col>
             <dt>@Html.DisplayNameFor(x => x.Scrubber.Id)</dt>
             <dd>@Model.Scrubber.Id</dd>
         </div>
         <div class="col>
-            <dt>@Html.DisplayNameFor(x => x.Scrubber.Uri)</dt>
-            <dd>@Model.Scrubber.Uri</dd>
-        </div>
-    </dl>
+                <dt>@Html.DisplayNameFor(x => x.Scrubber.Uri)</dt>
+                <dd>@Model.Scrubber.Uri</dd>
+            </div>
+        </dl>
 
-    <partial name="_TransactionsTable" model="Model.TransactionsTable" />
+        <partial name="_TransactionsTable" model="Model.TransactionsTable" />
 
-    <pre><code class="language-markup">@Model.Scrubber.ToXml()</code></pre>
-</div>
+        <pre><code class="language-markup">@Model.Scrubber.ToXml()</code></pre>
+    </div>
 
-@section AdditionalScripts
-{
+    @section AdditionalScripts
+    {
     <script src="~/js/prism.js"></script>
     <script>
         $('#transactions').dataTable({
@@ -48,5 +48,6 @@
                     "visible": false,
                 }
             ]
-        });</script>
+        });
+    </script>
 }
