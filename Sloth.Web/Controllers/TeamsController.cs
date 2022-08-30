@@ -46,7 +46,7 @@ namespace Sloth.Web.Controllers
             }
 
             // fetch team roles
-            var teamRoles = new[] { TeamRole.Admin, TeamRole.Approver };
+            var teamRoles = new[] { TeamRole.Admin, TeamRole.Manager, TeamRole.Approver };
             ViewBag.Roles = await DbContext.TeamRoles
                 .Where(r => teamRoles.Contains(r.Name))
                 .ToListAsync();
