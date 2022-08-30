@@ -12,48 +12,48 @@
     {
 }
 
-<div class="container">
-    <div class="row mb-4">
-         <h2>@ViewBag.Title</h2>
-    <div class="profile-label-wrapper">
-        <div class="profile-label">User Name</div>
-        <div class="profile-label-result">@Model.UserName</div>
-    </div>
-    <div class="profile-label-wrapper">
-        <div class="profile-label">Full Name</div>
-        <div class="profile-label-result">@Model.FullName</div>
-    </div>
-     <div class="profile-label-wrapper">
-        <div class="profile-label">Email</div>
-        <div class="profile-label-result">@Model.Email</div>
-    </div>
+    <div class="container">
+        <div class="row mb-4">
+            <h2>@ViewBag.Title</h2>
+            <div class="profile-label-wrapper">
+                <div class="profile-label">User Name</div>
+                <div class="profile-label-result">@Model.UserName</div>
+            </div>
+            <div class="profile-label-wrapper">
+                <div class="profile-label">Full Name</div>
+                <div class="profile-label-result">@Model.FullName</div>
+            </div>
+            <div class="profile-label-wrapper">
+                <div class="profile-label">Email</div>
+                <div class="profile-label-result">@Model.Email</div>
+            </div>
+        </div>
+
+        <div class="row">
+        @if (User.IsInRole(Roles.SystemAdmin))
+        {
+            <h2>Your System Roles</h2>
+        }
+
+        @foreach (var teamRoles in Model.UserTeamRoles)
+        {
+            <div class="col-md-3">
+                <h3>@teamRoles.Team.Name</h3>
+                <ul>
+                    @foreach (var role in Model.UserTeamRoles.Where(a => a.TeamId == teamRoles.TeamId))
+                    {
+                        <li>@role.Role.Name</li>
+                    }
+                </ul>
+            </div>
+
+        }
     </div>
 
-<div class="row">
-@if (User.IsInRole(Roles.SystemAdmin))
-{
-    <h2>Your System Roles</h2>
-}
 
-@foreach (var teamRoles in Model.UserTeamRoles)
-{
-    <div class="col-md-3">
-    <h3>@teamRoles.Team.Name</h3>
-    <ul>
-    @foreach (var role in Model.UserTeamRoles.Where(a => a.TeamId == teamRoles.TeamId))
-    {
-        <li>@role.Role.Name</li>
-    }
-    </ul>
-    </div>
-    
-}
+
 </div>
 
-
-    
-</div>
-   
 
 @section AdditionalScripts
     {
