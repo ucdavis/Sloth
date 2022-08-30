@@ -16,7 +16,7 @@
         <div class="row mb-4">
             <h2>@ViewBag.Title</h2>
             <div class="profile-label-wrapper">
-                <div class="profile-label">User Name</div>
+                <div class="profile-label">Kerb Id</div>
                 <div class="profile-label-result">@Model.UserName</div>
             </div>
             <div class="profile-label-wrapper">
@@ -33,14 +33,21 @@
         @if (User.IsInRole(Roles.SystemAdmin))
         {
             <h2>Your System Roles</h2>
+            <div class="col-md-3">
+                <ul>
+                    <li>System</li>
+                </ul>
+            </div>
         }
 
-        @foreach (var teamRoles in Model.UserTeamRoles)
+        <h2>Your Team Roles</h2>
+
+        @foreach (var teamRoles in Model.UserTeamRoles.Select(a => a.Team).Distinct())
         {
             <div class="col-md-3">
-                <h3>@teamRoles.Team.Name</h3>
+                <h3>@teamRoles.Name</h3>
                 <ul>
-                    @foreach (var role in Model.UserTeamRoles.Where(a => a.TeamId == teamRoles.TeamId))
+                    @foreach (var role in Model.UserTeamRoles.Where(a => a.TeamId == teamRoles.Id))
                     {
                         <li>@role.Role.Name</li>
                     }
@@ -49,8 +56,6 @@
 
         }
     </div>
-
-
 
 </div>
 
