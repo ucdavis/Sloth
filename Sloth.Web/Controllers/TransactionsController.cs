@@ -272,6 +272,7 @@ namespace Sloth.Web.Controllers
                 MerchantTrackingNumber = transaction.MerchantTrackingNumber,
                 MerchantTrackingUrl = transaction.MerchantTrackingUrl,
                 ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
+                Description = reversalAmount != totalAmount ? "Partial Reversal" : "Full Reversal",
             }.SetStatus(TransactionStatuses.Scheduled);
 
             // add reversal transfers

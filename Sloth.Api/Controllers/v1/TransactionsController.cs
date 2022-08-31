@@ -190,6 +190,7 @@ namespace Sloth.Api.Controllers.v1
                 KfsTrackingNumber       = transaction.KfsTrackingNumber,
                 Source                  = source,
                 TransactionDate         = transaction.TransactionDate,
+                Description             = transaction.Description,
                 Transfers               = transaction.Transfers.Select(t => new Transfer()
                 {
                     Account       = t.Account,
