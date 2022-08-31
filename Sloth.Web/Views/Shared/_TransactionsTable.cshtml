@@ -11,19 +11,20 @@
     var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
 }
 
-<table id="transactionsTable" class="table table-bordered">
+<table id="transactionsTable" class="table sloth-table active-table">
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Id)</th>
+             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Status)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().TransactionDate)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().KfsTrackingNumber)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().DocumentNumber)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().ProcessorTrackingNumber)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().MerchantTrackingNumber)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Description)</th>
-            <th>Accounts</th>
-            <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Status)</th>
-            <th></th>
+            
+           
+          
         </tr>
     </thead>
     <tbody>
@@ -33,15 +34,20 @@
             var firstCredit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Credit);
             var description = firstDebit.Description;
 
-            <tr>
+            var slug = !string.IsNullOrWhiteSpace(teamSlug) ? teamSlug : t.Source?.Team?.Slug;
+
+            <tr data-href="/@slug/Transactions/Details/@t.Id">
                 <th scope="row">@t.Id</th>
+                <td>
+                    <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize(LetterCasing.Title)</span>
+                </td>
                 <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate.ToPacificTime()</td>
                 <td>@t.KfsTrackingNumber</td>
                 <td>@t.DocumentNumber</td>
                 <td>@t.ProcessorTrackingNumber</td>
-                <td><a asp-controller="Transactions" asp-action="Index" asp-route-trackingNum="@t.MerchantTrackingNumber">@t.MerchantTrackingNumber</a></td>
+                <td>@t.MerchantTrackingNumber</td>
                 <td>@description</td>
-                @if (String.IsNullOrWhiteSpace(firstDebit.FinancialSegmentString))
+                @* @if (String.IsNullOrWhiteSpace(firstDebit.FinancialSegmentString))
                 {
                     <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
                 }
@@ -49,29 +55,8 @@
                 {
                     <td>See Details</td>
                 }
+                 *@
                 
-                <td class="text-center">
-                    <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize()</span>
-                </td>
-                <td>
-                    <a asp-controller="Transactions" asp-action="Details" asp-route-id="@t.Id" class="btn btn-primary btn-sm" target="_blank">
-                        <span style="white-space:nowrap">
-                            <span class="fa-layers">
-                                <i class="fa fa-info"></i>
-                                <i class="fa fa-external-link-alt" data-fa-transform="shrink-8 up-8 right-8"></i>
-                            </span>
-                            &nbsp;Details
-                        </span>
-                    </a>
-                    @if (Model.HasWebhooks)
-                    {
-                        <button id="callWebHook" class="btn btn-danger btn-sm">
-                            <span style="white-space: nowrap">
-                                <i class="fa fa-redo-alt"></i>&nbsp;WebHook
-                            </span>
-                        </button>
-                    }
-                </td>
             </tr>
         }
     </tbody>

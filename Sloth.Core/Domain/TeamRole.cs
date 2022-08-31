@@ -20,6 +20,7 @@ namespace Sloth.Core.Models
         // Role Codes
         public const string Admin = "Admin";
         public const string Approver = "Approver";
+        public const string Manager = "Manager";
 
         public static string[] GetAllRoles()
         {
@@ -27,6 +28,7 @@ namespace Sloth.Core.Models
             {
                 Admin,
                 Approver,
+                Manager,
             };
         }
     }

@@ -25,6 +25,11 @@ namespace Sloth.Web.Controllers
         {
             var userId = UserManager.GetUserId(User);
             var user = await DbContext.Users
+                .Include(a => a.UserTeamRoles)
+                .ThenInclude(a => a.Role)
+                .Include(a => a.UserTeamRoles)
+                .ThenInclude(a => a.Team)
+
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             return View(user);

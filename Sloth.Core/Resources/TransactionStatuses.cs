@@ -31,25 +31,25 @@ namespace Sloth.Core.Resources
             switch (status)
             {
                 case PendingApproval:
-                    return "badge-warning";
+                    return "badge-pending";
 
                 case Scheduled:
-                    return "badge-info";
+                    return "badge-scheduled";
 
                 case Processing:
-                    return "badge-info";
+                    return "badge-processing";
 
                 case Completed:
-                    return "badge-success";
+                    return "badge-completed";
 
                 case Rejected:
-                    return "badge-danger";
+                    return "badge-rejected";
 
                 case Cancelled:
-                    return "badge-danger";
+                    return "badge-cancelled";
 
                 default:
-                    return "badge-secondary";
+                    return "badge-default";
             }
         }
     }

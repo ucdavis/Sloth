@@ -1,0 +1,61 @@
+.form-group {
+  margin-bottom: 16px;
+}
+.form-control:focus,
+.form-select:focus {
+  border-color: $primary-color;
+  box-shadow: 0 0 0 0.25rem rgb(0 84 76 / 25%);
+}
+.alert {
+  a {
+    font-family: $sans-bold;
+    color: inherit;
+  }
+}
+button.btn-close {
+  width: 0.5rem;
+  height: 0.5rem;
+  opacity: 0.4;
+  width: 0.5rem;
+  height: 0.5rem;
+  opacity: 0.4;
+  float: right;
+  margin-top: 4px;
+}
+.badge {
+  font-family: $sans-bold;
+  font-size: 0.8rem;
+}
+.badge-completed {
+  color: $quad;
+  background-color: transparentize($quad, 0.8);
+}
+.badge-scheduled,
+.badge-processing {
+  color: $putahcreek;
+  background-color: transparentize($putahcreek, 0.8);
+}
+.badge-pending {
+  color: $secondary-color;
+  background-color: transparentize($secondary-color, 0.8);
+}
+.badge-rejected {
+  color: $merlot;
+  background-color: transparentize($merlot, 0.8);
+}
+.badge-cancelled {
+  color: $tertiary-font;
+  background-color: transparentize($tertiary-font, 0.8);
+}
+.badge-default {
+  color: $tertiary-font;
+  background-color: transparentize($tertiary-font, 0.8);
+}
+.badge-credit {
+  color: $sage;
+  background-color: transparentize($sage, 0.8);
+}
+.badge-debit {
+  color: $recpool;
+  background-color: transparentize($recpool, 0.8);
+}

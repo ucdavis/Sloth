@@ -20,7 +20,7 @@ using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
-    [Authorize(Policy = PolicyCodes.TeamApprover)]
+    
     public class TransactionsController : SuperController
     {
         private readonly IWebHookService WebHookService;
@@ -30,7 +30,9 @@ namespace Sloth.Web.Controllers
             WebHookService = webHookService;
         }
 
+
         // GET: /<controller>/
+        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> Index(TransactionsFilterModel filter = null)
         {
             if (filter == null)
@@ -88,14 +90,20 @@ namespace Sloth.Web.Controllers
                 Transactions = await query
                     .Include(t => t.Transfers)
                     .AsNoTracking()
-                    .ToListAsync(),
-                HasWebhooks = await DbContext.WebHooks
-                    .AnyAsync(w => w.Team.Slug == TeamSlug)
+                    .ToListAsync()
             };
+
+            result.PendingApprovalCount = await DbContext.Transactions
+                .Where(t => t.Source.Team.Slug == TeamSlug && t.Status == TransactionStatuses.PendingApproval)
+                .CountAsync();
+
+            var team = await DbContext.Teams.FirstAsync(t => t.Slug == TeamSlug);
+            ViewBag.Title = $"Transactions - {team.Name}";
 
             return View("Index", result);
         }
 
+        [Authorize(Policy = PolicyCodes.TeamApprover)]
         public async Task<IActionResult> NeedApproval()
         {
             var transactionsTable = new TransactionsTableViewModel()
@@ -105,15 +113,14 @@ namespace Sloth.Web.Controllers
                     .Where(t => t.Source.Team.Slug == TeamSlug)
                     .Where(t => t.Status == TransactionStatuses.PendingApproval)
                     .AsNoTracking()
-                    .ToListAsync(),
-                HasWebhooks = await DbContext.WebHooks
-                    .AnyAsync(w => w.Team.Slug == TeamSlug)
+                    .ToListAsync()
             };
 
             return View(transactionsTable);
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyCodes.TeamApprover)]
         public async Task<IActionResult> ApprovalAll()
         {
             // fetch transactions
@@ -132,6 +139,7 @@ namespace Sloth.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> Details(string id)
         {
             var transaction = await DbContext.Transactions
@@ -142,12 +150,39 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Transfers)
                 .Include(t => t.ReversalTransaction)
                 .Include(t => t.ReversalOfTransaction)
+                .Include(t => t.StatusEvents)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            return View(transaction);
+            var relatedTransactions = await DbContext.Transactions
+                .Include(a => a.Source)
+                    .ThenInclude(a => a.Team)
+                .Include(t => t.Transfers)
+                .Where(a => a.Id != transaction.Id && a.Source.Team.Slug == TeamSlug &&
+                    (
+                        a.KfsTrackingNumber == transaction.KfsTrackingNumber ||
+                        (a.ProcessorTrackingNumber != null && a.ProcessorTrackingNumber == transaction.ProcessorTrackingNumber) ||
+                        a.MerchantTrackingNumber == transaction.MerchantTrackingNumber
+                    )
+                ).ToListAsync();
+
+            var model = new TransactionDetailsViewModel()
+            {
+                Transaction = transaction,
+                HasWebhooks = await DbContext.WebHooks
+                    .AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive),
+
+
+                RelatedTransactions = new TransactionsTableViewModel
+                {
+                    Transactions = relatedTransactions
+                }
+            };
+
+            return View(model);
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyCodes.TeamApprover)]
         public async Task<IActionResult> ScheduleTransaction(string id)
         {
             var transaction = await DbContext.Transactions
@@ -174,6 +209,7 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyCodes.TeamManager)]
         public async Task<IActionResult> CreateReversal(string id, decimal reversalAmount)
         {
             reversalAmount = Math.Round(reversalAmount, 2);
@@ -311,28 +347,33 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = PolicyCodes.TeamManager)]
         public async Task<IActionResult> CallWebHook(string id)
         {
             var transaction = await DbContext.Transactions
                 .Include(t => t.Source)
                 .ThenInclude(s => s.Team)
                 .SingleOrDefaultAsync(t => t.Id == id);
-
+           
             if (transaction == null)
             {
-                return NotFound();
+                ErrorMessage = "Transaction not found.";
+                return RedirectToAction("Index");
             }
 
             if (transaction.Source.Team.Slug != TeamSlug)
             {
-                return Forbid();
+                ErrorMessage = $"Team Mismatch {transaction.Source.Team.Slug} not {TeamSlug}";
+                return RedirectToAction("Index", "Home");
+                
             }
 
-            var hasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug);
+            var hasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive);
 
             if (!hasWebhooks)
             {
-                return NotFound();
+                ErrorMessage = "Active Webhook not found for team.";
+                return RedirectToAction("Details", new {id=transaction.Id});
             }
 
             await WebHookService.SendWebHooksForTeam(transaction.Source.Team, new BankReconcileWebHookPayload()
@@ -343,7 +384,54 @@ namespace Sloth.Web.Controllers
                 TransactionDate = transaction.TransactionDate
             });
 
-            return Ok();
+            Message = "Webhook called.";
+
+            return RedirectToAction("Details", new { id = transaction.Id });
+        }
+
+        [HttpPost]
+        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
+        public async Task<IActionResult> Search(TransactionsFilterModel filter = null)
+        {
+            if (string.IsNullOrWhiteSpace(filter?.TrackingNum))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var txns = await DbContext.Transactions.Where(t => t.Source.Team.Slug == TeamSlug
+                                && (t.ProcessorTrackingNumber == filter.TrackingNum
+                                    || t.KfsTrackingNumber == filter.TrackingNum
+                                    || t.MerchantTrackingNumber == filter.TrackingNum)).OrderBy(a => a.TransactionDate).ToListAsync();
+            if (txns == null || txns.Count <= 0)
+            {
+                ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
+                return RedirectToAction("Index");
+
+            }
+
+            if (txns.Any(a => a.ProcessorTrackingNumber == filter.TrackingNum))
+            {
+                Message = $"Processor Tracking Number found: {filter.TrackingNum}";
+                return RedirectToAction("Details", new {id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id});
+            }
+
+
+            if (txns.Any(a => a.KfsTrackingNumber == filter.TrackingNum))
+            {
+                Message = $"KFS Tracking Number found: {filter.TrackingNum}";
+                return RedirectToAction("Details", new { txns.First(a => a.KfsTrackingNumber == filter.TrackingNum).Id });
+            }
+
+
+            if (txns.Any(a => a.MerchantTrackingNumber == filter.TrackingNum))
+            {
+                Message = $"Merchant Tracking Number found: {filter.TrackingNum}";
+                return RedirectToAction("Details", new { txns.First(a => a.MerchantTrackingNumber == filter.TrackingNum).Id });
+            }
+
+            ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
+            return RedirectToAction("Index");
+
         }
 
 

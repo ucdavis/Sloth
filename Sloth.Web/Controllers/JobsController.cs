@@ -79,8 +79,7 @@ namespace Sloth.Web.Controllers
                     Job = r,
                     TransactionsTable = new TransactionsTableViewModel()
                     {
-                        Transactions = r.Transactions,
-                        HasWebhooks = r.Transactions.Any(t => t.Source.Team.WebHooks.Any())
+                        Transactions = r.Transactions
                     },
                     TransactionCount = r.Transactions.Count
                 })
@@ -224,14 +223,16 @@ namespace Sloth.Web.Controllers
                 .Include(r => r.Logs)
                 .Include(r => r.Transactions)
                 .ThenInclude(t => t.Transfers)
+                .Include(a => a.Transactions)
+                .ThenInclude(a => a.Source)
+                .ThenInclude(a => a.Team)
                 .AsNoTracking()
                 .Select(r => new CybersourceBankReconcileJobViewModel
                 {
                     Job = r,
                     TransactionsTable = new TransactionsTableViewModel()
                     {
-                        Transactions = r.Transactions,
-                        HasWebhooks = r.Transactions.Any(t => t.Source.Team.WebHooks.Any())
+                        Transactions = r.Transactions
                     },
                     TransactionCount = r.Transactions.Count
                 })

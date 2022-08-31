@@ -12,7 +12,7 @@ using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
-    [Authorize(Policy = PolicyCodes.TeamApprover)]
+    [Authorize(Policy = PolicyCodes.TeamAnyRole)]
     public class ScrubbersController : SuperController
     {
         public ScrubbersController(ApplicationUserManager userManager, SlothDbContext dbContext) : base(userManager, dbContext)
@@ -51,9 +51,7 @@ namespace Sloth.Web.Controllers
                 Scrubber = scrubber,
                 TransactionsTable = new TransactionsTableViewModel()
                 {
-                    Transactions = scrubber.Transactions,
-                    HasWebhooks = await DbContext.WebHooks
-                        .AnyAsync(w => w.Team.Slug == TeamSlug)
+                    Transactions = scrubber.Transactions
                 }
             };
 

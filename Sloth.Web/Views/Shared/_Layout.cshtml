@@ -14,6 +14,7 @@
 
     var teams = user.GetTeams().ToList();
 
+
     var trackingNum = "";
 
     if (string.Equals("transactions", controller, StringComparison.OrdinalIgnoreCase)
@@ -22,7 +23,33 @@
         trackingNum = HttpContextAccessor.HttpContext.Request.Query["trackingNum"];
     }
 
+
+
+    var activeMenu = string.Empty;
+    switch (controller.ToLower())
+    {
+        case "transactions":
+            activeMenu = "Transactions";
+            break;
+        case "jobs":
+            activeMenu = "Jobs";
+            break;
+        case "scrubbers":
+            activeMenu = "Scrubbers";
+            break;
+        case "teams":
+        case "sources":
+        case "integrations":
+        case "webhooks":
+            activeMenu = "Settings";
+            break;
+        default:
+            activeMenu = String.Empty;
+            break;
+    }
+
 }
+
 
 <!DOCTYPE html>
 <html>
@@ -34,12 +61,10 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.0/css/all.css" integrity="sha384-aOkxzJ5uQz7WBObEZcHvV5JvRW3TUc2rNPA7pe3AwnsUohiw1Vj2Rgx2KSOkF5+h" crossorigin="anonymous">
 
     <environment names="Development">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css" />
     </environment>
     <environment names="Staging,Production">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/css/bootstrap-datepicker.min.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
     </environment>
 
     <partial name="_DataTableStyles" />
@@ -54,126 +79,185 @@
     @RenderSection("AdditionalStyles", required: false)
 </head>
 <body>
-    <div class="navbar navbar-expand-md navbar-dark bg-dark">
-        <div class="container">
-            <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">
-                <img src="~/images/logo.png" alt="logo" />
-                Sloth Web
-            </a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav mr-auto ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" asp-controller="Teams" asp-action="Index">Teams</a>
-                    </li>
+    <div class="page-wrap">
+        <header>
+            <div class="container">
+                <div class="row justify-content-between">
+                    <div class="col">
+                        <a asp-area="" asp-controller="Home" asp-action="Index">
+                            <img src="~/images/ucdavissloth-logo.svg" alt="logo" />
 
-                    @if (!string.IsNullOrEmpty(teamSlug))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Transactions" asp-action="Index">Transactions</a>
-                        </li>
+                        </a>
+                    </div>
+                    <div class="col-2 text-end"><img src="~/images/sloth-svg.svg" alt="logo" /></div>
+                </div>
+            </div>
 
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Scrubbers" asp-action="Index">Scrubbers</a>
-                        </li>
-                        @if (Context.HasTeamRole(TeamRole.Admin)) {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug">Settings</a>
-                            </li>
+        </header>
+        <div class="search-wrapper">
+            <div class="container">
+                <div class="row justify-content-between">
+
+                    <div class="col-8 d-flex search-bar">
+                        <div class="col-3 team-chooser">
+                            <select id="team-select" class="form-select" aria-label="Default select example">
+                                <option value="">-- Choose team --</option>
+                                @foreach (var item in teams)
+                                {
+                                    if (item.Slug == teamSlug)
+                                    {
+                                        <option selected value=@item.Slug data-slug=@item.Slug>@item.Name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value=@item.Slug data-slug=@item.Slug>@item.Name</option>
+                                    }
+                                }
+                            </select>
+                        </div>
+                        @if (!string.IsNullOrEmpty(teamSlug))
+                        {
+                            <div class="col-7">
+                                <form class="topsearch" asp-controller="Transactions" asp-action="Search" asp-route-team="@teamSlug" method="post">
+                                    <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
+                                </form>
+                            </div>
                         }
-                    }
 
-   
-                    @if (User.IsInRole(Roles.SystemAdmin))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Jobs" asp-action="Index">Jobs</a>
-                        </li>
-                    }
+                    </div>
+                    <div class="col-4 text-end profile-bar"><partial name="_LoginPartial" /></div>
+                </div>
 
-                    @if (!string.IsNullOrEmpty(teamSlug))
-                    {
-                        <li class="nav-item">
-                            <form class="topsearch" asp-controller="Transactions" asp-action="Index" asp-route-team="@teamSlug" method="get">
-                                <input class="form-control" name="trackingNum" type="search" placeholder="Search Transactions" value="@trackingNum" aria-label="Search Transactions">
-                            </form>
-                        </li>
-                    }
-                </ul>
-                <partial name="_LoginPartial" />
             </div>
         </div>
-    </div>
-    <div class="body-content">
-        @if (!string.IsNullOrWhiteSpace(ViewBag?.Message ?? ViewBag?.ErrorMessage))
-        {
+        <div class="navbar">
             <div class="container">
-                <div class="row mb-1">
-                    @if (!string.IsNullOrWhiteSpace(ViewBag?.Message))
-                    {
-                        <div class="col alert alert-info">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            @ViewBag.Message
-                        </div>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(ViewBag?.ErrorMessage))
-                    {
-                        <div class="col alert alert-danger">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            @ViewBag.ErrorMessage
-                        </div>
-                    }
+                <div id="navbarNav">
+                    <ul class="navbar-nav">
+                        @if (!string.IsNullOrEmpty(teamSlug))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(activeMenu == "Transactions" ? "active" : "")" asp-controller="Transactions" asp-action="Index"><partial name="_TransactionsSvgPartial" />Transactions</a>
+                            </li>
+
+                            <li class="nav-item">
+                                <a class="nav-link @(activeMenu == "Scrubbers" ? "active" : "")" asp-controller="Scrubbers" asp-action="Index"><partial name="_ScrubberSvgPartial" />Scrubbers</a>
+                            </li>
+                            @if (Context.HasTeamRole(TeamRole.Admin))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link @(activeMenu == "Settings" ? "active" : "")" asp-controller="Teams" asp-action="Details" asp-route-team="@teamSlug"><partial name="_SettingSvgPartial" /> Settings</a>
+                                </li>
+                            }
+                        }
+
+
+                        @if (User.IsInRole(Roles.SystemAdmin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(activeMenu == "Jobs" ? "active" : "")" asp-controller="Jobs" asp-action="Index"><partial name="_JobsSvgPartial" />Jobs</a>
+                            </li>
+                        }
+
+                        @if (!string.IsNullOrEmpty(teamSlug))
+                        {
+                            <li class="nav-item">
+
+                            </li>
+                        }
+                    </ul>
+
                 </div>
             </div>
-        }
-        @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string ?? TempData["ErrorMessage"] as string))
-        {
-            <div class="container">
-                <div class="row mb-1">
-                    @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
-                    {
-                        <div class="col alert alert-info">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            @TempData["Message"]
-                        </div>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
-                    {
-                        <div class="col alert alert-danger">
-                            <button type="button" class="close" data-dismiss="alert">×</button>
-                            @TempData["ErrorMessage"]
-                        </div>
-                    }
+        </div>
+        <div class="body-content">
+            @if (!string.IsNullOrWhiteSpace(ViewBag?.Message ?? ViewBag?.ErrorMessage))
+            {
+                <div class="container">
+                    <div class="row mb-1">
+                        @if (!string.IsNullOrWhiteSpace(ViewBag?.Message))
+                        {
+                            <div class="col alert alert-info">
+                                @ViewBag.Message
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(ViewBag?.ErrorMessage))
+                        {
+                            <div class="col alert alert-danger">
+                                @ViewBag.ErrorMessage
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                            </div>
+                        }
+                    </div>
                 </div>
-            </div>
-        }
-        @RenderBody()
+            }
+            @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string ?? TempData["ErrorMessage"] as string))
+            {
+                <div class="container">
+                    <div class="row mb-1">
+                        @if (!string.IsNullOrWhiteSpace(TempData["Message"] as string))
+                        {
+                            <div class="col alert alert-info">
+                                @TempData["Message"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                            </div>
+                        }
+                        @if (!string.IsNullOrWhiteSpace(TempData["ErrorMessage"] as string))
+                        {
+                            <div class="col alert alert-danger">
+                                @TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+            @RenderBody()
+        </div>
     </div>
+
     <footer class="border-top py-3">
         <div class="text-center">
             <p>&copy; - The Regents of the University of California, Davis campus. All rights reserved</p>
         </div>
     </footer>
 
+
     <environment names="Development">
-        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.js"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+        <!-- JavaScript Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.js"></script>
 
     </environment>
     <environment names="Staging,Production">
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.8.0/js/bootstrap-datepicker.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+        <!-- JavaScript Bundle with Popper -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/4.0.0/jquery.validate.unobtrusive.min.js"></script>
     </environment>
+
+    <script type="text/javascript">
+        $('#team-select').on('change', function (e) {
+            var optionSelected = $("option:selected", this);
+            var valueSelected = this.value;
+            if (valueSelected !== "") {
+                window.location = "/" + valueSelected + "/transactions";
+            }
+            else {
+                window.location = "/Teams";
+            }
+        });
+    </script>
 
     <partial name="_DataTableScripts" />
 

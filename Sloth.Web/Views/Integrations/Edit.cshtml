@@ -14,7 +14,9 @@
 }
 
 <div class="container">
-    <h2>@ViewBag.Title</h2>
+    <div class="row">
+        <div class="col-lg-6">
+<h2>@ViewBag.Title</h2>
 
     @using (Html.BeginForm(FormMethod.Post))
     {
@@ -67,6 +69,9 @@
             <input type="submit" value="Save" class="btn btn-primary" />
         </div>
     }
+        </div>
+    </div>
+    
 </div>
 
 @section AdditionalScripts

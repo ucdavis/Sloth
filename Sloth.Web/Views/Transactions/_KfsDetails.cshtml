@@ -1,83 +1,110 @@
+@using Humanizer
 @using Sloth.Core.Extensions
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
-@model Transaction
+@using Sloth.Web.Models.TransactionViewModels
+@model TransactionDetailsViewModel
 
 @{
     ViewBag.Title = "Transaction Details";
 
     Uri merchantUrl;
-    var isUrlValid = Uri.TryCreate(Model.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
+    var isUrlValid = Uri.TryCreate(Model.Transaction.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
 }
 
 
-<div class="row">
-    <div class="col-sm">
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.Id)</strong><br />
-            <span>@Model.Id</span>
+<div class="row txn-detail-wrapper">
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.Id)</span>
         </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.TransactionDate)</strong><br />
-            <span>@Model.TransactionDate.ToPacificTime()</span>
-        </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.KfsTrackingNumber)</strong><br />
-            <span>@Model.KfsTrackingNumber</span>
-        </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.DocumentNumber)</strong><br />
-            <span>@Model.DocumentNumber</span>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.Id</span>
         </div>
     </div>
-    <div class="col-sm">
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.ProcessorTrackingNumber)</strong><br />
-            <span>@Model.ProcessorTrackingNumber</span>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.TransactionDate)</span>
         </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.MerchantTrackingNumber)</strong><br />
-            <span>@Model.MerchantTrackingNumber</span>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.TransactionDate.ToPacificTime()</span>
         </div>
-        <div class="form-group">
-            <strong>@Html.DisplayNameFor(x => x.Status)</strong><br />
-            <span>@Model.Status</span>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.KfsTrackingNumber)</span>
         </div>
-        @{
-            if (isUrlValid)
-            {
-                <div class="form-group">
-                    <strong>@Html.DisplayNameFor(x => x.MerchantTrackingUrl)</strong><br />
-                    <span>
-                        <a href="@Html.Raw(merchantUrl.ToString())" target="_blank">@merchantUrl.ToString()</a>
-                    </span>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.KfsTrackingNumber</span>
+        </div>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.DocumentNumber)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.DocumentNumber</span>
+        </div>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.ProcessorTrackingNumber)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.ProcessorTrackingNumber</span>
+        </div>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.MerchantTrackingNumber)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.MerchantTrackingNumber</span>
+        </div>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.Status)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span class="badge @(TransactionStatuses.GetBadgeClass(Model.Transaction.Status))">@Model.Transaction.Status.Humanize(LetterCasing.Title)</span>
+        </div>
+    </div>
+    @{
+        if (isUrlValid)
+        {
+            <div class="txn-detail-row">
+                <div class="txn-detail-label">
+                    <span>@Html.DisplayNameFor(x => x.Transaction.MerchantTrackingUrl)</span>
                 </div>
-            }
+                <div class="txn-detail-result">
+                    <span><a href="@Html.Raw(merchantUrl.ToString())" target="_blank">@merchantUrl.ToString()</a></span>
+                </div>
+            </div>
         }
-
-    </div>
+    }
 </div>
 
-<table id="transfers" class="table table-striped table-bordered table-hover" style="width: 100%">
+<table id="transfers" class="table sloth-table" style="width: 100%">
     <thead>
         <tr>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Id)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Amount)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Direction)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Description)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].Account)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].ObjectCode)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].FiscalYear)</th>
-            <th>@Html.DisplayNameFor(x => x.Transfers[0].FiscalPeriod)</th>
+            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Id)</th>
+            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Amount)</th>
+            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Direction)</th>
+            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Description)</th>
+            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Account)</th>
+            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].ObjectCode)</th>
+            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].FiscalYear)</th>
+            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].FiscalPeriod)</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var t in Model.Transfers)
+        @foreach (var t in Model.Transaction.Transfers)
         {
             <tr>
                 <td>@t.Id</td>
-                <td class="text-right">@t.Amount.ToString("C")</td>
-                <td class="text-center">
+                <td>@t.Amount.ToString("C")</td>
+                <td>
                     <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
                 </td>
                 <td>@t.Description</td>
@@ -91,42 +118,63 @@
 </table>
 
 <div class="card my-3">
-    <div class="card-header d-flex justify-content-between align-items-center cursor-pointer collapsed" type="button" data-toggle="collapse" data-target="#transactionXml">
+    <div class="card-header d-flex justify-content-between align-items-center cursor-pointer collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#transactionXml">
         <span>Show XML</span>
         <i class="fa fa-fw fa-expand"></i>
     </div>
     <pre id="transactionXml" class="collapse my-0">
 <code class="language-markup">
-@Model.ToXml()
+            @Model.Transaction.ToXml()
 </code>
 </pre>
 </div>
 
 
-@if (Model.Status == TransactionStatuses.PendingApproval)
+@if (Model.Transaction.Status == TransactionStatuses.PendingApproval)
 {
-    <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Id" method="post">
-        <div class="d-flex justify-content-end align-items-center">
-            <button type="submit" class="btn btn-small btn-primary">Approve</button>
+    var canApprove = Context.HasTeamRole(TeamRole.Approver);
+    <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Transaction.Id" method="post">
+        <div>
+            <button type="submit" class="btn btn-primary" @(!canApprove ? "Disabled" : "")>Approve Transaction</button>
         </div>
     </form>
 }
 
-@if (Model.Status == TransactionStatuses.Completed && !Model.HasReversal)
+
+@if (Model.Transaction.Status == TransactionStatuses.Completed && Model.HasWebhooks)
 {
-    var reversalAmount = Model.Transfers.Where(x => x.Direction == Transfer.CreditDebit.Credit).Sum(x => x.Amount);
-    <div class="float-right">
-      <form asp-controller="Transactions" asp-action="CreateReversal" asp-route-id="@Model.Id" method="post" class="form-inline">
-        <label for="reversalAmount">Reversal Amount</label>
-        <div class="input-group ml-2">
-          <div class="input-group-prepend">
-            <div class="input-group-text">$</div>
-          </div>
-          <input type="text" class="form-control" style="width: 150px;" id="reversalAmount" name="reversalAmount" value="@reversalAmount" />
+    var canCallWebhook = Context.HasTeamRole(TeamRole.Manager);
+    <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
+        <div>
+            <button type="submit" class="btn btn-warning" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
         </div>
-        <button type="submit" class="btn btn-primary ml-2">Reverse Transaction</button>
-      </form>
-    </div>
+    </form>
+}
+
+@if (Model.Transaction.Status == TransactionStatuses.Completed && !Model.Transaction.HasReversal)
+{
+    var reversalAmount = Model.Transaction.Transfers.Where(x => x.Direction == Transfer.CreditDebit.Credit).Sum(x => x.Amount);
+    var canReverse = Context.HasTeamRole(TeamRole.Manager);
+
+    <form asp-controller="Transactions" asp-action="CreateReversal" asp-route-id="@Model.Transaction.Id" method="post" class="form-inline row">
+        <label for="reversalAmount">Reversal Amount</label>
+        <div class="col-3">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">$</div>
+                </div>
+                <input type="text" class="form-control" id="reversalAmount" name="reversalAmount" value="@reversalAmount" @(!canReverse ? "Disabled" : "") />
+            </div>
+        </div>
+        <div class="col">
+            <button type="submit" class="btn btn-primary" @(!canReverse ? "Disabled" : "")>Reverse Transaction</button>
+        </div>
+
+
+    </form>
+
+
+
 }
 
 

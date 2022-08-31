@@ -5,19 +5,6 @@
     ViewBag.Title = "Scrubber Details";
 }
 
-@section AdditionalStyles
-{
-    <link href="~/css/prism.css" rel="stylesheet" />
-
-    <style>
-        pre.code-toolbar > .toolbar a, pre.code-toolbar > .toolbar button, pre.code-toolbar > .toolbar span {
-            color: black;
-            font-size: 16px;
-            background-color: white;
-        }
-    </style>
-}
-
 <div class="container">
     <h2>@ViewBag.Title</h2>
 
@@ -37,16 +24,40 @@
     <pre><code class="language-markup">@Model.Scrubber.ToXml()</code></pre>
 </div>
 
+@section AdditionalStyles
+{
+    <link href="~/css/prism.css" rel="stylesheet" />
+
+    <style>
+        pre.code-toolbar > .toolbar a, pre.code-toolbar > .toolbar button, pre.code-toolbar > .toolbar span
+        {
+            color: black;
+            font-size: 16px;
+            background-color: white;
+        }
+    </style>
+}
+
 @section AdditionalScripts
 {
     <script src="~/js/prism.js"></script>
     <script>
-        $('#transactions').dataTable({
+        $('#transactionsTable').dataTable({
             "columnDefs": [
                 {
                     "targets": 0,
                     "visible": false,
                 }
-            ]
-        });</script>
+            ],
+            order: [[2, 'desc']],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+        });
+
+        $("#transactionsTable tbody").on("click", "tr", function () {
+            window.location = $(this).data("href");
+        });
+    </script>
 }

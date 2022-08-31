@@ -1,24 +1,60 @@
 @model Sloth.Web.Models.TransactionViewModels.TransactionsIndexViewModel
 
-@{
-    ViewBag.Title = "Transactions";
-}
+
+
 
     <div class="container">
-        <h2>@ViewBag.Title</h2>
-
-        @if (string.IsNullOrWhiteSpace(Model.Filter.TrackingNum))
+    @if (Model.PendingApprovalCount > 0)
+    {
+        @if (Context.HasTeamRole(TeamRole.Approver))
         {
-            <div class="row justify-content-between">
-                <div class="col-12"><hr /></div>
+            <div class="alert alert-warning" role="alert">
+                There are @Model.PendingApprovalCount @(Model.PendingApprovalCount > 1 ? "transactions" : "transaction") pending approval, <a asp-controller="Transactions" asp-action="NeedApproval">click here</a> <span> to view them</span>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-warning" role="alert">
+                <span>There are @Model.PendingApprovalCount @(Model.PendingApprovalCount > 1 ? "transactions" : "transaction") pending approval</span>
+            </div>
+        }
+    }
+        <h2>@ViewBag.Title</h2>
+        
+
+        <h3>Filters</h3>
+        <form class="row" id="invoiceFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
+            <div class="row justify-content-between filters-wrapper">
+                <div class="col-4">
+                    <div id="filter-date-range" class="input-group">
+                        <input name="from" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.From" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                        <span class="input-group-text">to</span>
+                        <input name="to" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.To" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+@*                        <select class="form-select status-filter" aria-label="Default select example"> //Maybe enable filtering by status if needed in the future.
+                            <option selected>Status</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>*@
+                    </div>
+
+                    <button type="submit" class="btn btn-light mt-1">Apply filter</button>
+                </div>
+
+            </div>
+        </form>
+
+
+
+@*                 
                 <div class="col-6">
                     <h3>Filters</h3>
                 </div>
                 <div class="col-6 d-flex justify-content-end align-items-end">
-                    <button class="btn align-self-end" type="button" data-toggle="collapse" data-target="#transactions-filter"><i class="fas fa-filter"></i></button>
-                </div>
+                    <button class="btn align-self-end" type="button" data-bs-toggle="collapse" data-bs-target="#transactions-filter"><i class="fas fa-filter"></i></button>
+                </div> *@
 
-                <div id="transactions-filter" class="col-12 collapse">
+                @* <div id="transactions-filter" class="col-12 collapse">
                     <form class="row" id="invoiceFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
                         <div class="col-lg-9">
                             <div class="row">
@@ -44,49 +80,35 @@
                             </div>
                         </div>
                     </form>
-                </div>
-                <div class="col-12"><hr /></div>
-            </div>
-        }
+                </div> *@
 
         <partial name="_TransactionsTable" model="Model.TransactionsTable" />
     </div>
+
 
 @section AdditionalScripts {
     <script>
         const table = $('#transactionsTable').DataTable({
             "columnDefs": [
                 { "targets": 0, "visible": false },
-                { "targets": [-1], "orderable": false },
             ],
-            order: [[1, 'desc']],
+            order: [[2, 'desc']],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+
         });
 
-        // setup datepickers
+         //setup datepickers
         $('#filter-date-range').datepicker({
             inputs: $('#filter-date-range input'),
-            keepEmptyValues: true,
+            keepEmptyValues: true,  
         });
 
-        $("body").on("click",
-            "#transactionsTable tbody tr #callWebHook",
-            function(e) {
-                e.preventDefault();
-                var row = table.row($(this).closest('tr')).data();
-                if (row && row[0]) {
-                    $.ajax({
-                        type: "POST",
-                        url: "@Url.Action("CallWebHook", "Transactions")",
-                        data: { id: row[0] },
-                        success: function(msg) {
-                            alert("WebHook Called");
-                        },
-                        error: function(_, status, error) {
-                            alert(status + ((error && (": " + error)) || ""));
-                        }
-                    });
-                }
-            });
+        $("#transactionsTable tbody").on("click", "tr", function () {
+            window.location = $(this).data("href");
+        });
 
     </script>
 }

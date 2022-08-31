@@ -1,29 +1,23 @@
+@using Humanizer
 @using Sloth.Core.Extensions
 @using Sloth.Core.Models
 @using Sloth.Core.Resources
-@model Transaction
+@using Sloth.Web.Models.TransactionViewModels
+@model TransactionDetailsViewModel
 
 @{
     ViewBag.Title = "Transaction Details";
 
     Uri merchantUrl;
-    var isUrlValid = Uri.TryCreate(Model.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
+    var isUrlValid = Uri.TryCreate(Model.Transaction.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
 }
 
-@section AdditionalStyles {
-    <link href="~/css/prism.css" rel="stylesheet" />
+<div class="container">
+    
+        <h2>@ViewBag.Title</h2>
+    
 
-    <style>
-        pre.code-toolbar > .toolbar a, pre.code-toolbar > .toolbar button, pre.code-toolbar > .toolbar span {
-            color: black;
-            font-size: 16px;
-            background-color: white;
-        }
-    </style>
-}
-
-<h2>@ViewBag.Title</h2>
-@if(String.IsNullOrWhiteSpace(Model.Transfers[0].FinancialSegmentString))
+@if(String.IsNullOrWhiteSpace(Model.Transaction.Transfers[0].FinancialSegmentString))
 {
     <partial name="_KfsDetails" model="Model" />
 }
@@ -33,9 +27,36 @@ else
 }
 
 
+<div class="row mt-5">
+    <h2>Activity Timeline</h2>
+    @foreach (var activity in Model.Transaction.StatusEvents.OrderBy(a => a.EventDate))
+    {
+        <div class="txn-timeline-row">
+            <div class="txn-timeline-date">
+                <span>@activity.EventDate.ToPacificTime().ToString("g")</span>
+            </div>
+            <div class="txn-timeline-result">
+                    <span class="badge @(TransactionStatuses.GetBadgeClass(activity.Status))">@activity.Status.Humanize(LetterCasing.Title)</span> <span>@activity.EventDetails</span>
+            </div>
+        </div>
+    } 
+</div>
+
+@if (Model.RelatedTransactions.Transactions.Any())
+{
+    <div class="row mt-5">
+    <h2>Related Transactions</h2>
+    <partial name="_TransactionsTable" model="Model.RelatedTransactions" />
+    </div>
+    
+}
+
+</div>
+
+
  @section AdditionalScripts {
     <script src="~/js/prism.js"></script>
-    <script>
+<script>
         $('#transfers').DataTable({
             "columnDefs": [
                 { "targets": 0, "visible": false }
@@ -43,7 +64,21 @@ else
             "paging": false,
             "info": false,
             //"searching": false,
-            "order": [[1, 'desc'],[2, 'desc']]
+            "order": [[1, 'desc'],[2, 'desc']],
+            searching: false,
         });
+        const table = $('#transactionsTable').DataTable({
+            "columnDefs": [
+                { "targets": 0, "visible": false },
+                { "targets": [-1], "orderable": false },
+            ],
+            order: [[1, 'desc']],
+            searching: false,
+        });
+
+        $("#transactionsTable tbody").on("click", "tr", function () {
+            window.location = $(this).data("href");
+        });
+
     </script>
 }

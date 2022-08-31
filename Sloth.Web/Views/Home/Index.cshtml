@@ -1,3 +1,4 @@
+@using Sloth.Core.Resources
 @model IEnumerable<Sloth.Core.Models.Team>
 @{
     ViewData["Title"] = "Home Page";
@@ -8,8 +9,8 @@
         <div class="col">
             <h1>SLOTH</h1>
             <ul>
-                <li>Scrubber</li>
-                <li>Loader &</li>
+                <li>Secure <span style="text-decoration: line-through">Scrubber</span></li>
+                <li>Ledger <span style="text-decoration: line-through">Loader</span></li>
                 <li>Online</li>
                 <li>Transaction</li>
                 <li>Hub</li>
@@ -17,17 +18,20 @@
         </div>
 
     </div>
+    @if (User.IsInRole(Roles.SystemAdmin))
+    {
 
-    <h2>Your Teams:</h2>
+        <h2>Your Teams:</h2>
 
-    <div class="row flex-column align-items-start justify-content-center">
-        @foreach (var team in Model)
-        {
-            <div class="col-sm-12 col-md-5">
-                <a asp-controller="Home" asp-action="TeamIndex" asp-route-team="@team.Slug">
-                    <span>@team.Name</span>
-                </a>
-            </div>
-        }
-    </div>
+        <div class="row flex-column align-items-start justify-content-center">
+            @foreach (var team in Model)
+            {
+                <div class="col-sm-12 col-md-5">
+                    <a asp-controller="Home" asp-action="TeamIndex" asp-route-team="@team.Slug">
+                        <span>@team.Name</span>
+                    </a>
+                </div>
+            }
+        </div>
+    }
 </div>

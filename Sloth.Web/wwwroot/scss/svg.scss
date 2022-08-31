@@ -1,0 +1,28 @@
+#alt-color {
+  fill: $tertiary-font;
+}
+#primary-color {
+  fill: $primary-color;
+}
+.navbar {
+  & .nav-link {
+    &:hover {
+      svg {
+        #alt-color,
+        #primary-color {
+          fill: $primary-color;
+        }
+      }
+      color: $primary-color;
+    }
+    &.active {
+      color: $primary-color;
+      svg {
+        #alt-color,
+        #primary-color {
+          fill: $primary-color;
+        }
+      }
+    }
+  }
+}

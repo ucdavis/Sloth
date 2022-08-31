@@ -19,19 +19,19 @@
     </style>
 }
 
-<div class="container">
+<div class="container team-settings">
     <div class="d-flex justify-content-between">
-        <h2>Team</h2>
-        <a asp-controller="Teams" asp-action="Edit" asp-route-team="@Model.Slug">Edit</a>
+        <h1>Settings</h1>
+        <a asp-controller="Teams" class="btn btn-primary" asp-action="Edit" asp-route-team="@Model.Slug">Edit</a>
     </div>
 
-    <div class="card my-3">
+    <div class="card mt-2">
         <div class="card-body">
             <div class="card-title">
                 <div class="d-flex justify-content-between align-items-start">
-                    <h3>Users</h3>
+                    <h2>Users</h2>
 
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#add-user-modal">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-user-modal">
                         Add User <i class="fa fa-fw fa-user"></i>
                     </button>
                 </div>
@@ -60,7 +60,7 @@
                                 <input name="teamId" value="@userRole.TeamId" hidden="hidden">
                                 <input name="userId" value="@userRole.UserId" hidden="hidden">
                                 <input name="roleId" value="@userRole.RoleId" hidden="hidden">
-                                <button type="submit" class="btn btn-danger">Remove</button>
+                                <button type="submit" class="btn btn-outline-danger">Remove</button>
                             </form>
                         </td>
                     </tr>
@@ -70,11 +70,11 @@
         </div>
     </div>
 
-    <div class="card mb-3">
+    <div class="card">
         <div class="card-body">
             <div class="card-title">
                 <div class="d-flex justify-content-between align-items-start">
-                    <h3>KFS Feed Sources</h3>
+                    <h2>KFS Feed Sources</h2>
                     <a asp-controller="Sources" asp-action="Create" class="btn btn-primary">
                         Create Source <i class="fas fa-fw fa-upload"></i>
                     </a>
@@ -86,11 +86,11 @@
         </div>
     </div>
 
-    <div class="card mb-3">
+    <div class="card">
         <div class="card-body">
             <div class="card-title">
                 <div class="d-flex justify-content-between align-items-start">
-                    <h3>Integrations</h3>
+                    <h2>Integrations</h2>
                     <a asp-controller="Integrations" asp-action="Create" class="btn btn-primary">
                         Create Integration <i class="fas fa-fw fa-plug"></i>
                     </a>
@@ -118,10 +118,10 @@
                         <td>@integration.ClearingAccount</td>
                         <td>@integration.HoldingAccount</td>
                         <td class="text-center" nowrap>
-                            <a asp-controller="Integrations" asp-action="Details" asp-route-id="@integration.Id" class="btn btn-primary btn-sm">
+                            <a asp-controller="Integrations" asp-action="Details" asp-route-id="@integration.Id" class="btn btn-outline-primary btn-sm">
                                 View
                             </a>
-                            <a asp-controller="Integrations" asp-action="Edit" asp-route-id="@integration.Id" class="btn btn-primary btn-sm">
+                            <a asp-controller="Integrations" asp-action="Edit" asp-route-id="@integration.Id" class="btn btn-outline-primary btn-sm">
                                 Edit
                             </a>
                         </td>
@@ -133,18 +133,18 @@
         </div>
     </div>
 
-    <div class="card mb-3">
+    <div class="card">
         <div class="card-body">
             <div class="card-title">
                 <div class="d-flex justify-content-between align-items-start">
-                    <h3>API Keys</h3>
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#create-key-modal">
+                    <h2>API Keys</h2>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#create-key-modal">
                         Create Api Key <i class="fas fa-fw fa-key"></i>
                     </button>
                 </div>
             </div>
 
-            <table id="apiKeysTable" class="table table-bordered table-condensed table-hover">
+            <table id="apiKeysTable" class="table table-bordered table-condensed">
                 <thead>
                 <tr>
                     <th>Key</th>
@@ -174,7 +174,7 @@
                             }
                             else
                             {
-                                <button class="btn btn-danger" data-toggle="modal" data-target="#revoke-key-modal" data-id="@k.Id" data-key="@k.MaskedKey()">
+                                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#revoke-key-modal" data-id="@k.Id" data-key="@k.MaskedKey()">
                                     Revoke Key
                                 </button>
                             }
@@ -187,18 +187,18 @@
         </div>
     </div>
 
-    <div class="card mb-3">
+    <div class="card">
         <div class="card-body">
             <div class="card-title">
                 <div class="d-flex justify-content-between align-items-start">
-                    <h3>WebHooks</h3>
+                    <h2>WebHooks</h2>
                     <a asp-controller="WebHooks" asp-action="Create" class="btn btn-primary">
                         Create WebHook <i class="fas fa-fw fa-server"></i>
                     </a>
                 </div>
             </div>
 
-            <table id="webHooksTable" class="table table-bordered table-condensed table-hover">
+            <table id="webHooksTable" class="table table-bordered table-condensed">
                 <thead>
                 <tr>
                     <th></th>
@@ -221,7 +221,7 @@
                             <a asp-controller="WebHooks" asp-action="Test" asp-route-id="@w.Id">Test</a>
                         </td>
                         <td>
-                            <a asp-controller="WebHooks" asp-action="Edit" asp-route-id="@w.Id" class="btn btn-primary btn-sm">
+                            <a asp-controller="WebHooks" asp-action="Edit" asp-route-id="@w.Id" class="btn btn-outline-primary btn-sm">
                                 Edit
                             </a>
                         </td>
@@ -237,9 +237,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Add User?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="modal-body">
                     <form>
@@ -272,7 +269,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="add-user-action" class="btn btn-primary">Add User</button>
                 </div>
             </div>
@@ -284,12 +281,9 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">Create New Api Key?</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="create-key-action" class="btn btn-primary">Create</button>
                 </div>
             </div>
@@ -301,9 +295,6 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="exampleModalLabel">New message</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
                 <div class="modal-body">
                     <p>Are you sure you want to revoke key:</p>
@@ -313,7 +304,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="revoke-key-action" class="btn btn-danger">Revoke Key</button>
                 </div>
             </div>
@@ -467,8 +458,8 @@
                     // create revoke button
                     var $button = $('<button></button>')
                         .addClass('btn btn-danger')
-                        .attr('data-toggle', 'modal')
-                        .attr('data-target', '#revoke-key-modal')
+                        .attr('data-bs-toggle', 'modal')
+                        .attr('data-bs-target', '#revoke-key-modal')
                         .attr('data-id', result.id)
                         .attr('data-key', result.key)
                         .text('Revoke Key');

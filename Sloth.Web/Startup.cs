@@ -100,6 +100,13 @@ namespace Sloth.Web
 
                 o.AddPolicy(PolicyCodes.TeamApprover,
                     policy => policy.Requirements.Add(new VerifyTeamPermission(TeamRole.Admin, TeamRole.Approver)));
+
+                o.AddPolicy(PolicyCodes.TeamManager,
+                    policy => policy.Requirements.Add(new VerifyTeamPermission(TeamRole.Admin, TeamRole.Manager)));
+
+                o.AddPolicy(PolicyCodes.TeamAnyRole,
+                    policy => policy.Requirements.Add(new VerifyTeamPermission(TeamRole.Admin, TeamRole.Approver, TeamRole.Manager)));
+
             });
             services.AddScoped<IAuthorizationHandler, VerifyTeamPermissionHandler>();
 

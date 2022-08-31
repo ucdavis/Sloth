@@ -26,13 +26,13 @@ namespace Sloth.Web.Controllers
             if (teams.Count == 1)
             {
                 var team = teams[0];
-                return RedirectToAction(nameof(TeamIndex), "Home", new { team = team.Slug });
+                return RedirectToAction(nameof(TransactionsController.Index), "Transactions", new { team = team.Slug });
             }
 
             return View(teams);
         }
 
-        [Authorize(Policy = PolicyCodes.TeamApprover)]
+        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> TeamIndex()
         {
             // find team

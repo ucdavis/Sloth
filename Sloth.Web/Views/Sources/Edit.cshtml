@@ -9,6 +9,8 @@
 }
 
 <div class="container">
+    <div class="row">
+<div class="col-lg-6">
     <h2>@ViewBag.Title</h2>
 
     @using (Html.BeginForm(FormMethod.Post))
@@ -68,17 +70,21 @@
             <div class="input-group">
                 @Html.PasswordFor(x => x.KfsFtpPasswordKey, new { @class = "form-control", value = "password", @readonly = true })
                 <div class="input-group-append">
-                    <div id="kfs-ftp-password-key-clear" class="btn btn-danger" data-toggle="modal" data-target="#passwordModal">
+                    <div id="kfs-ftp-password-key-clear" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#passwordModal">
                         <i class="fa fa-edit"></i>
                     </div>
                 </div>
             </div>
             <span asp-validation-for="KfsFtpPasswordKey" class="text-danger"></span>
         </div>
-        <div class="d-flex justify-content-end align-items-end">
+        <div class="d-grid">
             <input type="submit" value="Save" class="btn btn-primary" />
         </div>
     }
+</div>
+
+    </div>
+    
 </div>
 
 <div class="modal fade" id="passwordModal" tabindex="-1" role="dialog" aria-labelledby="passwordModalLabel" aria-hidden="true">
@@ -86,15 +92,14 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="exampleModalLabel">Upload Private Key</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                 </button>
             </div>
             <div class="modal-body">
                 <textarea id="passwordModalInput" class="form-control text-monospace"></textarea>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="passwordModalSave">Save</button>
             </div>
         </div>
