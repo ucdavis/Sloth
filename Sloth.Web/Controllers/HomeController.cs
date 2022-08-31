@@ -32,7 +32,7 @@ namespace Sloth.Web.Controllers
             return View(teams);
         }
 
-        [Authorize(Policy = PolicyCodes.TeamApprover)]
+        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> TeamIndex()
         {
             // find team

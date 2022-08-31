@@ -130,7 +130,7 @@
 
 @if (Model.Transaction.Status == TransactionStatuses.Completed && Model.HasWebhooks)
 {
-    var canCallWebhook = Context.HasTeamRole(TeamRole.Admin);
+    var canCallWebhook = Context.HasTeamRole(TeamRole.Manager);
     <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
         <div>
             <button type="submit" class="btn btn-warning" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
@@ -142,7 +142,7 @@
 @if (Model.Transaction.Status == TransactionStatuses.Completed && !Model.Transaction.HasReversal)
 {
     var reversalAmount = Model.Transaction.Transfers.Where(x => x.Direction == Transfer.CreditDebit.Credit).Sum(x => x.Amount);
-    var canReverse = Context.HasTeamRole(TeamRole.Admin);
+    var canReverse = Context.HasTeamRole(TeamRole.Manager);
 
     <form asp-controller="Transactions" asp-action="CreateReversal" asp-route-id="@Model.Transaction.Id" method="post" class="form-inline row">
         <label for="reversalAmount">Reversal Amount</label>

@@ -46,6 +46,11 @@ namespace Sloth.Core.Data
                 _context.TeamRoles.Add(new TeamRole() {Name = TeamRole.Admin});
                 _context.TeamRoles.Add(new TeamRole() {Name = TeamRole.Approver});
             }
+            //Add new role if it is missing
+            if(!_context.TeamRoles.Any(a => a.Name == TeamRole.Manager))
+            {
+                _context.TeamRoles.Add(new TeamRole() { Name = TeamRole.Manager});
+            }
 
             // create system users
             if (!_context.Users.Any())
