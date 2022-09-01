@@ -151,6 +151,9 @@ namespace Sloth.Api.Controllers.v2
         [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
         public async Task<IActionResult> Post([FromBody] CreateTransactionViewModel transaction)
         {
+
+            var teamId = GetTeamId();
+
             if (!ModelState.IsValid)
             {
                 return new BadRequestObjectResult(ModelState);
@@ -233,7 +236,7 @@ namespace Sloth.Api.Controllers.v2
 
             // find source
             var source = await _context.Sources.FirstOrDefaultAsync(s =>
-                s.Name == transaction.Source && s.Type == transaction.SourceType);
+                s.Name == transaction.Source && s.Type == transaction.SourceType && s.Team.Id == teamId);
 
             if (source == null)
             {
