@@ -124,9 +124,16 @@ namespace Sloth.Core.Jobs
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
 
-                                // save journal request
-                                _context.JournalRequests.Add(journalRequest);
-                                transaction.JournalRequest = journalRequest;
+                                if(result.GlJournalRequest.ValidationResults != null && result.GlJournalRequest.ValidationResults.ErrorMessages != null)
+                                {
+                                    log.ForContext("journalRequestId", journalRequest.RequestId);
+                                    foreach (var err in result.GlJournalRequest.ValidationResults.ErrorMessages)
+                                    {                                        
+                                        log.Warning("Transaction {TransactionId} rejected: {Message}",
+                                            transaction.Id, err);
+                                    }
+                                }
+                                
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
                             }
