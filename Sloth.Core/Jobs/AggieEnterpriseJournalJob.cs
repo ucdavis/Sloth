@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AggieEnterpriseApi;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Serilog;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
@@ -108,9 +109,10 @@ namespace Sloth.Core.Jobs
 
                                 // save journal request
                                 _context.JournalRequests.Add(journalRequest);
+                                transaction.JournalRequest = journalRequest;
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
-                                ;
+ 
                             }
                             else if (requestStatus.RequestId.HasValue &&
                                      requestStatus.RequestStatus == RequestStatus.Rejected)
@@ -122,6 +124,19 @@ namespace Sloth.Core.Jobs
 
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
+                                
+
+                                if(result.GlJournalRequest.ValidationResults != null && result.GlJournalRequest.ValidationResults.ErrorMessages != null)
+                                {
+                                    log.ForContext("journalRequestId", journalRequest.RequestId);
+                                    log.Warning("journalResult {journalResult}", JsonConvert.SerializeObject(result.GlJournalRequest));
+                                    foreach (var err in result.GlJournalRequest.ValidationResults.ErrorMessages)
+                                    {                                        
+                                        log.Warning("Transaction {TransactionId} rejected: {Message}",
+                                            transaction.Id, err);
+                                    }
+                                }
+                                
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
                             }
