@@ -108,9 +108,10 @@ namespace Sloth.Core.Jobs
 
                                 // save journal request
                                 _context.JournalRequests.Add(journalRequest);
+                                transaction.JournalRequest = journalRequest;
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
-                                ;
+ 
                             }
                             else if (requestStatus.RequestId.HasValue &&
                                      requestStatus.RequestStatus == RequestStatus.Rejected)
@@ -122,6 +123,10 @@ namespace Sloth.Core.Jobs
 
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
+
+                                // save journal request
+                                _context.JournalRequests.Add(journalRequest);
+                                transaction.JournalRequest = journalRequest;
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
                             }
