@@ -17,6 +17,8 @@ namespace Sloth.Core.Jobs
         private readonly IAggieEnterpriseService _aggieEnterpriseService;
 
         public static string JobName = "AggieEnterprise.JournalProcessor";
+        public static string JobNameUploadTransactions = nameof(AggieEnterpriseJournalJob) + "." + nameof(UploadTransactions);
+        public static string JobNameResolveProcessingJournals = nameof(AggieEnterpriseJournalJob) + "." + nameof(ResolveProcessingJournals);
 
         public AggieEnterpriseJournalJob(SlothDbContext context, IAggieEnterpriseService aggieEnterpriseService)
         {
@@ -46,7 +48,7 @@ namespace Sloth.Core.Jobs
         public async Task UploadTransactions(ILogger log)
         {
             var jobRun = new JobRecord
-                { Name = "AggieEnterpriseJournalJob.UploadTransactions", Status = JobRecord.Statuses.Running };
+                { Name = JobNameUploadTransactions, Status = JobRecord.Statuses.Running };
 
             _context.JobRecords.Add(jobRun);
 
@@ -166,7 +168,7 @@ namespace Sloth.Core.Jobs
         public async Task ResolveProcessingJournals(ILogger log)
         {
             var jobRun = new JobRecord
-                { Name = "AggieEnterpriseJournalJob.ResolveProcessingJournals", Status = JobRecord.Statuses.Running };
+                { Name = JobNameResolveProcessingJournals, Status = JobRecord.Statuses.Running };
 
             _context.JobRecords.Add(jobRun);
 

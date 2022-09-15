@@ -16,7 +16,7 @@ namespace Sloth.Core.Jobs
     /// </summary>
     public class ResendPendingWebHookRequestsJob
     {
-        public static string JobName = "WebHooks.Resend";
+        public const string JobName = "WebHooks.Resend";
         private readonly IWebHookService _webHookService;
 
         public ResendPendingWebHookRequestsJob(IWebHookService webHookService)

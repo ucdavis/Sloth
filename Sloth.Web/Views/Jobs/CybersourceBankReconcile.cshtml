@@ -60,7 +60,7 @@
                         <div class="input-group-sm form-group">
                             <label for="filter-date">Month</label>
                             <div id="filter-date" class="input-group input-daterange">
-                                <input name="date" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.Date" asp-format="{0:MM/dd/yyyy}" />
+                                <input name="date" class="form-control" type="text" placeholder="MM/DD/YYYY" asp-for="Filter.From" asp-format="{0:MM/dd/yyyy}" />
                             </div>
                         </div>
                     </div>
@@ -176,7 +176,7 @@
                         enable: 0
                     }
                 },
-                day: '@Model.Filter.Date.Value.ToString("yyyy-MM-dd")'
+                day: '@Model.Filter.From.Value.ToString("yyyy-MM-dd")'
             });
 
             $('#run-job-modal-action').click(function() {

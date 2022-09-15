@@ -16,7 +16,7 @@ namespace Sloth.Core.Jobs
         private readonly SlothDbContext _context;
         private readonly ICyberSourceBankReconcileService _cyberSourceBankReconcileService;
 
-        public static string JobName = "Cybersource.BankReconcile";
+        public const string JobName = "Cybersource.BankReconcile";
 
         public CybersourceBankReconcileJob(SlothDbContext context, ICyberSourceBankReconcileService cyberSourceBankReconcileService)
         {
@@ -59,7 +59,7 @@ namespace Sloth.Core.Jobs
                 CybersourceBankReconcileJobBlob jobBlob = null;
                 try
                 {
-                    jobBlob = await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, innerLog);                    
+                    jobBlob = await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, innerLog);
                 }
                 catch (Exception ex)
                 {

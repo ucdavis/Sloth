@@ -14,7 +14,7 @@ namespace Sloth.Core.Jobs
         private readonly SlothDbContext _context;
         private readonly IKfsScrubberService _kfsScrubberService;
 
-        public static string JobName = "Kfs.ScrubberUpload";
+        public const string JobName = "Kfs.ScrubberUpload";
 
         public KfsScrubberUploadJob(SlothDbContext context, IKfsScrubberService kfsScrubberService)
         {

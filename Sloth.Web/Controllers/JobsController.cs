@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Threading.Tasks;
@@ -32,6 +33,96 @@ namespace Sloth.Web.Controllers
             _cyberSourceBankReconcileService = cyberSourceBankReconcileService;
         }
 
+        [HttpGet("/jobs/{jobName}")]
+        public async Task<IActionResult> JobList(string jobName, [FromQuery] JobsFilterModel filter = null)
+        {
+            if (filter == null)
+            {
+                filter = new JobsFilterModel();
+            }
+            SanitizeJobsFilter(filter);
+
+            var fromUtc = filter.From.Value.ToUniversalTime();
+            var throughUtc = filter.To.Value.AddDays(1).ToUniversalTime();
+
+            var isOldCybersourceJob = jobName == CybersourceBankReconcileJob.JobName;
+            var isOldWebhookJob = jobName == ResendPendingWebHookRequestsJob.JobName;
+            var isOldKfsJob = jobName == KfsScrubberUploadJob.JobName;
+
+            var jobs = jobName switch
+            {
+                CybersourceBankReconcileJob.JobName =>
+                    await _dbContext.CybersourceBankReconcileJobRecords
+                        .Where(r =>
+                            ((r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
+                            || (r.RanOn > fromUtc && r.RanOn <= throughUtc))
+                            && (!filter.HasTransactions || r.Transactions.Count > 0))
+                        .OrderBy(r => r.ProcessedDate)
+                        .ThenBy(r => r.RanOn)
+                        .Select(r => new JobViewModel
+                        {
+                            Id = r.Id,
+                            StartedAt = r.RanOn,
+                            Status = r.Status,
+                            Name = r.Name,
+                            //TransactionCount = r.Transactions.Count
+                        })
+                        .ToListAsync(),
+                KfsScrubberUploadJob.JobName =>
+                    await _dbContext.KfsScrubberUploadJobRecords
+                        .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc
+                                                    && (!filter.HasTransactions || r.Transactions.Count > 0))
+                        .OrderBy(j => j.RanOn)
+                        .Select(r => new JobViewModel
+                        {
+                            Id = r.Id,
+                            StartedAt = r.RanOn,
+                            Status = r.Status,
+                            Name = r.Name,
+                            //TransactionCount = r.Transactions.Count
+                        })
+                        .ToListAsync(),
+                ResendPendingWebHookRequestsJob.JobName =>
+                    await _dbContext.WebHookRequestResendJobRecords
+                        .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc)
+                        .OrderBy(r => r.RanOn)
+                        .Select(r => new JobViewModel
+                        {
+                            Id = r.Id,
+                            StartedAt = r.RanOn,
+                            Status = r.Status,
+                            Name = r.Name,
+                        })
+                        .ToListAsync(),
+                _ =>
+                    await _dbContext.JobRecords
+                        .Where(j =>
+                            (string.IsNullOrEmpty(jobName) || j.Name == jobName)
+                            && j.StartedAt >= fromUtc
+                            && j.StartedAt < throughUtc)
+                        .OrderBy(j => j.StartedAt)
+                        .Select(j => new JobViewModel
+                        {
+                            Id = j.Id,
+                            Name = j.Name,
+                            StartedAt = j.StartedAt,
+                            EndedAt = j.EndedAt,
+                            Status = j.Status,
+                            Details = j.Details,
+                        })
+                        .ToListAsync()
+            };
+
+            var result = new JobListViewModel()
+            {
+                Filter = filter,
+                Jobs = jobs,
+                JobName = jobName,
+            };
+
+            return View(result);
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -44,10 +135,8 @@ namespace Sloth.Web.Controllers
 
             SanitizeJobsFilter(filter);
 
-            var date = filter.Date ?? DateTime.Now.AddMonths(-1);
-
-            var fromUtc = date.ToUniversalTime();
-            var throughUtc = date.AddMonths(1).ToUniversalTime();
+            var fromUtc = filter.From.Value.ToUniversalTime();
+            var throughUtc = filter.To.Value.AddDays(1).ToUniversalTime();
 
             var result = new KfsScrubberJobsViewModel()
             {
@@ -86,6 +175,16 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync();
 
             return View(record);
+        }
+
+        public Task<IActionResult> WebhookResendDetails(string id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IActionResult> JobDetails(string id)
+        {
+            throw new NotImplementedException();
         }
 
         [HttpPost]
@@ -190,10 +289,8 @@ namespace Sloth.Web.Controllers
 
             SanitizeJobsFilter(filter);
 
-            var date = filter.Date ?? DateTime.Now.AddMonths(-1);
-
-            var fromUtc = date.ToUniversalTime();
-            var throughUtc = date.AddMonths(1).ToUniversalTime();
+            var fromUtc = filter.From.Value.ToUniversalTime();
+            var throughUtc = filter.To.Value.AddDays(1).ToUniversalTime();
 
             var result = new CybersourceBankReconcileJobsViewModel()
             {
@@ -294,9 +391,8 @@ namespace Sloth.Web.Controllers
 
         private static void SanitizeJobsFilter(JobsFilterModel model)
         {
-            var date = (model.Date ?? DateTime.Now).Date;
-
-            model.Date = new DateTime(date.Year, date.Month, 1);
+            model.From = (model.From ?? DateTime.Today).Date.AddMonths(-1);
+            model.To = (model.To ?? DateTime.Today).Date;
         }
     }
 }
