@@ -12,6 +12,15 @@
     color: inherit;
   }
 }
+.btn-primary {
+  color: #fff;
+  background-color: $primary-color;
+  border-color: $primary-color;
+  &:hover {
+    background-color: lighten($primary-color, 0.9);
+    color: #fff;
+  }
+}
 button.btn-close {
   width: 0.5rem;
   height: 0.5rem;
