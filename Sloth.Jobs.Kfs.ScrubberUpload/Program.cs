@@ -24,11 +24,11 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
 
             // TODO: create new record for new job type
             // log run
-            var jobRecord = new KfsScrubberUploadJobRecord()
+            var jobRecord = new JobRecord()
             {
-                Name   = KfsScrubberUploadJob.JobName,
-                RanOn  = DateTime.UtcNow,
-                Status = "Running",
+                Name       = KfsScrubberUploadJob.JobName,
+                StartedAt  = DateTime.UtcNow,
+                Status     = "Running",
             };
 
             _log = Log.Logger
@@ -43,7 +43,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             var dbContext = provider.GetService<SlothDbContext>();
 
             // save log to db
-            dbContext.KfsScrubberUploadJobRecords.Add(jobRecord);
+            dbContext.JobRecords.Add(jobRecord);
             dbContext.SaveChanges();
 
             try
@@ -59,6 +59,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
                 // record status
                 _log.Information("Finished");
                 jobRecord.Status = "Finished";
+                jobRecord.EndedAt = DateTime.UtcNow;
                 dbContext.SaveChanges();
             }
         }

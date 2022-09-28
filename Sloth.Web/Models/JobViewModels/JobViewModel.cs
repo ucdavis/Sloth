@@ -14,6 +14,10 @@ namespace Sloth.Web.Models.JobViewModels
 
         public string Status { get; set; }
 
+        public int TransactionCount { get; set; }
+
+        public DateTime? ProcessedDate { get; set; }
+
         public object Details { get; set; }
     }
 }

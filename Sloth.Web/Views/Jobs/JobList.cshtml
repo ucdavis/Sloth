@@ -58,7 +58,7 @@
     <tbody>
       @foreach (var item in Model.Jobs)
       {
-        <tr data-href="@item.GetDetailsUrl()">
+        <tr data-href="/jobs/details/@item.Id">
           <td data-sort="@item.StartedAt.Ticks">
             @item.StartedAt
           </td>

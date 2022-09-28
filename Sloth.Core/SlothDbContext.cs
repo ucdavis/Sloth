@@ -7,7 +7,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Sloth.Core.Domain;
 using Sloth.Core.Models;
 
 namespace Sloth.Core
@@ -40,23 +39,17 @@ namespace Sloth.Core
 
         public virtual DbSet<UserTeamRole> UserTeamRoles { get; set; }
 
-        public virtual DbSet<CybersourceBankReconcileJobRecord> CybersourceBankReconcileJobRecords { get; set; }
-
-        public virtual DbSet<KfsScrubberUploadJobRecord> KfsScrubberUploadJobRecords { get; set; }
-
         public virtual DbSet<LogMessage> Logs { get; set; }
 
         public virtual DbSet<WebHook> WebHooks { get; set; }
 
         public virtual DbSet<Blob> Blobs { get; set; }
 
-        public virtual DbSet<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
+        public virtual DbSet<TransactionBlob> TransactionBlobs { get; set; }
 
         public virtual DbSet<TransactionStatusEvent> TransactionStatusEvents { get; set; }
 
         public virtual DbSet<WebHookRequest> WebHookRequests { get; set; }
-
-        public virtual DbSet<WebHookRequestResendJobRecord> WebHookRequestResendJobRecords { get; set; }
 
         public virtual async Task<string> GetNextKfsTrackingNumber(DbTransaction transaction = null)
         {
@@ -147,13 +140,10 @@ namespace Sloth.Core
             Integration.OnModelCreating(modelBuilder);
             Transaction.OnModelCreating(modelBuilder);
             LogMessage.OnModelCreating(modelBuilder);
-            CybersourceBankReconcileJobRecord.OnModelCreating(modelBuilder);
-            KfsScrubberUploadJobRecord.OnModelCreating(modelBuilder);
             Blob.OnModelCreating(modelBuilder);
             TransactionStatusEvent.OnModelCreating(modelBuilder);
             WebHook.OnModelCreating(modelBuilder);
             WebHookRequest.OnModelCreating(modelBuilder);
-            WebHookRequestResendJobRecord.OnModelCreating(modelBuilder);
         }
     }
 }

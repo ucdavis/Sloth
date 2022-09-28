@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -45,59 +46,32 @@ namespace Sloth.Web.Controllers
             var fromUtc = filter.From.Value.ToUniversalTime();
             var throughUtc = filter.To.Value.AddDays(1).ToUniversalTime();
 
-            var isOldCybersourceJob = jobName == CybersourceBankReconcileJob.JobName;
-            var isOldWebhookJob = jobName == ResendPendingWebHookRequestsJob.JobName;
-            var isOldKfsJob = jobName == KfsScrubberUploadJob.JobName;
-
             var jobs = jobName switch
             {
                 CybersourceBankReconcileJob.JobName =>
-                    await _dbContext.CybersourceBankReconcileJobRecords
-                        .Where(r =>
-                            ((r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
-                            || (r.RanOn > fromUtc && r.RanOn <= throughUtc))
-                            && (!filter.HasTransactions || r.Transactions.Count > 0))
+                    await _dbContext.JobRecords
+                        .Where(j =>
+                            j.Name == CybersourceBankReconcileJob.JobName
+                            && ((j.ProcessedDate > fromUtc && j.ProcessedDate <= throughUtc)
+                                || (j.StartedAt > fromUtc && j.StartedAt <= throughUtc))
+                            && (!filter.HasTransactions || j.TotalTransactions > 0))
                         .OrderBy(r => r.ProcessedDate)
-                        .ThenBy(r => r.RanOn)
+                        .ThenBy(r => r.StartedAt)
                         .Select(r => new JobViewModel
                         {
                             Id = r.Id,
-                            StartedAt = r.RanOn,
+                            StartedAt = r.StartedAt,
+                            EndedAt = r.EndedAt,
+                            ProcessedDate = r.ProcessedDate,
                             Status = r.Status,
                             Name = r.Name,
-                            //TransactionCount = r.Transactions.Count
-                        })
-                        .ToListAsync(),
-                KfsScrubberUploadJob.JobName =>
-                    await _dbContext.KfsScrubberUploadJobRecords
-                        .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc
-                                                    && (!filter.HasTransactions || r.Transactions.Count > 0))
-                        .OrderBy(j => j.RanOn)
-                        .Select(r => new JobViewModel
-                        {
-                            Id = r.Id,
-                            StartedAt = r.RanOn,
-                            Status = r.Status,
-                            Name = r.Name,
-                            //TransactionCount = r.Transactions.Count
-                        })
-                        .ToListAsync(),
-                ResendPendingWebHookRequestsJob.JobName =>
-                    await _dbContext.WebHookRequestResendJobRecords
-                        .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc)
-                        .OrderBy(r => r.RanOn)
-                        .Select(r => new JobViewModel
-                        {
-                            Id = r.Id,
-                            StartedAt = r.RanOn,
-                            Status = r.Status,
-                            Name = r.Name,
+                            TransactionCount = r.TotalTransactions ?? 0
                         })
                         .ToListAsync(),
                 _ =>
                     await _dbContext.JobRecords
                         .Where(j =>
-                            (string.IsNullOrEmpty(jobName) || j.Name == jobName)
+                            j.Name == jobName
                             && j.StartedAt >= fromUtc
                             && j.StartedAt < throughUtc)
                         .OrderBy(j => j.StartedAt)
@@ -108,7 +82,8 @@ namespace Sloth.Web.Controllers
                             StartedAt = j.StartedAt,
                             EndedAt = j.EndedAt,
                             Status = j.Status,
-                            Details = j.Details,
+                            //Details = j.Details,
+                            TransactionCount = j.TotalTransactions ?? 0
                         })
                         .ToListAsync()
             };
@@ -128,76 +103,36 @@ namespace Sloth.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> KfsScrubberUpload(JobsFilterModel filter)
+        public async Task<IActionResult> Details(string id)
         {
-            if (filter == null)
-                filter = new JobsFilterModel();
-
-            SanitizeJobsFilter(filter);
-
-            var fromUtc = filter.From.Value.ToUniversalTime();
-            var throughUtc = filter.To.Value.AddDays(1).ToUniversalTime();
-
-            var result = new KfsScrubberJobsViewModel()
-            {
-                Filter = filter,
-                Jobs = await _dbContext.KfsScrubberUploadJobRecords
-                    .Where(r => r.RanOn > fromUtc && r.RanOn <= throughUtc
-                                                  && (!filter.HasTransactions || r.Transactions.Count > 0))
-                    .OrderBy(j => j.RanOn)
-                    .Select(r => new KfsScrubberJobViewModel
-                    {
-                        Job = r,
-                        TransactionCount = r.Transactions.Count
-                    })
-                    .ToListAsync()
-            };
-
-            return View(result);
-        }
-
-        public async Task<IActionResult> KfsScrubberUploadDetails(string id)
-        {
-            var record = await _dbContext.KfsScrubberUploadJobRecords
+            var record = await _dbContext.JobRecords
                 .Where(r => r.Id == id)
-                .Include(r => r.Logs)
-                .Include(r => r.Transactions)
-                .ThenInclude(t => t.Transfers)
-                .Select(r => new KfsScrubberJobViewModel()
+                .Select(r => new JobViewModel()
                 {
-                    Job = r,
-                    TransactionsTable = new TransactionsTableViewModel()
-                    {
-                        Transactions = r.Transactions
-                    },
-                    TransactionCount = r.Transactions.Count
+                    Id = r.Id,
+                    Name = r.Name,
+                    StartedAt = r.StartedAt,
+                    EndedAt = r.EndedAt,
+                    Status = r.Status,
+                    Details = r.Details,
+                    TransactionCount = r.TotalTransactions ?? 0
                 })
                 .FirstOrDefaultAsync();
 
             return View(record);
         }
 
-        public Task<IActionResult> WebhookResendDetails(string id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IActionResult> JobDetails(string id)
-        {
-            throw new NotImplementedException();
-        }
-
         [HttpPost]
         public async Task<IActionResult> RunKfsScrubberUpload()
         {
             // log run
-            var record = new KfsScrubberUploadJobRecord()
+            var record = new JobRecord()
             {
                 Name = KfsScrubberUploadJob.JobName,
-                RanOn = DateTime.UtcNow,
+                StartedAt = DateTime.UtcNow,
                 Status = "Running",
             };
-            _dbContext.KfsScrubberUploadJobRecords.Add(record);
+            _dbContext.JobRecords.Add(record);
             await _dbContext.SaveChangesAsync();
 
             // build task and queue
@@ -207,7 +142,7 @@ namespace Sloth.Web.Controllers
                 var kfsScrubberUploadJob = serviceProvider.GetRequiredService<KfsScrubberUploadJob>();
 
                 // find job record
-                var scopedRecord = await dbContext.KfsScrubberUploadJobRecords.FindAsync(record.Id);
+                var scopedRecord = await dbContext.JobRecords.FindAsync(record.Id);
 
                 // build custom logger
                 var log = LoggingConfiguration.GetJobConfiguration()
@@ -229,7 +164,7 @@ namespace Sloth.Web.Controllers
                 }
             });
 
-            return RedirectToAction(nameof(KfsScrubberUploadDetails), new { id = record.Id });
+            return RedirectToAction(nameof(Details), new { id = record.Id });
         }
 
         [HttpPost]
@@ -242,14 +177,14 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync(i => i.Id == integrationId);
 
             // log run
-            var record = new CybersourceBankReconcileJobRecord()
+            var record = new JobRecord()
             {
-                Name   = CybersourceBankReconcileJob.JobName,
-                RanOn  = DateTime.UtcNow,
+                Name = CybersourceBankReconcileJob.JobName,
+                StartedAt = DateTime.UtcNow,
                 Status = "Running",
                 ProcessedDate = date
             };
-            _dbContext.CybersourceBankReconcileJobRecords.Add(record);
+            _dbContext.JobRecords.Add(record);
             await _dbContext.SaveChangesAsync();
 
             // build custom logger
@@ -260,80 +195,52 @@ namespace Sloth.Web.Controllers
                 .ForContext("jobname", record.Name)
                 .ForContext("jobid", record.Id);
 
+            var reconcileDetails = new CybersourceBankReconcileDetails();
             try
             {
                 // schedule methods
                 log.Information("Starting Job");
 
-                var jobBlob = await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, record, log);
-                if (jobBlob != null)
-                {
-                    // save uploaded blob metadata
-                    _dbContext.CybersourceBankReconcileJobBlobs.Add(jobBlob);
-                }
+                reconcileDetails.IntegrationDetails.Add(
+                    await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, log));
             }
             finally
             {
                 // record status
-                record.Status = "Finished";
+                record.SetCompleted("Finished", reconcileDetails);
                 await _dbContext.SaveChangesAsync();
             }
 
             return RedirectToAction(nameof(CybersourceBankReconcileDetails), new { id = record.Id });
         }
 
-        public async Task<IActionResult> CybersourceBankReconcile(JobsFilterModel filter = null)
+        public async Task<IActionResult> CybersourceBankReconcileDetails(string jobRecordId)
         {
-            if (filter == null)
-                filter = new JobsFilterModel();
-
-            SanitizeJobsFilter(filter);
-
-            var fromUtc = filter.From.Value.ToUniversalTime();
-            var throughUtc = filter.To.Value.AddDays(1).ToUniversalTime();
-
-            var result = new CybersourceBankReconcileJobsViewModel()
+            var record = await _dbContext.JobRecords
+                .Where(r => r.Id == jobRecordId && r.Name == CybersourceBankReconcileJob.JobName)
+                .SingleOrDefaultAsync();
+            if (record == null)
             {
-                Filter = filter,
-                Jobs = await _dbContext.CybersourceBankReconcileJobRecords
-                    .Where(r =>
-                        ((r.ProcessedDate > fromUtc && r.ProcessedDate <= throughUtc)
-                        || (r.RanOn > fromUtc && r.RanOn <= throughUtc))
-                        && (!filter.HasTransactions || r.Transactions.Count > 0))
-                    .OrderBy(r => r.ProcessedDate)
-                    .ThenBy(r => r.RanOn)
-                    .Select(r => new CybersourceBankReconcileJobViewModel
-                    {
-                        Job = r,
-                        TransactionCount = r.Transactions.Count
-                    })
-                    .ToListAsync()
-            };
-
-            return View(result);
-        }
-
-        public async Task<IActionResult> CybersourceBankReconcileDetails(string id)
-        {
-            var viewModel = await _dbContext.CybersourceBankReconcileJobRecords
-                .Where(r => r.Id == id)
-                .Include(r => r.Logs)
-                .Include(r => r.Transactions)
-                .ThenInclude(t => t.Transfers)
-                .Include(a => a.Transactions)
-                .ThenInclude(a => a.Source)
+                return NotFound();
+            }
+            var jobDetails = JsonSerializer.Deserialize<CybersourceBankReconcileDetails>(record.Details ?? "{}");
+            var transactionIds = jobDetails.IntegrationDetails.SelectMany(i => i.TransactionIds).ToList();
+            var transactions = await _dbContext.Transactions
+                .Where(t => transactionIds.Contains(t.Id))
+                .Include(t => t.Transfers)
+                .Include(a => a.Source)
                 .ThenInclude(a => a.Team)
                 .AsNoTracking()
-                .Select(r => new CybersourceBankReconcileJobViewModel
+                .ToListAsync();
+            var viewModel = new CybersourceBankReconcileJobViewModel
+            {
+                Job = record,
+                TransactionsTable = new TransactionsTableViewModel()
                 {
-                    Job = r,
-                    TransactionsTable = new TransactionsTableViewModel()
-                    {
-                        Transactions = r.Transactions
-                    },
-                    TransactionCount = r.Transactions.Count
-                })
-                .FirstOrDefaultAsync();
+                    Transactions = transactions
+                },
+                TransactionCount = transactions.Count
+            };
 
             return View(viewModel);
         }
@@ -342,14 +249,14 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> RunCybersourceBankReconcile(DateTime date)
         {
             // log run
-            var record = new CybersourceBankReconcileJobRecord()
+            var record = new JobRecord()
             {
-                Name          = CybersourceBankReconcileJob.JobName,
-                RanOn         = DateTime.UtcNow,
-                Status        = "Running",
+                Name = CybersourceBankReconcileJob.JobName,
+                StartedAt = DateTime.UtcNow,
+                Status = "Running",
                 ProcessedDate = date,
             };
-            _dbContext.CybersourceBankReconcileJobRecords.Add(record);
+            _dbContext.JobRecords.Add(record);
             await _dbContext.SaveChangesAsync();
 
             // build task and queue
@@ -359,29 +266,24 @@ namespace Sloth.Web.Controllers
                 var cybersourceBankReconcileJob = serviceProvider.GetRequiredService<CybersourceBankReconcileJob>();
 
                 // find job record
-                var scopedRecord = await dbContext.CybersourceBankReconcileJobRecords.FindAsync(record.Id);
+                var scopedRecord = await dbContext.JobRecords.FindAsync(record.Id);
 
                 // build custom logger
                 var log = LoggingConfiguration.GetJobConfiguration()
                     .CreateLogger()
                     .ForContext("jobname", scopedRecord.Name)
                     .ForContext("jobid", scopedRecord.Id);
-
+                var jobDetails = new CybersourceBankReconcileDetails();
                 try
                 {
                     // call methods
                     log.Information("Starting Job");
-                    await foreach (var jobBlob in cybersourceBankReconcileJob.ProcessReconcile(date, record, log))
-                    {
-                        if (jobBlob == null) continue;
-                        // save uploaded blob metadata
-                        dbContext.CybersourceBankReconcileJobBlobs.Add(jobBlob);
-                    }
+                    jobDetails = await cybersourceBankReconcileJob.ProcessReconcile(date, log);
                 }
                 finally
                 {
                     // record status
-                    scopedRecord.Status = "Finished";
+                    scopedRecord.SetCompleted("Finished", jobDetails);
                     await dbContext.SaveChangesAsync(token);
                 }
             });

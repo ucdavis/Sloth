@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
@@ -20,6 +22,10 @@ namespace Sloth.Core.Models
         public DateTime StartedAt { get; set; }
 
         public DateTime? EndedAt { get; set; }
+
+        public DateTime? ProcessedDate { get; set; }
+
+        public int? TotalTransactions { get; set; }
 
         [StringLength(32)]
         public string Status { get; set; }

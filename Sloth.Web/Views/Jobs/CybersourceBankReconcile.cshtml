@@ -3,9 +3,9 @@
 @model Sloth.Web.Models.JobViewModels.CybersourceBankReconcileJobsViewModel
 
 @functions {
-    private static long GetEventMilliseconds(CybersourceBankReconcileJobRecord r)
+    private static long GetEventMilliseconds(JobRecord r)
     {
-        return new DateTimeOffset(r.RanOn.ToLocalTime()).ToUnixTimeMilliseconds();
+        return new DateTimeOffset(r.StartedAt.ToLocalTime()).ToUnixTimeMilliseconds();
     }
 
     private static string GetEventType(string recordStatus)
@@ -90,7 +90,7 @@
                     @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.ProcessedDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.RanOn)
+                    @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.StartedAt)
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Job.Status)
@@ -105,11 +105,11 @@
             @foreach (var item in Model.Jobs)
             {
             <tr>
-                <td data-sort="@item.Job.ProcessedDate.Ticks">
-                    @item.Job.ProcessedDate.ToString("M/d/yyyy")
+                <td data-sort="@item.Job.ProcessedDate?.Ticks">
+                    @item.Job.ProcessedDate?.ToString("M/d/yyyy")
                 </td>
-                <td data-sort="@item.Job.RanOn.Ticks">
-                    @item.Job.RanOn
+                <td data-sort="@item.Job.StartedAt.Ticks">
+                    @item.Job.StartedAt.ToString("M/d/yyyy h:mm tt")
                 </td>
                 <td>
                     @item.Job.Status
@@ -165,7 +165,7 @@
                 events_source: [
                     @foreach (var r in Model.Jobs)
                 {
-                    @:{ id: '@r.Job.Id', title: '@($"{r.Job.Name} - {r.Job.RanOn:G}")', class: '@GetEventType(r.Job.Status)', url: '@Url.Action("CybersourceBankReconcileDetails", new {id = r.Job.Id})', start: @GetEventMilliseconds(r.Job), end: @GetEventMilliseconds(r.Job) + 1 },
+                    @:{ id: '@r.Job.Id', title: '@($"{r.Job.Name} - {r.Job.StartedAt:G}")', class: '@GetEventType(r.Job.Status)', url: '@Url.Action("CybersourceBankReconcileDetails", new {id = r.Job.Id})', start: @GetEventMilliseconds(r.Job), end: @GetEventMilliseconds(r.Job) + 1 },
                 }
                 ],
                 views: {

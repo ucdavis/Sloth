@@ -1,5 +1,5 @@
 @using Newtonsoft.Json
-@model Sloth.Core.Models.JobRecordBase
+@model Sloth.Core.Models.JobRecord
 
 <link href="~/css/prism.css" rel="stylesheet" />
 <style>
@@ -45,7 +45,7 @@
     }
 </style>
 
-<div class="console">
+@* <div class="console">
     @foreach (var log in Model.Logs.OrderBy(l => l.Id))
     {
         var time = log.TimeStamp.UtcDateTime - Model.RanOn;
@@ -66,7 +66,7 @@
             </div>
         </div>
     }
-</div>
+</div> *@
 
 <div class="modal" tabindex="-1" role="dialog" id="detailsModal">
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
@@ -89,7 +89,7 @@
 
 <script src="~/js/prism.js"></script>
 <script>
-    var logs = @Html.Raw(JsonConvert.SerializeObject(Model.Logs));
+    @* var logs = @Html.Raw(JsonConvert.SerializeObject(Model.Logs)); *@
 
     window.addEventListener('load', function () {
 

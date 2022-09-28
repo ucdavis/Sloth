@@ -9,7 +9,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Sloth.Core.Configuration;
-using Sloth.Core.Domain;
 using Sloth.Core.Models;
 using Sloth.Core.Models.WebHooks;
 using Sloth.Core.Resources;
@@ -22,12 +21,25 @@ namespace Sloth.Core.Services
 {
     public interface ICyberSourceBankReconcileService
     {
-        Task<CybersourceBankReconcileJobBlob> ProcessIntegration(Integration integration, DateTime date, CybersourceBankReconcileJobRecord jobRecord,
-            ILogger log = null);
+        Task<CybersourceBankReconcileIntegrationDetails> ProcessIntegration(Integration integration, DateTime date, ILogger log = null);
 
-        Task<CybersourceBankReconcileJobBlob> ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
-            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null);
+        Task<CybersourceBankReconcileIntegrationDetails> ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
+            ILogger log = null);
     }
+
+    public class CybersourceBankReconcileDetails
+    {
+        public List<CybersourceBankReconcileIntegrationDetails> IntegrationDetails { get; set; } = new();
+        public string Message { get; set; }
+    }
+
+    public class CybersourceBankReconcileIntegrationDetails
+    {
+        public string IntegrationId { get; set; }
+        public string BlobId { get; set; }
+        public List<string> TransactionIds { get; set; } = new();
+    }
+
 
     public class CyberSourceBankReconcileService : ICyberSourceBankReconcileService
     {
@@ -49,8 +61,8 @@ namespace Sloth.Core.Services
             // TODO validate options
         }
 
-        public async Task<CybersourceBankReconcileJobBlob> ProcessIntegration(Integration integration, DateTime date,
-            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null)
+        public async Task<CybersourceBankReconcileIntegrationDetails> ProcessIntegration(Integration integration, DateTime date,
+            ILogger log = null)
         {
             if (log == null)
             {
@@ -72,18 +84,18 @@ namespace Sloth.Core.Services
 
             var count = report.Requests?.Length ?? 0;
 
-            log.Information("Report found with {count} records.", new {count});
+            log.Information("Report found with {count} records.", new { count });
 
             if (count < 1)
             {
                 return null;
             }
 
-            return await ProcessReport(report, reportXml, integration, jobRecord, log);
+            return await ProcessReport(report, reportXml, integration, log);
         }
 
-        public async Task<CybersourceBankReconcileJobBlob> ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
-            CybersourceBankReconcileJobRecord jobRecord, ILogger log = null)
+        public async Task<CybersourceBankReconcileIntegrationDetails> ProcessOneTimeIntegration(Integration integration, string reportName, DateTime date,
+            ILogger log = null)
         {
             if (log == null)
             {
@@ -105,19 +117,21 @@ namespace Sloth.Core.Services
 
             var count = report.Requests?.Length ?? 0;
 
-            log.Information("Report found with {count} records.", new {count});
+            log.Information("Report found with {count} records.", new { count });
 
             if (count < 1)
             {
                 return null;
             }
 
-            return await ProcessReport(report, reportXml, integration, jobRecord, log);
+            return await ProcessReport(report, reportXml, integration, log);
         }
 
-        private async Task<CybersourceBankReconcileJobBlob> ProcessReport(Report report, string reportXml, Integration integration,
-            CybersourceBankReconcileJobRecord jobRecord, ILogger log)
+        private async Task<CybersourceBankReconcileIntegrationDetails> ProcessReport(Report report, string reportXml, Integration integration,
+            ILogger log)
         {
+            var transactions = new List<Transaction>();
+
             await using (var tran = await _context.Database.BeginTransactionAsync())
             {
                 try
@@ -160,16 +174,16 @@ namespace Sloth.Core.Services
 
                         transaction = new Transaction()
                         {
-                            Source                              = integration.Source,
-                            DocumentNumber                      = documentNumber,
-                            KfsTrackingNumber                   = kfsTrackingNumber,
-                            MerchantTrackingNumber              = deposit.MerchantReferenceNumber,
-                            ProcessorTrackingNumber             = deposit.RequestID,
-                            TransactionDate                     = deposit.LocalizedRequestDate,
-                            CybersourceBankReconcileJobRecordId = jobRecord.Id,
-                            Description                         = "Cybersource Deposit"
+                            Source = integration.Source,
+                            DocumentNumber = documentNumber,
+                            KfsTrackingNumber = kfsTrackingNumber,
+                            MerchantTrackingNumber = deposit.MerchantReferenceNumber,
+                            ProcessorTrackingNumber = deposit.RequestID,
+                            TransactionDate = deposit.LocalizedRequestDate,
+                            Description = "Cybersource Deposit"
 
                         }.SetStatus(TransactionStatuses.Scheduled);
+                        transactions.Add(transaction);
 
                         if (AccountValidationService.IsKfsAccount(integration.ClearingAccount))
                         {
@@ -195,7 +209,7 @@ namespace Sloth.Core.Services
                                 Description = "Cybersource Deposit",
                                 ObjectCode = ObjectCodes.Income,
                             };
-                            transaction.Transfers.Add(holding);                         
+                            transaction.Transfers.Add(holding);
                         }
                         else
                         {
@@ -237,10 +251,10 @@ namespace Sloth.Core.Services
                             await _webHookService.SendWebHooksForTeam(integration.Team,
                                 new BankReconcileWebHookPayload()
                                 {
-                                    KfsTrackingNumber       = kfsTrackingNumber,
-                                    MerchantTrackingNumber  = deposit.MerchantReferenceNumber,
+                                    KfsTrackingNumber = kfsTrackingNumber,
+                                    MerchantTrackingNumber = deposit.MerchantReferenceNumber,
                                     ProcessorTrackingNumber = deposit.RequestID,
-                                    TransactionDate         = deposit.LocalizedRequestDate,
+                                    TransactionDate = deposit.LocalizedRequestDate,
                                 });
                         }
                         catch (Exception ex)
@@ -252,7 +266,7 @@ namespace Sloth.Core.Services
                     // push changes for this integration
                     var inserted = await _context.SaveChangesAsync();
                     await tran.CommitAsync();
-                    log.Information("{count} records created.", new {count = inserted});
+                    log.Information("{count} records created.", new { count = inserted });
                 }
                 catch (Exception ex)
                 {
@@ -261,7 +275,8 @@ namespace Sloth.Core.Services
                 }
             }
 
-            CybersourceBankReconcileJobBlob jobBlob = null;
+            TransactionBlob transactionBlob = null;
+            CybersourceBankReconcileIntegrationDetails details = null;
 
             try
             {
@@ -277,12 +292,19 @@ namespace Sloth.Core.Services
                 var blob = await _storageService.PutBlobAsync(memoryStream, _options.ReportBlobContainer, filename,
                     "Cybersource Bank Reconcile Report",
                     MediaTypeNames.Application.Xml);
-                jobBlob = new CybersourceBankReconcileJobBlob
+                transactionBlob = new TransactionBlob
                 {
-                    IntegrationId =  integration.Id,
+                    IntegrationId = integration.Id,
                     BlobId = blob.Id,
                     Blob = blob,
-                    CybersourceBankReconcileJobRecordId = jobRecord.Id,
+                };
+                _context.TransactionBlobs.Add(transactionBlob);
+                await _context.SaveChangesAsync();
+                details = new CybersourceBankReconcileIntegrationDetails()
+                {
+                    IntegrationId = integration.Id,
+                    BlobId = blob.Id,
+                    TransactionIds = transactions.Select(t => t.Id).ToList(),
                 };
             }
             catch (Exception ex)
@@ -291,7 +313,7 @@ namespace Sloth.Core.Services
                     .Error(ex, ex.Message);
             }
 
-            return jobBlob;
+            return details;
         }
     }
 }

@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
-using Sloth.Core.Models;
 
-namespace Sloth.Core.Domain
+namespace Sloth.Core.Models
 {
-    public class CybersourceBankReconcileJobBlob
+    public class TransactionBlob
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
@@ -13,9 +12,9 @@ namespace Sloth.Core.Domain
 
         public Integration Integration { get; set; }
 
-        public string CybersourceBankReconcileJobRecordId { get; set; }
+        public string TransactionId { get; set; }
 
-        public CybersourceBankReconcileJobRecord CybersourceBankReconcileJobRecord { get; set; }
+        public Transaction Transaction { get; set; }
 
         public string BlobId { get; set; }
 

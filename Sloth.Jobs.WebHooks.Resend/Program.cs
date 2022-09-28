@@ -23,10 +23,10 @@ namespace Sloth.Jobs.WebHooks.Resend
             Configure();
 
             // log run
-            var jobRecord = new WebHookRequestResendJobRecord()
+            var jobRecord = new JobRecord()
             {
-                Name          = WebHookRequestResendJobRecord.JobName,
-                RanOn         = DateTime.UtcNow,
+                Name          = ResendPendingWebHookRequestsJob.JobName,
+                StartedAt     = DateTime.UtcNow,
                 Status        = "Running",
             };
 
@@ -42,7 +42,7 @@ namespace Sloth.Jobs.WebHooks.Resend
             var dbContext = provider.GetService<SlothDbContext>();
 
             // save log to db
-            dbContext.WebHookRequestResendJobRecords.Add(jobRecord);
+            dbContext.JobRecords.Add(jobRecord);
             await dbContext.SaveChangesAsync();
 
             try
@@ -50,11 +50,7 @@ namespace Sloth.Jobs.WebHooks.Resend
                 // create job service
                 var resendWebHookJob = provider.GetService<ResendPendingWebHookRequestsJob>();
 
-                // call methods
-                foreach (var webHookRequest in await resendWebHookJob.ResendPendingWebHookRequests())
-                {
-                    webHookRequest.WebHookRequestResendJobId = jobRecord.Id;
-                }
+                await resendWebHookJob.ResendPendingWebHookRequests();
             }
             finally
             {

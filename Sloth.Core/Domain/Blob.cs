@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
-using Sloth.Core.Domain;
 
 namespace Sloth.Core.Models
 {
@@ -27,7 +26,7 @@ namespace Sloth.Core.Models
 
         public IList<Scrubber> Scrubbers { get; set; }
 
-        public IList<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
+        public IList<TransactionBlob> JobRecordBlobs { get; set; }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,7 +46,7 @@ namespace Sloth.Core.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Blob>()
-                .HasMany(blob => blob.CybersourceBankReconcileJobBlobs)
+                .HasMany(blob => blob.JobRecordBlobs)
                 .WithOne(r => r.Blob)
                 .HasForeignKey(r => r.BlobId)
                 .OnDelete(DeleteBehavior.Restrict);

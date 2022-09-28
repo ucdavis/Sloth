@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Sloth.Core.Domain;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;

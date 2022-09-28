@@ -9,8 +9,8 @@ namespace Sloth.Web.Models.JobViewModels
 {
     public class CybersourceBankReconcileJobViewModel
     {
-        public CybersourceBankReconcileJobRecord Job { get; set; }
-        
+        public JobRecord Job { get; set; }
+
         public TransactionsTableViewModel TransactionsTable { get; set; }
 
         [Display(Name = "Transaction Count")]

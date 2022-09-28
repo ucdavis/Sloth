@@ -22,7 +22,7 @@ namespace Sloth.Core.Jobs
             _kfsScrubberService = kfsScrubberService;
         }
 
-        public async Task UploadScrubber(ILogger log, KfsScrubberUploadJobRecord jobRecord)
+        public async Task UploadScrubber(ILogger log, JobRecord jobRecord)
         {
             try
             {
@@ -83,7 +83,6 @@ namespace Sloth.Core.Jobs
                         // update transactions' status and jobRecord
                         groupedTransactions.ForEach(t =>
                         {
-                            t.KfsScrubberUploadJobRecordId = jobRecord.Id;
                             t.SetStatus(TransactionStatuses.Completed);
                         });
 
