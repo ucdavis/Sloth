@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -44,19 +45,21 @@ namespace Sloth.Jobs.WebHooks.Resend
             // save log to db
             dbContext.JobRecords.Add(jobRecord);
             await dbContext.SaveChangesAsync();
+            var jobDetails = new ResendPendingWebHookRequestsJob.WebHookRequestJobDetails();
 
             try
             {
                 // create job service
                 var resendWebHookJob = provider.GetService<ResendPendingWebHookRequestsJob>();
 
-                await resendWebHookJob.ResendPendingWebHookRequests();
+                var requests = await resendWebHookJob.ResendPendingWebHookRequests();
+                jobDetails.WebHookRequestIds = requests.Select(r => r.Id).ToList();
             }
             finally
             {
                 // record status
                 _log.Information("Finished");
-                jobRecord.Status = "Finished";
+                jobRecord.SetCompleted("Finished", jobDetails);
                 await dbContext.SaveChangesAsync();
             }
         }

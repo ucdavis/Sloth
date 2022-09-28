@@ -45,6 +45,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             // save log to db
             dbContext.JobRecords.Add(jobRecord);
             dbContext.SaveChanges();
+            KfsScrubberUploadJob.KfsScrubberUploadJobDetails jobDetails = null;
 
             try
             {
@@ -52,14 +53,13 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
                 var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
 
                 // call methods
-                uploadScrubberJob.UploadScrubber(_log, jobRecord).GetAwaiter().GetResult();
+                jobDetails = uploadScrubberJob.UploadScrubber(_log).GetAwaiter().GetResult();
             }
             finally
             {
                 // record status
                 _log.Information("Finished");
-                jobRecord.Status = "Finished";
-                jobRecord.EndedAt = DateTime.UtcNow;
+                jobRecord.SetCompleted("Finished", jobDetails ?? new());
                 dbContext.SaveChanges();
             }
         }

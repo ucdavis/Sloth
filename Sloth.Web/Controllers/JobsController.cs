@@ -150,16 +150,17 @@ namespace Sloth.Web.Controllers
                     .ForContext("jobname", scopedRecord.Name)
                     .ForContext("jobid", scopedRecord.Id);
 
+                KfsScrubberUploadJob.KfsScrubberUploadJobDetails jobDetails = null;
                 try
                 {
                     // schedule methods
                     log.Information("Starting Job");
-                    await kfsScrubberUploadJob.UploadScrubber(log, record);
+                    jobDetails = await kfsScrubberUploadJob.UploadScrubber(log);
                 }
                 finally
                 {
                     // record status
-                    scopedRecord.Status = "Finished";
+                    scopedRecord.SetCompleted("Finished", jobDetails ?? new());
                     await dbContext.SaveChangesAsync(token);
                 }
             });

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -22,8 +23,9 @@ namespace Sloth.Core.Jobs
             _kfsScrubberService = kfsScrubberService;
         }
 
-        public async Task UploadScrubber(ILogger log, JobRecord jobRecord)
+        public async Task<KfsScrubberUploadJobDetails> UploadScrubber(ILogger log)
         {
+            var scrubberJobDetails = new KfsScrubberUploadJobDetails();
             try
             {
                 // fetch staged transactions with accounts populated
@@ -39,17 +41,21 @@ namespace Sloth.Core.Jobs
                 if (!transactions.Any())
                 {
                     log.Information("No scheduled transactions found.");
-                    return;
+                    scrubberJobDetails.Message = "No scheduled transactions found.";
+                    return scrubberJobDetails;
                 }
 
                 // group transactions by origin code and feed
                 var groups = transactions.GroupBy(t => t.Source);
                 foreach (var group in groups)
                 {
+                    var transactionGroupDetails = new KfsTransactionGroupDetails();
+                    scrubberJobDetails.TransactionGroups.Add(transactionGroupDetails);
                     try
                     {
                         var source = group.Key;
                         var groupedTransactions = group.ToList();
+                        transactionGroupDetails.TransactionCount = groupedTransactions.Count;
 
                         var originCode = source.OriginCode;
 
@@ -93,13 +99,30 @@ namespace Sloth.Core.Jobs
                     {
                         log.Error(ex, ex.Message);
                         log.Error($"KFS Upload error for source {group.Key.Name}");
+                        transactionGroupDetails.Message = $"KFS Upload error for source {group.Key.Name}";
                     }
                 }
             }
             catch (Exception ex)
             {
                 log.Error(ex, ex.Message);
+                scrubberJobDetails.Message = "KFS Upload error";
             }
+
+            return scrubberJobDetails;
+        }
+
+        public class KfsScrubberUploadJobDetails
+        {
+            public List<KfsTransactionGroupDetails> TransactionGroups { get; set; } = new();
+            public string Message { get; set; }
+        }
+
+        public class KfsTransactionGroupDetails
+        {
+            public string ScrubberId { get; set; }
+            public int TransactionCount { get; set; }
+            public string Message { get; set; }
         }
     }
 }

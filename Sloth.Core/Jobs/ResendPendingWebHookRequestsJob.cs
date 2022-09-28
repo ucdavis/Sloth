@@ -27,5 +27,10 @@ namespace Sloth.Core.Jobs
         {
             return _webHookService.ResendPendingWebHookRequests();
         }
+
+        public class WebHookRequestJobDetails
+        {
+            public List<string> WebHookRequestIds { get; set; } = new ();
+        }
     }
 }
