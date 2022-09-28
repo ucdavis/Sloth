@@ -37,7 +37,7 @@ namespace Sloth.Core.Models
         [MaxLength(128)]
         public string HoldingAccount { get; set; }
 
-        public IList<TransactionBlob> JobRecordBlobs { get; set; }
+        public IList<TransactionBlob> TransactionBlobs { get; set; }
 
         protected internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -52,7 +52,7 @@ namespace Sloth.Core.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Integration>()
-                .HasMany(i => i.JobRecordBlobs)
+                .HasMany(i => i.TransactionBlobs)
                 .WithOne(b => b.Integration)
                 .HasForeignKey(b => b.IntegrationId)
                 .OnDelete(DeleteBehavior.Restrict);

@@ -45,6 +45,24 @@ namespace Sloth.Core.Models
             SetDetails(details);
         }
 
+        public static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.Name);
+
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.StartedAt);
+
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.EndedAt);
+
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.ProcessedDate);
+
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.Status);
+        }
+
         // list of possible statuses
         public static class Statuses
         {

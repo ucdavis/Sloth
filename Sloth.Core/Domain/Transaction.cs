@@ -134,6 +134,8 @@ namespace Sloth.Core.Models
 
         public IList<TransactionStatusEvent> StatusEvents { get; set; }
 
+        public IList<TransactionBlob> TransactionBlobs { get; set; }
+
         public void AddReversalTransaction(Transaction transaction)
         {
             // setup bidirectional relationship
@@ -176,6 +178,12 @@ namespace Sloth.Core.Models
                 .HasMany(t => t.StatusEvents)
                 .WithOne(e => e.Transaction)
                 .HasForeignKey(e => e.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transaction>()
+                .HasMany(t => t.TransactionBlobs)
+                .WithOne(b => b.Transaction)
+                .HasForeignKey(r => r.TransactionId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }

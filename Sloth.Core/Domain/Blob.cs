@@ -26,7 +26,7 @@ namespace Sloth.Core.Models
 
         public IList<Scrubber> Scrubbers { get; set; }
 
-        public IList<TransactionBlob> JobRecordBlobs { get; set; }
+        public IList<TransactionBlob> TransactionBlobs { get; set; }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -46,7 +46,7 @@ namespace Sloth.Core.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Blob>()
-                .HasMany(blob => blob.JobRecordBlobs)
+                .HasMany(blob => blob.TransactionBlobs)
                 .WithOne(r => r.Blob)
                 .HasForeignKey(r => r.BlobId)
                 .OnDelete(DeleteBehavior.Restrict);

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
@@ -19,6 +20,18 @@ namespace Sloth.Core.Models
         public string BlobId { get; set; }
 
         public Blob Blob { get; set; }
+
+        public static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<TransactionBlob>()
+                .HasIndex(r => r.IntegrationId);
+
+            modelBuilder.Entity<TransactionBlob>()
+                .HasIndex(r => r.TransactionId);
+
+            modelBuilder.Entity<TransactionBlob>()
+                .HasIndex(r => r.BlobId);
+        }
 
     }
 }
