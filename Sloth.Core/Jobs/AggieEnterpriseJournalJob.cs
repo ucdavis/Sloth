@@ -6,6 +6,7 @@ using AggieEnterpriseApi;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Serilog;
+using Sloth.Core.abstractions;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
@@ -17,9 +18,9 @@ namespace Sloth.Core.Jobs
         private readonly SlothDbContext _context;
         private readonly IAggieEnterpriseService _aggieEnterpriseService;
 
-        public static string JobName = "AggieEnterprise.JournalProcessor";
-        public static string JobNameUploadTransactions = nameof(AggieEnterpriseJournalJob) + "." + nameof(UploadTransactions);
-        public static string JobNameResolveProcessingJournals = nameof(AggieEnterpriseJournalJob) + "." + nameof(ResolveProcessingJournals);
+        public const string JobName = "AggieEnterprise.JournalProcessor";
+        public const string JobNameUploadTransactions = nameof(AggieEnterpriseJournalJob) + "." + nameof(UploadTransactions);
+        public const string JobNameResolveProcessingJournals = nameof(AggieEnterpriseJournalJob) + "." + nameof(ResolveProcessingJournals);
 
         public AggieEnterpriseJournalJob(SlothDbContext context, IAggieEnterpriseService aggieEnterpriseService)
         {
@@ -27,7 +28,7 @@ namespace Sloth.Core.Jobs
             _aggieEnterpriseService = aggieEnterpriseService;
         }
 
-        public class AggieEnterpriseJournalJobDetails
+        public class AggieEnterpriseJournalJobDetails : IHasTransactionIds
         {
             public AggieEnterpriseJournalJobDetails()
             {
@@ -43,6 +44,11 @@ namespace Sloth.Core.Jobs
                 public string TransactionId { get; set; }
                 public string Action { get; set; }
                 public string Message { get; set; }
+            }
+
+            public IEnumerable<string> GetTransactionIds()
+            {
+                return TransactionRunStatuses.Select(x => x.TransactionId);
             }
         }
 
@@ -114,7 +120,7 @@ namespace Sloth.Core.Jobs
                                 transaction.JournalRequest = journalRequest;
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
- 
+
                             }
                             else if (requestStatus.RequestId.HasValue &&
                                      requestStatus.RequestStatus == RequestStatus.Rejected)
@@ -126,19 +132,19 @@ namespace Sloth.Core.Jobs
 
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
-                                
+
 
                                 if(result.GlJournalRequest.ValidationResults != null && result.GlJournalRequest.ValidationResults.ErrorMessages != null)
                                 {
                                     log.ForContext("journalRequestId", journalRequest.RequestId);
                                     log.Warning("journalResult {journalResult}", JsonConvert.SerializeObject(result.GlJournalRequest));
                                     foreach (var err in result.GlJournalRequest.ValidationResults.ErrorMessages)
-                                    {                                        
+                                    {
                                         log.Warning("Transaction {TransactionId} rejected: {Message}",
                                             transaction.Id, err);
                                     }
                                 }
-                                
+
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
                             }

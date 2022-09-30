@@ -16,6 +16,7 @@ using Sloth.Integrations.CyberSource;
 using Sloth.Integrations.Cybersource.Clients;
 using Sloth.Integrations.Cybersource.Helpers;
 using Sloth.Integrations.Cybersource.Resources;
+using Sloth.Core.abstractions;
 
 namespace Sloth.Core.Services
 {
@@ -27,10 +28,15 @@ namespace Sloth.Core.Services
             ILogger log = null);
     }
 
-    public class CybersourceBankReconcileDetails
+    public class CybersourceBankReconcileDetails : IHasTransactionIds
     {
         public List<CybersourceBankReconcileIntegrationDetails> IntegrationDetails { get; set; } = new();
         public string Message { get; set; }
+
+        public IEnumerable<string> GetTransactionIds()
+        {
+            return IntegrationDetails.SelectMany(i => i.TransactionIds);
+        }
     }
 
     public class CybersourceBankReconcileIntegrationDetails

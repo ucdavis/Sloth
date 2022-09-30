@@ -1,0 +1,119 @@
+@using System.Text.Json;
+@using Sloth.Core.Extensions;
+@model Sloth.Web.Models.JobViewModels.JobDetailsViewModel
+
+@{
+  ViewBag.Title = Model.Job.Name;
+}
+
+@section AdditionalStyles
+{
+}
+
+<div class="container">
+  <h2>@ViewBag.Title</h2>
+
+  <div>
+    <h4>Job Record</h4>
+    <hr />
+    <dl class="dl-horizontal">
+      <dt>
+        @Html.DisplayNameFor(model => model.Job.Name)
+      </dt>
+      <dd>
+        @Html.DisplayFor(model => model.Job.Name)
+      </dd>
+      <dt>
+        @Html.DisplayNameFor(model => model.Job.StartedAt)
+      </dt>
+      <dd>
+        @Html.DisplayFor(model => model.Job.StartedAt)
+      </dd>
+      <dt>
+        @Html.DisplayNameFor(model => model.Job.EndedAt)
+      </dt>
+      <dd>
+        @if (Model.Job.EndedAt.HasValue)
+        {
+          @Html.DisplayFor(model => model.Job.EndedAt)
+        }
+        else
+        {
+          <span class="text-danger">Not yet completed</span>
+        }
+      </dd>
+      @if (Model.Job.ProcessedDate.HasValue)
+      {
+        <dt>
+          @Html.DisplayNameFor(model => model.Job.ProcessedDate)
+        </dt>
+        <dd>
+          @Html.DisplayFor(model => model.Job.ProcessedDate)
+        </dd>
+      }
+      <dt>
+        @Html.DisplayNameFor(model => model.Job.Status)
+      </dt>
+      <dd>
+        @Html.DisplayFor(model => model.Job.Status)
+      </dd>
+    </dl>
+  </div>
+
+  @if (Model.Job.Details != null)
+  {
+    <div>
+      <h4>Job Details</h4>
+      <hr />
+      <div>
+        @switch (Model.Job.Details)
+        {
+          case string details:
+            <pre><code class="language-json">@details.JsonPrettify()</code></pre>
+            break;
+          // Job-specific details or partial views can be included here, otherwise default to displaying the raw JSON
+          default:
+            <pre><code class="language-json">@JsonSerializer.Serialize(Model.Job.Details, new JsonSerializerOptions { WriteIndented = true })</code></pre>
+            break;
+        }
+      </div>
+    </div>
+  }
+
+  @if (Model.TransactionsTable != null)
+  {
+    <div>
+      <h4>Transactions</h4>
+      <hr />
+      @await Html.PartialAsync("_TransactionsTable", Model.TransactionsTable)
+    </div>
+  }
+
+  <div>
+    <a asp-action="@Model.Job.Name">Back to List</a>
+  </div>
+</div>
+
+@section AdditionalScripts
+{
+<script>
+  $('#transactionsTable').dataTable({
+    "columnDefs": [
+      {
+        "targets": 0,
+        "visible": false,
+      }
+    ],
+    order: [[2, 'desc']],
+    language: {
+      searchPlaceholder: "Search Table",
+      search: "",
+    },
+  });
+
+  $("#transactionsTable tbody").on("click", "tr", function () {
+    window.location = $(this).data("href");
+  });
+
+</script>
+}

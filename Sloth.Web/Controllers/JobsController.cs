@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sloth.Core;
+using Sloth.Core.abstractions;
 using Sloth.Core.Jobs;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
@@ -105,21 +106,91 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> Details(string id)
         {
-            var record = await _dbContext.JobRecords
+            var jobModel = await _dbContext.JobRecords
                 .Where(r => r.Id == id)
-                .Select(r => new JobViewModel()
+                .Select(r => new JobDetailsViewModel
                 {
-                    Id = r.Id,
-                    Name = r.Name,
-                    StartedAt = r.StartedAt,
-                    EndedAt = r.EndedAt,
-                    Status = r.Status,
-                    Details = r.Details,
-                    TransactionCount = r.TotalTransactions ?? 0
+                    Job = new JobViewModel()
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        StartedAt = r.StartedAt,
+                        EndedAt = r.EndedAt,
+                        Status = r.Status,
+                        Details = r.Details,
+                        TransactionCount = r.TotalTransactions ?? 0
+                    }
                 })
-                .FirstOrDefaultAsync();
+                .SingleOrDefaultAsync();
 
-            return View(record);
+            if (jobModel == null)
+            {
+                return NotFound();
+            }
+
+            var detailsJson = jobModel.Job.Details as string;
+
+            if (!string.IsNullOrWhiteSpace(detailsJson))
+            {
+                object details = null;
+                switch (jobModel.Job.Name)
+                {
+                    case CybersourceBankReconcileJob.JobName:
+                        details = JsonSerializer.Deserialize<CybersourceBankReconcileDetails>(detailsJson);
+                        jobModel.Job.Details = details;
+                        break;
+                    case KfsScrubberUploadJob.JobName:
+                        var scrubberUploadDetails = JsonSerializer.Deserialize<KfsScrubberUploadJob.KfsScrubberUploadJobDetails>(detailsJson);
+                        jobModel.Job.Details = scrubberUploadDetails;
+                        var scrubberIds = scrubberUploadDetails.TransactionGroups.Select(g => g.ScrubberId).ToArray();
+                        if (scrubberIds.Length > 0)
+                        {
+                            var transactions = await _dbContext.Transactions
+                                .Where(t => scrubberIds.Contains(t.ScrubberId))
+                                .Include(t => t.Transfers)
+                                .Include(a => a.Source)
+                                    .ThenInclude(a => a.Team)
+                                .AsNoTracking()
+                                .ToListAsync();
+                            jobModel.TransactionsTable = new TransactionsTableViewModel
+                            {
+                                Transactions = transactions
+                            };
+                        }
+                        break;
+                    case AggieEnterpriseJournalJob.JobNameUploadTransactions:
+                    case AggieEnterpriseJournalJob.JobNameResolveProcessingJournals:
+                        details = JsonSerializer.Deserialize<AggieEnterpriseJournalJob.AggieEnterpriseJournalJobDetails>(detailsJson);
+                        jobModel.Job.Details = details;
+                        break;
+                    case ResendPendingWebHookRequestsJob.JobName:
+                        details = JsonSerializer.Deserialize<ResendPendingWebHookRequestsJob.WebHookRequestJobDetails>(detailsJson);
+                        jobModel.Job.Details = details;
+                        break;
+                }
+
+                if (jobModel.TransactionsTable == null && details is IHasTransactionIds detailsWithTransactionIds)
+                {
+                    var transactionIds = detailsWithTransactionIds.GetTransactionIds().ToArray();
+                    if (transactionIds.Length > 0)
+                    {
+                        var transactions = await _dbContext.Transactions
+                            .Where(t => transactionIds.Contains(t.Id))
+                            .Include(t => t.Transfers)
+                            .Include(a => a.Source)
+                                .ThenInclude(a => a.Team)
+                            .AsNoTracking()
+                            .ToListAsync();
+                        jobModel.TransactionsTable = new TransactionsTableViewModel
+                        {
+                            Transactions = transactions
+                        };
+                    }
+                }
+
+            }
+
+            return View(jobModel);
         }
 
         [HttpPost]
@@ -212,38 +283,7 @@ namespace Sloth.Web.Controllers
                 await _dbContext.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(CybersourceBankReconcileDetails), new { id = record.Id });
-        }
-
-        public async Task<IActionResult> CybersourceBankReconcileDetails(string jobRecordId)
-        {
-            var record = await _dbContext.JobRecords
-                .Where(r => r.Id == jobRecordId && r.Name == CybersourceBankReconcileJob.JobName)
-                .SingleOrDefaultAsync();
-            if (record == null)
-            {
-                return NotFound();
-            }
-            var jobDetails = JsonSerializer.Deserialize<CybersourceBankReconcileDetails>(record.Details ?? "{}");
-            var transactionIds = jobDetails.IntegrationDetails.SelectMany(i => i.TransactionIds).ToList();
-            var transactions = await _dbContext.Transactions
-                .Where(t => transactionIds.Contains(t.Id))
-                .Include(t => t.Transfers)
-                .Include(a => a.Source)
-                .ThenInclude(a => a.Team)
-                .AsNoTracking()
-                .ToListAsync();
-            var viewModel = new CybersourceBankReconcileJobViewModel
-            {
-                Job = record,
-                TransactionsTable = new TransactionsTableViewModel()
-                {
-                    Transactions = transactions
-                },
-                TransactionCount = transactions.Count
-            };
-
-            return View(viewModel);
+            return RedirectToAction(nameof(Details), new { id = record.Id });
         }
 
         [HttpPost]
@@ -289,7 +329,7 @@ namespace Sloth.Web.Controllers
                 }
             });
 
-            return RedirectToAction(nameof(CybersourceBankReconcileDetails), new { id = record.Id });
+            return RedirectToAction(nameof(Details), new { id = record.Id });
         }
 
         private static void SanitizeJobsFilter(JobsFilterModel model)

@@ -107,6 +107,8 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         public Scrubber Scrubber { get; set; }
 
+        public string ScrubberId { get; set; }
+
         [JsonIgnore]
         public JournalRequest JournalRequest { get; set; }
 
