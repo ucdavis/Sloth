@@ -35,7 +35,7 @@ namespace Sloth.Core.Services
 
         public IEnumerable<string> GetTransactionIds()
         {
-            return IntegrationDetails.SelectMany(i => i.TransactionIds);
+            return IntegrationDetails.SelectMany(i => i?.TransactionIds ?? Enumerable.Empty<string>());
         }
     }
 
@@ -282,7 +282,7 @@ namespace Sloth.Core.Services
             }
 
             TransactionBlob transactionBlob = null;
-            CybersourceBankReconcileIntegrationDetails details = null;
+            CybersourceBankReconcileIntegrationDetails details = new();
 
             try
             {

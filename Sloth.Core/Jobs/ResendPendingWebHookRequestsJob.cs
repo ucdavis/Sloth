@@ -23,9 +23,12 @@ namespace Sloth.Core.Jobs
             _webHookService = webHookService;
         }
 
-        public Task<List<WebHookRequest>> ResendPendingWebHookRequests()
+        public async Task<WebHookRequestJobDetails> ResendPendingWebHookRequests()
         {
-            return _webHookService.ResendPendingWebHookRequests();
+            var jobDetails = new WebHookRequestJobDetails();
+            var requests = await _webHookService.ResendPendingWebHookRequests();
+            jobDetails.WebHookRequestIds = requests.Select(r => r.Id).ToList();
+            return jobDetails;
         }
 
         public class WebHookRequestJobDetails

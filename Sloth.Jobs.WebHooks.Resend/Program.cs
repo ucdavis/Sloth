@@ -26,9 +26,9 @@ namespace Sloth.Jobs.WebHooks.Resend
             // log run
             var jobRecord = new JobRecord()
             {
-                Name          = ResendPendingWebHookRequestsJob.JobName,
-                StartedAt     = DateTime.UtcNow,
-                Status        = "Running",
+                Name = ResendPendingWebHookRequestsJob.JobName,
+                StartedAt = DateTime.UtcNow,
+                Status = JobRecord.Statuses.Running,
             };
 
             _log = Log.Logger
@@ -45,21 +45,22 @@ namespace Sloth.Jobs.WebHooks.Resend
             // save log to db
             dbContext.JobRecords.Add(jobRecord);
             await dbContext.SaveChangesAsync();
-            var jobDetails = new ResendPendingWebHookRequestsJob.WebHookRequestJobDetails();
-
             try
             {
                 // create job service
                 var resendWebHookJob = provider.GetService<ResendPendingWebHookRequestsJob>();
 
-                var requests = await resendWebHookJob.ResendPendingWebHookRequests();
-                jobDetails.WebHookRequestIds = requests.Select(r => r.Id).ToList();
+                var jobDetails = await resendWebHookJob.ResendPendingWebHookRequests();
+                _log.Information("Finished");
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unexpected error", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
             }
             finally
             {
-                // record status
-                _log.Information("Finished");
-                jobRecord.SetCompleted("Finished", jobDetails);
                 await dbContext.SaveChangesAsync();
             }
         }

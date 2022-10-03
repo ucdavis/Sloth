@@ -28,7 +28,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             {
                 Name          = CybersourceBankReconcileJob.JobName,
                 StartedAt     = DateTime.UtcNow,
-                Status        = "Running",
+                Status        = JobRecord.Statuses.Running,
                 ProcessedDate = yesterday,
             };
 
@@ -46,21 +46,24 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             // save log to db
             dbContext.JobRecords.Add(jobRecord);
             await dbContext.SaveChangesAsync();
-            var reconcileDetails = new CybersourceBankReconcileDetails();
             try
             {
                 // create job service
                 var bankReconcileJob = provider.GetService<CybersourceBankReconcileJob>();
 
                 // call methods
-                reconcileDetails = await bankReconcileJob.ProcessReconcile(yesterday, _log);
+                var reconcileDetails = await bankReconcileJob.ProcessReconcile(yesterday, _log);
+                _log.Information("Finished");
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, reconcileDetails);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unexpected error", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
             }
             finally
             {
-                // record status
-                _log.Information("Finished");
-                jobRecord.SetCompleted("Finished", reconcileDetails);
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
         }
 

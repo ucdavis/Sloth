@@ -17,7 +17,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
     {
         private static ILogger _log;
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // setup env
             Configure();
@@ -28,7 +28,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             {
                 Name       = KfsScrubberUploadJob.JobName,
                 StartedAt  = DateTime.UtcNow,
-                Status     = "Running",
+                Status     = JobRecord.Statuses.Running,
             };
 
             _log = Log.Logger
@@ -45,7 +45,6 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
             // save log to db
             dbContext.JobRecords.Add(jobRecord);
             dbContext.SaveChanges();
-            KfsScrubberUploadJob.KfsScrubberUploadJobDetails jobDetails = null;
 
             try
             {
@@ -53,14 +52,18 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
                 var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
 
                 // call methods
-                jobDetails = uploadScrubberJob.UploadScrubber(_log).GetAwaiter().GetResult();
+                var jobDetails = await uploadScrubberJob.UploadScrubber(_log);
+                _log.Information("Finished");
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unexpected error", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
             }
             finally
             {
-                // record status
-                _log.Information("Finished");
-                jobRecord.SetCompleted("Finished", jobDetails ?? new());
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
         }
 

@@ -85,20 +85,24 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Run KFS Scrubber Upload Job?</h5>
+        <h5 class="modal-title">Run Job @Model.JobName?</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
         </button>
       </div>
       <div class="modal-body">
-        <form id="run-job-modal-form" method="post" action="@Url.Action("RunKfsScrubberUpload")">
-          <div class="input-group date" data-provide="datepicker" data-date-container="body">
-            <input name="date" type="text" class="form-control" placeholder="MM/DD/YYYY" />
-            <div class="input-group-append">
-              <button class="btn btn-outline-secondary" type="button">
-                <i class="fa fa-fw fa-calendar"></i>
-              </button>
+        <form id="run-job-modal-form" method="post" action="@Url.Action("RunJob")">
+          <input name="jobRunRequest.jobName" type="hidden" value="@Model.JobName" />
+          @if (Model.JobName == CybersourceBankReconcileJob.JobName)
+          {
+            <div class="input-group date" data-provide="datepicker" data-date-container="body">
+              <input name="jobRunRequest.date" type="text" class="form-control" placeholder="MM/DD/YYYY" />
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button">
+                  <i class="fa fa-fw fa-calendar"></i>
+                </button>
+              </div>
             </div>
-          </div>
+          }
         </form>
       </div>
       <div class="modal-footer">

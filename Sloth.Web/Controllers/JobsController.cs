@@ -194,52 +194,6 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> RunKfsScrubberUpload()
-        {
-            // log run
-            var record = new JobRecord()
-            {
-                Name = KfsScrubberUploadJob.JobName,
-                StartedAt = DateTime.UtcNow,
-                Status = "Running",
-            };
-            _dbContext.JobRecords.Add(record);
-            await _dbContext.SaveChangesAsync();
-
-            // build task and queue
-            _queue.QueueBackgroundWorkItem(async (token, serviceProvider) =>
-            {
-                var dbContext = serviceProvider.GetRequiredService<SlothDbContext>();
-                var kfsScrubberUploadJob = serviceProvider.GetRequiredService<KfsScrubberUploadJob>();
-
-                // find job record
-                var scopedRecord = await dbContext.JobRecords.FindAsync(record.Id);
-
-                // build custom logger
-                var log = LoggingConfiguration.GetJobConfiguration()
-                    .CreateLogger()
-                    .ForContext("jobname", scopedRecord.Name)
-                    .ForContext("jobid", scopedRecord.Id);
-
-                KfsScrubberUploadJob.KfsScrubberUploadJobDetails jobDetails = null;
-                try
-                {
-                    // schedule methods
-                    log.Information("Starting Job");
-                    jobDetails = await kfsScrubberUploadJob.UploadScrubber(log);
-                }
-                finally
-                {
-                    // record status
-                    scopedRecord.SetCompleted("Finished", jobDetails ?? new());
-                    await dbContext.SaveChangesAsync(token);
-                }
-            });
-
-            return RedirectToAction(nameof(Details), new { id = record.Id });
-        }
-
-        [HttpPost]
         public async Task<IActionResult> RunOneTimeCyberSourceIntegration(string integrationId, string reportName, DateTime date)
         {
             // fetch integration
@@ -249,14 +203,14 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync(i => i.Id == integrationId);
 
             // log run
-            var record = new JobRecord()
+            var jobRecord = new JobRecord()
             {
                 Name = CybersourceBankReconcileJob.JobName,
                 StartedAt = DateTime.UtcNow,
-                Status = "Running",
+                Status = JobRecord.Statuses.Running,
                 ProcessedDate = date
             };
-            _dbContext.JobRecords.Add(record);
+            _dbContext.JobRecords.Add(jobRecord);
             await _dbContext.SaveChangesAsync();
 
             // build custom logger
@@ -264,8 +218,8 @@ namespace Sloth.Web.Controllers
                 .CreateLogger()
                 .ForContext("date", date)
                 .ForContext("reportName", reportName)
-                .ForContext("jobname", record.Name)
-                .ForContext("jobid", record.Id);
+                .ForContext("jobname", jobRecord.Name)
+                .ForContext("jobid", jobRecord.Id);
 
             var reconcileDetails = new CybersourceBankReconcileDetails();
             try
@@ -275,27 +229,32 @@ namespace Sloth.Web.Controllers
 
                 reconcileDetails.IntegrationDetails.Add(
                     await _cyberSourceBankReconcileService.ProcessOneTimeIntegration(integration, reportName, date, log));
+                // record status
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, reconcileDetails);
+            }
+            catch(Exception ex)
+            {
+                log.Error("Unexpected error processing integration", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
             }
             finally
             {
-                // record status
-                record.SetCompleted("Finished", reconcileDetails);
                 await _dbContext.SaveChangesAsync();
             }
 
-            return RedirectToAction(nameof(Details), new { id = record.Id });
+            return RedirectToAction(nameof(Details), new { id = jobRecord.Id });
         }
 
         [HttpPost]
-        public async Task<IActionResult> RunCybersourceBankReconcile(DateTime date)
+        public async Task<IActionResult> RunJob(JobRunRequestModel jobRunRequest)
         {
             // log run
             var record = new JobRecord()
             {
-                Name = CybersourceBankReconcileJob.JobName,
+                Name = jobRunRequest.JobName,
                 StartedAt = DateTime.UtcNow,
-                Status = "Running",
-                ProcessedDate = date,
+                Status = JobRecord.Statuses.Running,
+                ProcessedDate = jobRunRequest.Date,
             };
             _dbContext.JobRecords.Add(record);
             await _dbContext.SaveChangesAsync();
@@ -304,7 +263,6 @@ namespace Sloth.Web.Controllers
             _queue.QueueBackgroundWorkItem(async (token, serviceProvider) =>
             {
                 var dbContext = serviceProvider.GetRequiredService<SlothDbContext>();
-                var cybersourceBankReconcileJob = serviceProvider.GetRequiredService<CybersourceBankReconcileJob>();
 
                 // find job record
                 var scopedRecord = await dbContext.JobRecords.FindAsync(record.Id);
@@ -314,17 +272,40 @@ namespace Sloth.Web.Controllers
                     .CreateLogger()
                     .ForContext("jobname", scopedRecord.Name)
                     .ForContext("jobid", scopedRecord.Id);
-                var jobDetails = new CybersourceBankReconcileDetails();
+
+                object jobDetails = null;
                 try
                 {
-                    // call methods
+                    // schedule methods
                     log.Information("Starting Job");
-                    jobDetails = await cybersourceBankReconcileJob.ProcessReconcile(date, log);
+                    switch (scopedRecord.Name)
+                    {
+                        case KfsScrubberUploadJob.JobName:
+                            var kfsScrubberUploadJob = serviceProvider.GetRequiredService<KfsScrubberUploadJob>();
+                            jobDetails = await kfsScrubberUploadJob.UploadScrubber(log);
+                            break;
+                        case CybersourceBankReconcileJob.JobName:
+                            var cybersourceBankReconcileJob = serviceProvider.GetRequiredService<CybersourceBankReconcileJob>();
+                            jobDetails = await cybersourceBankReconcileJob.ProcessReconcile(jobRunRequest.Date.Value, log);
+                            break;
+                        case AggieEnterpriseJournalJob.JobNameResolveProcessingJournals:
+                            var aeJournalJob = serviceProvider.GetRequiredService<AggieEnterpriseJournalJob>();
+                            jobDetails = await aeJournalJob.ResolveProcessingJournals(log);
+                            break;
+                        case AggieEnterpriseJournalJob.JobNameUploadTransactions:
+                            aeJournalJob = serviceProvider.GetRequiredService<AggieEnterpriseJournalJob>();
+                            jobDetails = await aeJournalJob.UploadTransactions(log);
+                            break;
+                        case ResendPendingWebHookRequestsJob.JobName:
+                            var resendWebhookJob = serviceProvider.GetRequiredService<ResendPendingWebHookRequestsJob>();
+                            jobDetails = await resendWebhookJob.ResendPendingWebHookRequests();
+                            break;
+                    }
                 }
                 finally
                 {
                     // record status
-                    scopedRecord.SetCompleted("Finished", jobDetails);
+                    scopedRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails ?? new());
                     await dbContext.SaveChangesAsync(token);
                 }
             });

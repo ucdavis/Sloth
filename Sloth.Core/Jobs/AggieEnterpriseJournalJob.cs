@@ -48,19 +48,12 @@ namespace Sloth.Core.Jobs
 
             public IEnumerable<string> GetTransactionIds()
             {
-                return TransactionRunStatuses.Select(x => x.TransactionId);
+                return TransactionRunStatuses?.Select(x => x.TransactionId) ?? Enumerable.Empty<string>();
             }
         }
 
-        public async Task UploadTransactions(ILogger log)
+        public async Task<AggieEnterpriseJournalJobDetails> UploadTransactions(ILogger log)
         {
-            var jobRun = new JobRecord
-                { Name = JobNameUploadTransactions, Status = JobRecord.Statuses.Running };
-
-            _context.JobRecords.Add(jobRun);
-
-            await _context.SaveChangesAsync();
-
             var jobDetails = new AggieEnterpriseJournalJobDetails();
 
             try
@@ -78,7 +71,7 @@ namespace Sloth.Core.Jobs
                 if (!transactions.Any())
                 {
                     log.Information("No scheduled transactions found");
-                    return;
+                    return jobDetails;
                 }
 
                 // group transactions by origin code and feed
@@ -177,24 +170,17 @@ namespace Sloth.Core.Jobs
                 log.Error(ex, "Error uploading transactions");
             }
 
-            jobRun.SetCompleted(JobRecord.Statuses.Success, jobDetails);
-
             await _context.SaveChangesAsync();
+
+            return jobDetails;
         }
 
         /// <summary>
         /// Find all transactions that have a status of "Processing" and have an associated journal request.
         /// Query the Aggie Enterprise API to determine the status of those requests and move into appropriate status.
         /// </summary>
-        public async Task ResolveProcessingJournals(ILogger log)
+        public async Task<AggieEnterpriseJournalJobDetails> ResolveProcessingJournals(ILogger log)
         {
-            var jobRun = new JobRecord
-                { Name = JobNameResolveProcessingJournals, Status = JobRecord.Statuses.Running };
-
-            _context.JobRecords.Add(jobRun);
-
-            await _context.SaveChangesAsync();
-
             var jobDetails = new AggieEnterpriseJournalJobDetails();
 
             try
@@ -210,7 +196,7 @@ namespace Sloth.Core.Jobs
                 if (!transactions.Any())
                 {
                     log.Information("No scheduled transactions found");
-                    return;
+                    return jobDetails;
                 }
 
                 var groups = transactions.GroupBy(t => t.Source.Team);
@@ -289,9 +275,9 @@ namespace Sloth.Core.Jobs
                 log.Error(ex, "Error processing journal statuses");
             }
 
-            jobRun.SetCompleted(JobRecord.Statuses.Success, jobDetails);
-
             await _context.SaveChangesAsync();
+
+            return jobDetails;
         }
     }
 }
