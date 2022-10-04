@@ -44,8 +44,8 @@ namespace Sloth.Web.Controllers
             }
             SanitizeJobsFilter(filter);
 
-            var fromUtc = filter.From.Value.ToUniversalTime();
-            var throughUtc = filter.To.Value.AddDays(1).ToUniversalTime();
+            var fromUtc = filter.From!.Value.ToUniversalTime();
+            var throughUtc = filter.To!.Value.AddDays(1).ToUniversalTime();
 
             var jobs = jobName switch
             {
@@ -74,7 +74,8 @@ namespace Sloth.Web.Controllers
                         .Where(j =>
                             j.Name == jobName
                             && j.StartedAt >= fromUtc
-                            && j.StartedAt < throughUtc)
+                            && j.StartedAt < throughUtc
+                            && (!filter.HasTransactions || j.TotalTransactions > 0))
                         .OrderBy(j => j.StartedAt)
                         .Select(j => new JobViewModel
                         {
@@ -285,8 +286,9 @@ namespace Sloth.Web.Controllers
                             jobDetails = await kfsScrubberUploadJob.UploadScrubber(log);
                             break;
                         case CybersourceBankReconcileJob.JobName:
+                            var yesterday = DateTime.UtcNow.Date.AddDays(-1);
                             var cybersourceBankReconcileJob = serviceProvider.GetRequiredService<CybersourceBankReconcileJob>();
-                            jobDetails = await cybersourceBankReconcileJob.ProcessReconcile(jobRunRequest.Date.Value, log);
+                            jobDetails = await cybersourceBankReconcileJob.ProcessReconcile(jobRunRequest.Date ?? yesterday, log);
                             break;
                         case AggieEnterpriseJournalJob.JobNameResolveProcessingJournals:
                             var aeJournalJob = serviceProvider.GetRequiredService<AggieEnterpriseJournalJob>();
