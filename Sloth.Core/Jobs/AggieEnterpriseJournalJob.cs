@@ -6,7 +6,7 @@ using AggieEnterpriseApi;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Serilog;
-using Sloth.Core.abstractions;
+using Sloth.Core.Abstractions;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;

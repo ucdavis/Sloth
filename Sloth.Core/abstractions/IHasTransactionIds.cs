@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Sloth.Core.abstractions
+namespace Sloth.Core.Abstractions
 {
     public interface IHasTransactionIds
     {

@@ -16,7 +16,7 @@ using Sloth.Integrations.CyberSource;
 using Sloth.Integrations.Cybersource.Clients;
 using Sloth.Integrations.Cybersource.Helpers;
 using Sloth.Integrations.Cybersource.Resources;
-using Sloth.Core.abstractions;
+using Sloth.Core.Abstractions;
 
 namespace Sloth.Core.Services
 {

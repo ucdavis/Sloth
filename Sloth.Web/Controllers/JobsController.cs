@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Sloth.Core;
-using Sloth.Core.abstractions;
+using Sloth.Core.Abstractions;
 using Sloth.Core.Jobs;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
