@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 
@@ -26,7 +27,12 @@ namespace Sloth.Core.Data
         public async Task Recreate()
         {
             await _context.Database.EnsureDeletedAsync();
-            await _context.Database.EnsureCreatedAsync();
+            await _context.Database.MigrateAsync();
+        }
+
+        public async Task Migrate()
+        {
+            await _context.Database.MigrateAsync();
         }
 
         /// <summary>
