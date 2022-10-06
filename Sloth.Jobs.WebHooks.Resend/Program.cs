@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,11 +24,11 @@ namespace Sloth.Jobs.WebHooks.Resend
             Configure();
 
             // log run
-            var jobRecord = new WebHookRequestResendJobRecord()
+            var jobRecord = new JobRecord()
             {
-                Name          = WebHookRequestResendJobRecord.JobName,
-                RanOn         = DateTime.UtcNow,
-                Status        = "Running",
+                Name = ResendPendingWebHookRequestsJob.JobName,
+                StartedAt = DateTime.UtcNow,
+                Status = JobRecord.Statuses.Running,
             };
 
             _log = Log.Logger
@@ -42,25 +43,24 @@ namespace Sloth.Jobs.WebHooks.Resend
             var dbContext = provider.GetService<SlothDbContext>();
 
             // save log to db
-            dbContext.WebHookRequestResendJobRecords.Add(jobRecord);
+            dbContext.JobRecords.Add(jobRecord);
             await dbContext.SaveChangesAsync();
-
             try
             {
                 // create job service
                 var resendWebHookJob = provider.GetService<ResendPendingWebHookRequestsJob>();
 
-                // call methods
-                foreach (var webHookRequest in await resendWebHookJob.ResendPendingWebHookRequests())
-                {
-                    webHookRequest.WebHookRequestResendJobId = jobRecord.Id;
-                }
+                var jobDetails = await resendWebHookJob.ResendPendingWebHookRequests();
+                _log.Information("Finished");
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unexpected error", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
             }
             finally
             {
-                // record status
-                _log.Information("Finished");
-                jobRecord.Status = "Finished";
                 await dbContext.SaveChangesAsync();
             }
         }

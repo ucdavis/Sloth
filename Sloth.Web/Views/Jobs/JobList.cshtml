@@ -1,0 +1,143 @@
+@using Sloth.Web.Models.JobViewModels
+@using Sloth.Core.Jobs;
+@model JobListViewModel
+
+@{
+  ViewBag.Title = $"{Model.JobName} Jobs";
+}
+
+@section AdditionalStyles
+{
+<style>
+  #recordsTable tr.group {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+</style>
+}
+
+<div class="container">
+  <div class="row mb-2">
+    <div class="col-8">
+      <h2>@ViewBag.Title</h2>
+    </div>
+    <div class="col-4 d-flex justify-content-end align-items-end">
+      <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#run-job-modal">Run Job</button>
+    </div>
+  </div>
+
+  <h3>Filters</h3>
+  <form class="row" id="invoiceFilterForm" asp-controller="Jobs" asp-action="Index" method="get">
+    <div class="row justify-content-between filters-wrapper">
+      <div class="col-4">
+        <div id="filter-date-range" class="input-group">
+          <input type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.From"
+            asp-format="{0:MM/dd/yyyy}" aria-label="From" />
+          <span class="input-group-text">to</span>
+          <input type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.To"
+            asp-format="{0:MM/dd/yyyy}" aria-label="To" />
+        </div>
+        <div id="filter-has-transactions" class="form-check mt-2">
+          <input class="form-check-input" type="checkbox" asp-for="Filter.HasTransactions">
+          <label class="form-check-label" asp-for="Filter.HasTransactions">
+            Has Transactions
+          </label>
+        </div>
+        <button type="submit" class="btn btn-light mt-1">Apply filter</button>
+      </div>
+
+    </div>
+  </form>
+
+  <table id="recordsTable" class="table sloth-table active-table">
+    <thead>
+      <tr>
+        <th>
+          @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().StartedAt)
+        </th>
+        <th>
+          @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().EndedAt)
+        </th>
+        <th>
+          @Html.DisplayNameFor(model => model.Jobs.FirstOrDefault().Status)
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach (var item in Model.Jobs)
+      {
+        <tr data-href="/jobs/details/@item.Id">
+          <td data-sort="@item.StartedAt.Ticks">
+            @item.StartedAt
+          </td>
+          <td data-sort="@item.EndedAt?.Ticks">
+            @item.EndedAt
+          </td>
+          <td>
+            @item.Status
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+<div id="run-job-modal" class="modal fade">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Run Job @Model.JobName?</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+        </button>
+      </div>
+      <div class="modal-body">
+        <form id="run-job-modal-form" method="post" action="@Url.Action("RunJob")">
+          <input name="jobRunRequest.jobName" type="hidden" value="@Model.JobName" />
+          @if (Model.JobName == CybersourceBankReconcileJob.JobName)
+          {
+            <div class="input-group date" data-provide="datepicker" data-date-container="body">
+              <input name="jobRunRequest.date" type="text" class="form-control" placeholder="MM/DD/YYYY" />
+              <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button">
+                  <i class="fa fa-fw fa-calendar"></i>
+                </button>
+              </div>
+            </div>
+          }
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" id="run-job-modal-action" class="btn btn-primary">Run Job</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+@section AdditionalScripts {
+<script>
+  $(document).ready(function () {
+    $('#recordsTable').DataTable({
+      "order": [[0, "desc"]],
+      "columnDefs": [
+        { width: 200, targets: 0 },
+        { width: 200, targets: 1 },
+        //{ "orderable": false, "targets": 3 }
+      ]
+    });
+
+    $("#recordsTable tbody").on("click", "tr", function () {
+      window.location = $(this).data("href");
+    });
+
+    $('#filter-date-range').datepicker({
+      inputs: $('#filter-date-range input'),
+      keepEmptyValues: true,
+    });
+
+    $('#run-job-modal-action').click(function () {
+      $('#run-job-modal-form').submit();
+    });
+  });
+</script>
+}

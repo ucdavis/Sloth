@@ -54,6 +54,7 @@ namespace Sloth.Web
             services.Configure<KfsScrubberOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
             services.Configure<WebHookServiceOptions>(Configuration.GetSection("WebHooks"));
+            services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
 
 
             // add infrastructure services
@@ -62,6 +63,7 @@ namespace Sloth.Web
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
             services.AddScoped<IWebHookService, WebHookService>();
+            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
 
             // add jobs services
             services.AddHostedService<QueuedHostedService>();
@@ -69,6 +71,8 @@ namespace Sloth.Web
             services.AddScoped<ICyberSourceBankReconcileService, CyberSourceBankReconcileService>();
             services.AddScoped<CybersourceBankReconcileJob>();
             services.AddScoped<KfsScrubberUploadJob>();
+            services.AddScoped<AggieEnterpriseJournalJob>();
+            services.AddScoped<ResendPendingWebHookRequestsJob>();
 
             // add database connection
             services.AddDbContext<SlothDbContext>(options =>

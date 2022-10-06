@@ -8,6 +8,6 @@ namespace Sloth.Web.Models
     public class AppSettings
     {
         public bool RebuildDb { get; set; }
-
+        public bool AutoMigrateDb { get; set; }
     }
 }

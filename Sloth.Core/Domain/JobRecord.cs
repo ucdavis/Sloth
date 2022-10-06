@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace Sloth.Core.Models
 {
@@ -21,6 +23,10 @@ namespace Sloth.Core.Models
 
         public DateTime? EndedAt { get; set; }
 
+        public DateTime? ProcessedDate { get; set; }
+
+        public int? TotalTransactions { get; set; }
+
         [StringLength(32)]
         public string Status { get; set; }
 
@@ -39,12 +45,30 @@ namespace Sloth.Core.Models
             SetDetails(details);
         }
 
+        public static void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.Name);
+
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.StartedAt);
+
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.EndedAt);
+
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.ProcessedDate);
+
+            modelBuilder.Entity<JobRecord>()
+                .HasIndex(j => j.Status);
+        }
+
         // list of possible statuses
         public static class Statuses
         {
             public const string Pending = "Pending";
             public const string Running = "Running";
-            public const string Success = "Success";
+            public const string Finished = "Finished";
             public const string Failed = "Failed";
         }
     }

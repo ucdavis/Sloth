@@ -22,7 +22,7 @@ namespace Sloth.Web
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var isDevelopment = string.Equals(environment, "development", StringComparison.OrdinalIgnoreCase);
@@ -55,10 +55,14 @@ namespace Sloth.Web
 #if DEBUG
                 if (settings.Value.RebuildDb)
                 {
-                    Task.Run(() => dbInitializer.Recreate()).Wait();
+                    await dbInitializer.Recreate();
                 }
 #endif
-                Task.Run(() => dbInitializer.Initialize()).Wait();
+                if (settings.Value.AutoMigrateDb)
+                {
+                    await dbInitializer.Migrate();
+                }
+                await dbInitializer.Initialize();
             }
 
             try

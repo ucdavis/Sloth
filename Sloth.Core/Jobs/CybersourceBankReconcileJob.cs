@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Sloth.Core.Domain;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
@@ -16,7 +15,7 @@ namespace Sloth.Core.Jobs
         private readonly SlothDbContext _context;
         private readonly ICyberSourceBankReconcileService _cyberSourceBankReconcileService;
 
-        public static string JobName = "Cybersource.BankReconcile";
+        public const string JobName = "Cybersource.BankReconcile";
 
         public CybersourceBankReconcileJob(SlothDbContext context, ICyberSourceBankReconcileService cyberSourceBankReconcileService)
         {
@@ -24,12 +23,12 @@ namespace Sloth.Core.Jobs
             _cyberSourceBankReconcileService = cyberSourceBankReconcileService;
         }
 
-        public async IAsyncEnumerable<CybersourceBankReconcileJobBlob> ProcessReconcile(DateTime date,
-            CybersourceBankReconcileJobRecord jobRecord, ILogger log)
+        public async Task<CybersourceBankReconcileDetails> ProcessReconcile(DateTime date, ILogger log)
         {
             log = log.ForContext("date", date);
 
             List<Integration> integrations;
+            var details = new CybersourceBankReconcileDetails();
 
             try
             {
@@ -42,34 +41,36 @@ namespace Sloth.Core.Jobs
                 if (!integrations.Any())
                 {
                     log.Information("Early exit, no active integrations found.");
-                    yield break;
+                    details.Message = "No active integrations found";
+                    return details;
                 }
 
             }
             catch (Exception ex)
             {
                 log.Error(ex, ex.Message);
-                yield break;
+                details.Message = "Error fetching integrations";
+                return details;
             }
 
             foreach (var integration in integrations)
             {
                 var innerLog = log.ForContext("TeamName", integration.Team.Name);
                 innerLog.Information("Starting integration for {TeamName}");
-                CybersourceBankReconcileJobBlob jobBlob = null;
                 try
                 {
-                    jobBlob = await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, jobRecord, innerLog);                    
+                    details.IntegrationDetails.Add(await _cyberSourceBankReconcileService.ProcessIntegration(integration, date, innerLog));
                 }
                 catch (Exception ex)
                 {
                     innerLog.Error(ex, ex.Message);
                 }
                 innerLog.Information("Completed integration for {TeamName}");
-
-                if (jobBlob != null)
-                    yield return jobBlob;
             }
+
+            return details;
         }
+
+
     }
 }

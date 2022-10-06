@@ -24,11 +24,11 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
 
             // log run
             var yesterday = DateTime.UtcNow.Date.AddDays(-1);
-            var jobRecord = new CybersourceBankReconcileJobRecord()
+            var jobRecord = new JobRecord()
             {
                 Name          = CybersourceBankReconcileJob.JobName,
-                RanOn         = DateTime.UtcNow,
-                Status        = "Running",
+                StartedAt     = DateTime.UtcNow,
+                Status        = JobRecord.Statuses.Running,
                 ProcessedDate = yesterday,
             };
 
@@ -44,28 +44,26 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
             var dbContext = provider.GetService<SlothDbContext>();
 
             // save log to db
-            dbContext.CybersourceBankReconcileJobRecords.Add(jobRecord);
+            dbContext.JobRecords.Add(jobRecord);
             await dbContext.SaveChangesAsync();
-
             try
             {
                 // create job service
                 var bankReconcileJob = provider.GetService<CybersourceBankReconcileJob>();
 
                 // call methods
-                await foreach (var jobBlob in bankReconcileJob.ProcessReconcile(yesterday, jobRecord, _log))
-                {
-                    if (jobBlob == null) continue;
-                    // save uploaded blob metadata
-                    dbContext.CybersourceBankReconcileJobBlobs.Add(jobBlob);
-                }
+                var reconcileDetails = await bankReconcileJob.ProcessReconcile(yesterday, _log);
+                _log.Information("Finished");
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, reconcileDetails);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unexpected error", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
             }
             finally
             {
-                // record status
-                _log.Information("Finished");
-                jobRecord.Status = "Finished";
-                dbContext.SaveChanges();
+                await dbContext.SaveChangesAsync();
             }
         }
 

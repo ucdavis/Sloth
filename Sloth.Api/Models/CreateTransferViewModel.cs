@@ -48,7 +48,7 @@ namespace Sloth.Api.Models
         public string ObjectCode { get; set; }
 
         /// <summary>
-        /// Sub-Object is an optional accounting unit attribute that allows finer 
+        /// Sub-Object is an optional accounting unit attribute that allows finer
         ///  distinctions within a particular object code on an account.
         /// Sub-Object codes are specific to a Chart Code, Account and Object Code combination.
         /// </summary>
@@ -89,9 +89,9 @@ namespace Sloth.Api.Models
         /// <summary>
         /// Fiscal Year in which the feed will post to the General Ledger.
         /// It is highly recommended to include the fiscal period in all records.
-        /// 
+        ///
         /// Feed systems are generally only allowed to submit files for accounting periods 1-12.
-        /// 
+        ///
         /// If the fiscal year/period combination referenced on lines in the file is not open for posting,
         ///  then the entries will be defaulted to the current fiscal period as derived from the system’s date table
         /// </summary>

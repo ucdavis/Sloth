@@ -222,13 +222,13 @@ namespace Sloth.Api.Controllers.v1
                 if (string.IsNullOrWhiteSpace(transactionToCreate.KfsTrackingNumber))
                 {
                     transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
-                } 
+                }
 
                 _context.Transactions.Add(transactionToCreate);
                 await _context.SaveChangesAsync();
                 tran.Commit();
 
-                return new JsonResult(transactionToCreate); 
+                return new JsonResult(transactionToCreate);
             }
         }
     }

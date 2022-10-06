@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
-using Sloth.Core.Domain;
 
 namespace Sloth.Core.Models
 {
@@ -38,8 +37,7 @@ namespace Sloth.Core.Models
         [MaxLength(128)]
         public string HoldingAccount { get; set; }
 
-        public IList<CybersourceBankReconcileJobBlob> CybersourceBankReconcileJobBlobs { get; set; }
-
+        public IList<TransactionBlob> TransactionBlobs { get; set; }
 
         protected internal static void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -54,7 +52,7 @@ namespace Sloth.Core.Models
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Integration>()
-                .HasMany(i => i.CybersourceBankReconcileJobBlobs)
+                .HasMany(i => i.TransactionBlobs)
                 .WithOne(b => b.Integration)
                 .HasForeignKey(b => b.IntegrationId)
                 .OnDelete(DeleteBehavior.Restrict);

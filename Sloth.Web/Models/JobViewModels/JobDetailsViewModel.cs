@@ -7,13 +7,10 @@ using Sloth.Web.Models.TransactionViewModels;
 
 namespace Sloth.Web.Models.JobViewModels
 {
-    public class CybersourceBankReconcileJobViewModel
+    public class JobDetailsViewModel
     {
-        public JobRecord Job { get; set; }
+        public JobViewModel Job { get; set; }
 
         public TransactionsTableViewModel TransactionsTable { get; set; }
-
-        [Display(Name = "Transaction Count")]
-        public int TransactionCount { get; set; }
     }
 }

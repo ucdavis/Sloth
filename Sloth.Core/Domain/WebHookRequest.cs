@@ -30,10 +30,6 @@ namespace Sloth.Core.Models
 
         public bool Persist { get; set; }
 
-        public WebHookRequestResendJobRecord WebHookRequestResendJob { get; set; }
-
-        public string WebHookRequestResendJobId { get; set; }
-
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<WebHookRequest>()

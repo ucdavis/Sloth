@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace Sloth.Core.Extensions
@@ -52,6 +53,13 @@ namespace Sloth.Core.Extensions
             {
                 return value;
             }
+        }
+
+
+        public static string JsonPrettify(this string json)
+        {
+            using var jDoc = JsonDocument.Parse(json);
+            return JsonSerializer.Serialize(jDoc, new JsonSerializerOptions { WriteIndented = true });
         }
 
     }

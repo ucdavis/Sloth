@@ -5,6 +5,7 @@ using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Jobs;
+using Sloth.Core.Models;
 using Sloth.Core.Services;
 using Sloth.Jobs.Core;
 
@@ -14,7 +15,7 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
     {
         private static ILogger _log = null!;
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             // setup env
             Configure();
@@ -25,32 +26,65 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
             // log run
             _log = Log.Logger
                 .ForContext("jobname", AggieEnterpriseJournalJob.JobName);
-                // .ForContext("jobid", jobRecord.Id);
+            // .ForContext("jobid", jobRecord.Id);
 
             var assembyName = typeof(Program).Assembly.GetName();
             _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
 
             // setup di
             var provider = ConfigureServices();
+            // create services
+            var dbContext = provider.GetRequiredService<SlothDbContext>();
+            var journalJob = provider.GetRequiredService<AggieEnterpriseJournalJob>();
 
+            // 1. check journal status for pending transactions
+            var jobRecord = new JobRecord
+            {
+                Name = AggieEnterpriseJournalJob.JobNameUploadTransactions,
+                StartedAt = DateTime.UtcNow,
+                Status = JobRecord.Statuses.Running
+            };
+            dbContext.JobRecords.Add(jobRecord);
+            await dbContext.SaveChangesAsync();
             try
             {
-                // create job service
-                var journalJob = provider.GetService<AggieEnterpriseJournalJob>();
-
-                // call methods
-
-                // 1. check journal status for pending transactions
-                journalJob?.ResolveProcessingJournals(_log).GetAwaiter().GetResult();
-
-                // 2. upload all scheduled transactions
-                journalJob?.UploadTransactions(_log).GetAwaiter().GetResult();
+                var aeJournalJobDetails = await journalJob.ResolveProcessingJournals(_log);
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, aeJournalJobDetails);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unexpected error", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
             }
             finally
             {
-                // record status
-                _log.Information("Finished");
+                await dbContext.SaveChangesAsync();
             }
+
+            // 2. upload all scheduled transactions
+            jobRecord = new JobRecord
+            {
+                Name = AggieEnterpriseJournalJob.JobNameUploadTransactions,
+                StartedAt = DateTime.UtcNow,
+                Status = JobRecord.Statuses.Running
+            };
+            dbContext.JobRecords.Add(jobRecord);
+            await dbContext.SaveChangesAsync();
+            try
+            {
+                var uploadTransactionsJobDetails = await journalJob.UploadTransactions(_log);
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, uploadTransactionsJobDetails);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unexpected error", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
+            }
+            finally
+            {
+                await dbContext.SaveChangesAsync();
+            }
+
         }
 
         private static ServiceProvider ConfigureServices()

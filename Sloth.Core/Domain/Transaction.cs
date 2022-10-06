@@ -107,6 +107,8 @@ namespace Sloth.Core.Models
         [JsonIgnore]
         public Scrubber Scrubber { get; set; }
 
+        public string ScrubberId { get; set; }
+
         [JsonIgnore]
         public JournalRequest JournalRequest { get; set; }
 
@@ -132,19 +134,9 @@ namespace Sloth.Core.Models
         [DisplayName("Has Reversal Transaction")]
         public bool HasReversal => !string.IsNullOrEmpty(ReversalTransactionId);
 
-        [DisplayName("Cybersource Reconcile Job")]
-        public CybersourceBankReconcileJobRecord CybersourceBankReconcileJob { get; set; }
-
-        [DisplayName("Cybersource Reconcile Job Record Id")]
-        public string CybersourceBankReconcileJobRecordId { get; set; }
-
-        [DisplayName("Kfs Scrubber Upload Job")]
-        public KfsScrubberUploadJobRecord KfsScrubberUploadJob { get; set; }
-
-        [DisplayName("Kfs Scrubber Upload Job Record Id")]
-        public string KfsScrubberUploadJobRecordId { get; set; }
-
         public IList<TransactionStatusEvent> StatusEvents { get; set; }
+
+        public IList<TransactionBlob> TransactionBlobs { get; set; }
 
         public void AddReversalTransaction(Transaction transaction)
         {
@@ -188,6 +180,12 @@ namespace Sloth.Core.Models
                 .HasMany(t => t.StatusEvents)
                 .WithOne(e => e.Transaction)
                 .HasForeignKey(e => e.TransactionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transaction>()
+                .HasMany(t => t.TransactionBlobs)
+                .WithOne(b => b.Transaction)
+                .HasForeignKey(r => r.TransactionId)
                 .OnDelete(DeleteBehavior.Restrict);
         }
     }
