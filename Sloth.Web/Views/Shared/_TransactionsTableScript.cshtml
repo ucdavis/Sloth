@@ -1,0 +1,28 @@
+@using Sloth.Web.Models.TransactionViewModels;
+@model object
+@{
+  // most of the time no explicit model is passed in, in which case we default to hiding just the first column
+  var viewModel = Model as TransactionsTableScriptViewModel;
+  var hideColumns = viewModel?.HideColumns ?? new List<int>{0};
+}
+
+<script>
+  $('#transactionsTable').dataTable({
+    "columnDefs": [
+      {
+        "targets": [@string.Join(",", hideColumns)],
+        "visible": false,
+      }
+    ],
+    order: [[2, 'desc']],
+    language: {
+      searchPlaceholder: "Search Table",
+      search: "",
+    },
+  });
+
+  $("#transactionsTable tbody").on("click", "tr", function () {
+    window.location = $(this).data("href");
+  });
+
+</script>

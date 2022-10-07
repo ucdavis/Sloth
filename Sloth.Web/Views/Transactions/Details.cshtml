@@ -67,18 +67,6 @@ else
             "order": [[1, 'desc'],[2, 'desc']],
             searching: false,
         });
-        const table = $('#transactionsTable').DataTable({
-            "columnDefs": [
-                { "targets": 0, "visible": false },
-                { "targets": [-1], "orderable": false },
-            ],
-            order: [[1, 'desc']],
-            searching: false,
-        });
-
-        $("#transactionsTable tbody").on("click", "tr", function () {
-            window.location = $(this).data("href");
-        });
-
     </script>
+    <partial name="_TransactionsTableScript" />
 }

@@ -85,7 +85,7 @@
     <div>
       <h4>Transactions</h4>
       <hr />
-      @await Html.PartialAsync("_TransactionsTable", Model.TransactionsTable)
+      <partial name="_TransactionsTable" model="Model.TransactionsTable" />
     </div>
   }
 
@@ -96,24 +96,5 @@
 
 @section AdditionalScripts
 {
-<script>
-  $('#transactionsTable').dataTable({
-    "columnDefs": [
-      {
-        "targets": 0,
-        "visible": false,
-      }
-    ],
-    order: [[2, 'desc']],
-    language: {
-      searchPlaceholder: "Search Table",
-      search: "",
-    },
-  });
-
-  $("#transactionsTable tbody").on("click", "tr", function () {
-    window.location = $(this).data("href");
-  });
-
-</script>
+<partial name="_TransactionsTableScript" />
 }
