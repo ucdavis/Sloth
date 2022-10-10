@@ -15,6 +15,7 @@ using Sloth.Core.Models.WebHooks;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
 using Sloth.Web.Identity;
+using Sloth.Web.Models.BlobViewModels;
 using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Resources;
 
@@ -165,6 +166,11 @@ namespace Sloth.Web.Controllers
                     )
                 ).ToListAsync();
 
+            var blobs = await DbContext.Blobs
+                .Where(b => b.TransactionBlobs.Select(tb => tb.TransactionId).Contains(transaction.Id)
+                    || b.Scrubbers.SelectMany( s => s.Transactions.Select(t => t.Id)).Contains(transaction.Id))
+                .ToListAsync();
+
             var model = new TransactionDetailsViewModel()
             {
                 Transaction = transaction,
@@ -175,6 +181,11 @@ namespace Sloth.Web.Controllers
                 RelatedTransactions = new TransactionsTableViewModel
                 {
                     Transactions = relatedTransactions
+                },
+                RelatedBlobs = new BlobsTableViewModel
+                {
+                    Blobs = blobs,
+                    TeamSlug = TeamSlug
                 }
             };
 

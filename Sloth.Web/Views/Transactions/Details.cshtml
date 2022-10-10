@@ -48,7 +48,14 @@ else
     <h2>Related Transactions</h2>
     <partial name="_TransactionsTable" model="Model.RelatedTransactions" />
     </div>
+}
     
+@if (Model.RelatedBlobs.Blobs.Any())
+{
+    <div class="row mt-5">
+    <h2>Related Files</h2>
+    <partial name="_BlobsTable" model=@Model.RelatedBlobs />
+    </div>
 }
 
 </div>
@@ -68,5 +75,12 @@ else
             searching: false,
         });
     </script>
-    <partial name="_TransactionsTableScript" />
+    @if (Model.RelatedTransactions.Transactions.Any())
+    {
+        <partial name="_TransactionsTableScript" />
+    }
+    @if (Model.RelatedBlobs.Blobs.Any())
+    {
+        <partial name="_BlobsTableScript" />
+    }
 }
