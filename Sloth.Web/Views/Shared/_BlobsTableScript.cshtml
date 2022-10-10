@@ -1,0 +1,22 @@
+@using Sloth.Web.Models.BlobViewModels;
+
+<script>
+  $('#blobsTable').dataTable({
+    "columnDefs": [
+      {
+        "targets": [0],
+        "visible": false,
+      }
+    ],
+    order: [[2, 'desc']],
+    language: {
+      searchPlaceholder: "Search Table",
+      search: "",
+    },
+  });
+
+  $("#blobsTable tbody").on("click", "tr", function () {
+    window.location = $(this).data("href");
+  });
+
+</script>

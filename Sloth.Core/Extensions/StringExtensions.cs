@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Sloth.Core.Extensions
 {
@@ -62,5 +63,17 @@ namespace Sloth.Core.Extensions
             return JsonSerializer.Serialize(jDoc, new JsonSerializerOptions { WriteIndented = true });
         }
 
+        public static string XmlPrettify(this string xml)
+        {
+            try
+            {
+                var doc = XDocument.Parse(xml);
+                return doc.ToString();
+            }
+            catch (Exception)
+            {
+                return xml;
+            }
+        }
     }
 }

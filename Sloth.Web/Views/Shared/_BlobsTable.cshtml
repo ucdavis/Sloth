@@ -1,0 +1,32 @@
+@using Humanizer
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Routing
+@using Sloth.Core.Extensions
+@using Sloth.Core.Models
+@using Sloth.Core.Resources
+@model Sloth.Web.Models.BlobViewModels.BlobsTableViewModel
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
+}
+
+<table id="blobsTable" class="table sloth-table active-table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(x => x.Blobs.FirstOrDefault().Id)</th>
+             <th>@Html.DisplayNameFor(x => x.Blobs.FirstOrDefault().Description)</th>
+            <th>@Html.DisplayNameFor(x => x.Blobs.FirstOrDefault().UploadedDate)</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model.Blobs)
+        {
+            <tr data-href="/@Model.TeamSlug/Blobs/Details/@t.Id">
+                <th scope="row">@t.Id</th>
+                <td>@t.Description</td>
+                <td nowrap data-sort="@t.UploadedDate.Ticks">@t.UploadedDate.ToPacificTime()</td>
+            </tr>
+        }
+    </tbody>
+</table>

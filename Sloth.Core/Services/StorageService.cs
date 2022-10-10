@@ -33,6 +33,7 @@ namespace Sloth.Core.Services
             var containerClient = await GetBlobContainerAsync(containerName);
             var blobClient = containerClient.GetBlockBlobClient(blobName);
             await blobClient.DownloadToAsync(stream);
+            stream.Position = 0;
             return stream;
         }
 

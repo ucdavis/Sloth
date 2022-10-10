@@ -1,5 +1,6 @@
 @using Sloth.Core.Models
-@model Sloth.Web.Models.TransactionViewModels.TransactionsTableViewModel
+@using Sloth.Web.Models.TransactionViewModels
+@model TransactionsTableViewModel
 
 @{
     ViewBag.Title = "Transactions Needing Approval";
@@ -56,25 +57,9 @@
 
 @section AdditionalScripts {
     <script>
-        $('#transactionsTable').DataTable({
-            "columnDefs": [
-                { "targets": [0, 3, 4, 5, 6], "visible": false },
-                { "targets": [-1], "orderable": false },
-            ],
-            order: [[2, 'desc']],
-            language: {
-                searchPlaceholder: "Search Table",
-                search: "",
-            },
-        });
-
         $('#approvalAllSubmit').click(function() {
             $('#approvalAllForm').submit();
         });
-
-
-        $("#transactionsTable tbody").on("click", "tr", function () {
-            window.location = $(this).data("href");
-        });
     </script>
+    <partial name="_TransactionsTableScript" model=@(new TransactionsTableScriptViewModel { HideColumns = new() {0,3,4,5,6}}) />
 }

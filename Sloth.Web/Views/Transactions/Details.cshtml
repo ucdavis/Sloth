@@ -48,7 +48,14 @@ else
     <h2>Related Transactions</h2>
     <partial name="_TransactionsTable" model="Model.RelatedTransactions" />
     </div>
+}
     
+@if (Model.RelatedBlobs.Blobs.Any())
+{
+    <div class="row mt-5">
+    <h2>Related Files</h2>
+    <partial name="_BlobsTable" model=@Model.RelatedBlobs />
+    </div>
 }
 
 </div>
@@ -67,18 +74,13 @@ else
             "order": [[1, 'desc'],[2, 'desc']],
             searching: false,
         });
-        const table = $('#transactionsTable').DataTable({
-            "columnDefs": [
-                { "targets": 0, "visible": false },
-                { "targets": [-1], "orderable": false },
-            ],
-            order: [[1, 'desc']],
-            searching: false,
-        });
-
-        $("#transactionsTable tbody").on("click", "tr", function () {
-            window.location = $(this).data("href");
-        });
-
     </script>
+    @if (Model.RelatedTransactions.Transactions.Any())
+    {
+        <partial name="_TransactionsTableScript" />
+    }
+    @if (Model.RelatedBlobs.Blobs.Any())
+    {
+        <partial name="_BlobsTableScript" />
+    }
 }

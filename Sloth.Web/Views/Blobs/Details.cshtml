@@ -1,0 +1,72 @@
+@using Humanizer
+@using Sloth.Core.Extensions
+@using Sloth.Core.Models
+@using Sloth.Core.Resources
+@using Sloth.Web.Models.BlobViewModels
+@model BlobDetailsViewModel
+
+@{
+  ViewBag.Title = "File Details";
+}
+
+<div class="container">
+
+  <h2>@ViewBag.Title</h2>
+
+
+  <div class="row txn-detail-wrapper">
+    <div class="txn-detail-row">
+      <div class="txn-detail-label">
+        <span>@Html.DisplayNameFor(x => x.Blob.Id)</span>
+      </div>
+      <div class="txn-detail-result">
+        <span>@Model.Blob.Id</span>
+      </div>
+    </div>
+    <div class="txn-detail-row">
+      <div class="txn-detail-label">
+        <span>@Html.DisplayNameFor(x => x.Blob.Description)</span>
+      </div>
+      <div class="txn-detail-result">
+        <span>@Model.Blob.Description</span>
+      </div>
+    </div>
+    <div class="txn-detail-row">
+      <div class="txn-detail-label">
+        <span>@Html.DisplayNameFor(x => x.Blob.FileName)</span>
+      </div>
+      <div class="txn-detail-result">
+        <span>@Model.Blob.FileName</span>
+      </div>
+    </div>
+    <div class="txn-detail-row">
+      <div class="txn-detail-label">
+        <span>@Html.DisplayNameFor(x => x.Blob.UploadedDate)</span>
+      </div>
+      <div class="txn-detail-result">
+        <span>@Model.Blob.UploadedDate</span>
+      </div>
+    </div>
+    <div class="txn-detail-row">
+      <div class="txn-detail-label">
+        <span>@Html.DisplayNameFor(x => x.Blob.Uri)</span>
+      </div>
+      <div class="txn-detail-result">
+        <span>@Model.Blob.Uri</span>
+      </div>
+    </div>
+  </div>
+
+    <div class="row mt-5">
+    <h2>File Contents</h2>
+    <pre><code>@Model.Contents</code></pre>
+    </div>
+
+
+</div>
+
+
+@section AdditionalScripts
+{
+<script src="~/js/prism.js"></script>
+}
