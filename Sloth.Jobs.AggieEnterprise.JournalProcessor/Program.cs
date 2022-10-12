@@ -49,6 +49,7 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
             try
             {
                 var aeJournalJobDetails = await journalJob.ResolveProcessingJournals(_log);
+                jobRecord.TotalTransactions = aeJournalJobDetails.TransactionsProcessedCount;
                 jobRecord.SetCompleted(JobRecord.Statuses.Finished, aeJournalJobDetails);
             }
             catch (Exception ex)
@@ -73,6 +74,7 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
             try
             {
                 var uploadTransactionsJobDetails = await journalJob.UploadTransactions(_log);
+                jobRecord.TotalTransactions = uploadTransactionsJobDetails.TransactionsProcessedCount;
                 jobRecord.SetCompleted(JobRecord.Statuses.Finished, uploadTransactionsJobDetails);
             }
             catch (Exception ex)

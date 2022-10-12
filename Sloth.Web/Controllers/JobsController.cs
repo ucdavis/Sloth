@@ -283,20 +283,28 @@ namespace Sloth.Web.Controllers
                     {
                         case KfsScrubberUploadJob.JobName:
                             var kfsScrubberUploadJob = serviceProvider.GetRequiredService<KfsScrubberUploadJob>();
-                            jobDetails = await kfsScrubberUploadJob.UploadScrubber(log);
+                            var kfsScrubberJobDetails = await kfsScrubberUploadJob.UploadScrubber(log);
+                            scopedRecord.TotalTransactions = kfsScrubberJobDetails.TransactionGroups.Select(g => g.TransactionCount).Sum();
+                            jobDetails = kfsScrubberJobDetails;
                             break;
                         case CybersourceBankReconcileJob.JobName:
                             var yesterday = DateTime.UtcNow.Date.AddDays(-1);
                             var cybersourceBankReconcileJob = serviceProvider.GetRequiredService<CybersourceBankReconcileJob>();
-                            jobDetails = await cybersourceBankReconcileJob.ProcessReconcile(jobRunRequest.Date ?? yesterday, log);
+                            var reconcileDetails = await cybersourceBankReconcileJob.ProcessReconcile(jobRunRequest.Date ?? yesterday, log);
+                            scopedRecord.TotalTransactions = reconcileDetails.GetTransactionIds().Count();
+                            jobDetails = reconcileDetails;
                             break;
                         case AggieEnterpriseJournalJob.JobNameResolveProcessingJournals:
                             var aeJournalJob = serviceProvider.GetRequiredService<AggieEnterpriseJournalJob>();
-                            jobDetails = await aeJournalJob.ResolveProcessingJournals(log);
+                            var resolveJournalDetails = await aeJournalJob.ResolveProcessingJournals(log);
+                            scopedRecord.TotalTransactions = resolveJournalDetails.TransactionsProcessedCount;
+                            jobDetails = resolveJournalDetails;
                             break;
                         case AggieEnterpriseJournalJob.JobNameUploadTransactions:
                             aeJournalJob = serviceProvider.GetRequiredService<AggieEnterpriseJournalJob>();
-                            jobDetails = await aeJournalJob.UploadTransactions(log);
+                            var uploadTransactionsDetails = await aeJournalJob.UploadTransactions(log);
+                            scopedRecord.TotalTransactions = uploadTransactionsDetails.TransactionsProcessedCount;
+                            jobDetails = uploadTransactionsDetails;
                             break;
                         case ResendPendingWebHookRequestsJob.JobName:
                             var resendWebhookJob = serviceProvider.GetRequiredService<ResendPendingWebHookRequestsJob>();
