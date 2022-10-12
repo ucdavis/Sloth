@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +54,7 @@ namespace Sloth.Jobs.CyberSource.BankReconcile
 
                 // call methods
                 var reconcileDetails = await bankReconcileJob.ProcessReconcile(yesterday, _log);
+                jobRecord.TotalTransactions = reconcileDetails.GetTransactionIds().Count();
                 _log.Information("Finished");
                 jobRecord.SetCompleted(JobRecord.Statuses.Finished, reconcileDetails);
             }

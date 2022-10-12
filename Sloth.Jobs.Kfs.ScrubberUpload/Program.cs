@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +54,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
 
                 // call methods
                 var jobDetails = await uploadScrubberJob.UploadScrubber(_log);
+                jobRecord.TotalTransactions = jobDetails.TransactionGroups.Select(g => g.TransactionCount).Sum();
                 _log.Information("Finished");
                 jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
             }
