@@ -1,0 +1,62 @@
+
+@using Sloth.Core.Resources
+@model string
+@{
+    ViewBag.Title = "Reports";
+    var teamSlug = Model;
+}
+
+@section AdditionalStyles
+{
+    <style>
+        .job img.card-img-top {
+            max-height: 180px;
+            object-fit: cover;
+        }
+    </style>
+}
+
+<div class="container">
+    <h2>@ViewBag.Title</h2>
+
+@if(!string.IsNullOrEmpty(teamSlug) && teamSlug != "any")
+{
+    <h3>Team Reports</h3>
+    <div class="row">
+        <div class="col-6">
+            <div class="card job">
+                [Image needed]
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a asp-action="StaleTransactions" >Stale Transactions</a>
+                    </h5>
+                    <p class="card-text">
+                        Shows transctions that have been in status <code>Processing</code> for more than 5 days.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (User.IsInRole(Roles.SystemAdmin))
+{
+    <h3>System Admin Reports</h3>
+    <div class="row">
+        <div class="col-6">
+            <div class="card job">
+                [Image needed]
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <a asp-action="StaleTransactionsAllTeams" >Stale Transactions Across All Teams</a>
+                    </h5>
+                    <p class="card-text">
+                        Shows transctions across all teams that have been in status <code>Processing</code> for more than 5 days.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+</div>
+
