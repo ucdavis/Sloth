@@ -1,5 +1,4 @@
-@using System.Text.Json;
-@using Sloth.Core.Extensions;
+@using Sloth.Web.Models.TransactionViewModels
 @model Sloth.Web.Models.ReportViewModels.TransactionsReportViewModel
 
 @{
@@ -21,5 +20,5 @@
 
 @section AdditionalScripts
 {
-<partial name="_TransactionsTableScript" />
+<partial name="_TransactionsTableScript" model=@(new TransactionsTableScriptViewModel{ HideColumns = new() {0}}) />
 }

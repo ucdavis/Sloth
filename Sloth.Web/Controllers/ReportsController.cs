@@ -67,6 +67,8 @@ namespace Sloth.Web.Controllers
                        && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
                                         .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5))
                 .Include(t => t.Transfers)
+                .Include(t => t.Source)
+                    .ThenInclude(s => s.Team)
                 .AsNoTracking()
                 .ToListAsync();
 
