@@ -3,7 +3,7 @@
 @{
   // most of the time no explicit model is passed in, in which case we default to hiding just the first column
   var viewModel = Model as TransactionsTableScriptViewModel;
-  var hideColumns = viewModel?.HideColumns ?? new List<int>{0};
+  var hideColumns = viewModel?.HideColumns ?? new List<int>{0, 8};
 }
 
 <script>

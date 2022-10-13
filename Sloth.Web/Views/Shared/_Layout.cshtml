@@ -159,10 +159,10 @@
                             </li>
                         }
 
-                        @if (!string.IsNullOrEmpty(teamSlug))
+                        @if (User.IsInRole(Roles.SystemAdmin) || !string.IsNullOrEmpty(teamSlug))
                         {
                             <li class="nav-item">
-
+                                <a class="nav-link @(activeMenu == "Reports" ? "active" : "")" asp-controller="Reports" asp-action="Index" asp-route-team="@(string.IsNullOrEmpty(teamSlug) ? "any" : teamSlug)"><partial name="_ReportsSvgPartial" />Reports</a>
                             </li>
                         }
                     </ul>

@@ -1,0 +1,24 @@
+@using Sloth.Web.Models.TransactionViewModels
+@model Sloth.Web.Models.ReportViewModels.TransactionsReportViewModel
+
+@{
+  ViewBag.Title = "Stale Transactions";
+}
+
+@section AdditionalStyles
+{
+}
+
+<div class="container">
+  <h2>@ViewBag.Title</h2>
+  <div>
+    <h4>Transactions</h4>
+    <hr />
+    <partial name="_TransactionsTable" model="Model.TransactionsTable" />
+  </div>
+</div>
+
+@section AdditionalScripts
+{
+<partial name="_TransactionsTableScript" model=@(new TransactionsTableScriptViewModel{ HideColumns = new() {0}}) />
+}

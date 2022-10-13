@@ -22,9 +22,10 @@
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().ProcessorTrackingNumber)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().MerchantTrackingNumber)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Description)</th>
-            
-           
-          
+            <th>Team</th>
+
+
+
         </tr>
     </thead>
     <tbody>
@@ -38,7 +39,7 @@
                 description = t.Description;
             }
 
-            var slug = !string.IsNullOrWhiteSpace(teamSlug) ? teamSlug : t.Source?.Team?.Slug;
+            var slug = !string.IsNullOrWhiteSpace(teamSlug) && teamSlug != "any" ? teamSlug : t.Source?.Team?.Slug;
 
             <tr data-href="/@slug/Transactions/Details/@t.Id">
                 <th scope="row">@t.Id</th>
@@ -51,6 +52,7 @@
                 <td>@t.ProcessorTrackingNumber</td>
                 <td>@t.MerchantTrackingNumber</td>
                 <td>@description</td>
+                <td>@slug</td>
                 @* @if (String.IsNullOrWhiteSpace(firstDebit.FinancialSegmentString))
                 {
                     <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
@@ -60,7 +62,7 @@
                     <td>See Details</td>
                 }
                  *@
-                
+
             </tr>
         }
     </tbody>
