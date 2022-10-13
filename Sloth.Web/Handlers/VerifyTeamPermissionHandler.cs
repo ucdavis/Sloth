@@ -28,7 +28,7 @@ namespace Sloth.Web.Handlers
             if (context.User.IsInRole(Roles.SystemAdmin))
             {
                 // sys admin gets all available roles
-                _httpContext.HttpContext.Items.Add("TeamRoles", new [] { TeamRole.Admin, TeamRole.Approver });
+                _httpContext.HttpContext.Items["TeamRoles"] = TeamRole.GetAllRoles();
 
                 context.Succeed(requirement);
                 return;
@@ -39,7 +39,7 @@ namespace Sloth.Web.Handlers
             if (_httpContext.HttpContext.Request != null)
             {
                 team = _httpContext.HttpContext.Request.RouteValues["team"]?.ToString() ?? "";
-            }    
+            }
 
             var user = await _userManager.GetUserAsync(context.User);
             if (user != null && team != "")

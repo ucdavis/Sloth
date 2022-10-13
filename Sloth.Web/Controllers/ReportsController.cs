@@ -35,7 +35,6 @@ namespace Sloth.Web.Controllers
             return View("Index", TeamSlug);
         }
 
-        [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> StaleTransactions()
         {
             var transactions = await DbContext.Transactions
