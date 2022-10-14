@@ -27,7 +27,7 @@
         @Html.DisplayNameFor(model => model.Job.StartedAt)
       </dt>
       <dd>
-        @Html.DisplayFor(model => model.Job.StartedAt)
+        @Html.DisplayFor(model => model.Job.StartedAt.ToPacificTime())
       </dd>
       <dt>
         @Html.DisplayNameFor(model => model.Job.EndedAt)
@@ -35,7 +35,7 @@
       <dd>
         @if (Model.Job.EndedAt.HasValue)
         {
-          @Html.DisplayFor(model => model.Job.EndedAt)
+          @Html.DisplayFor(model => model.Job.EndedAt.ToPacificTime())
         }
         else
         {
@@ -48,7 +48,7 @@
           @Html.DisplayNameFor(model => model.Job.ProcessedDate)
         </dt>
         <dd>
-          @Html.DisplayFor(model => model.Job.ProcessedDate)
+          @Html.DisplayFor(model => model.Job.ProcessedDate.ToPacificTime())
         </dd>
       }
       <dt>
