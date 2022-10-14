@@ -22,7 +22,10 @@
   });
 
   $("#transactionsTable tbody").on("click", "tr", function () {
-    window.location = $(this).data("href");
+    const location = $(this).data("href");
+    if (location && !location.includes("undefined")) {
+      window.location.href = location;
+    }
   });
 
 </script>
