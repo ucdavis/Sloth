@@ -159,10 +159,17 @@
                             </li>
                         }
 
-                        @if (User.IsInRole(Roles.SystemAdmin) || !string.IsNullOrEmpty(teamSlug))
+                        @if (!string.IsNullOrEmpty(teamSlug))
                         {
                             <li class="nav-item">
-                                <a class="nav-link @(activeMenu == "Reports" ? "active" : "")" asp-controller="Reports" asp-action="Index" asp-route-team="@(string.IsNullOrEmpty(teamSlug) ? "any" : teamSlug)"><partial name="_ReportsSvgPartial" />Reports</a>
+                                @* Using href because the TagHelper gets confused and generates an invalid route, probably because this controller is also accessible via non-team-routes *@
+                                <a class="nav-link @(activeMenu == "Reports" ? "active" : "")" href="~/@(teamSlug)/Reports"><partial name="_ReportsSvgPartial" />Reports</a>
+                            </li>
+                        }
+                        else if (User.IsInRole(Roles.SystemAdmin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(activeMenu == "Reports" ? "active" : "")" asp-controller="Reports" asp-action="Index"><partial name="_ReportsSvgPartial" />Reports</a>
                             </li>
                         }
                     </ul>

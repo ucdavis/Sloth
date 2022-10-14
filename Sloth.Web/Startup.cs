@@ -157,7 +157,7 @@ namespace Sloth.Web
                     name: "non-team-routes",
                     pattern: "{controller}/{action=Index}/{id?}",
                     defaults: new { },
-                    constraints: new { controller = "(account|jobs|system|users)" });
+                    constraints: new { controller = "(account|jobs|system|users|reports)" });
 
                 routes.MapControllerRoute(
                     name: "team-management-routes",
