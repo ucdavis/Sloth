@@ -1,5 +1,6 @@
 @using Sloth.Web.Models.JobViewModels
-@using Sloth.Core.Jobs;
+@using Sloth.Core.Jobs
+@using Sloth.Core.Extensions
 @model JobListViewModel
 
 @{
@@ -67,10 +68,10 @@
       {
         <tr data-href="/jobs/details/@item.Id">
           <td data-sort="@item.StartedAt.Ticks">
-            @item.StartedAt
+            @item.StartedAt.ToPacificTime()
           </td>
           <td data-sort="@item.EndedAt?.Ticks">
-            @item.EndedAt
+            @item.EndedAt.ToPacificTime()
           </td>
           <td>
             @item.Status
