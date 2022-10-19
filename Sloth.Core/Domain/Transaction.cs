@@ -30,6 +30,7 @@ namespace Sloth.Core.Models
         public string CreatorName => Creator?.UserName;
 
         // Status updates must go through SetStatus to ensure StatusEvents are properly updated
+        [MaxLength(20)]
         public string Status { get; private set; }
 
         [JsonIgnore]
@@ -46,6 +47,7 @@ namespace Sloth.Core.Models
         /// <summary>
         /// Tracking Number created by the merchant accountant
         /// </summary>
+        [MaxLength(128)]
         [DisplayName("Merchant Tracking Number")]
         public string MerchantTrackingNumber { get; set; }
 
@@ -58,6 +60,7 @@ namespace Sloth.Core.Models
         /// <summary>
         /// Tracking Number created by the payment processor
         /// </summary>
+        [MaxLength(128)]
         [DisplayName("Processor Tracking Number")]
         public string ProcessorTrackingNumber { get; set; }
 
@@ -187,6 +190,21 @@ namespace Sloth.Core.Models
                 .WithOne(b => b.Transaction)
                 .HasForeignKey(r => r.TransactionId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Transaction>()
+                .HasIndex(t => t.KfsTrackingNumber);
+
+            modelBuilder.Entity<Transaction>()
+                .HasIndex(t => t.MerchantTrackingNumber);
+
+            modelBuilder.Entity<Transaction>()
+                .HasIndex(t => t.ProcessorTrackingNumber);
+
+            modelBuilder.Entity<Transaction>()
+                .HasIndex(t => t.Status);
+
+            modelBuilder.Entity<Transaction>()
+                .HasIndex(t => t.TransactionDate);
         }
     }
 }
