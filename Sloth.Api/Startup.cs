@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using Harvest.Core.Models.Settings;
+using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -46,12 +48,14 @@ namespace Sloth.Api
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
+            services.Configure<SparkpostOptions>(Configuration.GetSection("SparkPost"));
 
             // add infrastructure services
             services.AddSingleton<IKfsService, KfsService>();
             services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             // add database connection
             services.AddDbContext<SlothDbContext>(options =>

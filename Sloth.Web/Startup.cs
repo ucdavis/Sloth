@@ -1,4 +1,6 @@
 using AspNetCore.Security.CAS;
+using Harvest.Core.Models.Settings;
+using Harvest.Core.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -55,6 +57,7 @@ namespace Sloth.Web
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
             services.Configure<WebHookServiceOptions>(Configuration.GetSection("WebHooks"));
             services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
+            services.Configure<SparkpostOptions>(Configuration.GetSection("SparkPost"));
 
 
             // add infrastructure services
@@ -64,6 +67,7 @@ namespace Sloth.Web
             services.AddSingleton<IStorageService, StorageService>();
             services.AddScoped<IWebHookService, WebHookService>();
             services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             // add jobs services
             services.AddHostedService<QueuedHostedService>();
