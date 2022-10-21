@@ -55,6 +55,7 @@ namespace Sloth.Api
             services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
+            services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<INotificationService, NotificationService>();
 
             // add database connection
@@ -85,7 +86,7 @@ namespace Sloth.Api
             {
                 o.AddPolicy("ApiKey", p => p.Requirements.Add(new ApiKeyRequirement()));
             });
-            
+
             // add authentication handlers
             services.AddSingleton<IAuthorizationHandler, ApiKeyHandler>();
 
