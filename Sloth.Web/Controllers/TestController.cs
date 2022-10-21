@@ -5,6 +5,8 @@ using Razor.Templating.Core;
 using Sloth.Core;
 using Sloth.Core.Models.Emails;
 using Sloth.Core.Resources;
+using Sloth.Core.Services;
+using Sloth.Core.Views.Shared;
 using Sloth.Web.Controllers;
 using Sloth.Web.Identity;
 using System;
@@ -17,50 +19,43 @@ namespace Harvest.Web.Controllers
     [Authorize(Roles = Roles.SystemAdmin)]
     public class TestController : SuperController
     {
-        public TestController(ApplicationUserManager userManager, SlothDbContext dbContext) : base(userManager, dbContext)
+        private readonly INotificationService _notificationService;
+
+        public TestController(ApplicationUserManager userManager, SlothDbContext dbContext, INotificationService notificationService) : base(userManager, dbContext)
         {
+            _notificationService = notificationService;
         }
 
-        public async Task<IActionResult> GenerateTransactionsNotificationTemplate()
+        public IActionResult ViewDefaultNotification()
         {
-            var model = new TransactionsNotificationModel();
-
-            var results = await RazorTemplateEngine.RenderAsync("/Views/Emails/TransactionsNotification_mjml.cshtml", model);
-
-            return Content(results);
-        }
-
-        public IActionResult ViewTransactionsNotification()
-        {
-            var model = new TransactionsNotificationModel
+            var model = new DefaultNotificationModel
             {
-                Title = "Transactions Notification",
-                NotificationText = "This is a test notification",
-                ButtonText1 = "View Transactions",
-                ButtonUrl1 = "https://www.google.com"
+                Subject = "Transactions Notification",
+                MessageText = "This is a test notification",
+                LinkBackButton = new EmailButtonModel
+                {
+                    Text = "View Transactions",
+                    Url = "https://www.google.com"
+                }
             };
 
-            return View("/Views/Emails/TransactionsNotification.cshtml", model);
+            return View("/Views/Emails/DefaultNotification.cshtml", model);
         }
 
-        // public async Task<IActionResult> TestEmail()
-        // {
-        //     var user = await _userService.GetCurrentUser();
+        public async Task<IActionResult> TestEmail([FromQuery] string emailAddress)
+        {
+            if (string.IsNullOrWhiteSpace(emailAddress))
+            {
+                return BadRequest("emailAddress is required");
+            }
 
-        //     var model = await _dbContext.Projects.Where(a => a.IsActive && a.Name != null && a.End <= DateTime.UtcNow.AddYears(1))
-        //         .OrderBy(a => a.End).Take(5).Select(s => new ExpiringProjectsModel
-        //         {
-        //             EndDate = s.End.ToShortDateString(), Name = s.Name,
-        //             ProjectUrl = $"https://harvest.caes.ucdavis.edu/Project/Details/{s.Id}"
-        //         }).ToArrayAsync();
+            await _notificationService.Notify(
+                Notification.Message("This is a test email", emailAddress)
+                .WithSubject("Test Email")
+                .WithLinkBack("View Sloth", "https://sloth-test.ucdavis.edu"));
 
-
-
-        //     var emailBody = await RazorTemplateEngine.RenderAsync("/Views/Emails/ExpiringProjects.cshtml", model);
-        //     await _notificationService.SendNotification(new string[] { user.Email }, null, emailBody, "EXPIRE", "EXPIRE");
-
-        //     return Content("Done. Maybe. Well, possibly. If you don't get it, check the settings.");
-        // }
+            return Ok();
+        }
 
 
     }

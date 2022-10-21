@@ -7,20 +7,24 @@
         </mj-text>
       </mj-column>
       <mj-column width="33.33333333333333%" vertical-align="bottom">
-        <mj-image width="150px" alt="UC Davis Sloth logo"
-          src="https://sloth-test.ucdavis.edu/images/thumbnail.jpg"></mj-image>
+        <mj-image width="150px" alt="UC Davis Sloth logo" src="https://sloth-test.ucdavis.edu/images/thumbnail.jpg">
+        </mj-image>
       </mj-column>
     </mj-section>
+    <mj-raw>
+      <!-- MJML squashes raw content into one line ¯\_(ツ)_/¯ -->
+      @RenderBody()
 
-    @RenderBody()
-
-    <mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" border-bottom="1px solid #c7c8cc"
-      background-color="#ffffff" padding-bottom="20px" padding-top="20px">
+      @if (emailButtonModel != null)
+      {
+      @await Html.PartialAsync("_EmailButton", emailButtonModel)
+      }
+    </mj-raw>
+    <mj-section border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" border-bottom="1px solid #c7c8cc" background-color="#ffffff" padding-bottom="20px" padding-top="20px">
     </mj-section>
     <mj-section padding-bottom="20px" padding-top="20px">
       <mj-column width="100%" vertical-align="middle">
-        <mj-text line-height="1.5" align="center" color="#000000" font-size="13px" padding-bottom="10px"
-          padding-top="10px">
+        <mj-text line-height="150%" align="center" color="#000000" font-size="13px" padding-bottom="10px" padding-top="10px">
           <p>
             This email was automatically generated. Please do not reply to it, as the mailbox is not monitored.
           </p>

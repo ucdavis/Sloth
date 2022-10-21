@@ -5,6 +5,8 @@ using Harvest.Core.Services;
 using Razor.Templating.Core;
 using Renci.SshNet.Messages;
 using Serilog;
+using Sloth.Core.Models.Emails;
+using Sloth.Core.Views.Shared;
 
 namespace Sloth.Core.Services
 {
@@ -33,19 +35,28 @@ namespace Sloth.Core.Services
                 throw new ArgumentException("No email addresses specified", nameof(notification.Emails));
             }
 
-            if ((string.IsNullOrWhiteSpace(notification.Body) && string.IsNullOrWhiteSpace(notification.ViewName))
-                || (!string.IsNullOrWhiteSpace(notification.Body) && !string.IsNullOrWhiteSpace(notification.ViewName)))
+            if (string.IsNullOrWhiteSpace(notification.Body)
+                && string.IsNullOrWhiteSpace(notification.ViewName)
+                && string.IsNullOrWhiteSpace(notification.MessageText))
             {
-                throw new ArgumentException("Either Body or ViewName must be specified, but not both", nameof(notification.Body) + " or " + nameof(notification.ViewName));
+                throw new ArgumentException("Either Body, ViewName or MessageText must be specified",
+                    $"{nameof(notification.Body)} or {nameof(notification.ViewName)} or {nameof(notification.MessageText)}");
             }
 
             try
             {
                 var body = !string.IsNullOrWhiteSpace(notification.Body)
                     ? notification.Body
-                    : await RazorTemplateEngine.RenderAsync(notification.ViewName, notification.Model, notification.ViewBagOrViewData);
+                    : !string.IsNullOrWhiteSpace(notification.ViewName)
+                        ? await RazorTemplateEngine.RenderAsync(notification.ViewName, notification.Model, notification.ViewBagOrViewData)
+                        : await RazorTemplateEngine.RenderAsync("/Views/Emails/DefaultNotification.cshtml", new DefaultNotificationModel
+                            {
+                                MessageText = notification.MessageText,
+                                Subject = notification.Subject,
+                                LinkBackButton = notification.LinkBackButton
+                            });
 
-                await _smtpService.SendEmail(notification.Emails, notification.CcEmails, body, notification.TextVersion, notification.Subject);
+                await _smtpService.SendEmail(notification.Emails, notification.CcEmails, body, notification.MessageText, notification.Subject);
             }
             catch (Exception ex)
             {
@@ -61,26 +72,32 @@ namespace Sloth.Core.Services
         public string Subject { get; set; } = "Sloth Notification";
         public string[] Emails { get; set; }
         public string[] CcEmails { get; set; } = new string[] { };
-        public string TextVersion { get; set; } = "";
 
-        public string Body { get; set; }
+        // Used only by DefaultNotification view. If using a custom view and model, a property of
+        // this type and name in your model will be picked up by the _EmailLayout_mjml view
+        public EmailButtonModel LinkBackButton { get; set; }
 
-        // remaining properties are mutually exclusive with Body
+        // Used as alternativeText and as content in DefaultNotification view
+        public string MessageText { get; set; } = "";
+
+        // If set, overrides usage of DefaultNotification view
         public string ViewName { get; set; }
         public object Model { get; set; }
         public Dictionary<string, object> ViewBagOrViewData = new Dictionary<string, object>();
 
-        public static Notification Message(string message, string[] emails)
+        // If set, overrides all usage of view templates
+        public string Body { get; set; }
+
+        public static Notification Message(string message, params string[] emails)
         {
             return new Notification
             {
                 Emails = emails,
-                Body = message,
-                TextVersion = message,
+                MessageText = message,
             };
         }
 
-        public static Notification View(string viewName, string[] emails)
+        public static Notification View(string viewName, params string[] emails)
         {
             return new Notification
             {
@@ -91,7 +108,7 @@ namespace Sloth.Core.Services
 
         public Notification WithTextVersion(string textVersion)
         {
-            TextVersion = textVersion;
+            MessageText = textVersion;
             return this;
         }
 
@@ -101,7 +118,7 @@ namespace Sloth.Core.Services
             return this;
         }
 
-        public Notification WithCcEmails(string[] ccEmails)
+        public Notification WithCcEmails(params string[] ccEmails)
         {
             CcEmails = ccEmails;
             return this;
@@ -116,6 +133,16 @@ namespace Sloth.Core.Services
         public Notification WithData(Dictionary<string, object> viewBagOrViewData)
         {
             ViewBagOrViewData = viewBagOrViewData;
+            return this;
+        }
+
+        public Notification WithLinkBack(string text, string url)
+        {
+            LinkBackButton = new EmailButtonModel
+            {
+                Url = url,
+                Text = text
+            };
             return this;
         }
     }
