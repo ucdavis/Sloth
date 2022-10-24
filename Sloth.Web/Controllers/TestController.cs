@@ -30,7 +30,7 @@ namespace Harvest.Web.Controllers
         {
             var model = new DefaultNotificationModel
             {
-                Subject = "Transactions Notification",
+                Subject = "Sloth Notification",
                 MessageText = "This is a test notification",
                 LinkBackButton = new EmailButtonModel
                 {
