@@ -68,3 +68,6 @@ button.btn-close {
   color: $recpool;
   background-color: transparentize($recpool, 0.8);
 }
+.btn-check:focus+.btn, .btn:focus {
+    color: #fff;
+}
