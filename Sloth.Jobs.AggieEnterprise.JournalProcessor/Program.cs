@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Sloth.Core.Models.Settings;
+using Sloth.Core.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -6,7 +8,6 @@ using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Jobs;
 using Sloth.Core.Models;
-using Sloth.Core.Services;
 using Sloth.Jobs.Core;
 
 namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
@@ -95,6 +96,8 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
 
             // options files
             services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
+            services.Configure<SparkpostOptions>(Configuration.GetSection("SparkPost"));
+            services.Configure<NotificationOptions>(Configuration.GetSection("Notifications"));
 
             // db service
             services.AddDbContext<SlothDbContext>(options =>
@@ -106,6 +109,8 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
             services.AddTransient<AggieEnterpriseJournalJob>();
 
             services.AddSingleton(_log);
+            services.AddScoped<ISmtpService, SmtpService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             return services.BuildServiceProvider();
         }

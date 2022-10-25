@@ -9,6 +9,7 @@ namespace Sloth.Core.Views.Shared
     public class EmailButtonModel
     {
         public string Text { get; set; }
-        public string Url { get; set; }
+        // host will be supplied by the notification service
+        public string UrlPath { get; set; }
     }
 }

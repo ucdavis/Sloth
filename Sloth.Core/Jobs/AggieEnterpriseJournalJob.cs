@@ -17,15 +17,17 @@ namespace Sloth.Core.Jobs
     {
         private readonly SlothDbContext _context;
         private readonly IAggieEnterpriseService _aggieEnterpriseService;
+        private readonly INotificationService _notificationService;
 
         public const string JobName = "AggieEnterprise.JournalProcessor";
         public const string JobNameUploadTransactions = nameof(AggieEnterpriseJournalJob) + "." + nameof(UploadTransactions);
         public const string JobNameResolveProcessingJournals = nameof(AggieEnterpriseJournalJob) + "." + nameof(ResolveProcessingJournals);
 
-        public AggieEnterpriseJournalJob(SlothDbContext context, IAggieEnterpriseService aggieEnterpriseService)
+        public AggieEnterpriseJournalJob(SlothDbContext context, IAggieEnterpriseService aggieEnterpriseService, INotificationService notificationService)
         {
             _context = context;
             _aggieEnterpriseService = aggieEnterpriseService;
+            _notificationService = notificationService;
         }
 
         public class AggieEnterpriseJournalJobDetails : IHasTransactionIds
@@ -81,6 +83,8 @@ namespace Sloth.Core.Jobs
                     var source = group.Key;
                     var groupedTransactions = group.ToList();
 
+                    bool hasRejectedTransactions = false;
+
                     log.Information("Uploading {TransactionCount} transactions for {SourceName}",
                         groupedTransactions.Count, source.Name);
 
@@ -88,7 +92,7 @@ namespace Sloth.Core.Jobs
                     foreach (var transaction in groupedTransactions)
                     {
                         var transactionRunStatus = new AggieEnterpriseJournalJobDetails.TransactionRunStatus
-                            { TransactionId = transaction.Id };
+                        { TransactionId = transaction.Id };
 
                         try
                         {
@@ -97,7 +101,7 @@ namespace Sloth.Core.Jobs
 
                             // here we will store the result of the transaction upload
                             var journalRequest = new JournalRequest
-                                { Transactions = new[] { transaction }, Source = source };
+                            { Transactions = new[] { transaction }, Source = source };
 
                             if (requestStatus.RequestId.HasValue &&
                                 requestStatus.RequestStatus == RequestStatus.Pending)
@@ -120,6 +124,8 @@ namespace Sloth.Core.Jobs
                             {
                                 // TODO: show rejection reason in SetStatus
 
+                                hasRejectedTransactions = true;
+
                                 // failure, update transaction status to rejected
                                 transaction.SetStatus(TransactionStatuses.Rejected);
 
@@ -127,7 +133,7 @@ namespace Sloth.Core.Jobs
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
 
 
-                                if(result.GlJournalRequest.ValidationResults != null && result.GlJournalRequest.ValidationResults.ErrorMessages != null)
+                                if (result.GlJournalRequest.ValidationResults != null && result.GlJournalRequest.ValidationResults.ErrorMessages != null)
                                 {
                                     log.ForContext("journalRequestId", journalRequest.RequestId);
                                     log.Warning("journalResult {journalResult}", JsonConvert.SerializeObject(result.GlJournalRequest));
@@ -162,6 +168,19 @@ namespace Sloth.Core.Jobs
                         }
 
                         jobDetails.TransactionRunStatuses.Add(transactionRunStatus);
+                    }
+
+                    if (hasRejectedTransactions)
+                    {
+                        if (!await _notificationService.Notify(Notification
+                            .Message("One or more transactions were rejected by Aggie Enterprise")
+                            .WithEmailsToTeam(source.Team.Slug, TeamRole.Admin)
+                            .WithCcEmailsToTeam(source.Team.Slug, TeamRole.Manager)
+                            .WithLinkBack("View Failed Transactions", $"/{source.Team.Slug}/Reports/FailedTransactions")))
+                        {
+                            log.Error("Error sending rejected transactions notification for team {TeamSlug}", source.Team.Slug);
+                            //TODO: queue notification for retry
+                        }
                     }
                 }
             }
@@ -212,7 +231,7 @@ namespace Sloth.Core.Jobs
                     foreach (var transaction in groupedTransactions)
                     {
                         var transactionRunStatus = new AggieEnterpriseJournalJobDetails.TransactionRunStatus
-                            { TransactionId = transaction.Id };
+                        { TransactionId = transaction.Id };
 
                         try
                         {

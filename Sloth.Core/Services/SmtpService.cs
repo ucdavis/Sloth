@@ -1,5 +1,5 @@
 ﻿
-using Harvest.Core.Models.Settings;
+using Sloth.Core.Models.Settings;
 using Microsoft.Extensions.Options;
 using Sloth.Core;
 using System;
@@ -10,7 +10,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Harvest.Core.Services
+namespace Sloth.Core.Services
 {
     public interface ISmtpService
     {

@@ -37,6 +37,11 @@ namespace Sloth.Web.Controllers
 
         public async Task<IActionResult> FailedTransactions()
         {
+            if (string.IsNullOrWhiteSpace(TeamSlug))
+            {
+                return BadRequest("TeamSlug is required");
+            }
+
             var transactions = await DbContext.Transactions
                 .Where(t => t.Source.Team.Slug == TeamSlug
                        && t.Status == TransactionStatuses.Processing

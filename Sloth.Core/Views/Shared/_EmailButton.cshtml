@@ -13,7 +13,7 @@
 
         </mj-text>
         <mj-button background-color="#266041" color="#FFFFFF" font-size="15px" align="center" vertical-align="middle" border="none"
-                   padding="15px 30px" border-radius="3px" href="@Model.Url" padding-left="25px" padding-right="25px" padding-bottom="10px">
+                   padding="15px 30px" border-radius="3px" href="@ViewData["LinkBackBaseUrl"]@Model.UrlPath" padding-left="25px" padding-right="25px" padding-bottom="10px">
           @Model.Text
         </mj-button>
       </mj-column>
@@ -54,7 +54,7 @@
                         <td align="center" bgcolor="#266041" role="presentation"
                           style="border:none;border-radius:3px;cursor:auto;mso-padding-alt:10px 25px;background:#266041;"
                           valign="middle">
-                          <a href="@Model.Url"
+                          <a href="@ViewData["LinkBackBaseUrl"]@Model.UrlPath"
                             style="display:inline-block;background:#266041;color:#FFFFFF;font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:15px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:3px;"
                             target="_blank"> @Model.Text </a>
                         </td>

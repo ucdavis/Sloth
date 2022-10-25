@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Harvest.Core.Services;
+using Sloth.Core.Services;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Razor.Templating.Core;
 using Renci.SshNet.Messages;
 using Serilog;
+using Sloth.Core.Configuration;
 using Sloth.Core.Models.Emails;
 using Sloth.Core.Views.Shared;
 
@@ -17,10 +21,15 @@ namespace Sloth.Core.Services
 
     public class NotificationService : INotificationService
     {
+        private readonly NotificationOptions _notificationOptions;
         private readonly ISmtpService _smtpService;
-        public NotificationService(ISmtpService smtpService)
+        private readonly SlothDbContext _dbContext;
+
+        public NotificationService(IOptions<NotificationOptions> notificationOptions,ISmtpService smtpService, SlothDbContext dbContext)
         {
+            _notificationOptions = notificationOptions.Value;
             _smtpService = smtpService;
+            _dbContext = dbContext;
         }
 
         public async Task<bool> Notify(Notification notification)
@@ -30,9 +39,36 @@ namespace Sloth.Core.Services
                 throw new ArgumentNullException(nameof(notification));
             }
 
-            if (notification.Emails == null || notification.Emails.Length == 0)
+            if (notification.TeamRolesForEmails != null)
+            {
+                // get email addresses based on team slug and roles
+                notification.Emails = await _dbContext.Users
+                    .Where(u => u.UserTeamRoles.Any(utr =>
+                        utr.Team.Slug == notification.TeamRolesForEmails.Slug
+                        && (notification.TeamRolesForEmails.Roles.Contains(utr.Role.Name))))
+                    .Select(u => u.Email)
+                    .ToArrayAsync();
+            }
+
+            if (notification.TeamRolesForCcEmails != null)
+            {
+                // get cc email addresses based on team slug and roles
+                notification.CcEmails = await _dbContext.Users
+                    .Where(u => u.UserTeamRoles.Any(utr =>
+                        utr.Team.Slug == notification.TeamRolesForCcEmails.Slug
+                        && (notification.TeamRolesForCcEmails.Roles.Contains(utr.Role.Name))))
+                    .Select(u => u.Email)
+                    .ToArrayAsync();
+            }
+
+            if (notification.Emails == null || !notification.Emails.Any())
             {
                 throw new ArgumentException("No email addresses specified", nameof(notification.Emails));
+            }
+
+            if (notification.CcEmails == null)
+            {
+                notification.CcEmails = Enumerable.Empty<string>();
             }
 
             if (string.IsNullOrWhiteSpace(notification.Body)
@@ -43,6 +79,13 @@ namespace Sloth.Core.Services
                     $"{nameof(notification.Body)} or {nameof(notification.ViewName)} or {nameof(notification.MessageText)}");
             }
 
+            if (notification.ViewBagOrViewData == null)
+            {
+                notification.ViewBagOrViewData = new Dictionary<string, object>();
+            }
+
+            notification.ViewBagOrViewData.Add("LinkBackBaseUrl", _notificationOptions.LinkBackBaseUrl);
+
             try
             {
                 var body = !string.IsNullOrWhiteSpace(notification.Body)
@@ -50,13 +93,13 @@ namespace Sloth.Core.Services
                     : !string.IsNullOrWhiteSpace(notification.ViewName)
                         ? await RazorTemplateEngine.RenderAsync(notification.ViewName, notification.Model, notification.ViewBagOrViewData)
                         : await RazorTemplateEngine.RenderAsync("/Views/Emails/DefaultNotification.cshtml", new DefaultNotificationModel
-                            {
-                                MessageText = notification.MessageText,
-                                Subject = notification.Subject,
-                                LinkBackButton = notification.LinkBackButton
-                            });
+                        {
+                            MessageText = notification.MessageText,
+                            Subject = notification.Subject,
+                            LinkBackButton = notification.LinkBackButton
+                        });
 
-                await _smtpService.SendEmail(notification.Emails, notification.CcEmails, body, notification.MessageText, notification.Subject);
+                await _smtpService.SendEmail(notification.Emails.ToArray(), notification.CcEmails.ToArray(), body, notification.MessageText, notification.Subject);
             }
             catch (Exception ex)
             {
@@ -70,8 +113,12 @@ namespace Sloth.Core.Services
     public class Notification
     {
         public string Subject { get; set; } = "Sloth Notification";
-        public string[] Emails { get; set; }
-        public string[] CcEmails { get; set; } = new string[] { };
+        public IEnumerable<string> Emails { get; set; }
+        public IEnumerable<string> CcEmails { get; set; }
+
+        // TeamRoles can be specified to let the service fill in Emails and CcEmails
+        public TeamRoles TeamRolesForEmails { get; set; }
+        public TeamRoles TeamRolesForCcEmails { get; set; }
 
         // Used only by DefaultNotification view. If using a custom view and model, a property of
         // this type and name in your model will be picked up by the _EmailLayout_mjml view
@@ -92,8 +139,8 @@ namespace Sloth.Core.Services
         {
             return new Notification
             {
-                Emails = emails,
                 MessageText = message,
+                Emails = emails
             };
         }
 
@@ -106,15 +153,36 @@ namespace Sloth.Core.Services
             };
         }
 
-        public Notification WithTextVersion(string textVersion)
+        public Notification WithEmailsToTeam(string slug, string role, params string[] additionalRoles)
         {
-            MessageText = textVersion;
+            TeamRolesForEmails = new TeamRoles
+            {
+                Slug = slug,
+                Roles = Enumerable.Repeat(role, 1).Concat(additionalRoles)
+            };
+            return this;
+        }
+
+        public Notification WithCcEmailsToTeam(string slug, string role, params string[] additionalRoles)
+        {
+            TeamRolesForCcEmails = new TeamRoles
+            {
+                Slug = slug,
+                Roles = Enumerable.Repeat(role, 1).Concat(additionalRoles)
+            };
+
             return this;
         }
 
         public Notification WithSubject(string subject)
         {
             Subject = subject;
+            return this;
+        }
+
+        public Notification WithEmails(params string[] emails)
+        {
+            Emails = emails;
             return this;
         }
 
@@ -136,14 +204,20 @@ namespace Sloth.Core.Services
             return this;
         }
 
-        public Notification WithLinkBack(string text, string url)
+        public Notification WithLinkBack(string text, string urlPath = "")
         {
             LinkBackButton = new EmailButtonModel
             {
-                Url = url,
+                UrlPath = urlPath,
                 Text = text
             };
             return this;
+        }
+
+        public class TeamRoles
+        {
+            public string Slug { get; set; }
+            public IEnumerable<string> Roles { get; set; }
         }
     }
 }

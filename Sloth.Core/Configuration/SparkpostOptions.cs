@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Harvest.Core.Models.Settings
+namespace Sloth.Core.Models.Settings
 {
     public class SparkpostOptions
     {

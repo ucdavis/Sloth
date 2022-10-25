@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Razor.Templating.Core;
 using Sloth.Core;
+using Sloth.Core.Configuration;
 using Sloth.Core.Models.Emails;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
@@ -14,16 +16,19 @@ using System.Linq;
 using System.Threading.Tasks;
 
 
-namespace Harvest.Web.Controllers
+namespace Sloth.Web.Controllers
 {
     [Authorize(Roles = Roles.SystemAdmin)]
     public class TestController : SuperController
     {
         private readonly INotificationService _notificationService;
+        private readonly NotificationOptions _notificationOptions;
 
-        public TestController(ApplicationUserManager userManager, SlothDbContext dbContext, INotificationService notificationService) : base(userManager, dbContext)
+        public TestController(ApplicationUserManager userManager, SlothDbContext dbContext, INotificationService notificationService,
+                              IOptions<NotificationOptions> notificationOptions) : base(userManager, dbContext)
         {
             _notificationService = notificationService;
+            _notificationOptions = notificationOptions.Value;
         }
 
         public IActionResult ViewDefaultNotification()
@@ -34,10 +39,12 @@ namespace Harvest.Web.Controllers
                 MessageText = "This is a test notification",
                 LinkBackButton = new EmailButtonModel
                 {
-                    Text = "View Transactions",
-                    Url = "https://www.google.com"
+                    Text = "Visit Sloth-Test",
+                    UrlPath = ""
                 }
             };
+
+            ViewData["LinkBackBaseUrl"] = _notificationOptions.LinkBackBaseUrl;
 
             return View("/Views/Emails/DefaultNotification.cshtml", model);
         }
@@ -51,8 +58,9 @@ namespace Harvest.Web.Controllers
 
             await _notificationService.Notify(
                 Notification.Message("This is a test email", emailAddress)
+                .WithEmails(emailAddress)
                 .WithSubject("Test Email")
-                .WithLinkBack("View Sloth", "https://sloth-test.ucdavis.edu"));
+                .WithLinkBack("Visit Sloth"));
 
             return Ok();
         }
