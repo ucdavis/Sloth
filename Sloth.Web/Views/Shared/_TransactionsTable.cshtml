@@ -43,9 +43,9 @@
 
             <tr data-href="/@slug/Transactions/Details/@t.Id">
                 <th scope="row">@t.Id</th>
-            <td>
+                <td>
                     <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize(LetterCasing.Title)</span>
-                    <a href="/@slug/Transactions/Details/@t.Id" class="stretched-link"></a>
+                    <a class="stretched-link hide-me" href="/@slug/Transactions/Details/@t.Id">a</a>
                 </td>
                 <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate.ToPacificTime()</td>
                 <td>@t.KfsTrackingNumber</td>
@@ -63,7 +63,6 @@
                     <td>See Details</td>
                 }
                  *@
-
             </tr>
         }
     </tbody>

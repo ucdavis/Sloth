@@ -111,9 +111,11 @@ table.sloth-table {
       &:last-child td {
         border-bottom: none;
       }
+      position: relative;
     }
     td {
       border-bottom: 1px solid $borders-sloth;
+      transform: 0;
     }
   }
 }
