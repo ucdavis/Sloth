@@ -43,9 +43,9 @@
 
             <tr data-href="/@slug/Transactions/Details/@t.Id">
                 <th scope="row">@t.Id</th>
-                <td>
+            <td>
                     <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize(LetterCasing.Title)</span>
-                    <a href="https://apple.com" class="hide-me stretched-link"></a>
+                    <a href="/@slug/Transactions/Details/@t.Id" class="stretched-link"></a>
                 </td>
                 <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate.ToPacificTime()</td>
                 <td>@t.KfsTrackingNumber</td>
