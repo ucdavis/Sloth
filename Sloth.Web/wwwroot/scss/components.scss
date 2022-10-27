@@ -72,8 +72,10 @@ button.btn-close {
 .btn:focus {
   color: #fff;
 }
-.hide-me {
-  font-size: 0.01rem;
-  padding: 0;
-  margin: 0;
+a.stretched-link {
+  text-decoration: none;
+  color: inherit;
+  &:hover {
+    color: inherit;
+  }
 }
