@@ -19,15 +19,6 @@ namespace Sloth.Core.Extensions
                     .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5);
         }
 
-        public static T IsStale<T>(this T query) where T : IQueryable<Transaction>
-        {
-            return (T)query.Where(t => t.Status == TransactionStatuses.Processing
-                                 && t.StatusEvents
-                                    .Where(e => e.Status == TransactionStatuses.Processing)
-                                    .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5));
-        }
-
-
         public static string ToXml(this Transaction transaction)
         {
             var sw = new StringWriterWithEncoding(Encoding.UTF8);
