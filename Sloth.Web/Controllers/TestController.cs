@@ -62,7 +62,8 @@ namespace Sloth.Web.Controllers
                 .WithSubject("Test Email")
                 .WithLinkBack("Visit Sloth"));
 
-            return Ok();
+            Message = "Test email sent";
+            return RedirectToAction("Index", "Home");
         }
 
 
