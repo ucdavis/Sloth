@@ -86,7 +86,7 @@
     }
 </div>
 
-
+<form id="transactionEditForm" asp-controller="Transactions" asp-action="ApplyEdit" method="post">
 <table id="transfers" class="table sloth-table" style="width: 100%">
     <thead>
         <tr>
@@ -100,7 +100,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var t in Model.Transaction.Transfers)
+        @foreach (var (t, i) in Model.Transaction.Transfers.Select((t, i) => (t,  i)))
         {
             <tr>
                 <td>@t.Id</td>
@@ -109,69 +109,24 @@
                     <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
                 </td>
                 <td>@t.Description</td>
-                <td>@t.AccountingDate</td>
-                <td style="white-space:nowrap">@t.FinancialSegmentString</td>
+                <td>
+                    <div class="input-group transfer-date-edit">
+                        <input type="hidden" asp-for="Transaction.Transfers[i].Id" />
+                        <input type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Transaction.Transfers[i].AccountingDate" asp-format="{0:MM/dd/yyyy}" aria-label="Accounting Date" />
+                    </div>
+                </td>
+                <td style="white-space:nowrap">
+                    <div class="input-group">
+                        <input type="text" class="form-control force-upper transfer-ccoa-edit" name="Transaction.Transfers[@i].FinancialSegmentString" value="@t.AccountingDate.ToPacificTime()" aria-label="CCOA" />
+                        <div class="input-group-append">
+                            <button id="ccoa-picker-@i" class="btn btn-primary" type="button">CCOA Picker</button>
+                        </div>
+                    </div>
+                </td>
             </tr>
         }
     </tbody>
 </table>
-
-
-
-@if (Model.Transaction.Status == TransactionStatuses.PendingApproval)
-{
-    var canApprove = Context.HasTeamRole(TeamRole.Approver);
-    <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Transaction.Id" method="post">
-        <div>
-            <button type="submit" class="btn btn-primary" @(!canApprove ? "Disabled" : "")>Approve Transaction</button>
-        </div>
-    </form>
-}
-
-@if (Model.Transaction.Status == TransactionStatuses.Completed && Model.HasWebhooks)
-{
-    var canCallWebhook = Context.HasTeamRole(TeamRole.Manager);
-    <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
-        <div>
-            <button type="submit" class="btn btn-warning" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
-        </div>
-    </form>
-}
-
-@if (Model.Transaction.Status == TransactionStatuses.Rejected || Model.Transaction.IsStale())
-{
-    var canEdit = Context.HasTeamRole(TeamRole.Manager);
-    <form asp-controller="Transactions" asp-action="Edit" asp-route-id="@Model.Transaction.Id">
-        <div>
-            <button type="submit" class="btn btn-warning" @(!canEdit ? "Disabled" : "")>Edit Transaction</button>
-        </div>
-    </form>
-}
-
-@if (Model.Transaction.Status == TransactionStatuses.Completed && !Model.Transaction.HasReversal)
-{
-    var reversalAmount = Model.Transaction.Transfers.Where(x => x.Direction == Transfer.CreditDebit.Credit).Sum(x => x.Amount);
-    var canReverse = Context.HasTeamRole(TeamRole.Manager);
-
-    <form asp-controller="Transactions" asp-action="CreateReversal" asp-route-id="@Model.Transaction.Id" method="post" class="form-inline row">
-        <label for="reversalAmount">Reversal Amount</label>
-        <div class="col-3">
-            <div class="input-group">
-                <div class="input-group-prepend">
-                    <div class="input-group-text">$</div>
-                </div>
-                <input type="text" class="form-control" id="reversalAmount" name="reversalAmount" value="@reversalAmount" @(!canReverse ? "Disabled" : "") />
-            </div>
-        </div>
-        <div class="col">
-            <button type="submit" class="btn btn-primary" @(!canReverse ? "Disabled" : "")>Reverse Transaction</button>
-        </div>
-
-
-    </form>
-
-
-
-}
-
-
+<input type="hidden" asp-for="Transaction.Id" />
+<button type="submit" id="apply-transaction-edit" class="btn btn-primary">Update and Resubmit for Processing</button>
+</form>

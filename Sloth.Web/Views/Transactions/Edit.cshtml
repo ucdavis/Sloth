@@ -6,7 +6,7 @@
 @model TransactionDetailsViewModel
 
 @{
-    ViewBag.Title = "Transaction Details";
+    ViewBag.Title = "Edit Transaction";
 
     Uri merchantUrl;
     var isUrlValid = Uri.TryCreate(Model.Transaction.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
@@ -17,14 +17,7 @@
         <h2>@ViewBag.Title</h2>
 
 
-@* @if(String.IsNullOrWhiteSpace(Model.Transaction.Transfers[0].FinancialSegmentString))
-{
-    <partial name="_KfsDetails" model="Model" />
-}
-else
-{ *@
-    <partial name="_AeDetails" model="Model" />
-@* } *@
+    <partial name="_AeEditDetails" model="Model" />
 
 
 <div class="row mt-5">
@@ -63,7 +56,8 @@ else
 
  @section AdditionalScripts {
     <script src="~/js/prism.js"></script>
-<script>
+    <script src="https://finjector.ucdavis.edu/finjector.js?v=3" type="text/javascript" asp-add-nonce="true"></script>
+    <script>
         $('#transfers').DataTable({
             "columnDefs": [
                 { "targets": 0, "visible": false }
@@ -74,6 +68,27 @@ else
             "order": [[1, 'desc'],[2, 'desc']],
             searching: false,
         });
+
+        $('.transfer-date-edit').each((index, elem) => {
+            const input = $(elem).find('input')
+            $(elem).datepicker({
+              inputs: input,
+              keepEmptyValues: true,
+            });
+        });
+
+        $('.transfer-ccoa-edit').each((index, elem) => {
+            $($(elem).parent()).find('button').on('click', async (e) => {
+                const chart = await window.Finjector.findChartSegmentString("https://finjector.ucdavis.edu/landing");
+                if (chart && chart.status === "success") {
+                    $(elem).val(chart.data);
+                }
+                else {
+                    alert("Something went wrong with the CCOA picker")
+                }
+                return false;
+            });
+        });
     </script>
     @if (Model.RelatedTransactions.Transactions.Any())
     {
@@ -83,4 +98,15 @@ else
     {
         <partial name="_BlobsTableScript" />
     }
+}
+
+@section AdditionalStyles
+{
+    <style>
+      .transfer-date-edit { }
+      .transfer-ccoa-edit { }
+      .force-upper{
+          text-transform: uppercase;
+      }
+    </style>
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,7 +22,7 @@ using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
 {
-    
+
     public class TransactionsController : SuperController
     {
         private readonly IWebHookService WebHookService;
@@ -168,7 +169,7 @@ namespace Sloth.Web.Controllers
 
             var blobs = await DbContext.Blobs
                 .Where(b => b.TransactionBlobs.Select(tb => tb.TransactionId).Contains(transaction.Id)
-                    || b.Scrubbers.SelectMany( s => s.Transactions.Select(t => t.Id)).Contains(transaction.Id))
+                    || b.Scrubbers.SelectMany(s => s.Transactions.Select(t => t.Id)).Contains(transaction.Id))
                 .ToListAsync();
 
             var model = new TransactionDetailsViewModel()
@@ -190,6 +191,155 @@ namespace Sloth.Web.Controllers
             };
 
             return View(model);
+        }
+
+        [Authorize(Policy = PolicyCodes.TeamManager)]
+        public async Task<IActionResult> Edit(string id)
+        {
+            var transaction = await DbContext.Transactions
+                .Include(t => t.Scrubber)
+                .Include(t => t.JournalRequest)
+                .Include(t => t.Source)
+                    .ThenInclude(s => s.Team)
+                .Include(t => t.Transfers)
+                .Include(t => t.ReversalTransaction)
+                .Include(t => t.ReversalOfTransaction)
+                .Include(t => t.StatusEvents)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == id && t.Source.Team.Slug == TeamSlug);
+
+            if (transaction == null)
+            {
+                ErrorMessage = "Transaction not found";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (transaction.Status != TransactionStatuses.Rejected && !transaction.IsStale())
+            {
+                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days) or Rejected";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            var relatedTransactions = await DbContext.Transactions
+                .Include(a => a.Source)
+                    .ThenInclude(a => a.Team)
+                .Include(t => t.Transfers)
+                .Where(a => a.Id != transaction.Id && a.Source.Team.Slug == TeamSlug &&
+                    (
+                        a.KfsTrackingNumber == transaction.KfsTrackingNumber ||
+                        (a.ProcessorTrackingNumber != null && a.ProcessorTrackingNumber == transaction.ProcessorTrackingNumber) ||
+                        a.MerchantTrackingNumber == transaction.MerchantTrackingNumber
+                    ))
+                .AsNoTracking()
+                .ToListAsync();
+
+            var blobs = await DbContext.Blobs
+                .Where(b => b.TransactionBlobs.Select(tb => tb.TransactionId).Contains(transaction.Id)
+                    || b.Scrubbers.SelectMany(s => s.Transactions.Select(t => t.Id)).Contains(transaction.Id))
+                .AsNoTracking()
+                .ToListAsync();
+
+            var model = new TransactionDetailsViewModel()
+            {
+                Transaction = transaction,
+                HasWebhooks = await DbContext.WebHooks
+                    .AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive),
+
+
+                RelatedTransactions = new TransactionsTableViewModel
+                {
+                    Transactions = relatedTransactions
+                },
+                RelatedBlobs = new BlobsTableViewModel
+                {
+                    Blobs = blobs,
+                    TeamSlug = TeamSlug
+                }
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [Authorize(Policy = PolicyCodes.TeamManager)]
+        public async Task<IActionResult> ApplyEdit(TransactionEditViewModel transaction)
+        {
+            if (transaction == null || string.IsNullOrWhiteSpace(transaction.Id))
+            {
+                ErrorMessage = "No transaction specified";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (transaction.Transfers == null || transaction.Transfers.Count == 0)
+            {
+                ErrorMessage = "No transfers specified";
+                return RedirectToAction(nameof(Edit), new { id = transaction.Id });
+            }
+
+            var editTransaction = await DbContext.Transactions
+                .Include(t => t.Source)
+                    .ThenInclude(s => s.Team)
+                .Include(t => t.Transfers)
+                .Include(t => t.StatusEvents)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t => t.Id == transaction.Id && t.Source.Team.Slug == TeamSlug);
+
+            if (editTransaction == null)
+            {
+                ErrorMessage = "Transaction not found";
+                return RedirectToAction(nameof(Edit), new { id = transaction.Id });
+            }
+
+            if (editTransaction.Status != TransactionStatuses.Rejected && !editTransaction.IsStale())
+            {
+                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days) or Rejected";
+                return RedirectToAction(nameof(Edit), new { id = transaction.Id });
+            }
+
+            var oldTransferValues = new List<TransactionEditViewModel.TransferEditModel>();
+
+            foreach (var (currentTransfer, transferViewModel) in editTransaction.Transfers.Join(transaction.Transfers,
+                currentTransfer => currentTransfer.Id,
+                transferViewModel => transferViewModel.Id,
+                (currentTransfer, transferViewModel) => (currentTransfer, transferViewModel)))
+            {
+                bool transferUpdated = false;
+                var currentAccountingDate = currentTransfer.AccountingDate;
+                var currentFinancialSegmentString = currentTransfer.FinancialSegmentString;
+                if (currentAccountingDate != transferViewModel.AccountingDate?.FromPacificTime())
+                {
+                    currentTransfer.AccountingDate = transferViewModel.AccountingDate?.FromPacificTime();
+                    transferUpdated = true;
+                }
+                if (currentFinancialSegmentString != transferViewModel.FinancialSegmentString)
+                {
+                    currentTransfer.FinancialSegmentString = transferViewModel.FinancialSegmentString;
+                    transferUpdated = true;
+                }
+
+                if (transferUpdated)
+                {
+                    oldTransferValues.Add(new TransactionEditViewModel.TransferEditModel
+                    {
+                        Id = currentTransfer.Id,
+                        AccountingDate = currentAccountingDate,
+                        FinancialSegmentString = currentFinancialSegmentString
+                    });
+                }
+            }
+
+            if (oldTransferValues.Count > 0)
+            {
+                editTransaction.SetStatus(TransactionStatuses.Processing, $"Edited by: {User.Identity.Name} Original values: {JsonSerializer.Serialize(oldTransferValues)}");
+                await DbContext.SaveChangesAsync();
+                Message = "Transaction updated";
+            }
+            else
+            {
+                ErrorMessage = "No changes made";
+            }
+
+            return RedirectToAction(nameof(Details), new { id = transaction.Id });
         }
 
         [HttpPost]
@@ -366,7 +516,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Source)
                 .ThenInclude(s => s.Team)
                 .SingleOrDefaultAsync(t => t.Id == id);
-           
+
             if (transaction == null)
             {
                 ErrorMessage = "Transaction not found.";
@@ -377,7 +527,7 @@ namespace Sloth.Web.Controllers
             {
                 ErrorMessage = $"Team Mismatch {transaction.Source.Team.Slug} not {TeamSlug}";
                 return RedirectToAction("Index", "Home");
-                
+
             }
 
             var hasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive);
@@ -385,7 +535,7 @@ namespace Sloth.Web.Controllers
             if (!hasWebhooks)
             {
                 ErrorMessage = "Active Webhook not found for team.";
-                return RedirectToAction("Details", new {id=transaction.Id});
+                return RedirectToAction("Details", new { id = transaction.Id });
             }
 
             await WebHookService.SendWebHooksForTeam(transaction.Source.Team, new BankReconcileWebHookPayload()
@@ -424,7 +574,7 @@ namespace Sloth.Web.Controllers
             if (txns.Any(a => a.ProcessorTrackingNumber == filter.TrackingNum))
             {
                 Message = $"Processor Tracking Number found: {filter.TrackingNum}";
-                return RedirectToAction("Details", new {id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id});
+                return RedirectToAction("Details", new { id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id });
             }
 
 

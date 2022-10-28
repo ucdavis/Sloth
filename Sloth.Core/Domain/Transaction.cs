@@ -54,7 +54,7 @@ namespace Sloth.Core.Models
         /// <summary>
         /// URL created by the merchant to track back
         /// </summary>
-        [Display(Name="Merchant Url")]
+        [Display(Name = "Merchant Url")]
         public string MerchantTrackingUrl { get; set; }
 
         /// <summary>
@@ -156,8 +156,9 @@ namespace Sloth.Core.Models
                 TransactionId = Id,
                 Status = status,
                 EventDate = DateTime.UtcNow,
-                EventDetails =
-                    $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}. {details}",
+                EventDetails = !string.IsNullOrEmpty(details)
+                    ? details
+                    : $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}. {details}",
             });
 
             Status = status;

@@ -20,10 +20,10 @@
         }
     }
         <h2>@ViewBag.Title</h2>
-        
+
 
         <h3>Filters</h3>
-        <form class="row" id="invoiceFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
+        <form class="row" id="transactionFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
             <div class="row justify-content-between filters-wrapper">
                 <div class="col-4">
                     <div id="filter-date-range" class="input-group">
@@ -46,7 +46,7 @@
 
 
 
-@*                 
+@*
                 <div class="col-6">
                     <h3>Filters</h3>
                 </div>
@@ -55,7 +55,7 @@
                 </div> *@
 
                 @* <div id="transactions-filter" class="col-12 collapse">
-                    <form class="row" id="invoiceFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
+                    <form class="row" id="transactionFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
                         <div class="col-lg-9">
                             <div class="row">
                                 <div class="input-group-sm form-group col-lg-6">
@@ -91,7 +91,7 @@
          //setup datepickers
         $('#filter-date-range').datepicker({
             inputs: $('#filter-date-range input'),
-            keepEmptyValues: true,  
+            keepEmptyValues: true,
         });
     </script>
 <partial name="_TransactionsTableScript" />
