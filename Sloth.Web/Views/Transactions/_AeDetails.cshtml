@@ -12,6 +12,14 @@
     var isUrlValid = Uri.TryCreate(Model.Transaction.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
 }
 <div class="row txn-detail-wrapper">
+       <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.Status)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span class="badge @(TransactionStatuses.GetBadgeClass(Model.Transaction.Status))">@Model.Transaction.Status.Humanize(LetterCasing.Title)</span>
+        </div>
+    </div>
     <div class="txn-detail-row">
         <div class="txn-detail-label">
             <span>@Html.DisplayNameFor(x => x.Transaction.Id)</span>
@@ -63,14 +71,7 @@
             <span>@Model.Transaction.MerchantTrackingNumber</span>
         </div>
     </div>
-    <div class="txn-detail-row">
-        <div class="txn-detail-label">
-            <span>@Html.DisplayNameFor(x => x.Transaction.Status)</span>
-        </div>
-        <div class="txn-detail-result">
-            <span class="badge @(TransactionStatuses.GetBadgeClass(Model.Transaction.Status))">@Model.Transaction.Status.Humanize(LetterCasing.Title)</span>
-        </div>
-    </div>
+    
     @{
         if (isUrlValid)
         {
@@ -83,6 +84,16 @@
                 </div>
             </div>
         }
+    }
+        @if (Model.Transaction.Description !=null) {
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.Description)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.Description</span>
+        </div>
+    </div>
     }
 </div>
 

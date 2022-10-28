@@ -68,3 +68,14 @@ button.btn-close {
   color: $recpool;
   background-color: transparentize($recpool, 0.8);
 }
+.btn-check:focus + .btn,
+.btn:focus {
+  color: #fff;
+}
+a.stretched-link {
+  text-decoration: none;
+  color: inherit;
+  &:hover {
+    color: inherit;
+  }
+}

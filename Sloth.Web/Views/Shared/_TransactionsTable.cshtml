@@ -45,14 +45,16 @@
                 <th scope="row">@t.Id</th>
                 <td>
                     <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize(LetterCasing.Title)</span>
+                    
                 </td>
                 <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate.ToPacificTime()</td>
                 <td>@t.KfsTrackingNumber</td>
                 <td>@t.DocumentNumber</td>
                 <td>@t.ProcessorTrackingNumber</td>
                 <td>@t.MerchantTrackingNumber</td>
-                <td>@description</td>
-                <td>@slug</td>
+                <td><a class="stretched-link" href="/@slug/Transactions/Details/@t.Id">
+                    @description</a></td>
+                <td>@slug </td>
                 @* @if (String.IsNullOrWhiteSpace(firstDebit.FinancialSegmentString))
                 {
                     <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
@@ -62,7 +64,6 @@
                     <td>See Details</td>
                 }
                  *@
-
             </tr>
         }
     </tbody>
