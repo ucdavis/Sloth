@@ -58,6 +58,7 @@ namespace Sloth.Web
             services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
             services.Configure<SparkpostOptions>(Configuration.GetSection("SparkPost"));
             services.Configure<NotificationOptions>(Configuration.GetSection("Notifications"));
+            services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
 
 
             // add infrastructure services
@@ -69,6 +70,8 @@ namespace Sloth.Web
             services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddSingleton<IKfsService, KfsService>();
+            services.AddScoped<AccountValidationService>();
 
             // add jobs services
             services.AddHostedService<QueuedHostedService>();
