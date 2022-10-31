@@ -97,7 +97,7 @@ namespace Sloth.Core.Services
                             MessageText = notification.MessageText,
                             Subject = notification.Subject,
                             LinkBackButton = notification.LinkBackButton
-                        });
+                        }, notification.ViewBagOrViewData);
 
                 await _smtpService.SendEmail(notification.Emails.ToArray(), notification.CcEmails.ToArray(), body, notification.MessageText, notification.Subject);
             }

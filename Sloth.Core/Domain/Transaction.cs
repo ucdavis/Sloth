@@ -156,7 +156,7 @@ namespace Sloth.Core.Models
                 TransactionId = Id,
                 Status = status,
                 EventDate = DateTime.UtcNow,
-                EventDetails = !string.IsNullOrEmpty(details)
+                EventDetails = !string.IsNullOrWhiteSpace(details)
                     ? details
                     : $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}. {details}",
             });
