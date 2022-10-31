@@ -25,11 +25,14 @@ namespace Sloth.Web.Controllers
 
     public class TransactionsController : SuperController
     {
-        private readonly IWebHookService WebHookService;
+        private readonly IWebHookService _webHookService;
+        private readonly AccountValidationService _accountValidationService;
 
-        public TransactionsController(ApplicationUserManager userManager, SlothDbContext dbContext, IWebHookService webHookService) : base(userManager, dbContext)
+        public TransactionsController(ApplicationUserManager userManager, SlothDbContext dbContext, IWebHookService webHookService,
+            AccountValidationService accountValidationService) : base(userManager, dbContext)
         {
-            WebHookService = webHookService;
+            _webHookService = webHookService;
+            _accountValidationService = accountValidationService;
         }
 
 
@@ -273,6 +276,26 @@ namespace Sloth.Web.Controllers
             if (transaction.Transfers == null || transaction.Transfers.Count == 0)
             {
                 ErrorMessage = "No transfers specified";
+                return RedirectToAction(nameof(Edit), new { id = transaction.Id });
+            }
+
+            var ccoaValidationRequests = transaction.Transfers
+                .Select(t => t.FinancialSegmentString)
+                .Where(ccoa => !string.IsNullOrWhiteSpace(ccoa))
+                .Distinct()
+                .Select(async ccoa => new { ccoa, isValid = await _accountValidationService.IsAccountValid(ccoa, true) })
+                .ToArray();
+
+            await Task.WhenAll(ccoaValidationRequests);
+
+            var invalidCcoaStrings = ccoaValidationRequests
+                .Where(x => !x.Result.isValid)
+                .Select(x => x.Result.ccoa)
+                .ToArray();
+
+            if (invalidCcoaStrings.Length > 0)
+            {
+                ErrorMessage = $"The following CCOA strings are invalid:{Environment.NewLine}{string.Join(Environment.NewLine, invalidCcoaStrings)}";
                 return RedirectToAction(nameof(Edit), new { id = transaction.Id });
             }
 
@@ -538,7 +561,7 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction("Details", new { id = transaction.Id });
             }
 
-            await WebHookService.SendWebHooksForTeam(transaction.Source.Team, new BankReconcileWebHookPayload()
+            await _webHookService.SendWebHooksForTeam(transaction.Source.Team, new BankReconcileWebHookPayload()
             {
                 KfsTrackingNumber = transaction.KfsTrackingNumber,
                 MerchantTrackingNumber = transaction.MerchantTrackingNumber,

@@ -38,6 +38,10 @@ namespace Sloth.Test.Web
         public Mock<DatabaseFacade> MockDatabase { get; set; }
         public Mock<IDbContextTransaction> MockDbContextTransaction { get; set; }
         public Mock<DbTransaction> MockDbTransaction { get; set; }
+        public Mock<AccountValidationService> MockAccountValidationService { get; set; }
+        public Mock<IAggieEnterpriseService> MockAggieEnterpriseService { get; set; }
+        public Mock<IKfsService> MockKfsService { get; set; }
+
         public TransactionsController Controller { get; set; }
 
 
@@ -58,6 +62,9 @@ namespace Sloth.Test.Web
             MockDbContextTransaction = new Mock<IDbContextTransaction>();
             MockHttpContext = new Mock<HttpContext>();
             MockDbTransaction = new Mock<DbTransaction>();
+            MockAggieEnterpriseService = new Mock<IAggieEnterpriseService>();
+            MockKfsService = new Mock<IKfsService>();
+            MockAccountValidationService = new Mock<AccountValidationService>(MockAggieEnterpriseService.Object, MockKfsService.Object);
 
             //Default Data
             UserData = new List<User>();
@@ -90,7 +97,7 @@ namespace Sloth.Test.Web
 
             var routeData = new RouteData();
             routeData.Values.Add("team", "testSlug");
-            Controller = new TransactionsController(MockUserManager.Object, MockDbContext.Object, MockWebhookService.Object)
+            Controller = new TransactionsController(MockUserManager.Object, MockDbContext.Object, MockWebhookService.Object, MockAccountValidationService.Object)
             {
                 ControllerContext = new ControllerContext
                 {
