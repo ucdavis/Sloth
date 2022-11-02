@@ -304,7 +304,6 @@ namespace Sloth.Web.Controllers
                     .ThenInclude(s => s.Team)
                 .Include(t => t.Transfers)
                 .Include(t => t.StatusEvents)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == transaction.Id && t.Source.Team.Slug == TeamSlug);
 
             if (editTransaction == null)
