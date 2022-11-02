@@ -70,8 +70,6 @@ namespace Sloth.Web
             services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<INotificationService, NotificationService>();
-            services.AddSingleton<IKfsService, KfsService>();
-            services.AddScoped<AccountValidationService>();
 
             // add jobs services
             services.AddHostedService<QueuedHostedService>();

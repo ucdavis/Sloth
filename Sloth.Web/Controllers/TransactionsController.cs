@@ -26,13 +26,13 @@ namespace Sloth.Web.Controllers
     public class TransactionsController : SuperController
     {
         private readonly IWebHookService _webHookService;
-        private readonly AccountValidationService _accountValidationService;
+        private readonly IAggieEnterpriseService _aggieEnterpriseService;
 
         public TransactionsController(ApplicationUserManager userManager, SlothDbContext dbContext, IWebHookService webHookService,
-            AccountValidationService accountValidationService) : base(userManager, dbContext)
+            IAggieEnterpriseService aggieEnterpriseService) : base(userManager, dbContext)
         {
             _webHookService = webHookService;
-            _accountValidationService = accountValidationService;
+            _aggieEnterpriseService = aggieEnterpriseService;
         }
 
 
@@ -283,7 +283,7 @@ namespace Sloth.Web.Controllers
                 .Select(t => t.FinancialSegmentString)
                 .Where(ccoa => !string.IsNullOrWhiteSpace(ccoa))
                 .Distinct()
-                .Select(async ccoa => new { ccoa, isValid = await _accountValidationService.IsAccountValid(ccoa, true) })
+                .Select(async ccoa => new { ccoa, isValid = await _aggieEnterpriseService.IsAccountValid(ccoa, true) })
                 .ToArray();
 
             await Task.WhenAll(ccoaValidationRequests);
