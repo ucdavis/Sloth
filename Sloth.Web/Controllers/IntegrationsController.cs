@@ -123,7 +123,8 @@ namespace Sloth.Web.Controllers
             var integration = await DbContext.Integrations.FirstOrDefaultAsync(i => i.Id == id);
             if (integration == null)
             {
-                return NotFound();
+                ErrorMessage = "Integration not found";
+                return RedirectToAction("Index", "Home");
             }
 
             // validate model
@@ -131,7 +132,8 @@ namespace Sloth.Web.Controllers
             var team = adminTeams.FirstOrDefault(t => t.Slug == TeamSlug);
             if (team == null)
             {
-                ViewBag.ErrorMessage = "Team not found";
+                ErrorMessage = "Team not found";
+                return RedirectToAction("Index", "Home");
             }
 
             var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == model.SourceId);
@@ -188,7 +190,7 @@ namespace Sloth.Web.Controllers
 
             await DbContext.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Teams", new { id = team.Id });
+            return RedirectToAction("Details", "Teams", new { id = team!.Id });
         }
     }
 }
