@@ -86,50 +86,51 @@
     }
 </div>
 
-<form id="transactionEditForm" asp-controller="Transactions" asp-action="ApplyEdit" method="post">
-<table id="transfers" class="table sloth-table" style="width: 100%">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Id)</th>
-            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Amount)</th>
-            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Direction)</th>
-            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Description)</th>
-            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].AccountingDate)</th>
-            <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Account)</th>
+@using (Html.BeginForm(FormMethod.Post))
+{
+  <table id="transfers" class="table sloth-table" style="width: 100%">
+      <thead>
+          <tr>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Id)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Amount)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Direction)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Description)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].AccountingDate)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Account)</th>
 
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var (t, i) in Model.Transaction.Transfers.Select((t, i) => (t, i)))
-        {
-            <tr>
-                <td>@t.Id</td>
-                <td>@t.Amount.ToString("C")</td>
-                <td>
-                    <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
-                </td>
-                <td>@t.Description</td>
-                <td>
-                    <div class="input-group transfer-date-edit">
-                        <input type="hidden" asp-for="Transaction.Transfers[i].Id" />
-                        <input type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Transaction.Transfers[i].AccountingDate"
-                               asp-format="{0:MM/dd/yyyy}" aria-label="Accounting Date" />
-                    </div>
-                </td>
-                <td style="white-space:nowrap">
-                    <div class="input-group">
-                        <input type="text" class="form-control force-upper transfer-ccoa-edit" asp-for="Transaction.Transfers[i].FinancialSegmentString"
-                               aria-label="CCOA" />
-                        <div class="input-group-append">
-                            <button id="ccoa-picker-@i" class="btn btn-primary" type="button">CCOA Picker</button>
-                        </div>
-                    </div>
-                    <span asp-validation-for="Transaction.Transfers[i].FinancialSegmentString" class="text-danger"></span>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-<input type="hidden" asp-for="Transaction.Id" />
-<button type="submit" id="apply-transaction-edit" class="btn btn-primary">Update and Resubmit for Processing</button>
-</form>
+          </tr>
+      </thead>
+      <tbody>
+          @foreach (var (t, i) in Model.Transaction.Transfers.Select((t, i) => (t, i)))
+          {
+              <tr>
+                  <td>@t.Id</td>
+                  <td>@t.Amount.ToString("C")</td>
+                  <td>
+                      <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
+                  </td>
+                  <td>@t.Description</td>
+                  <td>
+                      <div class="input-group transfer-date-edit">
+                          <input type="hidden" asp-for="Transaction.Transfers[i].Id" />
+                          <input type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Transaction.Transfers[i].AccountingDate"
+                                asp-format="{0:MM/dd/yyyy}" aria-label="Accounting Date" />
+                      </div>
+                  </td>
+                  <td style="white-space:nowrap">
+                      <div class="input-group">
+                          <input type="text" class="form-control force-upper transfer-ccoa-edit" asp-for="Transaction.Transfers[i].FinancialSegmentString"
+                                aria-label="CCOA" />
+                          <div class="input-group-append">
+                              <button id="ccoa-picker-@i" class="btn btn-primary" type="button">CCOA Picker</button>
+                          </div>
+                      </div>
+                      <span asp-validation-for="Transaction.Transfers[i].FinancialSegmentString" class="text-danger"></span>
+                  </td>
+              </tr>
+          }
+      </tbody>
+  </table>
+  <input type="hidden" asp-for="Transaction.Id" />
+  <button type="submit" id="apply-transaction-edit" class="btn btn-primary">Update and Resubmit for Processing</button>
+}

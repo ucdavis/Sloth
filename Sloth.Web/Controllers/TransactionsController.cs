@@ -204,9 +204,9 @@ namespace Sloth.Web.Controllers
 
         [HttpPost]
         [Authorize(Policy = PolicyCodes.TeamManager)]
-        public async Task<IActionResult> ApplyEdit(TransactionEditViewModel transaction)
+        public async Task<IActionResult> Edit(string id, TransactionEditViewModel transaction)
         {
-            if (transaction == null || string.IsNullOrWhiteSpace(transaction.Id))
+            if (transaction == null || string.IsNullOrWhiteSpace(id))
             {
                 ErrorMessage = "No transaction specified";
                 return RedirectToAction(nameof(Index));
@@ -222,24 +222,24 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.ReversalOfTransaction)
                 .Include(t => t.StatusEvents)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(t => t.Id == transaction.Id && t.Source.Team.Slug == TeamSlug);
+                .FirstOrDefaultAsync(t => t.Id == id && t.Source.Team.Slug == TeamSlug);
 
             if (currentTransaction == null)
             {
                 ErrorMessage = "Transaction not found";
-                return RedirectToAction(nameof(Edit), new { id = transaction.Id });
+                return RedirectToAction(nameof(Edit), new { id });
             }
 
             if (currentTransaction.Status != TransactionStatuses.Rejected && !currentTransaction.IsStale())
             {
                 ErrorMessage = "Transaction is not Stale (Processing for more than 5 days) or Rejected";
-                return RedirectToAction(nameof(Details), new { id = transaction.Id });
+                return RedirectToAction(nameof(Details), new { id });
             }
 
             if (transaction.Transfers == null || transaction.Transfers.Count == 0)
             {
                 ErrorMessage = "No transfers specified";
-                return RedirectToAction(nameof(Edit), new { id = transaction.Id });
+                return RedirectToAction(nameof(Edit), new { id });
             }
 
             var ccoaValidationRequests = transaction.Transfers
@@ -325,7 +325,7 @@ namespace Sloth.Web.Controllers
                 return View(nameof(Edit), model);
             }
 
-            return RedirectToAction(nameof(Details), new { id = transaction.Id });
+            return RedirectToAction(nameof(Details), new { id });
         }
 
         private async Task<TransactionDetailsViewModel> GetTransactionDetailsViewModel(Transaction transaction)
