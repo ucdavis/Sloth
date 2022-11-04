@@ -172,11 +172,12 @@ namespace Sloth.Core.Jobs
 
                     if (hasRejectedTransactions)
                     {
-                        if (!await _notificationService.Notify(Notification
+                        var notifySuccess = await _notificationService.Notify(Notification
                             .Message("One or more transactions were rejected by Aggie Enterprise")
                             .WithEmailsToTeam(source.Team.Slug, TeamRole.Admin)
                             .WithCcEmailsToTeam(source.Team.Slug, TeamRole.Manager)
-                            .WithLinkBack("View Failed Transactions", $"/{source.Team.Slug}/Reports/FailedTransactions")))
+                            .WithLinkBack("View Failed Transactions", $"/{source.Team.Slug}/Reports/FailedTransactions"));
+                        if (!notifySuccess)
                         {
                             log.Error("Error sending rejected transactions notification for team {TeamSlug}", source.Team.Slug);
                             //TODO: queue notification for retry

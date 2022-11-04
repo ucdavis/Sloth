@@ -99,7 +99,7 @@
     <script>
         $('.ccoa-edit').each((index, elem) => {
             $($(elem).parent()).find('button').on('click', async (e) => {
-                const chart = await window.Finjector.findChartSegmentString("https://finjector.ucdavis.edu/landing");
+                const chart = await window.Finjector.findChartSegmentString();
                 if (chart && chart.status === "success") {
                     $(elem).val(chart.data);
                 }

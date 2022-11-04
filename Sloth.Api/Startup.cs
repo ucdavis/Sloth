@@ -55,8 +55,6 @@ namespace Sloth.Api
             services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
-            services.AddScoped<ISmtpService, SmtpService>();
-            services.AddScoped<INotificationService, NotificationService>();
 
             // add database connection
             services.AddDbContext<SlothDbContext>(options =>
