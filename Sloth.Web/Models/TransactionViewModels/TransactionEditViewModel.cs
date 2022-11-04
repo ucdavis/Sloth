@@ -13,7 +13,6 @@ namespace Sloth.Web.Models.TransactionViewModels
         {
             public string Id { get; set; }
             public string FinancialSegmentString { get; set; }
-            public DateTime? AccountingDate { get; set; }
         }
     }
 }

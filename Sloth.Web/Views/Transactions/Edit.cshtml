@@ -13,44 +13,8 @@
 }
 
 <div class="container">
-
-        <h2>@ViewBag.Title</h2>
-
-
+    <h2>@ViewBag.Title</h2>
     <partial name="_AeEditDetails" model="Model" />
-
-
-<div class="row mt-5">
-    <h2>Activity Timeline</h2>
-    @foreach (var activity in Model.Transaction.StatusEvents.OrderBy(a => a.EventDate))
-    {
-        <div class="txn-timeline-row">
-            <div class="txn-timeline-date">
-                <span>@activity.EventDate.ToPacificTime().ToString("g")</span>
-            </div>
-            <div class="txn-timeline-result">
-                    <span class="badge @(TransactionStatuses.GetBadgeClass(activity.Status))">@activity.Status.Humanize(LetterCasing.Title)</span> <span>@activity.EventDetails</span>
-            </div>
-        </div>
-    }
-</div>
-
-@if (Model.RelatedTransactions.Transactions.Any())
-{
-    <div class="row mt-5">
-    <h2>Related Transactions</h2>
-    <partial name="_TransactionsTable" model="Model.RelatedTransactions" />
-    </div>
-}
-
-@if (Model.RelatedBlobs.Blobs.Any())
-{
-    <div class="row mt-5">
-    <h2>Related Files</h2>
-    <partial name="_BlobsTable" model=@Model.RelatedBlobs />
-    </div>
-}
-
 </div>
 
 
@@ -69,14 +33,6 @@
             searching: false,
         });
 
-        $('.transfer-date-edit').each((index, elem) => {
-            const input = $(elem).find('input')
-            $(elem).datepicker({
-              inputs: input,
-              keepEmptyValues: true,
-            });
-        });
-
         $('.transfer-ccoa-edit').each((index, elem) => {
             $($(elem).parent()).find('button').on('click', async (e) => {
                 const chart = await window.Finjector.findChartSegmentString();
@@ -90,20 +46,11 @@
             });
         });
     </script>
-    @if (Model.RelatedTransactions.Transactions.Any())
-    {
-        <partial name="_TransactionsTableScript" />
-    }
-    @if (Model.RelatedBlobs.Blobs.Any())
-    {
-        <partial name="_BlobsTableScript" />
-    }
 }
 
 @section AdditionalStyles
 {
     <style>
-      .transfer-date-edit { }
       .transfer-ccoa-edit { }
       .force-upper{
           text-transform: uppercase;

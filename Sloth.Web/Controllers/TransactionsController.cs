@@ -160,7 +160,38 @@ namespace Sloth.Web.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            var model = await GetTransactionDetailsViewModel(transaction);
+            var model = new TransactionDetailsViewModel()
+            {
+                Transaction = transaction,
+                HasWebhooks = await DbContext.WebHooks
+                    .AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive),
+
+
+                RelatedTransactions = new TransactionsTableViewModel
+                {
+                    Transactions = await DbContext.Transactions
+                        .Include(a => a.Source)
+                            .ThenInclude(a => a.Team)
+                        .Include(t => t.Transfers)
+                        .Where(a => a.Id != transaction.Id && a.Source.Team.Slug == TeamSlug &&
+                            (
+                                a.KfsTrackingNumber == transaction.KfsTrackingNumber ||
+                                (a.ProcessorTrackingNumber != null && a.ProcessorTrackingNumber == transaction.ProcessorTrackingNumber) ||
+                                a.MerchantTrackingNumber == transaction.MerchantTrackingNumber
+                            ))
+                        .AsNoTracking()
+                        .ToListAsync()
+                },
+                RelatedBlobs = new BlobsTableViewModel
+                {
+                    Blobs = await DbContext.Blobs
+                        .Where(b => b.TransactionBlobs.Select(tb => tb.TransactionId).Contains(transaction.Id)
+                            || b.Scrubbers.SelectMany(s => s.Transactions.Select(t => t.Id)).Contains(transaction.Id))
+                        .AsNoTracking()
+                        .ToListAsync(),
+                    TeamSlug = TeamSlug
+                },
+            };
 
             return View(model);
         }
@@ -169,14 +200,10 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             var transaction = await DbContext.Transactions
-                .Include(t => t.Scrubber)
                 .Include(t => t.JournalRequest)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
                 .Include(t => t.Transfers)
-                .Include(t => t.ReversalTransaction)
-                .Include(t => t.ReversalOfTransaction)
-                .Include(t => t.StatusEvents)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id && t.Source.Team.Slug == TeamSlug);
 
@@ -197,7 +224,10 @@ namespace Sloth.Web.Controllers
                 transfer.AccountingDate = transfer.AccountingDate?.ToPacificTime();
             }
 
-            var model = await GetTransactionDetailsViewModel(transaction);
+            var model = new TransactionDetailsViewModel
+            {
+                Transaction = transaction,
+            };
 
             return View(model);
         }
@@ -213,15 +243,10 @@ namespace Sloth.Web.Controllers
             }
 
             var currentTransaction = await DbContext.Transactions
-                .Include(t => t.Scrubber)
                 .Include(t => t.JournalRequest)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
                 .Include(t => t.Transfers)
-                .Include(t => t.ReversalTransaction)
-                .Include(t => t.ReversalOfTransaction)
-                .Include(t => t.StatusEvents)
-                .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id && t.Source.Team.Slug == TeamSlug);
 
             if (currentTransaction == null)
@@ -269,13 +294,8 @@ namespace Sloth.Web.Controllers
                 select (transfer, edit ))
             {
                 bool transferUpdated = false;
-                var currentAccountingDate = transfer.AccountingDate;
+                var currentAccoutingDate = transfer.AccountingDate;
                 var currentFinancialSegmentString = transfer.FinancialSegmentString;
-                if (currentAccountingDate != edit.AccountingDate?.FromPacificTime())
-                {
-                    transfer.AccountingDate = edit.AccountingDate?.FromPacificTime();
-                    transferUpdated = true;
-                }
                 if (currentFinancialSegmentString != edit.FinancialSegmentString)
                 {
                     transfer.FinancialSegmentString = edit.FinancialSegmentString;
@@ -287,7 +307,6 @@ namespace Sloth.Web.Controllers
                     oldTransferValues.Add(new TransactionEditViewModel.TransferEditModel
                     {
                         Id = transfer.Id,
-                        AccountingDate = currentAccountingDate,
                         FinancialSegmentString = currentFinancialSegmentString
                     });
                 }
@@ -309,59 +328,21 @@ namespace Sloth.Web.Controllers
                 {
                     if (edit != null)
                     {
-                        transfer.AccountingDate = edit.AccountingDate;
                         transfer.FinancialSegmentString = edit.FinancialSegmentString;
                         if (!string.IsNullOrWhiteSpace(edit.FinancialSegmentString) && invalidCcoaStrings.Contains(edit.FinancialSegmentString))
                         {
                             ModelState.AddModelError($"Transaction.Transfers[{currentTransaction.Transfers.IndexOf(transfer)}].FinancialSegmentString", "Invalid CCOA");
                         }
                     }
-                    else
-                    {
-                        transfer.AccountingDate = transfer.AccountingDate?.ToPacificTime();
-                    }
                 }
-                var model = await GetTransactionDetailsViewModel(currentTransaction);
+                var model = new TransactionDetailsViewModel
+                {
+                    Transaction = currentTransaction,
+                };
                 return View(nameof(Edit), model);
             }
 
             return RedirectToAction(nameof(Details), new { id });
-        }
-
-        private async Task<TransactionDetailsViewModel> GetTransactionDetailsViewModel(Transaction transaction)
-        {
-            return new TransactionDetailsViewModel()
-            {
-                Transaction = transaction,
-                HasWebhooks = await DbContext.WebHooks
-                    .AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive),
-
-
-                RelatedTransactions = new TransactionsTableViewModel
-                {
-                    Transactions = await DbContext.Transactions
-                        .Include(a => a.Source)
-                            .ThenInclude(a => a.Team)
-                        .Include(t => t.Transfers)
-                        .Where(a => a.Id != transaction.Id && a.Source.Team.Slug == TeamSlug &&
-                            (
-                                a.KfsTrackingNumber == transaction.KfsTrackingNumber ||
-                                (a.ProcessorTrackingNumber != null && a.ProcessorTrackingNumber == transaction.ProcessorTrackingNumber) ||
-                                a.MerchantTrackingNumber == transaction.MerchantTrackingNumber
-                            ))
-                        .AsNoTracking()
-                        .ToListAsync()
-                },
-                RelatedBlobs = new BlobsTableViewModel
-                {
-                    Blobs = await DbContext.Blobs
-                        .Where(b => b.TransactionBlobs.Select(tb => tb.TransactionId).Contains(transaction.Id)
-                            || b.Scrubbers.SelectMany(s => s.Transactions.Select(t => t.Id)).Contains(transaction.Id))
-                        .AsNoTracking()
-                        .ToListAsync(),
-                    TeamSlug = TeamSlug
-                },
-            };
         }
 
         [HttpPost]
