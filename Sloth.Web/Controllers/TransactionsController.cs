@@ -294,7 +294,6 @@ namespace Sloth.Web.Controllers
                 select (transfer, edit ))
             {
                 bool transferUpdated = false;
-                var currentAccoutingDate = transfer.AccountingDate;
                 var currentFinancialSegmentString = transfer.FinancialSegmentString;
                 if (currentFinancialSegmentString != edit.FinancialSegmentString)
                 {
