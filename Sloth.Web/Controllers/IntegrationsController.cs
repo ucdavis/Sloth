@@ -18,11 +18,14 @@ namespace Sloth.Web.Controllers
     public class IntegrationsController : SuperController
     {
         private readonly ISecretsService _secretsService;
+        private readonly IAggieEnterpriseService _aggieEnterpriseService;
 
-        public IntegrationsController(ApplicationUserManager userManager, SlothDbContext dbContext, ISecretsService secretsService)
+        public IntegrationsController(ApplicationUserManager userManager, SlothDbContext dbContext, ISecretsService secretsService,
+            IAggieEnterpriseService aggieEnterpriseService)
             : base(userManager, dbContext)
         {
             _secretsService = secretsService;
+            _aggieEnterpriseService = aggieEnterpriseService;
         }
 
         [HttpGet]
@@ -120,7 +123,8 @@ namespace Sloth.Web.Controllers
             var integration = await DbContext.Integrations.FirstOrDefaultAsync(i => i.Id == id);
             if (integration == null)
             {
-                return NotFound();
+                ErrorMessage = "Integration not found";
+                return RedirectToAction("Index", "Home");
             }
 
             // validate model
@@ -128,17 +132,42 @@ namespace Sloth.Web.Controllers
             var team = adminTeams.FirstOrDefault(t => t.Slug == TeamSlug);
             if (team == null)
             {
-                return View(model);
+                ErrorMessage = "Team not found";
+                return RedirectToAction("Index", "Home");
             }
 
             var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == model.SourceId);
             if (source == null)
             {
-                return View(model);
+                ViewBag.ErrorMessage = "Validation Failed";
+                ModelState.AddModelError(nameof(model.SourceId), "Source not found");
             }
 
             if (model.ReportPasswordDirty && string.IsNullOrWhiteSpace(model.ReportPassword))
             {
+                ViewBag.ErrorMessage = "Validation Failed";
+                ModelState.AddModelError(nameof(model.ReportPassword), "Password is required");
+            }
+
+            if (!await _aggieEnterpriseService.IsAccountValid(model.ClearingAccount, true))
+            {
+                ViewBag.ErrorMessage = "Validation Failed";
+                ModelState.AddModelError(nameof(model.ClearingAccount), "Invalid Clearing Account");
+            }
+
+            if (!await _aggieEnterpriseService.IsAccountValid(model.HoldingAccount, true))
+            {
+                ViewBag.ErrorMessage = "Validation Failed";
+                ModelState.AddModelError(nameof(model.HoldingAccount), "Invalid Holding Account");
+            }
+
+            if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
+            {
+                ViewBag.Sources = await DbContext.Sources.ToListAsync();
+                ViewBag.Types = new[]
+                {
+                    IntegrationTypes.CyberSource
+                };
                 return View(model);
             }
 
@@ -161,7 +190,7 @@ namespace Sloth.Web.Controllers
 
             await DbContext.SaveChangesAsync();
 
-            return RedirectToAction("Details", "Teams", new { id = team.Id });
+            return RedirectToAction("Details", "Teams", new { id = team!.Id });
         }
     }
 }

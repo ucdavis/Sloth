@@ -1,4 +1,6 @@
 using AspNetCore.Security.CAS;
+using Sloth.Core.Models.Settings;
+using Sloth.Core.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -20,7 +22,6 @@ using Sloth.Core;
 using Sloth.Core.Configuration;
 using Sloth.Core.Jobs;
 using Sloth.Core.Models;
-using Sloth.Core.Services;
 using Sloth.Web.Authorization;
 using Sloth.Web.Handlers;
 using Sloth.Web.Identity;
@@ -55,6 +56,9 @@ namespace Sloth.Web
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
             services.Configure<WebHookServiceOptions>(Configuration.GetSection("WebHooks"));
             services.Configure<AggieEnterpriseOptions>(Configuration.GetSection("AggieEnterprise"));
+            services.Configure<SparkpostOptions>(Configuration.GetSection("SparkPost"));
+            services.Configure<NotificationOptions>(Configuration.GetSection("Notifications"));
+            services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
 
 
             // add infrastructure services
@@ -64,6 +68,8 @@ namespace Sloth.Web
             services.AddSingleton<IStorageService, StorageService>();
             services.AddScoped<IWebHookService, WebHookService>();
             services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
+            services.AddScoped<ISmtpService, SmtpService>();
+            services.AddScoped<INotificationService, NotificationService>();
 
             // add jobs services
             services.AddHostedService<QueuedHostedService>();

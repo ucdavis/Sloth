@@ -1,6 +1,8 @@
 using System;
 using System.IO;
 using System.Linq;
+using Sloth.Core.Models.Settings;
+using Sloth.Core.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,7 +23,6 @@ using Sloth.Api.Models;
 using Sloth.Api.Swagger;
 using Sloth.Core;
 using Sloth.Core.Configuration;
-using Sloth.Core.Services;
 
 namespace Sloth.Api
 {
@@ -46,6 +47,8 @@ namespace Sloth.Api
             services.Configure<AzureOptions>(Configuration.GetSection("Azure"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
             services.Configure<StorageServiceOptions>(Configuration.GetSection("Storage"));
+            services.Configure<SparkpostOptions>(Configuration.GetSection("SparkPost"));
+            services.Configure<NotificationOptions>(Configuration.GetSection("Notifications"));
 
             // add infrastructure services
             services.AddSingleton<IKfsService, KfsService>();
@@ -81,7 +84,7 @@ namespace Sloth.Api
             {
                 o.AddPolicy("ApiKey", p => p.Requirements.Add(new ApiKeyRequirement()));
             });
-            
+
             // add authentication handlers
             services.AddSingleton<IAuthorizationHandler, ApiKeyHandler>();
 

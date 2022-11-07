@@ -55,15 +55,25 @@
         </div>
         <div class="form-group">
             @Html.LabelFor(x => x.ClearingAccount)
-            @Html.TextBoxFor(x => x.ClearingAccount, new { @class = "form-control" })
+            <div class="input-group">
+                @Html.TextBoxFor(x => x.ClearingAccount, new { @class = "form-control force-upper ccoa-edit" })
+                <div class="input-group-append">
+                    <button id="ccoa-picker-clearing" class="btn btn-primary" type="button">CCOA Picker</button>
+                </div>
+            </div>
             <span asp-validation-for="ClearingAccount" class="text-danger"></span>
-            <small id="emailHelp" class="form-text text-muted">Full GL or PPM string for Aggie Enterprise, or provide just the 7-digit Account Number for KFS</small>
+            <small id="emailHelp" class="form-text text-muted">Full GL or PPM string for Aggie Enterprise</small>
         </div>
         <div class="form-group">
             @Html.LabelFor(x => x.HoldingAccount)
-            @Html.TextBoxFor(x => x.HoldingAccount, new { @class = "form-control" })
+            <div class="input-group">
+                @Html.TextBoxFor(x => x.HoldingAccount, new { @class = "form-control force-upper ccoa-edit" })
+                <div class="input-group-append">
+                    <button id="ccoa-picker-holding" class="btn btn-primary" type="button">CCOA Picker</button>
+                </div>
+            </div>
             <span asp-validation-for="HoldingAccount" class="text-danger"></span>
-            <small id="emailHelp" class="form-text text-muted">Full GL or PPM string for Aggie Enterprise, or provide just the 7-digit Account Number for KFS</small>
+            <small id="emailHelp" class="form-text text-muted">Full GL or PPM string for Aggie Enterprise</small>
         </div>
         <div class="d-flex justify-content-end align-items-end">
             <input type="submit" value="Save" class="btn btn-primary" />
@@ -71,12 +81,35 @@
     }
         </div>
     </div>
-    
+
 </div>
+
+@section AdditionalStyles {
+    <style>
+      .force-upper{
+          text-transform: uppercase;
+      }
+      .ccoa-edit { }
+    </style>
+}
 
 @section AdditionalScripts
 {
+    <script src="https://finjector.ucdavis.edu/finjector.js?v=3" type="text/javascript" asp-add-nonce="true"></script>
     <script>
+        $('.ccoa-edit').each((index, elem) => {
+            $($(elem).parent()).find('button').on('click', async (e) => {
+                const chart = await window.Finjector.findChartSegmentString();
+                if (chart && chart.status === "success") {
+                    $(elem).val(chart.data);
+                }
+                else {
+                    alert("Something went wrong with the CCOA picker")
+                }
+                return false;
+            });
+        });
+
         $('#report-password-clear').click(function () {
             if ($('#report-password-dirty').val() === 'False') {
                 editPassword();

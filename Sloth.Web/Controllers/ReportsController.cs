@@ -35,8 +35,13 @@ namespace Sloth.Web.Controllers
             return View("Index", TeamSlug);
         }
 
-        public async Task<IActionResult> StaleTransactions()
+        public async Task<IActionResult> FailedTransactions()
         {
+            if (string.IsNullOrWhiteSpace(TeamSlug))
+            {
+                return BadRequest("TeamSlug is required");
+            }
+
             var transactions = await DbContext.Transactions
                 .Where(t => t.Source.Team.Slug == TeamSlug
                        && t.Status == TransactionStatuses.Processing
@@ -55,11 +60,11 @@ namespace Sloth.Web.Controllers
                 }
             };
 
-            return View("StaleTransactions", model);
+            return View("FailedTransactions", model);
         }
 
         [Authorize(Roles = Roles.SystemAdmin)]
-        public async Task<IActionResult> StaleTransactionsAllTeams()
+        public async Task<IActionResult> FailedTransactionsAllTeams()
         {
             var transactions = await DbContext.Transactions
                 .Where(t => t.Status == TransactionStatuses.Processing
@@ -80,7 +85,7 @@ namespace Sloth.Web.Controllers
                 }
             };
 
-            return View("StaleTransactions", model);
+            return View("FailedTransactions", model);
         }
     }
 }

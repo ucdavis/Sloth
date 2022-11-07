@@ -1,0 +1,69 @@
+﻿@using Sloth.Core.Views.Shared
+@model Sloth.Core.Models.Emails.DefaultNotificationModel
+
+@{
+  Layout = "_EmailLayout";
+}
+
+@*
+<!-- This section should be pasted in mjml editor to generate this view's content. Uncomment to get intellisense for model properties -->
+<mjml>
+  <mj-body background-color="#FEFEFE">
+    <!-- BEGIN VIEW CONTENT -->
+    <mj-section border-top="4px solid #00423d" border-left="1px solid #c7c8cc" border-right="1px solid #c7c8cc" background-color="#ffffff"
+                padding-bottom="20px" padding-top="20px">
+      <mj-column width="100%" vertical-align="top">
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="28px" color="#1F1F1F">
+          <p>@Model.Subject</p>
+        </mj-text>
+        <mj-text padding-top="0px" padding-bottom="0px" font-size="24px" color="rgba(31,31,31,0.8)">
+          @Model.MessageText
+        </mj-text>
+      </mj-column>
+    </mj-section>
+    <!-- END VIEW CONTENT -->
+  </mj-body>
+</mjml>
+*@
+
+<!--[if mso | IE]><table align="center" border="0" cellpadding="0" cellspacing="0" class="" style="width:600px;" width="600" bgcolor="#ffffff" ><tr><td style="line-height:0px;font-size:0px;mso-line-height-rule:exactly;"><![endif]-->
+<div style="background:#ffffff;background-color:#ffffff;margin:0px auto;max-width:600px;">
+  <table align="center" border="0" cellpadding="0" cellspacing="0" role="presentation"
+    style="background:#ffffff;background-color:#ffffff;width:100%;">
+    <tbody>
+      <tr>
+        <td
+          style="border-left:1px solid #c7c8cc;border-right:1px solid #c7c8cc;border-top:4px solid #00423d;direction:ltr;font-size:0px;padding:20px 0;padding-bottom:20px;padding-top:20px;text-align:center;">
+          <!--[if mso | IE]><table role="presentation" border="0" cellpadding="0" cellspacing="0"><tr><td class="" style="vertical-align:top;width:598px;" ><![endif]-->
+          <div class="mj-column-per-100 mj-outlook-group-fix"
+            style="font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;">
+            <table border="0" cellpadding="0" cellspacing="0" role="presentation" style="vertical-align:top;"
+              width="100%">
+              <tbody>
+                <tr>
+                  <td align="left"
+                    style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:0px;word-break:break-word;">
+                    <div
+                      style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:28px;line-height:1;text-align:left;color:#1F1F1F;">
+                      <p>@Model.Subject</p>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="left"
+                    style="font-size:0px;padding:10px 25px;padding-top:0px;padding-bottom:0px;word-break:break-word;">
+                    <div
+                      style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:24px;line-height:1;text-align:left;color:rgba(31,31,31,0.8);">
+                      @Model.MessageText</div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!--[if mso | IE]></td></tr></table><![endif]-->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<!--[if mso | IE]></td></tr></table><![endif]-->

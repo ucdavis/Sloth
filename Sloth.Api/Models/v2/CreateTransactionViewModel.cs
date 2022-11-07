@@ -29,6 +29,7 @@ namespace Sloth.Api.Models.v2
         /// <summary>
         /// Tracking Number created by the merchant accountant
         /// </summary>
+        [MaxLength(128)]
         public string MerchantTrackingNumber { get; set; }
 
         /// <summary>
@@ -39,6 +40,7 @@ namespace Sloth.Api.Models.v2
         /// <summary>
         /// Tracking Number created by the payment processor
         /// </summary>
+        [MaxLength(128)]
         public string ProcessorTrackingNumber { get; set; }
 
         /// <summary>

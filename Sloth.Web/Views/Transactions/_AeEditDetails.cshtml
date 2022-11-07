@@ -1,0 +1,131 @@
+@using Humanizer
+@using Sloth.Core.Extensions
+@using Sloth.Core.Models
+@using Sloth.Core.Resources
+@using Sloth.Web.Models.TransactionViewModels
+@model TransactionDetailsViewModel
+
+@{
+    ViewBag.Title = "Transaction Details";
+
+    Uri merchantUrl;
+    var isUrlValid = Uri.TryCreate(Model.Transaction.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
+}
+<div class="row txn-detail-wrapper">
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.Id)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.Id</span>
+        </div>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.TransactionDate)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.TransactionDate.ToPacificTime()</span>
+        </div>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.KfsTrackingNumber)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.KfsTrackingNumber</span>
+        </div>
+    </div>
+    @if (Model.Transaction.JournalRequest != null)
+    {
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>@Html.DisplayNameFor(x => x.Transaction.JournalRequest.RequestId)</span>
+            </div>
+            <div class="txn-detail-result">
+                <span>@Model.Transaction.JournalRequest.RequestId</span>
+            </div>
+        </div>
+    }
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.ProcessorTrackingNumber)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.ProcessorTrackingNumber</span>
+        </div>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.MerchantTrackingNumber)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.MerchantTrackingNumber</span>
+        </div>
+    </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.Status)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span class="badge @(TransactionStatuses.GetBadgeClass(Model.Transaction.Status))">@Model.Transaction.Status.Humanize(LetterCasing.Title)</span>
+        </div>
+    </div>
+    @{
+        if (isUrlValid)
+        {
+            <div class="txn-detail-row">
+                <div class="txn-detail-label">
+                    <span>@Html.DisplayNameFor(x => x.Transaction.MerchantTrackingUrl)</span>
+                </div>
+                <div class="txn-detail-result">
+                    <span><a href="@Html.Raw(merchantUrl.ToString())" target="_blank">@merchantUrl.ToString()</a></span>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@using (Html.BeginForm(FormMethod.Post))
+{
+  <table id="transfers" class="table sloth-table" style="width: 100%">
+      <thead>
+          <tr>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Id)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Amount)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Direction)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Description)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].AccountingDate)</th>
+              <th>@Html.DisplayNameFor(x => x.Transaction.Transfers[0].Account)</th>
+
+          </tr>
+      </thead>
+      <tbody>
+          @foreach (var (t, i) in Model.Transaction.Transfers.Select((t, i) => (t, i)))
+          {
+              <tr>
+                  <td>@t.Id</td>
+                  <td>@t.Amount.ToString("C")</td>
+                  <td>
+                      <span class="badge @(Transfer.GetDirectionBadgeClass(t.Direction))">@t.Direction</span>
+                  </td>
+                  <td>@t.Description</td>
+                  <td>@t.AccountingDate</td>
+                  <td style="white-space:nowrap">
+                      <input type="hidden" asp-for="Transaction.Transfers[i].Id" />
+                      <div class="input-group">
+                          <input type="text" class="form-control force-upper transfer-ccoa-edit" asp-for="Transaction.Transfers[i].FinancialSegmentString"
+                                aria-label="CCOA" />
+                          <div class="input-group-append">
+                              <button id="ccoa-picker-@i" class="btn btn-primary" type="button">CCOA Picker</button>
+                          </div>
+                      </div>
+                      <span asp-validation-for="Transaction.Transfers[i].FinancialSegmentString" class="text-danger"></span>
+                  </td>
+              </tr>
+          }
+      </tbody>
+  </table>
+  <input type="hidden" asp-for="Transaction.Id" />
+  <button type="submit" id="apply-transaction-edit" class="btn btn-primary">Update and Resubmit for Processing</button>
+}

@@ -13,18 +13,18 @@
 }
 
 <div class="container">
-    
-        <h2>@ViewBag.Title</h2>
-    
 
-@if(String.IsNullOrWhiteSpace(Model.Transaction.Transfers[0].FinancialSegmentString))
+        <h2>@ViewBag.Title</h2>
+
+
+@* @if(String.IsNullOrWhiteSpace(Model.Transaction.Transfers[0].FinancialSegmentString))
 {
     <partial name="_KfsDetails" model="Model" />
 }
 else
-{
+{ *@
     <partial name="_AeDetails" model="Model" />
-}
+@* } *@
 
 
 <div class="row mt-5">
@@ -39,7 +39,7 @@ else
                     <span class="badge @(TransactionStatuses.GetBadgeClass(activity.Status))">@activity.Status.Humanize(LetterCasing.Title)</span> <span>@activity.EventDetails</span>
             </div>
         </div>
-    } 
+    }
 </div>
 
 @if (Model.RelatedTransactions.Transactions.Any())
@@ -49,7 +49,7 @@ else
     <partial name="_TransactionsTable" model="Model.RelatedTransactions" />
     </div>
 }
-    
+
 @if (Model.RelatedBlobs.Blobs.Any())
 {
     <div class="row mt-5">

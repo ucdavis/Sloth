@@ -102,6 +102,9 @@ namespace Sloth.Core.Models
             modelBuilder.Entity<Team>()
                 .ToTable("Teams")
                 .HasIndex(t => t.Name).IsUnique();
+
+            modelBuilder.Entity<Team>()
+                .HasIndex(t => t.Slug).IsUnique();
         }
     }
 }

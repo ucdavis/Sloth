@@ -71,7 +71,7 @@
             <span>@Model.Transaction.MerchantTrackingNumber</span>
         </div>
     </div>
-    
+
     @{
         if (isUrlValid)
         {
@@ -149,6 +149,15 @@
     </form>
 }
 
+@if (Model.Transaction.Status == TransactionStatuses.Rejected || Model.Transaction.IsStale())
+{
+    var canEdit = Context.HasTeamRole(TeamRole.Manager);
+    <form asp-controller="Transactions" asp-action="Edit" asp-route-id="@Model.Transaction.Id" method="get">
+        <div>
+            <button type="submit" class="btn btn-warning" @(!canEdit ? "Disabled" : "")>Edit Transaction</button>
+        </div>
+    </form>
+}
 
 @if (Model.Transaction.Status == TransactionStatuses.Completed && !Model.Transaction.HasReversal)
 {
