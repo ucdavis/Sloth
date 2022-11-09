@@ -60,7 +60,7 @@
                                 <input name="teamId" value="@userRole.TeamId" hidden="hidden">
                                 <input name="userId" value="@userRole.UserId" hidden="hidden">
                                 <input name="roleId" value="@userRole.RoleId" hidden="hidden">
-                                <button type="submit" class="btn btn-outline-danger">Remove</button>
+                                <button type="submit" class="btn btn-outline">Remove</button>
                             </form>
                         </td>
                     </tr>
@@ -174,7 +174,7 @@
                             }
                             else
                             {
-                                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#revoke-key-modal" data-id="@k.Id" data-key="@k.MaskedKey()">
+                                <button class="btn btn-outline" data-bs-toggle="modal" data-bs-target="#revoke-key-modal" data-id="@k.Id" data-key="@k.MaskedKey()">
                                     Revoke Key
                                 </button>
                             }
@@ -269,7 +269,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="add-user-action" class="btn btn-primary">Add User</button>
                 </div>
             </div>
@@ -283,7 +283,7 @@
                     <h5 class="modal-title">Create New Api Key?</h5>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outliner" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="create-key-action" class="btn btn-primary">Create</button>
                 </div>
             </div>
@@ -304,7 +304,7 @@
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-outline" data-bs-dismiss="modal">Close</button>
                     <button type="button" id="revoke-key-action" class="btn btn-danger">Revoke Key</button>
                 </div>
             </div>
