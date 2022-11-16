@@ -18,9 +18,8 @@
     <h2>@ViewBag.Title</h2>
 
     <div class="row">
-        <div class="col">
+        <div class="col-md-6">
             <div class="card job">
-                <img class="card-img-top" src="~/images/architecture-business-cabinet-325229.jpg" alt="Card image cap">
                 <div class="card-body">
                     <h5 class="card-title">
                         <a asp-action="JobList" asp-route-jobname="@KfsScrubberUploadJob.JobName">Kfs Scrubber Upload Job</a>
@@ -31,9 +30,8 @@
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col-md-6">
             <div class="card job">
-                <img class="card-img-top" src="~/images/bank-banking-blue-50987.jpg" alt="Card image cap">
                 <div class="card-body">
                     <h5 class="card-title">
                         <a asp-action="JobList" asp-route-jobname="@CybersourceBankReconcileJob.JobName">Cybersource Bank Reconcile Job</a>
@@ -44,11 +42,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col">
+        <div class="col-md-6">
             <div class="card job">
-                [Image needed]
                 <div class="card-body">
                     <h5 class="card-title">
                         <a asp-action="JobList" asp-route-jobname="@AggieEnterpriseJournalJob.JobNameUploadTransactions">AE Transaction Upload Job</a>
@@ -60,9 +55,8 @@
                 </div>
             </div>
         </div>
-        <div class="col">
+        <div class="col-md-6">
             <div class="card job">
-                [Image needed]
                 <div class="card-body">
                     <h5 class="card-title">
                         <a asp-action="JobList" asp-route-jobname="@AggieEnterpriseJournalJob.JobNameResolveProcessingJournals">AE Resolve Processing Journal Job</a>
@@ -74,11 +68,8 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-6">
+                <div class="col-md-6">
             <div class="card job">
-                [Image needed]
                 <div class="card-body">
                     <h5 class="card-title">
                         <a asp-action="JobList" asp-route-jobname="@ResendPendingWebHookRequestsJob.JobName">Resend Webhook Requests Job</a>

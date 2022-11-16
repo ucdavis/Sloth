@@ -16,6 +16,10 @@ h1 {
 }
 a {
   color: $primary-color;
+  text-decoration: none;
+  &:hover {
+    color: lighten($primary-color, 7);
+  }
 }
 h2 {
   font-size: 1.6rem;

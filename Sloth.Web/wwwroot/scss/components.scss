@@ -21,6 +21,13 @@
     color: #fff;
   }
 }
+.btn-primary:active {
+  color: #fff;
+}
+.btn-outline:focus {
+  color: $primary-color !important;
+  border: 1px solid $borders;
+}
 button.btn-close {
   width: 0.5rem;
   height: 0.5rem;
@@ -78,4 +85,7 @@ a.stretched-link {
   &:hover {
     color: inherit;
   }
+}
+.job {
+  margin-bottom: 2%;
 }
