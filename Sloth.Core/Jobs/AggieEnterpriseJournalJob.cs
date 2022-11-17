@@ -158,6 +158,8 @@ namespace Sloth.Core.Jobs
                             log.Error(ex, "Error creating journal for transaction {TransactionId}", transaction.Id);
                             transactionRunStatus.Action = "Error";
 
+                            hasRejectedTransactions = true;
+
                             // failure because of txn args, do not retry
                             transaction.SetStatus(TransactionStatuses.Rejected, ex.Message);
                         }
