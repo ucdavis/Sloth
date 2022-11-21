@@ -1,8 +1,0 @@
-extraction:
-  csharp:
-    prepare:
-      packages: "nodejs"
-    index:
-      dotnet:
-        arguments: "--configuration Release"
-        version: "6.0.100"
