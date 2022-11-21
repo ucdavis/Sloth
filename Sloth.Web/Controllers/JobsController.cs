@@ -218,7 +218,7 @@ namespace Sloth.Web.Controllers
             var log = LoggingConfiguration.GetJobConfiguration()
                 .CreateLogger()
                 .ForContext("date", date)
-                .ForContext("reportName", reportName)
+                .ForContext("reportName", reportName.Replace(Environment.NewLine, ""))
                 .ForContext("jobname", jobRecord.Name)
                 .ForContext("jobid", jobRecord.Id);
 
