@@ -17,6 +17,7 @@ namespace Sloth.Core.Models
         {
             Transfers = new List<Transfer>();
             StatusEvents = new List<TransactionStatusEvent>();
+            Metadata = new List<TransactionMetadata>();
         }
 
         public string Id { get; set; } = Guid.NewGuid().ToString();

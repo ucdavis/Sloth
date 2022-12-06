@@ -276,7 +276,7 @@ namespace Sloth.Api.Controllers.v2
                 : TransactionStatuses.PendingApproval);
 
             // assign metadata if it exists
-            if (transaction.Metadata.Count > 0)
+            if (transaction.Metadata is { Count: > 0 })
             {
                 foreach (var entry in transaction.Metadata)
                 {
