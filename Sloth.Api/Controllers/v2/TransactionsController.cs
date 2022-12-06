@@ -70,6 +70,7 @@ namespace Sloth.Api.Controllers.v2
                 .Where(t => t.Source.Team.Id == teamId)
                 .Include(t => t.Creator)
                 .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
@@ -91,6 +92,7 @@ namespace Sloth.Api.Controllers.v2
                 .Where(t => t.Source.Team.Id == teamId)
                 .Include(t => t.Creator)
                 .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.ProcessorTrackingNumber == id);
 
@@ -117,6 +119,7 @@ namespace Sloth.Api.Controllers.v2
                 .Where(t => t.Source.Team.Id == teamId)
                 .Include(t => t.Creator)
                 .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
                 .Where(t => t.KfsTrackingNumber == id)
                 .AsNoTracking()
                 .ToListAsync();
@@ -151,7 +154,6 @@ namespace Sloth.Api.Controllers.v2
         [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
         public async Task<IActionResult> Post([FromBody] CreateTransactionViewModel transaction)
         {
-
             var teamId = GetTeamId();
 
             if (!ModelState.IsValid)
@@ -248,7 +250,6 @@ namespace Sloth.Api.Controllers.v2
                 });
             }
 
-            // TODO: financial info needs to be update to AE
             // create final transaction
             var transactionToCreate = new Transaction
             {
@@ -273,6 +274,15 @@ namespace Sloth.Api.Controllers.v2
             transactionToCreate.SetStatus(transaction.AutoApprove
                 ? TransactionStatuses.Scheduled
                 : TransactionStatuses.PendingApproval);
+
+            // assign metadata if it exists
+            if (transaction.Metadata.Count > 0)
+            {
+                foreach (var entry in transaction.Metadata)
+                {
+                    transactionToCreate.Metadata.Add(new TransactionMetadata { Transaction = transactionToCreate, Name = entry.Key, Value = entry.Value });
+                }
+            }
 
             await using var txn = await _context.Database.BeginTransactionAsync();
 
