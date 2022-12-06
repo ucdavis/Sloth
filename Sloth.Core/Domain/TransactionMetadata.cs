@@ -1,5 +1,6 @@
 using System;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sloth.Core.Models
 {
@@ -11,8 +12,11 @@ namespace Sloth.Core.Models
 
         public Transaction Transaction { get; set; }
 
+        [Required]
+        [MaxLength(128)]
         public string Name { get; set; }
 
+        [Required]
         public string Value { get; set; }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
