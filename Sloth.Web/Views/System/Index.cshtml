@@ -4,50 +4,64 @@
     ViewBag.Title = "System Management";
 }
 
-<h2>@ViewBag.Title</h2>
-<hr />
-
-<div class="row mb-1">
-    <div class="col">
-        <h3>Admin Users</h3>
+<div class="container team-settings">
+    <div class="d-flex justify-content-between">
+        <h1>System Management</h1>
     </div>
     <div class="col d-flex justify-content-end align-items-end">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-user-modal">
-            Add User
-        </button>
+        <a class="btn btn-primary" asp-controller="Teams" asp-action="Create">Create New Team</a>
     </div>
-</div>
-<table id="adminUsers" class="table table-bordered">
-    <thead>
-    <tr>
-        <th>Name</th>
-        <th>Username</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var adminUser in Model.AdminUsers)
-    {
-        <tr>
-            <td>@adminUser.FullName</td>
-            <td>@adminUser.UserName</td>
-            <td>@adminUser.Email</td>
-            <td>System Admin</td>
-            <td>
-                <form asp-action="RemoveUserFromRole">
-                    <input name="userId" value="@adminUser.UserName" hidden="hidden">
-                    <input name="role" value="SystemAdmin" hidden="hidden">
-                    <button type="submit" class="btn btn-danger">Remove</button>
-                </form>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
 
-<hr />
+    <div class="card mt-2">
+        <div class="card-body">
+            <div class="card-title">
+                <div class="d-flex justify-content-between align-items-start">
+                    <h2>Admin Users</h2>
+
+                    <div class="col d-flex justify-content-end align-items-end">
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#add-user-modal">
+                            Add User
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <table id="usersTable" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var adminUser in Model.AdminUsers)
+                    {
+                        <tr>
+                            <td>@adminUser.FullName</td>
+                            <td>@adminUser.UserName</td>
+                            <td>@adminUser.Email</td>
+                            <td>System Admin</td>
+                            <td>
+                                <form asp-action="RemoveUserFromRole">
+                                    <input name="userId" value="@adminUser.UserName" hidden="hidden">
+                                    <input name="role" value="SystemAdmin" hidden="hidden">
+                                    <button type="submit" class="btn btn-danger">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+</div>
+
+
 
 <div id="add-user-modal" class="modal fade">
     <div class="modal-dialog" role="document">
