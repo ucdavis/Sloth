@@ -17,7 +17,11 @@ namespace Sloth.Core.Models
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<TransactionMetadata>()
+                .HasIndex(r => r.TransactionId);
 
+            // modelBuilder.Entity<TransactionMetadata>()
+            //     .HasIndex(r => r.Name);
         }
     }
 }
