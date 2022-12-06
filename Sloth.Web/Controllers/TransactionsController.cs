@@ -157,6 +157,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.ReversalTransaction)
                 .Include(t => t.ReversalOfTransaction)
                 .Include(t => t.StatusEvents)
+                .Include(t => t.Metadata)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 

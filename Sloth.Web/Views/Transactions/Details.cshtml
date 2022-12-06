@@ -26,7 +26,6 @@ else
     <partial name="_AeDetails" model="Model" />
 @* } *@
 
-
 <div class="row mt-5">
     <h2>Activity Timeline</h2>
     @foreach (var activity in Model.Transaction.StatusEvents.OrderBy(a => a.EventDate))
@@ -41,6 +40,14 @@ else
         </div>
     }
 </div>
+
+@if (Model.Transaction.Metadata.Any())
+{
+    <div class="row mt-5">
+    <h2>Metadata</h2>
+    <partial name="_TransactionMetadata" model="Model.Transaction.Metadata" />
+    </div>
+}
 
 @if (Model.RelatedTransactions.Transactions.Any())
 {
@@ -63,7 +70,7 @@ else
 
  @section AdditionalScripts {
     <script src="~/js/prism.js"></script>
-<script>
+    <script>
         $('#transfers').DataTable({
             "columnDefs": [
                 { "targets": 0, "visible": false }
@@ -75,10 +82,17 @@ else
             searching: false,
         });
     </script>
+
+    @if (Model.Transaction.Metadata.Any())
+    {
+        <partial name="_MetadataTableScript" />
+    }
+
     @if (Model.RelatedTransactions.Transactions.Any())
     {
         <partial name="_TransactionsTableScript" />
     }
+
     @if (Model.RelatedBlobs.Blobs.Any())
     {
         <partial name="_BlobsTableScript" />
