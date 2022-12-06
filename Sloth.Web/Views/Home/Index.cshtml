@@ -16,12 +16,11 @@
                 <li>Hub</li>
             </ul>
         </div>
-
     </div>
     @if (User.IsInRole(Roles.SystemAdmin))
     {
 
-        <h2>Your Teams:</h2>
+        <h2>All Teams:</h2>
 
         <div class="row flex-column align-items-start justify-content-center">
             @foreach (var team in Model)

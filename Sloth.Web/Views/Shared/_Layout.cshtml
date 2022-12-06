@@ -46,6 +46,9 @@
         case "reports":
             activeMenu = "Reports";
             break;
+        case "system":
+            activeMenu = "System";
+            break;
         default:
             activeMenu = String.Empty;
             break;
@@ -173,6 +176,12 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link @(activeMenu == "Reports" ? "active" : "")" asp-controller="Reports" asp-action="Index"><partial name="_ReportsSvgPartial" />Reports</a>
+                            </li>
+                        }
+                        @if (User.IsInRole(Roles.SystemAdmin))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link @(activeMenu == "System" ? "active" : "")" asp-action="Index" asp-controller="System"><partial name="_SettingSvgPartial" /> System</a>
                             </li>
                         }
                     </ul>

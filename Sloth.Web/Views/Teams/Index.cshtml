@@ -10,12 +10,6 @@
         <div class="col">
             <h2>Your Teams</h2>
         </div>
-        @if (User.IsInRole(Roles.SystemAdmin))
-        {
-            <div class="col d-flex justify-content-end align-items-end">
-                <a class="btn btn-primary" asp-action="Create">Create New Team</a>
-            </div>
-        }
     </div>
 
     @ViewBag.Roles
