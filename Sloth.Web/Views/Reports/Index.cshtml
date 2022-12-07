@@ -1,4 +1,3 @@
-
 @using Sloth.Core.Resources
 @model string
 @{
@@ -7,7 +6,7 @@
 }
 
 @section AdditionalStyles
-{
+    {
     <style>
         .job img.card-img-top {
             max-height: 180px;
@@ -16,49 +15,46 @@
     </style>
 }
 
-<div class="container">
-    <h2>@ViewBag.Title</h2>
-<div class="row">
-@if(!string.IsNullOrEmpty(teamSlug))
-{
-    
-    
-        <div class="col-md-6">
-            <h3>Team Reports</h3>
-            <div class="card job">
-               
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a asp-action="FailedTransactions" >Failed Transactions</a>
-                    </h5>
-                    <p class="card-text">
-                        Shows transctions that have been rejected or have been in status <code>Processing</code> for more than 5 days.
-                    </p>
-                </div>
-            </div>
-        </div>
-   
-}
+    <div class="container">
+        <h2>@ViewBag.Title</h2>
+        <div class="row">
+        @if (!string.IsNullOrEmpty(teamSlug))
+        {
+            <div class="col-md-6">
+                <h3>Team Reports</h3>
+                <div class="card job">
+                    <a href="~/@(teamSlug)/Reports/FailedTransactions">
+                        <div class="card-body">
 
-@if (User.IsInRole(Roles.SystemAdmin))
-{
-   
-        <div class="col-md-6">
-             <h3>System Admin Reports</h3>
-            <div class="card job">
-             
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a asp-action="FailedTransactionsAllTeams" >Failed Transactions Across All Teams</a>
-                    </h5>
-                    <p class="card-text">
-                        Shows transctions across all teams that have been rejected or have been in status <code>Processing</code> for more than 5 days.
-                    </p>
+                            <h5 class="card-title">Failed Transactions</h5>
+
+                            <p class="card-text">
+                                Shows transactions that have been rejected or have been in status <code>Processing</code> for more than 5 days.
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
-        </div>
-   
-}
-</div>
+        }
+
+        @if (User.IsInRole(Roles.SystemAdmin))
+        {
+            <div class="col-md-6">
+                <h3>System Admin Reports</h3>
+                <div class="card job">
+                    <a asp-action="FailedTransactionsAllTeams">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Failed Transactions Across All Teams
+                            </h5>
+                            <p class="card-text">
+                                Shows transactions across all teams that have been rejected or have been in status <code>Processing</code> for more than 5 days.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
 </div>
 
