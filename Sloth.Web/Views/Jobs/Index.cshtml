@@ -1,4 +1,3 @@
-
 @using Sloth.Core.Jobs;
 @{
     ViewBag.Title = "Jobs";
@@ -14,72 +13,82 @@
     </style>
 }
 
-<div class="container">
-    <h2>@ViewBag.Title</h2>
+    <div class="container">
+        <h2>@ViewBag.Title</h2>
 
-    <div class="row">
-        <div class="col-md-6">
-            <div class="card job">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a asp-action="JobList" asp-route-jobname="@KfsScrubberUploadJob.JobName">Kfs Scrubber Upload Job</a>
-                    </h5>
-                    <p class="card-text">
-                        Runs at end of business. Collects all scheduled KFS transactions and groups them into scrubbers. Uploads scrubbers to KFS service for processing.
-                    </p>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card job">
+                    <a asp-action="JobList" asp-route-jobname="@KfsScrubberUploadJob.JobName">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Kfs Scrubber Upload Job
+                            </h5>
+                            <p class="card-text">
+                                Runs at end of business. Collects all scheduled KFS transactions and groups them into scrubbers. Uploads scrubbers to KFS service for processing.
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card job">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a asp-action="JobList" asp-route-jobname="@CybersourceBankReconcileJob.JobName">Cybersource Bank Reconcile Job</a>
-                    </h5>
-                    <p class="card-text">
-                        Runs each hour. Iterates through all Cybersource integrations, collecting bank reconcile reports, and creating transactions from them.
-                    </p>
+            <div class="col-md-6">
+                <div class="card job">
+                    <a asp-action="JobList" asp-route-jobname="@CybersourceBankReconcileJob.JobName">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Cybersource Bank Reconcile Job
+                            </h5>
+                            <p class="card-text">
+                                Runs each hour. Iterates through all Cybersource integrations, collecting bank reconcile reports, and creating transactions from them.
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card job">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a asp-action="JobList" asp-route-jobname="@AggieEnterpriseJournalJob.JobNameUploadTransactions">AE Transaction Upload Job</a>
-                    </h5>
-                    <p class="card-text">
-                        Runs each hour on business days. Collects all scheduled AE transactions, groups them by origin code/feed,
-                        and uploads the groups to AE as journal entries.
-                    </p>
+            <div class="col-md-6">
+                <div class="card job">
+                    <a asp-action="JobList" asp-route-jobname="@AggieEnterpriseJournalJob.JobNameUploadTransactions">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                AE Transaction Upload Job
+                            </h5>
+                            <p class="card-text">
+                                Runs each hour on business days. Collects all scheduled AE transactions, groups them by origin code/feed,
+                                and uploads the groups to AE as journal entries.
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="card job">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a asp-action="JobList" asp-route-jobname="@AggieEnterpriseJournalJob.JobNameResolveProcessingJournals">AE Resolve Processing Journal Job</a>
-                    </h5>
-                    <p class="card-text">
-                        Runs each hour on business days. Collects all AE transactions with a status of "Processing" and having an associated
-                        journal request. Updates transactions' status according to journal status.
-                    </p>
+            <div class="col-md-6">
+                <div class="card job">
+                    <a asp-action="JobList" asp-route-jobname="@AggieEnterpriseJournalJob.JobNameResolveProcessingJournals">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                AE Resolve Processing Journal Job
+                            </h5>
+                            <p class="card-text">
+                                Runs each hour on business days. Collects all AE transactions with a status of "Processing" and having an associated
+                                journal request. Updates transactions' status according to journal status.
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
-        </div>
-                <div class="col-md-6">
-            <div class="card job">
-                <div class="card-body">
-                    <h5 class="card-title">
-                        <a asp-action="JobList" asp-route-jobname="@ResendPendingWebHookRequestsJob.JobName">Resend Webhook Requests Job</a>
-                    </h5>
-                    <p class="card-text">
-                        Runs each hour. Resends previous webhook requests that failed to return a 200 (OK) response.
-                    </p>
+            <div class="col-md-6">
+                <div class="card job">
+                    <a asp-action="JobList" asp-route-jobname="@ResendPendingWebHookRequestsJob.JobName">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Resend Webhook Requests Job
+                            </h5>
+                            <p class="card-text">
+                                Runs each hour. Resends previous webhook requests that failed to return a 200 (OK) response.
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
