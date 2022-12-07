@@ -23,14 +23,16 @@
             <div class="col-md-6">
                 <h3>Team Reports</h3>
                 <div class="card job">
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a href="~/@(teamSlug)/Reports/FailedTransactions">Failed Transactions</a>
-                        </h5>
-                        <p class="card-text">
-                            Shows transactions that have been rejected or have been in status <code>Processing</code> for more than 5 days.
-                        </p>
-                    </div>
+                    <a href="~/@(teamSlug)/Reports/FailedTransactions">
+                        <div class="card-body">
+
+                            <h5 class="card-title">Failed Transactions</h5>
+
+                            <p class="card-text">
+                                Shows transactions that have been rejected or have been in status <code>Processing</code> for more than 5 days.
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
         }
@@ -40,15 +42,16 @@
             <div class="col-md-6">
                 <h3>System Admin Reports</h3>
                 <div class="card job">
-
-                    <div class="card-body">
-                        <h5 class="card-title">
-                            <a asp-action="FailedTransactionsAllTeams">Failed Transactions Across All Teams</a>
-                        </h5>
-                        <p class="card-text">
-                            Shows transactions across all teams that have been rejected or have been in status <code>Processing</code> for more than 5 days.
-                        </p>
-                    </div>
+                    <a asp-action="FailedTransactionsAllTeams">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Failed Transactions Across All Teams
+                            </h5>
+                            <p class="card-text">
+                                Shows transactions across all teams that have been rejected or have been in status <code>Processing</code> for more than 5 days.
+                            </p>
+                        </div>
+                    </a>
                 </div>
             </div>
         }
