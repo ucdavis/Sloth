@@ -21,6 +21,13 @@ a {
     color: lighten($primary-color, 7);
   }
 }
+.card {
+  a {
+    p {
+      color: $primary-font;
+    }
+  }
+}
 h2 {
   font-size: 1.6rem;
   color: $primary-color;
