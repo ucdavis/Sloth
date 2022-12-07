@@ -1,0 +1,19 @@
+@model IList<TransactionMetadata>
+
+<table id="metadataTable" class="table sloth-table">
+    <thead>
+        <tr>
+            <th>Key</th>
+            <th>Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var t in Model)
+        {
+            <tr>
+                <td>@t.Name</td>
+                <td>@t.Value</td>
+            </tr>
+        }
+    </tbody>
+</table>

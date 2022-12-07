@@ -63,6 +63,11 @@ namespace Sloth.Api.Models.v2
         [Required]
         public string SourceType { get; set; }
 
+        /// <summary>
+        /// Optional key/value pairs of generic metadata that will persist with this transaction
+        /// </summary>
+        public Dictionary<string, string> Metadata { get; set; }
+
         public string Description { get; set; }
 
         [ListMinLength(2)]
