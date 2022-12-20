@@ -64,7 +64,15 @@ namespace Sloth.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(string id)
         {
-            var webhook = await DbContext.WebHooks.FirstOrDefaultAsync(i => i.Id == id);
+            var webhook = await DbContext.WebHooks
+                .Where(i => i.Team.Slug == TeamSlug)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (webhook == null)
+            {
+                ErrorMessage = "WebHook not found.";
+                return RedirectToAction(nameof(HomeController.TeamIndex), "Home", new { team = TeamSlug });
+            }
 
             var model = new EditWebHookViewModel()
             {
@@ -78,10 +86,13 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(string id, EditWebHookViewModel model)
         {
-            var webhook = await DbContext.WebHooks.FirstOrDefaultAsync(i => i.Id == id);
+            var webhook = await DbContext.WebHooks
+                .Where(i => i.Team.Slug == TeamSlug)
+                .FirstOrDefaultAsync(i => i.Id == id);
             if (webhook == null)
             {
-                return NotFound();
+                ErrorMessage = "WebHook not found.";
+                return RedirectToAction(nameof(HomeController.TeamIndex), "Home", new { team = TeamSlug });
             }
 
             // validate model
@@ -118,10 +129,13 @@ namespace Sloth.Web.Controllers
         [IgnoreAntiforgeryToken]
         public async Task<IActionResult> SendTest(string id, [FromQuery] bool? persist)
         {
-            var webhook = await DbContext.WebHooks.FirstOrDefaultAsync(i => i.Id == id);
+            var webhook = await DbContext.WebHooks
+                .Where(i => i.Team.Slug == TeamSlug)
+                .FirstOrDefaultAsync(i => i.Id == id);
             if (webhook == null)
             {
-                return NotFound();
+                ErrorMessage = "WebHook not found.";
+                return RedirectToAction(nameof(HomeController.TeamIndex), "Home", new { team = TeamSlug });
             }
 
             var payload = new TestWebHookPayload()

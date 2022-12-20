@@ -149,6 +149,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Details(string id)
         {
             var transaction = await DbContext.Transactions
+                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .Include(t => t.Scrubber)
                 .Include(t => t.JournalRequest)
                 .Include(t => t.Source)
@@ -160,6 +161,12 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Metadata)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (transaction == null)
+            {
+                ErrorMessage = "Transaction not found";
+                return RedirectToAction(nameof(Index));
+            }
 
             var model = new TransactionDetailsViewModel()
             {
@@ -350,19 +357,21 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> ScheduleTransaction(string id)
         {
             var transaction = await DbContext.Transactions
+                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .Include(t => t.Scrubber)
                 .Include(t => t.Transfers)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
-            //TODO: return error messages and redirect
             if (transaction == null)
             {
-                return NotFound();
+                ErrorMessage = "Transaction not found";
+                return RedirectToAction(nameof(Index));
             }
 
             if (transaction.Status != TransactionStatuses.PendingApproval)
             {
-                return NotFound();
+                ErrorMessage = "Transaction is not Pending Approval";
+                return RedirectToAction(nameof(Details), new { id });
             }
 
             transaction.SetStatus(TransactionStatuses.Scheduled);
@@ -379,6 +388,7 @@ namespace Sloth.Web.Controllers
             reversalAmount = Math.Round(reversalAmount, 2);
 
             var transaction = await DbContext.Transactions
+                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .Include(t => t.Scrubber)
                 .Include(t => t.Source)
                 .Include(t => t.Transfers)
@@ -386,7 +396,8 @@ namespace Sloth.Web.Controllers
 
             if (transaction == null)
             {
-                return NotFound();
+                ErrorMessage = "Transaction not found";
+                return RedirectToAction("Index");
             }
 
             // you can only reverse a completed transaction
@@ -516,6 +527,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> CallWebHook(string id)
         {
             var transaction = await DbContext.Transactions
+                .Where(t => t.Source.Team.Slug == TeamSlug)
                 .Include(t => t.Source)
                 .ThenInclude(s => s.Team)
                 .SingleOrDefaultAsync(t => t.Id == id);
@@ -524,13 +536,6 @@ namespace Sloth.Web.Controllers
             {
                 ErrorMessage = "Transaction not found.";
                 return RedirectToAction("Index");
-            }
-
-            if (transaction.Source.Team.Slug != TeamSlug)
-            {
-                ErrorMessage = $"Team Mismatch {transaction.Source.Team.Slug} not {TeamSlug}";
-                return RedirectToAction("Index", "Home");
-
             }
 
             var hasWebhooks = await DbContext.WebHooks.AnyAsync(w => w.Team.Slug == TeamSlug && w.IsActive);

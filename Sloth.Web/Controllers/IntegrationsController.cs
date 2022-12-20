@@ -32,8 +32,16 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Details(string id)
         {
             var integration = await DbContext.Integrations
+                .Where(i => i.Source.Team.Slug == TeamSlug)
                 .Include(i => i.Source)
                 .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (integration == null)
+            {
+                ErrorMessage = "Integration not found";
+                return RedirectToAction(nameof(Index));
+            }
+
             return View(integration);
         }
 
@@ -101,7 +109,15 @@ namespace Sloth.Web.Controllers
                 IntegrationTypes.CyberSource
             };
 
-            var integration = await DbContext.Integrations.FirstOrDefaultAsync(i => i.Id == id);
+            var integration = await DbContext.Integrations
+                .Where(i => i.Source.Team.Slug == TeamSlug)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (integration == null)
+            {
+                ErrorMessage = "Integration not found";
+                return RedirectToAction(nameof(HomeController.TeamIndex), "Home", new { team = TeamSlug });
+            }
 
             var model = new EditIntegrationViewModel()
             {
@@ -120,11 +136,13 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(string id, EditIntegrationViewModel model)
         {
-            var integration = await DbContext.Integrations.FirstOrDefaultAsync(i => i.Id == id);
+            var integration = await DbContext.Integrations
+                .Where(i => i.Source.Team.Slug == TeamSlug)
+                .FirstOrDefaultAsync(i => i.Id == id);
             if (integration == null)
             {
                 ErrorMessage = "Integration not found";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction(nameof(HomeController.TeamIndex), "Home", new { team = TeamSlug });
             }
 
             // validate model

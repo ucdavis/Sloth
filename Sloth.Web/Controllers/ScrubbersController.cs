@@ -34,6 +34,7 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Details(string id)
         {
             var scrubber = await DbContext.Scrubbers
+                .Where(s => s.Source.Team.Slug == TeamSlug)
                 .Include(s => s.Source)
                     .ThenInclude(s => s.Team)
                 .Include(s => s.Transactions)
@@ -45,6 +46,12 @@ namespace Sloth.Web.Controllers
                         .ThenInclude(r => r.Source)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (scrubber == null)
+            {
+                ErrorMessage = "Scrubber not found.";
+                return RedirectToAction(nameof(Index));
+            }
 
             var scrubberDetails = new ScrubberDetailsViewModel()
             {
