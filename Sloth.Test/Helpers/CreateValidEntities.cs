@@ -30,6 +30,14 @@ namespace Sloth.Test.Helpers
             rtValue.TransactionDate = DateTime.Now;
             rtValue.Transfers = transfers;
             rtValue.SetStatus(status ?? TransactionStatuses.Completed);
+            rtValue.Source = new Source()
+            {
+                Team = new Team()
+                {
+                    Name = "Test Team",
+                    Slug = "testSlug"
+                }
+            };
             return rtValue;
         }
 

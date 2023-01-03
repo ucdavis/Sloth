@@ -85,12 +85,14 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Edit(string id)
         {
             var source = await DbContext.Sources
+                .Where(s => s.Team.Slug == TeamSlug)
                 .Include(s => s.Team)
                 .FirstOrDefaultAsync(s => s.Id == id);
 
             if (source == null)
             {
-                return NotFound();
+                ErrorMessage = "Source not found.";
+                return RedirectToAction(nameof(Index));
             }
 
             var model = new EditSourceViewModel()
@@ -112,10 +114,13 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(string id, EditSourceViewModel model)
         {
-            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == id);
+            var source = await DbContext.Sources
+                .Where(s => s.Team.Slug == TeamSlug)
+                .FirstOrDefaultAsync(s => s.Id == id);
             if (source == null)
             {
-                return NotFound();
+                ErrorMessage = "Source not found.";
+                return RedirectToAction(nameof(Index));
             }
 
             // validate model

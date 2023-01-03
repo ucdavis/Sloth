@@ -38,12 +38,15 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> Details(string id)
         {
             var blob = await DbContext.Blobs
+                .Where(b => b.Scrubbers.Any(s => s.Source.Team.Slug == TeamSlug)
+                    || b.TransactionBlobs.Any(tb => tb.Transaction.Source.Team.Slug == TeamSlug))
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (blob == null)
             {
-                return NotFound();
+                ErrorMessage = "Blob not found.";
+                return RedirectToAction(nameof(HomeController.TeamIndex), "Home", new { team = TeamSlug });
             }
 
             using var reader = new StreamReader(await _storageService.GetBlobAsync(blob.Container, blob.FileName));
