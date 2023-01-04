@@ -156,8 +156,8 @@ namespace Sloth.Core.Services
         /// <param name="requestId">Found in JournalRequest.RequestId</param>
         /// <returns></returns>
         public async Task<IGlJournalRequestStatusResult> GetJournalStatus(string requestId)
-        {
-            var result = await _aggieClient.GlJournalRequestStatus.ExecuteAsync(requestId);
+        {           
+            var result = await _aggieClient.GlJournalRequestStatus.ExecuteAsync(new Guid(requestId));
 
             return result.ReadData();
         }
