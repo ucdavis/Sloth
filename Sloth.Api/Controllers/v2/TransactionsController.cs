@@ -281,7 +281,7 @@ namespace Sloth.Api.Controllers.v2
             {
                 foreach (var entry in transaction.Metadata)
                 {
-                    transactionToCreate.Metadata.Add(new TransactionMetadata { Transaction = transactionToCreate, Name = entry.Key, Value = entry.Value });
+                    transactionToCreate.Metadata.Add(new TransactionMetadata { Transaction = transactionToCreate, Name = entry.Name, Value = entry.Value });
                 }
             }
 

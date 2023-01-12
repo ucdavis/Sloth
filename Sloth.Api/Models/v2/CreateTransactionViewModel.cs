@@ -12,6 +12,7 @@ namespace Sloth.Api.Models.v2
             AutoApprove = false;
             ValidateFinancialSegmentStrings = true;
             Transfers = new List<CreateTransferViewModel>();
+            Metadata = new List<MetadataEntry>();
         }
 
         /// <summary>
@@ -66,12 +67,18 @@ namespace Sloth.Api.Models.v2
         /// <summary>
         /// Optional key/value pairs of generic metadata that will persist with this transaction
         /// </summary>
-        public Dictionary<string, string> Metadata { get; set; }
+        public IList<MetadataEntry> Metadata { get; set; }
 
         public string Description { get; set; }
 
         [ListMinLength(2)]
         [Required]
         public IList<CreateTransferViewModel> Transfers { get; set; }
+
+        public class MetadataEntry
+        {
+            public string Name { get; set; }
+            public string Value { get; set; }
+        }
     }
 }
