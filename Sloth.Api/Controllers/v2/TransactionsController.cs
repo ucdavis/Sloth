@@ -48,6 +48,7 @@ namespace Sloth.Api.Controllers.v2
                 .Where(t => t.Source.Team.Id == teamId)
                 .Include(t => t.Creator)
                 .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
                 .Take(1)
                 .AsNoTracking()
                 .ToListAsync();
