@@ -44,10 +44,18 @@ namespace Sloth.Web.Controllers
 
             var transactions = await DbContext.Transactions
                 .Where(t => t.Source.Team.Slug == TeamSlug
-                       && t.Status == TransactionStatuses.Processing
-                       // not likely to have multiple processing status events, but look for the latest just in case
-                       && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
-                                        .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5))
+                    &&
+                    (
+                        t.Status == TransactionStatuses.Rejected
+                        ||
+                        (
+                            t.Status == TransactionStatuses.Processing
+                            // not likely to have multiple processing status events, but look for the latest just in case
+                            && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
+                                             .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5)
+                        )
+                    )
+                )
                 .Include(t => t.Transfers)
                 .AsNoTracking()
                 .ToListAsync();
@@ -67,10 +75,16 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> FailedTransactionsAllTeams()
         {
             var transactions = await DbContext.Transactions
-                .Where(t => t.Status == TransactionStatuses.Processing
-                       // not likely to have multiple processing status events, but look for the latest just in case
-                       && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
-                                        .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5))
+                .Where(t =>
+                    t.Status == TransactionStatuses.Rejected
+                    ||
+                    (
+                        t.Status == TransactionStatuses.Processing
+                        // not likely to have multiple processing status events, but look for the latest just in case
+                        && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
+                                         .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5)
+                    )
+                )
                 .Include(t => t.Transfers)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
