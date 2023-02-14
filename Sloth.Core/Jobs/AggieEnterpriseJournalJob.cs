@@ -96,6 +96,9 @@ namespace Sloth.Core.Jobs
 
                         try
                         {
+                            // create a new trackingId for the AE Service to use
+                            transaction.ConsumerTrackingId = Guid.NewGuid().ToString();
+
                             var result = await _aggieEnterpriseService.CreateJournal(source, transaction);
                             var requestStatus = result.GlJournalRequest.RequestStatus;
 
