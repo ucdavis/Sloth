@@ -123,7 +123,7 @@ namespace Sloth.Core.Services
             {
                 Header = new ActionRequestHeaderInput
                 {
-                    ConsumerTrackingId = transaction.Id.SafeTruncate(80),
+                    ConsumerTrackingId = transaction.ConsumerTrackingId.SafeTruncate(80),
                     ConsumerReferenceId = source.Name.SafeTruncate(80),
                     ConsumerNotes =
                         transaction.Description.SafeTruncate(240),
@@ -156,12 +156,12 @@ namespace Sloth.Core.Services
         /// <param name="requestId">Found in JournalRequest.RequestId</param>
         /// <returns></returns>
         public async Task<IGlJournalRequestStatusResult> GetJournalStatus(Guid requestId)
-        {           
+        {
             var result = await _aggieClient.GlJournalRequestStatus.ExecuteAsync(requestId);
 
             return result.ReadData();
         }
-        
+
         private PpmSegmentInput ConvertToPpmSegmentInput(PpmSegments segments)
         {
             return new PpmSegmentInput
