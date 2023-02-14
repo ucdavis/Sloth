@@ -100,6 +100,13 @@ namespace Sloth.Core.Models
         public string KfsTrackingNumber { get; set; }
 
         /// <summary>
+        /// Unique identifier for tracking this transaction through the financial system (Aggie Enterprise)
+        /// </summary>
+        [MaxLength(128)]
+        [DisplayName("Consumer Tracking Id")]
+        public string ConsumerTrackingId { get; set; }
+
+        /// <summary>
         /// Date the transaction occurred.
         /// </summary>
         [Required]
