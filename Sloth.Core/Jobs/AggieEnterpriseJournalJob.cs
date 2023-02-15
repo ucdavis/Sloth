@@ -110,7 +110,7 @@ namespace Sloth.Core.Jobs
                                 requestStatus.RequestStatus == RequestStatus.Pending)
                             {
                                 // success, update transaction status to uploaded
-                                transaction.SetStatus(TransactionStatuses.Processing);
+                                transaction.SetStatus(TransactionStatuses.Processing, details: $"RequestId: {requestStatus.RequestId}, ConsumerTrackingId: {transaction.ConsumerTrackingId}");
 
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
@@ -130,7 +130,7 @@ namespace Sloth.Core.Jobs
                                 hasRejectedTransactions = true;
 
                                 // failure, update transaction status to rejected
-                                transaction.SetStatus(TransactionStatuses.Rejected);
+                                transaction.SetStatus(TransactionStatuses.Rejected, details: $"RequestId: {requestStatus.RequestId}, ConsumerTrackingId: {transaction.ConsumerTrackingId}");
 
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
