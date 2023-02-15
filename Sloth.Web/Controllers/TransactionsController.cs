@@ -137,7 +137,7 @@ namespace Sloth.Web.Controllers
                 .ToListAsync();
 
             // update status
-            transactions.ForEach(t => t.SetStatus(TransactionStatuses.Scheduled));
+            transactions.ForEach(t => t.SetStatus(TransactionStatuses.Scheduled, details: $"Approved All", memberName: User.Identity.Name));
 
             // save to db
             await DbContext.SaveChangesAsync();
@@ -376,7 +376,7 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction(nameof(Details), new { id });
             }
 
-            transaction.SetStatus(TransactionStatuses.Scheduled);
+            transaction.SetStatus(TransactionStatuses.Scheduled, details: "Approved", memberName: User.Identity.Name);
 
             await DbContext.SaveChangesAsync();
 
