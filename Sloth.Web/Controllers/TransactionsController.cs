@@ -212,6 +212,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
                 .Include(t => t.Transfers)
+                .Include(t => t.StatusEvents)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id && t.Source.Team.Slug == TeamSlug);
 
@@ -255,6 +256,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
                 .Include(t => t.Transfers)
+                .Include(t => t.StatusEvents)
                 .FirstOrDefaultAsync(t => t.Id == id && t.Source.Team.Slug == TeamSlug);
 
             if (currentTransaction == null)
@@ -319,11 +321,11 @@ namespace Sloth.Web.Controllers
                 }
             }
 
-            if (oldTransferValues.Count > 0 && string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
+            if (string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
             {
-                currentTransaction.SetStatus(TransactionStatuses.Processing, $"Edited by: {User.Identity.Name} Original values: {JsonSerializer.Serialize(oldTransferValues)}");
+                currentTransaction.SetStatus(TransactionStatuses.Scheduled, $"Edited by: {User.Identity.Name} Original values changed: {JsonSerializer.Serialize(oldTransferValues)}");
                 await DbContext.SaveChangesAsync();
-                Message = "Transaction updated";
+                Message = oldTransferValues.Count > 0 ? "Transaction updated" : "No transfers updated. Transaction set to Scheduled";
             }
             else if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
             {
