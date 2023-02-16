@@ -24,15 +24,12 @@ namespace Sloth.Core.Services
     public class AggieEnterpriseService : IAggieEnterpriseService
     {
         private readonly IAggieEnterpriseClient _aggieClient;
-        private readonly string _journalSource;
-        private readonly string _journalCategory;
+        private readonly AggieEnterpriseOptions _options;
 
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
             _aggieClient = AggieEnterpriseApi.GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
-
-            _journalSource = options.Value.JournalSource;
-            _journalCategory = options.Value.JournalCategory;
+            _options = options.Value;
         }
 
         public async Task<bool> IsAccountValid(string financialSegmentString, bool validateCVRs = true)
@@ -128,13 +125,14 @@ namespace Sloth.Core.Services
                     ConsumerNotes =
                         transaction.Description.SafeTruncate(240),
                     BoundaryApplicationName = source.Name.SafeTruncate(80),
+                    BatchRequest = _options.BatchRequest // requests to promote thin ledger
                     // TODO: Seems to kill the API if specified, so don't specify for now.
                     // BatchRequest = true // always want to batch requests to promote thin ledger
                 },
                 Payload = new GlJournalInput
                 {
-                    JournalSourceName = _journalSource.SafeTruncate(80),
-                    JournalCategoryName = _journalCategory.SafeTruncate(80),
+                    JournalSourceName = _options.JournalSource.SafeTruncate(80),
+                    JournalCategoryName = _options.JournalCategory.SafeTruncate(80),
                     JournalName = source.Name.StripToErpName(100),
                     JournalReference = source.Team.Name.StripToGlReferenceField(25),
                     AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
