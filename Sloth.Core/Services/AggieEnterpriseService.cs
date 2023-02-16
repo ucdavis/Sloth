@@ -82,10 +82,23 @@ namespace Sloth.Core.Services
                     throw new ArgumentException("Invalid financial segment string: " + transfer.FinancialSegmentString);
                 }
 
+                //TODO: Have a flag if this is for Devar's as they might want other fields? Or use the Journal Source?
+                var glide = new GlideInput
+                {
+                    LineDescription = transfer.Description.SafeTruncate(50),
+                    TransactionDate = transaction.TransactionDate.Date,
+                    UdfString1      = transaction.Description.SafeTruncate(50),
+                    UdfString2      = transaction.KfsTrackingNumber.StripToErpName(50),
+                    UdfString3      = transaction.ProcessorTrackingNumber.SafeTruncate(50),
+                    UdfString4      = transaction.MerchantTrackingNumber.SafeTruncate(50),
+                    UdfString5      = transfer.Id.SafeTruncate(50)
+                };
+
                 var line = new GlJournalLineInput
                 {
                     ExternalSystemIdentifier = transaction.KfsTrackingNumber.StripToGlReferenceField(10),
-                    ExternalSystemReference = transfer.Id.StripToGlReferenceField(25)
+                    ExternalSystemReference = transfer.Id.StripToGlReferenceField(25),
+                    Glide = glide
                 };
 
                 if (transfer.Direction == Transfer.CreditDebit.Credit)
