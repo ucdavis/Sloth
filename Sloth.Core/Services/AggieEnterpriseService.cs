@@ -24,16 +24,11 @@ namespace Sloth.Core.Services
     public class AggieEnterpriseService : IAggieEnterpriseService
     {
         private readonly IAggieEnterpriseClient _aggieClient;
-        private readonly string _journalSource;
-        private readonly string _journalCategory;
         private readonly AggieEnterpriseOptions _options;
 
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
             _aggieClient = AggieEnterpriseApi.GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
-
-            _journalSource = options.Value.JournalSource;
-            _journalCategory = options.Value.JournalCategory;
             _options = options.Value;
         }
 
@@ -136,8 +131,8 @@ namespace Sloth.Core.Services
                 },
                 Payload = new GlJournalInput
                 {
-                    JournalSourceName = _journalSource.SafeTruncate(80),
-                    JournalCategoryName = _journalCategory.SafeTruncate(80),
+                    JournalSourceName = _options.JournalSource.SafeTruncate(80),
+                    JournalCategoryName = _options.JournalCategory.SafeTruncate(80),
                     JournalName = source.Name.StripToErpName(100),
                     JournalReference = source.Team.Name.StripToGlReferenceField(25),
                     AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
