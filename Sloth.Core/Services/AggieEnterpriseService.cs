@@ -82,7 +82,7 @@ namespace Sloth.Core.Services
                     throw new ArgumentException("Invalid financial segment string: " + transfer.FinancialSegmentString);
                 }
 
-                //TODO: Have a flag if this is for Devar's as they might want other fields?
+                //TODO: Have a flag if this is for Devar's as they might want other fields? Or use the Journal Source?
                 var glide = new GlideInput
                 {
                     LineDescription = transfer.Description.SafeTruncate(50),
@@ -91,7 +91,7 @@ namespace Sloth.Core.Services
                     UdfString2      = transaction.KfsTrackingNumber.StripToErpName(50),
                     UdfString3      = transaction.ProcessorTrackingNumber.SafeTruncate(50),
                     UdfString4      = transaction.MerchantTrackingNumber.SafeTruncate(50),
-                    UdfString5      = transaction.MerchantTrackingUrl.SafeTruncate(50)
+                    UdfString5      = transfer.Id.SafeTruncate(50)
                 };
 
                 var line = new GlJournalLineInput
