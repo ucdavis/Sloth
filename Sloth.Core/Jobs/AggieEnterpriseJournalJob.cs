@@ -266,7 +266,7 @@ namespace Sloth.Core.Jobs
                                 {
                                     if(result.GlJournalRequestStatus.ProcessingResult != null)
                                     {
-                                        var innerLog = log.ForContext("{TransactionId}", transaction.Id);
+                                        var innerLog = log.ForContext("TransactionId", transaction.Id);
                                         innerLog.Information("Processing Result Status {status}", result.GlJournalRequestStatus.ProcessingResult.Status);
                                         foreach (var job in result.GlJournalRequestStatus.ProcessingResult.Jobs)
                                         {
