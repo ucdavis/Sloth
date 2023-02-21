@@ -138,11 +138,11 @@ namespace Sloth.Core.Jobs
 
                                 if (result.GlJournalRequest.ValidationResults != null && result.GlJournalRequest.ValidationResults.ErrorMessages != null)
                                 {
-                                    log.ForContext("journalRequestId", journalRequest.RequestId);
-                                    log.Warning("journalResult {journalResult}", JsonConvert.SerializeObject(result.GlJournalRequest));
+                                    var innerLog = log.ForContext("journalRequestId", journalRequest.RequestId);
+                                    innerLog.Warning("journalResult {journalResult}", JsonConvert.SerializeObject(result.GlJournalRequest));
                                     foreach (var err in result.GlJournalRequest.ValidationResults.ErrorMessages)
                                     {
-                                        log.Warning("Transaction {TransactionId} rejected: {Message}",
+                                        innerLog.Warning("Transaction {TransactionId} rejected: {Message}",
                                             transaction.Id, err);
                                     }
                                 }
@@ -266,10 +266,11 @@ namespace Sloth.Core.Jobs
                                 {
                                     if(result.GlJournalRequestStatus.ProcessingResult != null)
                                     {
-                                        log.Information("Processing Result Status {status}", result.GlJournalRequestStatus.ProcessingResult.Status);
+                                        var innerLog = log.ForContext("{TransactionId}", transaction.Id);
+                                        innerLog.Information("Processing Result Status {status}", result.GlJournalRequestStatus.ProcessingResult.Status);
                                         foreach (var job in result.GlJournalRequestStatus.ProcessingResult.Jobs)
                                         {
-                                            log.Information("Job {jobId} Status {status} Job Report {jobReport}", job.JobId, job.JobStatus, job.JobReport);
+                                            innerLog.Information("Job {jobId} Status {status} Job Report {jobReport}", job.JobId, job.JobStatus, job.JobReport);
                                         }
                                     }
                                 }
