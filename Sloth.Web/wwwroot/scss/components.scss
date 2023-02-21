@@ -28,6 +28,11 @@
   color: $primary-color !important;
   border: 1px solid $borders;
 }
+.btn {
+  &.disabled {
+    opacity: 0.3;
+  }
+}
 button.btn-close {
   width: 0.5rem;
   height: 0.5rem;
@@ -60,8 +65,8 @@ button.btn-close {
   background-color: transparentize($merlot, 0.8);
 }
 .badge-cancelled {
-  color: $tertiary-font;
-  background-color: transparentize($tertiary-font, 0.8);
+  color: $poppy;
+  background-color: transparentize($poppy, 0.8);
 }
 .badge-default {
   color: $tertiary-font;
