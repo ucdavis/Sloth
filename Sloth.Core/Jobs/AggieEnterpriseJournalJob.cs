@@ -261,6 +261,22 @@ namespace Sloth.Core.Jobs
                                     result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
 
                                 transactionRunStatus.Action = TransactionStatuses.Rejected;
+
+                                try
+                                {
+                                    if(result.GlJournalRequestStatus.ProcessingResult != null)
+                                    {
+                                        log.Information("Processing Result Status {status}", result.GlJournalRequestStatus.ProcessingResult.Status);
+                                        foreach (var job in result.GlJournalRequestStatus.ProcessingResult.Jobs)
+                                        {
+                                            log.Information("Job {jobId} Status {status} Job Report {jobReport}", job.JobId, job.JobStatus, job.JobReport);
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.Error("Exception trying to process journal error", ex);
+                                }
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
                                      RequestStatus.Complete)
