@@ -1,12 +1,101 @@
-@model Sloth.Web.Models.SystemViewModels.SystemViewModel
-
 @{
     ViewBag.Title = "StyleGuide";
 }
 
 <div class="container ">
-    
-         <button type="button" class="btn btn-primary">Primary</button>
+    <div class="row mb-3">
+        <div class="col">
+            <h1>h1. Bootstrap heading</h1>
+            <h2>h2. Bootstrap heading</h2>
+            <h3>h3. Bootstrap heading</h3>
+            <h4>h4. Bootstrap heading</h4>
+            <h5>h5. Bootstrap heading</h5>
+            <h6>h6. Bootstrap heading</h6>
+            <h3>
+  Fancy display heading
+  <small class="text-muted">With faded secondary text</small>
+</h3>
+<p class="lead">
+  This is a lead paragraph. It stands out from regular paragraphs.
+</p>
+<p>Trees grow in all kinds of ways. They're not all perfectly straight. Not every limb is perfect. Put light against light - you have nothing. Put dark against dark - you have nothing. It's the contrast of light and dark that each give the other one meaning. I want everbody to be happy. That's what it's all about. You can get away with a lot. And that's when it becomes fun - you don't have to spend your time thinking about what's happening - you just let it happen. Just think about these things in your mind - then bring them into your world.</p>
+<figure>
+  <blockquote class="blockquote">
+    <p>A well-known quote, contained in a blockquote element.</p>
+  </blockquote>
+  <figcaption class="blockquote-footer">
+    Someone famous in <cite title="Source Title">Source Title</cite>
+  </figcaption>
+</figure>
+        </div>
+    </div>
+    <dl class="row">
+  <dt class="col-sm-3">Description lists</dt>
+  <dd class="col-sm-9">A description list is perfect for defining terms.</dd>
+
+  <dt class="col-sm-3">Term</dt>
+  <dd class="col-sm-9">
+    <p>Definition for the term.</p>
+    <p>And some more placeholder definition text.</p>
+  </dd>
+
+  <dt class="col-sm-3">Another term</dt>
+  <dd class="col-sm-9">This definition is short, so no extra paragraphs or anything.</dd>
+
+  <dt class="col-sm-3 text-truncate">Truncated term is truncated</dt>
+  <dd class="col-sm-9">This can be useful when space is tight. Adds an ellipsis at the end.</dd>
+
+  <dt class="col-sm-3">Nesting</dt>
+  <dd class="col-sm-9">
+    <dl class="row">
+      <dt class="col-sm-4">Nested definition list</dt>
+      <dd class="col-sm-8">I heard you like definition lists. Let me put a definition list inside your definition list.</dd>
+    </dl>
+  </dd>
+</dl>
+<div class="row mb-3">
+    <div class="col-4">
+    <div class="alert alert-primary" role="alert">
+  A simple primary alert—check it out!
+</div>
+<div class="alert alert-secondary" role="alert">
+  A simple secondary alert—check it out!
+</div>
+<div class="alert alert-success" role="alert">
+  A simple success alert—check it out!
+</div>
+<div class="alert alert-danger" role="alert">
+  A simple danger alert—check it out!
+</div>
+<div class="alert alert-warning" role="alert">
+  A simple warning alert—check it out!
+</div>
+<div class="alert alert-info" role="alert">
+  A simple info alert—check it out!
+</div>
+<div class="alert alert-light" role="alert">
+  A simple light alert—check it out!
+</div>
+<div class="alert alert-dark" role="alert">
+  A simple dark alert—check it out!
+</div>
+    </div>
+    <div class="col-4">
+        <span class="badge bg-primary">Primary</span>
+<span class="badge bg-secondary">Secondary</span>
+<span class="badge bg-success">Success</span>
+<span class="badge bg-danger">Danger</span>
+<span class="badge bg-warning text-dark">Warning</span>
+<span class="badge bg-info text-dark">Info</span>
+<span class="badge bg-light text-dark">Light</span>
+<span class="badge bg-dark">Dark</span>
+    </div>
+
+
+</div>
+    <div class="row mb-3">
+        <div class="col">
+             <button type="button" class="btn btn-primary">Primary</button>
         <button type="button" class="btn btn-primary disabled">Disabled</button>
         <button type="button" class="btn btn-secondary">Secondary</button>
         <button type="button" class="btn btn-success">Success</button>
@@ -17,13 +106,19 @@
         <button type="button" class="btn btn-dark">Dark</button>
         <button type="button" class="btn btn-link">Link</button>
         </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col">
         <div class="input-group date" data-provide="datepicker" data-date-container="body">
-                            <input name="date" type="text" class="form-control" placeholder="MM/DD/YYYY" />
-                            
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fa fa-fw fa-calendar"></i>
-                            </div>
-                        </div>
+            <input name="date" type="text" class="form-control" placeholder="MM/DD/YYYY" />
+                <button class="btn btn-outline-secondary" type="button">
+                    <i class="fa fa-fw fa-calendar"></i>
+            </div>
+        
+        </div>
+    </div>
+    
+        
 </div>
 
 

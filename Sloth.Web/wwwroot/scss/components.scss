@@ -28,8 +28,11 @@
   }
 }
 .input-group {
-  .btn {
+  .btn-outline-secondary {
     box-shadow: none;
+    background-color: $bg-primary;
+    color: $primary-color;
+    border-color: $borders-sloth;
   }
 }
 .btn {
