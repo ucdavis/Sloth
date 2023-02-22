@@ -156,7 +156,7 @@
     var canCallWebhook = Context.HasTeamRole(TeamRole.Manager);
     <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
         <div>
-            <button type="submit" class="btn btn-outline" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
+            <button type="submit" class="btn btn-secondary" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
         </div>
     </form>
 }
@@ -177,7 +177,7 @@
             </div>
         </div>
         <div class="col">
-            <button type="submit" class="btn btn-primary" @(!canReverse ? "Disabled" : "")>Reverse Transaction</button>
+            <button type="submit" class="btn btn-warning" @(!canReverse ? "Disabled" : "")>Reverse Transaction</button>
         </div>
 
 

@@ -73,5 +73,10 @@ namespace Sloth.Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+        public async Task<IActionResult> StyleGuide()
+        {
+            
+            return View();
+        }
     }
 }
