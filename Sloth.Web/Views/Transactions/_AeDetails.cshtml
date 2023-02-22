@@ -144,7 +144,7 @@
     var canCallWebhook = Context.HasTeamRole(TeamRole.Manager);
     <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
         <div>
-            <button type="submit" class="btn btn-warning" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
+            <button type="submit" class="btn btn-secondary" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
         </div>
     </form>
 }
@@ -154,7 +154,7 @@
     var canEdit = Context.HasTeamRole(TeamRole.Manager);
     <form asp-controller="Transactions" asp-action="Edit" asp-route-id="@Model.Transaction.Id" method="get">
         <div>
-            <button type="submit" class="btn btn-warning" @(!canEdit ? "Disabled" : "")>Edit Transaction</button>
+            <button type="submit" class="btn btn-primary" @(!canEdit ? "Disabled" : "")>Edit Transaction</button>
         </div>
     </form>
 }
