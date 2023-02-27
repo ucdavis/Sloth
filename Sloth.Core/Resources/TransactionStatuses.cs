@@ -13,9 +13,6 @@ namespace Sloth.Core.Resources
         public const string Rejected = "Rejected";
         public const string Cancelled = "Cancelled";
 
-        // Only used to keep track of the last time a notification was sent; not for actually setting Transaction.Status
-        public const string NotificationSent = "NotificationSent";
-
         public static string[] GetAllStatuses()
         {
             return new[]

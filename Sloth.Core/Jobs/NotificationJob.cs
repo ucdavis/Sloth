@@ -20,34 +20,39 @@ namespace Sloth.Core.Jobs
             _dbContext = dbContext;
         }
 
-        public Task ProcessNotifications(ILogger log)
+        public async Task ProcessNotifications()
         {
-            return ProcessFailedTransactionNotifications(log);
+            await ProcessFailedTransactionNotifications();
         }
 
-        private async Task ProcessFailedTransactionNotifications(ILogger log)
+        private async Task ProcessFailedTransactionNotifications()
         {
+            var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
+            var sixDaysAgo = DateTime.UtcNow.Date.AddDays(-6);
+
             var groups = await _dbContext.Transactions
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
                 .Where(t =>
-                    (
+                    t.Status == TransactionStatuses.Rejected
+                    || (
                         t.Status == TransactionStatuses.Processing
-                        && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing).Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5)
-                        && t.StatusEvents.Where(e => e.Status == TransactionStatuses.NotificationSent).Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5)
-                    )
-                    ||
-                    (
-                        (t.Status == TransactionStatuses.Processing && t.StatusEvents.Where(e => e.Status == TransactionStatuses.NotificationSent).Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5))
+                        && (t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
+                            .Max(e => (DateTime?)e.EventDate) ?? sixDaysAgo) < fiveDaysAgo
+                            // casting to nullable is an MS-condoned hack to allow calling Max on a potentially empty collection
                     )
                 )
                 .GroupBy(t => t.Source.Team.Slug)
                 .ToArrayAsync();
 
+            if (!groups.Any())
+            {
+                Log.Information("No failed transactions found");
+                return;
+            }
+
             foreach (var group in groups)
             {
-
-
                 var notifySuccess = await _notificationService.Notify(Notification
                     .Message("One or more transactions have failed")
                     .WithEmailsToTeam(group.Key, TeamRole.Admin)
@@ -55,7 +60,7 @@ namespace Sloth.Core.Jobs
                     .WithLinkBack("View Failed Transactions", $"/{group.Key}/Reports/FailedTransactions"));
                 if (!notifySuccess)
                 {
-                    log.Error("Error sending failed transactions notification for team {TeamSlug}", group.Key);
+                    Log.Error("Error sending failed transactions notification for team {TeamSlug}", group.Key);
                     //TODO: queue notification for retry
                 }
             }
