@@ -59,8 +59,15 @@ namespace Sloth.Core.Extensions
 
         public static string JsonPrettify(this string json)
         {
-            using var jDoc = JsonDocument.Parse(json);
-            return JsonSerializer.Serialize(jDoc, new JsonSerializerOptions { WriteIndented = true });
+            try
+            {
+                using var jDoc = JsonDocument.Parse(json);
+                return JsonSerializer.Serialize(jDoc, new JsonSerializerOptions { WriteIndented = true });
+            }
+            catch (Exception)
+            {
+                return json;
+            }
         }
 
         public static string XmlPrettify(this string xml)
