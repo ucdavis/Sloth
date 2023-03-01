@@ -42,20 +42,28 @@ namespace Sloth.Web.Controllers
                 return BadRequest("TeamSlug is required");
             }
 
-            var transactions = await DbContext.Transactions
-                .Where(t => t.Source.Team.Slug == TeamSlug
-                    &&
-                    (
-                        t.Status == TransactionStatuses.Rejected
-                        ||
-                        (
-                            t.Status == TransactionStatuses.Processing
-                            // not likely to have multiple processing status events, but look for the latest just in case
-                            && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
-                                             .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5)
-                        )
-                    )
+            var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
+
+            // get latest TransactionStatusEvent for each transaction
+            // and filter that set to only rejected or processing older than 5 days
+            var txnIdsFromStaleOrRejectedProcessingEvents = DbContext.TransactionStatusEvents
+                .GroupBy(e => e.TransactionId)
+                .Select(g => new
+                {
+                    TransactionId = g.Key,
+                    MaxDate = g.Max(e => e.EventDate)
+                })
+                .Join(DbContext.TransactionStatusEvents,
+                    outer => new { outer.TransactionId, EventDate = outer.MaxDate },
+                    inner => new { inner.TransactionId, inner.EventDate },
+                    (_, inner) => inner
                 )
+                .Where(e => e.Status == TransactionStatuses.Rejected
+                    || (e.Status == TransactionStatuses.Processing && e.EventDate < fiveDaysAgo))
+                .Select(e => e.TransactionId);
+
+            var transactions = await DbContext.Transactions
+                .Where(t => t.Source.Team.Slug == TeamSlug && txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id))
                 .Include(t => t.Transfers)
                 .AsNoTracking()
                 .ToListAsync();
@@ -74,17 +82,28 @@ namespace Sloth.Web.Controllers
         [Authorize(Roles = Roles.SystemAdmin)]
         public async Task<IActionResult> FailedTransactionsAllTeams()
         {
-            var transactions = await DbContext.Transactions
-                .Where(t =>
-                    t.Status == TransactionStatuses.Rejected
-                    ||
-                    (
-                        t.Status == TransactionStatuses.Processing
-                        // not likely to have multiple processing status events, but look for the latest just in case
-                        && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
-                                         .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5)
-                    )
+            var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
+
+            // get latest TransactionStatusEvent for each transaction
+            // and filter that set to only rejected or processing older than 5 days
+            var txnIdsFromStaleOrRejectedProcessingEvents = DbContext.TransactionStatusEvents
+                .GroupBy(e => e.TransactionId)
+                .Select(g => new
+                {
+                    TransactionId = g.Key,
+                    MaxDate = g.Max(e => e.EventDate)
+                })
+                .Join(DbContext.TransactionStatusEvents,
+                    outer => new { outer.TransactionId, EventDate = outer.MaxDate },
+                    inner => new { inner.TransactionId, inner.EventDate },
+                    (_, inner) => inner
                 )
+                .Where(e => e.Status == TransactionStatuses.Rejected
+                    || (e.Status == TransactionStatuses.Processing && e.EventDate < fiveDaysAgo))
+                .Select(e => e.TransactionId);
+
+            var transactions = await DbContext.Transactions
+                .Where(t => txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id))
                 .Include(t => t.Transfers)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
