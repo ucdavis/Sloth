@@ -34,61 +34,55 @@ namespace Sloth.Core.Jobs
         private async Task<FailedTxnResult> ProcessFailedTransactionNotifications()
         {
             var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
-            var sixDaysAgo = DateTime.UtcNow.Date.AddDays(-6);
 
-            var txnIdsFromStaleProcessingEvents = await _dbContext.TransactionStatusEvents
-                .Where(e => e.Status == TransactionStatuses.Processing)
+            // get latest TransactionStatusEvent for each transaction
+            // and filter that set to only rejected or processing older than 5 days
+            var txnIdsFromStaleOrRejectedProcessingEvents = _dbContext.TransactionStatusEvents
                 .GroupBy(e => e.TransactionId)
                 .Select(g => new
                 {
                     TransactionId = g.Key,
-                    MaxDate = g.Max(e => (DateTime?)e.EventDate) ?? fiveDaysAgo
+                    MaxDate = g.Max(e => e.EventDate)
                 })
-                .Where(e => e.MaxDate > fiveDaysAgo)
-                .Select(e => e.TransactionId)
-                .ToArrayAsync();
-
-            var groups = await _dbContext.Transactions
-                .Include(t => t.Source)
-                    .ThenInclude(s => s.Team)
-                .Where(t =>
-                    t.Status == TransactionStatuses.Rejected
-                    //|| txnIdsFromStaleProcessingEvents.Contains(t.Id)
-
-                    // || (
-                    //     t.Status == TransactionStatuses.Processing
-                    //     && (t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
-                    //         .Max(e => (DateTime?)e.EventDate) ?? sixDaysAgo) < fiveDaysAgo
-                    // // casting to nullable is an MS-condoned hack to allow calling Max on a potentially empty collection
-                    // )
+                .Join(_dbContext.TransactionStatusEvents,
+                    outer => new { outer.TransactionId, EventDate = outer.MaxDate },
+                    inner => new { inner.TransactionId, inner.EventDate },
+                    (_, inner) => inner
                 )
-                .GroupBy(t => t.Source.Team.Slug)
+                .Where(e => e.Status == TransactionStatuses.Rejected
+                    || (e.Status == TransactionStatuses.Processing && e.EventDate < fiveDaysAgo))
+                .Select(e => e.TransactionId);
+
+            var teamsWithFailedTransactions = await _dbContext.Transactions
+                .Where(t => txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id))
+                .Select(t => t.Source.Team.Slug)
+                .Distinct()
                 .ToArrayAsync();
 
             var failedTxnResult = new FailedTxnResult();
 
-            if (!groups.Any())
+            if (!teamsWithFailedTransactions.Any())
             {
                 Log.Information("No failed transactions found");
                 return failedTxnResult;
             }
 
-            foreach (var group in groups)
+            foreach (var team in teamsWithFailedTransactions)
             {
                 var notifySuccess = await _notificationService.Notify(Notification
-                    .Message("One or more transactions have failed")
-                    .WithEmailsToTeam(group.Key, TeamRole.Admin)
-                    .WithCcEmailsToTeam(group.Key, TeamRole.Manager)
-                    .WithLinkBack("View Failed Transactions", $"/{group.Key}/Reports/FailedTransactions"));
+                    .Message($"One or more {team} transactions have failed")
+                    .WithEmailsToTeam(team, TeamRole.Admin)
+                    .WithCcEmailsToTeam(team, TeamRole.Manager)
+                    .WithLinkBack("View Failed Transactions", $"/{team}/Reports/FailedTransactions"));
                 if (!notifySuccess)
                 {
-                    Log.Error("Error sending failed transactions notification for team {TeamSlug}", group.Key);
-                    failedTxnResult.FailedTxnTeamsNotEmailed.Add(group.Key);
+                    Log.Error("Error sending failed transactions notification for team {TeamSlug}", team);
+                    failedTxnResult.FailedTxnTeamsNotEmailed.Add(team);
                     //TODO: queue notification for retry
                 }
                 else
                 {
-                    failedTxnResult.FailedTxnTeamsEmailed.Add(group.Key);
+                    failedTxnResult.FailedTxnTeamsEmailed.Add(team);
                 }
             }
 
