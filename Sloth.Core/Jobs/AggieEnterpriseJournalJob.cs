@@ -276,7 +276,23 @@ namespace Sloth.Core.Jobs
                                 }
                                 catch (Exception ex)
                                 {
-                                    log.Error("Exception trying to process journal error", ex);
+                                    log.Error("Exception trying to process journal ProcessingResult.Jobs error", ex);
+                                }
+                                try
+                                {
+                                    if (result.GlJournalRequestStatus.RequestStatus.ErrorMessages != null)
+                                    {
+                                        var innerLog = log.ForContext("TransactionId", transaction.Id);
+                                        innerLog.Information("RequestStatus Status {status}", result.GlJournalRequestStatus.RequestStatus.RequestStatus);
+                                        foreach (var err in result.GlJournalRequestStatus.RequestStatus.ErrorMessages)
+                                        {
+                                            innerLog.Information("Error Message: {err}", err);
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.Error("Exception trying to process journal ErrorMessages", ex);
                                 }
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
