@@ -286,7 +286,7 @@ namespace Sloth.Core.Jobs
                                         innerLog.Information("RequestStatus Status {status}", result.GlJournalRequestStatus.RequestStatus.RequestStatus);
                                         foreach (var err in result.GlJournalRequestStatus.RequestStatus.ErrorMessages)
                                         {
-                                            innerLog.Information("Error {err}", err);
+                                            innerLog.Information("Error Message: {err}", err);
                                         }
                                     }
                                 }
