@@ -53,7 +53,7 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> RemoveUserFromRole(string userId, string role)
         {
-            
+
             if(role != Roles.SystemAdmin)
             {
                 return BadRequest();
@@ -73,9 +73,8 @@ namespace Sloth.Web.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-        public async Task<IActionResult> StyleGuide()
+        public IActionResult StyleGuide()
         {
-            
             return View();
         }
     }
