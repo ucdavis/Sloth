@@ -22,10 +22,10 @@
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().ProcessorTrackingNumber)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().MerchantTrackingNumber)</th>
             <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Description)</th>
+            <th>Amount</th>
+            <th>Accounts</th>
             <th>Team</th>
-
-
-
+            
         </tr>
     </thead>
     <tbody>
@@ -34,6 +34,8 @@
             var firstDebit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Debit);
             var firstCredit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Credit);
             var description = firstDebit.Description;
+            var amount = t.Transfers.Where(a => a.Direction == Transfer.CreditDebit.Credit).Sum(x => x.Amount);
+            var accounts = string.Join(", ", t.Transfers.Select(a => a.FinancialSegmentString).Distinct().ToList());
             if(!string.IsNullOrWhiteSpace(t.Description))
             {
                 description = t.Description;
@@ -54,7 +56,11 @@
                 <td>@t.MerchantTrackingNumber</td>
                 <td><a class="stretched-link" href="/@slug/Transactions/Details/@t.Id">
                     @description</a></td>
+                <td>@amount.ToString("C")</td>
+                <td>@accounts</td>
                 <td>@slug </td>
+                
+                
                 @* @if (String.IsNullOrWhiteSpace(firstDebit.FinancialSegmentString))
                 {
                     <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>

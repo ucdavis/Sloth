@@ -148,7 +148,7 @@
     
     <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
         <div>
-            <button type="submit" class="btn btn-warning" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
+            <button type="submit" class="btn btn-secondary" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
         </div>
     </form>
     

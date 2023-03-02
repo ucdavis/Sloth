@@ -96,6 +96,9 @@ namespace Sloth.Core.Jobs
 
                         try
                         {
+                            // create a new trackingId for the AE Service to use
+                            transaction.ConsumerTrackingId = Guid.NewGuid().ToString();
+
                             var result = await _aggieEnterpriseService.CreateJournal(source, transaction);
                             var requestStatus = result.GlJournalRequest.RequestStatus;
 
@@ -107,7 +110,7 @@ namespace Sloth.Core.Jobs
                                 requestStatus.RequestStatus == RequestStatus.Pending)
                             {
                                 // success, update transaction status to uploaded
-                                transaction.SetStatus(TransactionStatuses.Processing);
+                                transaction.SetStatus(TransactionStatuses.Processing, details: $"RequestId: {requestStatus.RequestId}, ConsumerTrackingId: {transaction.ConsumerTrackingId}");
 
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
@@ -127,7 +130,7 @@ namespace Sloth.Core.Jobs
                                 hasRejectedTransactions = true;
 
                                 // failure, update transaction status to rejected
-                                transaction.SetStatus(TransactionStatuses.Rejected);
+                                transaction.SetStatus(TransactionStatuses.Rejected, details: $"RequestId: {requestStatus.RequestId}, ConsumerTrackingId: {transaction.ConsumerTrackingId}");
 
                                 journalRequest.RequestId = requestStatus.RequestId.Value;
                                 journalRequest.Status = requestStatus.RequestStatus.ToString();
@@ -135,11 +138,11 @@ namespace Sloth.Core.Jobs
 
                                 if (result.GlJournalRequest.ValidationResults != null && result.GlJournalRequest.ValidationResults.ErrorMessages != null)
                                 {
-                                    log.ForContext("journalRequestId", journalRequest.RequestId);
-                                    log.Warning("journalResult {journalResult}", JsonConvert.SerializeObject(result.GlJournalRequest));
+                                    var innerLog = log.ForContext("journalRequestId", journalRequest.RequestId);
+                                    innerLog.Warning("journalResult {journalResult}", JsonConvert.SerializeObject(result.GlJournalRequest));
                                     foreach (var err in result.GlJournalRequest.ValidationResults.ErrorMessages)
                                     {
-                                        log.Warning("Transaction {TransactionId} rejected: {Message}",
+                                        innerLog.Warning("Transaction {TransactionId} rejected: {Message}",
                                             transaction.Id, err);
                                     }
                                 }
@@ -258,6 +261,39 @@ namespace Sloth.Core.Jobs
                                     result.GlJournalRequestStatus.RequestStatus.RequestStatus.ToString();
 
                                 transactionRunStatus.Action = TransactionStatuses.Rejected;
+
+                                try
+                                {
+                                    if(result.GlJournalRequestStatus.ProcessingResult != null)
+                                    {
+                                        var innerLog = log.ForContext("TransactionId", transaction.Id);
+                                        innerLog.Information("Processing Result Status {status}", result.GlJournalRequestStatus.ProcessingResult.Status);
+                                        foreach (var job in result.GlJournalRequestStatus.ProcessingResult.Jobs)
+                                        {
+                                            innerLog.Information("Job {jobId} Status {status} Job Report {jobReport}", job.JobId, job.JobStatus, job.JobReport);
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.Error("Exception trying to process journal ProcessingResult.Jobs error", ex);
+                                }
+                                try
+                                {
+                                    if (result.GlJournalRequestStatus.RequestStatus.ErrorMessages != null)
+                                    {
+                                        var innerLog = log.ForContext("TransactionId", transaction.Id);
+                                        innerLog.Information("RequestStatus Status {status}", result.GlJournalRequestStatus.RequestStatus.RequestStatus);
+                                        foreach (var err in result.GlJournalRequestStatus.RequestStatus.ErrorMessages)
+                                        {
+                                            innerLog.Information("Error Message: {err}", err);
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    log.Error("Exception trying to process journal ErrorMessages", ex);
+                                }
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
                                      RequestStatus.Complete)
