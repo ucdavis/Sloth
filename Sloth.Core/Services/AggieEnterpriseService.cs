@@ -24,15 +24,12 @@ namespace Sloth.Core.Services
     public class AggieEnterpriseService : IAggieEnterpriseService
     {
         private readonly IAggieEnterpriseClient _aggieClient;
-        private readonly string _journalSource;
-        private readonly string _journalCategory;
+        private readonly AggieEnterpriseOptions _options;
 
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
             _aggieClient = AggieEnterpriseApi.GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
-
-            _journalSource = options.Value.JournalSource;
-            _journalCategory = options.Value.JournalCategory;
+            _options = options.Value;
         }
 
         public async Task<bool> IsAccountValid(string financialSegmentString, bool validateCVRs = true)
@@ -85,10 +82,23 @@ namespace Sloth.Core.Services
                     throw new ArgumentException("Invalid financial segment string: " + transfer.FinancialSegmentString);
                 }
 
+                //TODO: Have a flag if this is for Devar's as they might want other fields? Or use the Journal Source?
+                var glide = new GlideInput
+                {
+                    LineDescription = transfer.Description.SafeTruncate(50),
+                    TransactionDate = transaction.TransactionDate.Date,
+                    UdfString1      = transaction.Description.SafeTruncate(50),
+                    UdfString2      = transaction.KfsTrackingNumber.StripToErpName(50),
+                    UdfString3      = transaction.ProcessorTrackingNumber.SafeTruncate(50),
+                    UdfString4      = transaction.MerchantTrackingNumber.SafeTruncate(50),
+                    UdfString5      = transfer.Id.SafeTruncate(50)
+                };
+
                 var line = new GlJournalLineInput
                 {
                     ExternalSystemIdentifier = transaction.KfsTrackingNumber.StripToGlReferenceField(10),
-                    ExternalSystemReference = transfer.Id.StripToGlReferenceField(25)
+                    ExternalSystemReference = transfer.Id.StripToGlReferenceField(25),
+                    Glide = glide
                 };
 
                 if (transfer.Direction == Transfer.CreditDebit.Credit)
@@ -123,18 +133,19 @@ namespace Sloth.Core.Services
             {
                 Header = new ActionRequestHeaderInput
                 {
-                    ConsumerTrackingId = transaction.Id.SafeTruncate(80),
+                    ConsumerTrackingId = transaction.ConsumerTrackingId.SafeTruncate(80),
                     ConsumerReferenceId = source.Name.SafeTruncate(80),
                     ConsumerNotes =
                         transaction.Description.SafeTruncate(240),
                     BoundaryApplicationName = source.Name.SafeTruncate(80),
+                    BatchRequest = _options.BatchRequest // requests to promote thin ledger
                     // TODO: Seems to kill the API if specified, so don't specify for now.
                     // BatchRequest = true // always want to batch requests to promote thin ledger
                 },
                 Payload = new GlJournalInput
                 {
-                    JournalSourceName = _journalSource.SafeTruncate(80),
-                    JournalCategoryName = _journalCategory.SafeTruncate(80),
+                    JournalSourceName = _options.JournalSource.SafeTruncate(80),
+                    JournalCategoryName = _options.JournalCategory.SafeTruncate(80),
                     JournalName = source.Name.StripToErpName(100),
                     JournalReference = source.Team.Name.StripToGlReferenceField(25),
                     AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
@@ -156,12 +167,12 @@ namespace Sloth.Core.Services
         /// <param name="requestId">Found in JournalRequest.RequestId</param>
         /// <returns></returns>
         public async Task<IGlJournalRequestStatusResult> GetJournalStatus(Guid requestId)
-        {           
+        {
             var result = await _aggieClient.GlJournalRequestStatus.ExecuteAsync(requestId);
 
             return result.ReadData();
         }
-        
+
         private PpmSegmentInput ConvertToPpmSegmentInput(PpmSegments segments)
         {
             return new PpmSegmentInput

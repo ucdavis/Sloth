@@ -12,21 +12,36 @@
     color: inherit;
   }
 }
-.btn-primary {
+.btn-warning,
+.btn-secondary {
   color: #fff;
-  background-color: $primary-color;
-  border-color: $primary-color;
   &:hover {
-    background-color: lighten($primary-color, 0.9);
     color: #fff;
   }
 }
-.btn-primary:active {
-  color: #fff;
+.btn-link {
+  color: $primary-color;
+  text-decoration: none;
+  &:hover {
+    color: $primary-color;
+    background-color: $bg-primary;
+  }
 }
-.btn-outline:focus {
-  color: $primary-color !important;
-  border: 1px solid $borders;
+.input-group {
+  .btn-outline-secondary {
+    box-shadow: none;
+    background-color: $bg-primary;
+    color: $primary-color;
+    border-color: $borders-sloth;
+  }
+}
+.btn {
+  &.disabled {
+    opacity: 0.3;
+  }
+}
+.btn:disabled {
+  opacity: 0.3 !important;
 }
 button.btn-close {
   width: 0.5rem;
@@ -60,8 +75,8 @@ button.btn-close {
   background-color: transparentize($merlot, 0.8);
 }
 .badge-cancelled {
-  color: $tertiary-font;
-  background-color: transparentize($tertiary-font, 0.8);
+  color: $poppy;
+  background-color: transparentize($poppy, 0.8);
 }
 .badge-default {
   color: $tertiary-font;
