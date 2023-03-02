@@ -63,7 +63,9 @@ namespace Sloth.Web.Controllers
                 .Select(e => e.TransactionId);
 
             var transactions = await DbContext.Transactions
-                .Where(t => t.Source.Team.Slug == TeamSlug && txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id))
+                .Where(t => t.Source.Team.Slug == TeamSlug
+                    && (t.Status == TransactionStatuses.Rejected || t.Status == TransactionStatuses.Processing)
+                    && txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id))
                 .Include(t => t.Transfers)
                 .AsNoTracking()
                 .ToListAsync();
@@ -103,7 +105,8 @@ namespace Sloth.Web.Controllers
                 .Select(e => e.TransactionId);
 
             var transactions = await DbContext.Transactions
-                .Where(t => txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id))
+                .Where(t => txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id)
+                    && (t.Status == TransactionStatuses.Rejected || t.Status == TransactionStatuses.Processing))
                 .Include(t => t.Transfers)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
