@@ -160,7 +160,6 @@
     
     <form asp-controller="Transactions" asp-action="Edit" asp-route-id="@Model.Transaction.Id" method="get">
         <div>
-            <button type="submit" class="btn btn-primary" @(!canEdit ? "Disabled" : "")>Edit Transaction</button>
             <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "")>Edit Transaction</button>
         </div>
     </form>
