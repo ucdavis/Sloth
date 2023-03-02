@@ -129,47 +129,49 @@
 
 
 <div class="row justify-content-start">
+    <div class="col-4">
 @if (true || Model.Transaction.Status == TransactionStatuses.PendingApproval)
 {
     var canApprove = Context.HasTeamRole(TeamRole.Approver);
-    <div class="col">
+    
     <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Transaction.Id" method="post">
         <div>
             <button type="submit" class="btn btn-primary" @(!canApprove ? "Disabled" : "")>Approve Transaction</button>
         </div>
     </form>
-    </div>
+    
 }
 
 @if (true || Model.Transaction.Status == TransactionStatuses.Completed && Model.HasWebhooks)
 {
     var canCallWebhook = Context.HasTeamRole(TeamRole.Manager);
-    <div class="col">
+    
     <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
         <div>
             <button type="submit" class="btn btn-warning" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
         </div>
     </form>
-    </div>
+    
 }
 
 @if (true || Model.Transaction.Status == TransactionStatuses.Rejected || Model.Transaction.IsStale())
 {
     var isTeamManager = Context.HasTeamRole(TeamRole.Manager);
-    <div class="col">
+    
     <form asp-controller="Transactions" asp-action="Edit" asp-route-id="@Model.Transaction.Id" method="get">
         <div>
             <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "")>Edit Transaction</button>
         </div>
     </form>
-    </div>
+    
 
-    <div class="col">
+    
     <div>
         <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
     </div>
-    </div>
+    
 }
+</div>
 </div>
 
 @if (true || Model.Transaction.Status == TransactionStatuses.Completed && !Model.Transaction.HasReversal)
