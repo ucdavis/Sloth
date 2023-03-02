@@ -128,8 +128,8 @@
 </table>
 
 
-<div class="row justify-content-start">
-    <div class="col-4">
+<div class="row justify-content-start mt-3 mb-3 button-row">
+    <div class="col">
 @if (true || Model.Transaction.Status == TransactionStatuses.PendingApproval)
 {
     var canApprove = Context.HasTeamRole(TeamRole.Approver);
@@ -166,9 +166,9 @@
     
 
     
-    <div>
+   
         <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
-    </div>
+    
     
 }
 </div>

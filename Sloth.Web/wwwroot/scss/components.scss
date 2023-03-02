@@ -1,6 +1,11 @@
 .form-group {
   margin-bottom: 16px;
 }
+.button-row {
+  form {
+    display: inline-block;
+  }
+}
 .form-control:focus,
 .form-select:focus {
   border-color: $primary-color;
