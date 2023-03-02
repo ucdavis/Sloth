@@ -211,6 +211,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.JournalRequest)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
+                .Include(t => t.StatusEvents)
                 .Include(t => t.Transfers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(t => t.Id == id && t.Source.Team.Slug == TeamSlug);
