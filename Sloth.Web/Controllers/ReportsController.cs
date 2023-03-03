@@ -42,30 +42,14 @@ namespace Sloth.Web.Controllers
                 return BadRequest("TeamSlug is required");
             }
 
-            var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
-
-            // get latest TransactionStatusEvent for each transaction
-            // and filter that set to only rejected or processing older than 5 days
-            var txnIdsFromStaleOrRejectedProcessingEvents = DbContext.TransactionStatusEvents
-                .GroupBy(e => e.TransactionId)
-                .Select(g => new
-                {
-                    TransactionId = g.Key,
-                    MaxDate = g.Max(e => e.EventDate)
-                })
-                .Join(DbContext.TransactionStatusEvents,
-                    outer => new { outer.TransactionId, EventDate = outer.MaxDate },
-                    inner => new { inner.TransactionId, inner.EventDate },
-                    (_, inner) => inner
-                )
-                .Where(e => e.Status == TransactionStatuses.Rejected
-                    || (e.Status == TransactionStatuses.Processing && e.EventDate < fiveDaysAgo))
-                .Select(e => e.TransactionId);
-
+            // get transactions that are rejected or have been processing for longer than 5 days
             var transactions = await DbContext.Transactions
                 .Where(t => t.Source.Team.Slug == TeamSlug
-                    && (t.Status == TransactionStatuses.Rejected || t.Status == TransactionStatuses.Processing)
-                    && txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id))
+                    && (
+                        t.Status == TransactionStatuses.Rejected
+                        || (t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-5))
+                    )
+                )
                 .Include(t => t.Transfers)
                 .AsNoTracking()
                 .ToListAsync();
@@ -84,29 +68,10 @@ namespace Sloth.Web.Controllers
         [Authorize(Roles = Roles.SystemAdmin)]
         public async Task<IActionResult> FailedTransactionsAllTeams()
         {
-            var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
-
-            // get latest TransactionStatusEvent for each transaction
-            // and filter that set to only rejected or processing older than 5 days
-            var txnIdsFromStaleOrRejectedProcessingEvents = DbContext.TransactionStatusEvents
-                .GroupBy(e => e.TransactionId)
-                .Select(g => new
-                {
-                    TransactionId = g.Key,
-                    MaxDate = g.Max(e => e.EventDate)
-                })
-                .Join(DbContext.TransactionStatusEvents,
-                    outer => new { outer.TransactionId, EventDate = outer.MaxDate },
-                    inner => new { inner.TransactionId, inner.EventDate },
-                    (_, inner) => inner
-                )
-                .Where(e => e.Status == TransactionStatuses.Rejected
-                    || (e.Status == TransactionStatuses.Processing && e.EventDate < fiveDaysAgo))
-                .Select(e => e.TransactionId);
-
+            // get transactions that are rejected or have been processing for longer than 5 days
             var transactions = await DbContext.Transactions
-                .Where(t => txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id)
-                    && (t.Status == TransactionStatuses.Rejected || t.Status == TransactionStatuses.Processing))
+                .Where(t => t.Status == TransactionStatuses.Rejected
+                    || (t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-5)))
                 .Include(t => t.Transfers)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)

@@ -35,26 +35,10 @@ namespace Sloth.Core.Jobs
         {
             var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
 
-            // get latest TransactionStatusEvent for each transaction
-            // and filter that set to only rejected or processing older than 5 days
-            var txnIdsFromStaleOrRejectedProcessingEvents = _dbContext.TransactionStatusEvents
-                .GroupBy(e => e.TransactionId)
-                .Select(g => new
-                {
-                    TransactionId = g.Key,
-                    MaxDate = g.Max(e => e.EventDate)
-                })
-                .Join(_dbContext.TransactionStatusEvents,
-                    outer => new { outer.TransactionId, EventDate = outer.MaxDate },
-                    inner => new { inner.TransactionId, inner.EventDate },
-                    (_, inner) => inner
-                )
-                .Where(e => e.Status == TransactionStatuses.Rejected
-                    || (e.Status == TransactionStatuses.Processing && e.EventDate < fiveDaysAgo))
-                .Select(e => e.TransactionId);
-
+            // get transactions that are rejected or have been processing for longer than 5 days
             var teamsWithFailedTransactions = await _dbContext.Transactions
-                .Where(t => txnIdsFromStaleOrRejectedProcessingEvents.Contains(t.Id))
+                .Where(t => t.Status == TransactionStatuses.Rejected
+                    || (t.Status == TransactionStatuses.Processing && t.LastModified < fiveDaysAgo))
                 .Select(t => t.Source.Team.Slug)
                 .Distinct()
                 .ToArrayAsync();

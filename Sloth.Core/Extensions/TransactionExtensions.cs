@@ -13,16 +13,8 @@ namespace Sloth.Core.Extensions
     {
         public static bool IsStale(this Transaction transaction)
         {
-            var lastProcessingEvent = transaction.StatusEvents
-                .Where(e => e.Status == TransactionStatuses.Processing)
-                .OrderByDescending(e => e.EventDate)
-                .FirstOrDefault();
-
-            // a missing last processing event means the transaction was likely created
-            // prior to the implementation of status events
             return transaction.Status == TransactionStatuses.Processing
-                 && (lastProcessingEvent == null
-                 || lastProcessingEvent.EventDate < DateTime.UtcNow.Date.AddDays(-5));
+                 && transaction.LastModified < DateTime.UtcNow.Date.AddDays(-5);
         }
 
         public static string ToXml(this Transaction transaction)
