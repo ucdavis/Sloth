@@ -37,10 +37,12 @@ namespace Sloth.Core.Models
             if (details is string stringDetails)
             {
                 Details = stringDetails;
-                return;
             }
-            // convert to json string and store
-            Details = JsonSerializer.Serialize(details);
+            else
+            {
+                // convert to json string and store
+                Details = JsonSerializer.Serialize(details);
+            }
         }
 
         public void SetCompleted(string status, object details)
