@@ -42,12 +42,14 @@ namespace Sloth.Web.Controllers
                 return BadRequest("TeamSlug is required");
             }
 
+            // get transactions that are rejected or have been processing for longer than 5 days
             var transactions = await DbContext.Transactions
                 .Where(t => t.Source.Team.Slug == TeamSlug
-                       && t.Status == TransactionStatuses.Processing
-                       // not likely to have multiple processing status events, but look for the latest just in case
-                       && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
-                                        .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5))
+                    && (
+                        t.Status == TransactionStatuses.Rejected
+                        || (t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-5))
+                    )
+                )
                 .Include(t => t.Transfers)
                 .AsNoTracking()
                 .ToListAsync();
@@ -66,11 +68,10 @@ namespace Sloth.Web.Controllers
         [Authorize(Roles = Roles.SystemAdmin)]
         public async Task<IActionResult> FailedTransactionsAllTeams()
         {
+            // get transactions that are rejected or have been processing for longer than 5 days
             var transactions = await DbContext.Transactions
-                .Where(t => t.Status == TransactionStatuses.Processing
-                       // not likely to have multiple processing status events, but look for the latest just in case
-                       && t.StatusEvents.Where(e => e.Status == TransactionStatuses.Processing)
-                                        .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5))
+                .Where(t => t.Status == TransactionStatuses.Rejected
+                    || (t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-5)))
                 .Include(t => t.Transfers)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)

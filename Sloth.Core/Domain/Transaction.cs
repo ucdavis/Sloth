@@ -113,6 +113,12 @@ namespace Sloth.Core.Models
         [DisplayName("Transaction Date")]
         public DateTime TransactionDate { get; set; }
 
+        /// <summary>
+        /// Date the transaction was last modified.
+        /// </summary>
+        [DisplayName("Last Modified")]
+        public DateTime LastModified { get; set; } = DateTime.UtcNow;
+
         public IList<Transfer> Transfers { get; set; }
 
         [JsonIgnore]
@@ -161,11 +167,12 @@ namespace Sloth.Core.Models
         public Transaction SetStatus(string status, string details = "", [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
+            LastModified = DateTime.UtcNow;
             StatusEvents.Add(new TransactionStatusEvent
             {
                 TransactionId = Id,
                 Status = status,
-                EventDate = DateTime.UtcNow,
+                EventDate = LastModified,
                 EventDetails = !string.IsNullOrWhiteSpace(details)
                     ? details
                     : $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}. {details}",
@@ -222,6 +229,14 @@ namespace Sloth.Core.Models
 
             modelBuilder.Entity<Transaction>()
                 .HasIndex(t => t.TransactionDate);
+
+            modelBuilder.Entity<Transaction>()
+                .HasIndex(t => t.LastModified);
+
+            modelBuilder.Entity<Transaction>()
+                .Property(t => t.LastModified)
+                // SYSUTCDATETIME() returns a datetime2, as opposed to datetime returned by GETUTCDATE()
+                .HasDefaultValueSql("SYSUTCDATETIME()");
         }
     }
 }

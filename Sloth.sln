@@ -36,6 +36,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.WebHooks.Resend"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Jobs.AggieEnterprise.JournalProcessor", "Sloth.Jobs.AggieEnterprise.JournalProcessor\Sloth.Jobs.AggieEnterprise.JournalProcessor.csproj", "{B62FB659-EBA0-4F65-9F24-7B5558D46814}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Jobs.Notifications", "Sloth.Jobs.Notifications\Sloth.Jobs.Notifications.csproj", "{BB500DB8-1B26-461D-8F53-E32C65253FCF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +90,10 @@ Global
 		{B62FB659-EBA0-4F65-9F24-7B5558D46814}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B62FB659-EBA0-4F65-9F24-7B5558D46814}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B62FB659-EBA0-4F65-9F24-7B5558D46814}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BB500DB8-1B26-461D-8F53-E32C65253FCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BB500DB8-1B26-461D-8F53-E32C65253FCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BB500DB8-1B26-461D-8F53-E32C65253FCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BB500DB8-1B26-461D-8F53-E32C65253FCF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +104,7 @@ Global
 		{60693A8F-3E5C-4879-B159-3A46D4B25482} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 		{8B2DE509-F577-457B-A1CD-9E2C122455DD} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 		{B62FB659-EBA0-4F65-9F24-7B5558D46814} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
+    {BB500DB8-1B26-461D-8F53-E32C65253FCF} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {24A52AFC-C6F1-46E3-B01C-59D9D1977B9F}

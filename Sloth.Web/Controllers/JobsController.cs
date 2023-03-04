@@ -310,12 +310,22 @@ namespace Sloth.Web.Controllers
                             var resendWebhookJob = serviceProvider.GetRequiredService<ResendPendingWebHookRequestsJob>();
                             jobDetails = await resendWebhookJob.ResendPendingWebHookRequests();
                             break;
+                        case NotificationJob.JobName:
+                            var notificationJob = serviceProvider.GetRequiredService<NotificationJob>();
+                            jobDetails = await notificationJob.ProcessNotifications();
+                            break;
                     }
+
+                    // record status
+                    scopedRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails ?? new());
+                }
+                catch (Exception ex)
+                {
+                    log.Error("Unexpected error processing job", ex);
+                    scopedRecord.SetCompleted(JobRecord.Statuses.Failed, $"Unexpected error processing job: {ex.Message}");
                 }
                 finally
                 {
-                    // record status
-                    scopedRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails ?? new());
                     await dbContext.SaveChangesAsync(token);
                 }
             });

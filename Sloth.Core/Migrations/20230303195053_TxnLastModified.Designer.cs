@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Sloth.Core;
 
@@ -11,9 +12,10 @@ using Sloth.Core;
 namespace Sloth.Core.Migrations
 {
     [DbContext(typeof(SlothDbContext))]
-    partial class SlothDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230303195053_TxnLastModified")]
+    partial class TxnLastModified
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

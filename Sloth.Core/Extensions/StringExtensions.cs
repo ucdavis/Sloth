@@ -50,7 +50,7 @@ namespace Sloth.Core.Extensions
             {
                 return Regex.Replace(value, regEx, string.Empty);
             }
-            catch (Exception)
+            catch
             {
                 return value;
             }
@@ -59,8 +59,15 @@ namespace Sloth.Core.Extensions
 
         public static string JsonPrettify(this string json)
         {
-            using var jDoc = JsonDocument.Parse(json);
-            return JsonSerializer.Serialize(jDoc, new JsonSerializerOptions { WriteIndented = true });
+            try
+            {
+                using var jDoc = JsonDocument.Parse(json);
+                return JsonSerializer.Serialize(jDoc, new JsonSerializerOptions { WriteIndented = true });
+            }
+            catch
+            {
+                return json;
+            }
         }
 
         public static string XmlPrettify(this string xml)
@@ -70,7 +77,7 @@ namespace Sloth.Core.Extensions
                 var doc = XDocument.Parse(xml);
                 return doc.ToString();
             }
-            catch (Exception)
+            catch
             {
                 return xml;
             }

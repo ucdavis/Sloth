@@ -211,6 +211,7 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.JournalRequest)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
+                .Include(t => t.StatusEvents)
                 .Include(t => t.Transfers)
                 .Include(t => t.StatusEvents)
                 .AsNoTracking()
@@ -301,7 +302,7 @@ namespace Sloth.Web.Controllers
             foreach (var (transfer, edit) in
                 from transfer in currentTransaction.Transfers
                 from edit in transaction.Transfers.Where(x => x.Id == transfer.Id).DefaultIfEmpty()
-                select (transfer, edit ))
+                select (transfer, edit))
             {
                 bool transferUpdated = false;
                 var currentFinancialSegmentString = transfer.FinancialSegmentString;
@@ -333,7 +334,7 @@ namespace Sloth.Web.Controllers
                 foreach (var (transfer, edit) in
                     from transfer in currentTransaction.Transfers
                     from edit in transaction.Transfers.Where(x => x.Id == transfer.Id).DefaultIfEmpty()
-                    select (transfer, edit ))
+                    select (transfer, edit))
                 {
                     if (edit != null)
                     {
@@ -353,6 +354,46 @@ namespace Sloth.Web.Controllers
 
             return RedirectToAction(nameof(Details), new { id });
         }
+
+        [HttpPost]
+        [Authorize(Policy = PolicyCodes.TeamManager)]
+        public async Task<IActionResult> Cancel(string id, string reason)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                ErrorMessage = "No transaction specified";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (string.IsNullOrWhiteSpace(reason))
+            {
+                ErrorMessage = "No reason specified";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            var transaction = await DbContext.Transactions
+                .Include(t => t.StatusEvents)
+                .FirstOrDefaultAsync(t => t.Id == id && t.Source.Team.Slug == TeamSlug);
+
+            if (transaction == null)
+            {
+                ErrorMessage = "Transaction not found";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (transaction.Status != TransactionStatuses.Rejected && !transaction.IsStale())
+            {
+                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days) or Rejected";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            transaction.SetStatus(TransactionStatuses.Cancelled, $"Cancelled by: {User.Identity.Name} Reason: {reason}");
+
+            await DbContext.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Details), new { id });
+        }
+
 
         [HttpPost]
         [Authorize(Policy = PolicyCodes.TeamApprover)]

@@ -14,9 +14,7 @@ namespace Sloth.Core.Extensions
         public static bool IsStale(this Transaction transaction)
         {
             return transaction.Status == TransactionStatuses.Processing
-                 && transaction.StatusEvents
-                    .Where(e => e.Status == TransactionStatuses.Processing)
-                    .Max(e => e.EventDate) < DateTime.UtcNow.Date.AddDays(-5);
+                 && transaction.LastModified < DateTime.UtcNow.Date.AddDays(-5);
         }
 
         public static string ToXml(this Transaction transaction)

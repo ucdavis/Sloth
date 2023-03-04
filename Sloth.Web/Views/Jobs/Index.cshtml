@@ -89,6 +89,20 @@
                     </a>
                 </div>
             </div>
+            <div class="col-md-6">
+                <div class="card job">
+                    <a asp-action="JobList" asp-route-jobname="@NotificationJob.JobName">
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                Notification Job
+                            </h5>
+                            <p class="card-text">
+                                Runs each night. Sends notifications to team admins if there are any rejected or stale transactions.
+                            </p>
+                        </div>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -51,7 +51,7 @@ namespace Sloth.Core.Services
                     var request = await SendWebHook(hook, payload, persist);
                     requests.Add(request);
                 }
-                catch (Exception)
+                catch
                 {
                     // Okay to swallow exception since it has already been logged.  Also important to call
                     // SendWebHook on all hooks to ensure requests are persisted.
@@ -114,7 +114,7 @@ namespace Sloth.Core.Services
                 {
                     await SendWebHookRequest(webHookRequest.WebHook, webHookRequest);
                 }
-                catch (Exception)
+                catch
                 {
                     // Okay to swallow exception since it has already been logged.  Also important to call
                     // SendWebHook on all hooks to ensure requests are persisted.

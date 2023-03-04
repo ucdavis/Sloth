@@ -79,11 +79,15 @@ namespace Sloth.Web
             services.AddScoped<KfsScrubberUploadJob>();
             services.AddScoped<AggieEnterpriseJournalJob>();
             services.AddScoped<ResendPendingWebHookRequestsJob>();
+            services.AddScoped<NotificationJob>();
 
             // add database connection
             services.AddDbContext<SlothDbContext>(options =>
             {
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"), sqlOptions =>
+                {
+                    sqlOptions.EnableRetryOnFailure();
+                });
             });
 
             services.AddIdentity<User, IdentityRole>()

@@ -67,6 +67,30 @@ else
 
 </div>
 
+@if (Model.Transaction.Status == TransactionStatuses.Rejected || Model.Transaction.IsStale())
+{
+    <div id="cancel-txn-modal" class="modal fade">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Cancel Transaction?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="cancel-txn-modal-form" method="post" action="@Url.Action("Cancel")">
+              <input name="id" type="hidden" value="@Model.Transaction.Id" />
+              <input name="reason" class="form-control" type="text" placeholder="Reason" />
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" id="cancel-txn-modal-action" class="btn btn-primary">Cancel Transaction</button>
+          </div>
+        </div>
+      </div>
+    </div>
+}
 
  @section AdditionalScripts {
     <script src="~/js/prism.js"></script>
@@ -81,6 +105,12 @@ else
             "order": [[1, 'desc'],[2, 'desc']],
             searching: false,
         });
+    </script>
+
+    <script>
+        $('#cancel-txn-modal-action').click(function () {
+        $('#cancel-txn-modal-form').submit();
+    });
     </script>
 
     @if (Model.Transaction.Metadata.Any())
