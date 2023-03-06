@@ -468,7 +468,10 @@
                     var apiKeysTable = $('#apiKeysTable').DataTable();
                     apiKeysTable.row.add([
                         result.key,
-                        result.issued,
+                        {
+                            "display": result.issued,
+                            "@@data-sort": result.issuedTicks,
+                        },
                         $('<div>').append($button).html(),
                     ]).draw();
 
