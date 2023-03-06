@@ -624,21 +624,42 @@ namespace Sloth.Web.Controllers
 
             if (txns.Any(a => a.ProcessorTrackingNumber == filter.TrackingNum))
             {
-                Message = $"Processor Tracking Number found: {filter.TrackingNum}";
+                if (txns.Where(a => a.ProcessorTrackingNumber == filter.TrackingNum).Count() > 1)
+                {
+                    Message = $"Multiple Transactions found for Processor Tracking Number: {filter.TrackingNum}. See related Txns for others.";
+                }
+                else
+                {
+                    Message = $"Processor Tracking Number found: {filter.TrackingNum}";
+                }                
                 return RedirectToAction("Details", new { id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id });
             }
 
 
             if (txns.Any(a => a.KfsTrackingNumber == filter.TrackingNum))
             {
-                Message = $"KFS Tracking Number found: {filter.TrackingNum}";
+                if (txns.Where(a => a.KfsTrackingNumber == filter.TrackingNum).Count() > 1)
+                {
+                    Message = $"Multiple Transactions found for KFS Tracking Number: {filter.TrackingNum}. See related Txns for others.";
+                }
+                else
+                {
+                    Message = $"KFS Tracking Number found: {filter.TrackingNum}";
+                }
                 return RedirectToAction("Details", new { txns.First(a => a.KfsTrackingNumber == filter.TrackingNum).Id });
             }
 
 
             if (txns.Any(a => a.MerchantTrackingNumber == filter.TrackingNum))
             {
-                Message = $"Merchant Tracking Number found: {filter.TrackingNum}";
+                if (txns.Where(a => a.MerchantTrackingNumber == filter.TrackingNum).Count() > 1)
+                {
+                    Message = $"Multiple Transactions found for Merchant Tracking Number: {filter.TrackingNum}. See related Txns for others.";
+                }
+                else
+                {
+                    Message = $"Merchant Tracking Number found: {filter.TrackingNum}";
+                }
                 return RedirectToAction("Details", new { txns.First(a => a.MerchantTrackingNumber == filter.TrackingNum).Id });
             }
 

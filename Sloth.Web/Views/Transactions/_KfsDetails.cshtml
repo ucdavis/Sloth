@@ -93,6 +93,17 @@
         </div>
     </div>
     }
+    @if (Model.RelatedTransactions.Transactions.Any())
+    {
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>Related Transactions</span>
+            </div>
+            <div class="txn-detail-result">
+                <span style="color: chartreuse">Related Transactions Found, see below for more info.</span>
+            </div>
+        </div>
+    }
 </div>
 
 <table id="transfers" class="table sloth-table" style="width: 100%">
