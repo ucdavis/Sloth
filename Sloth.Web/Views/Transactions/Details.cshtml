@@ -68,7 +68,7 @@ else
 </div>
 
 @if (Model.Transaction.Status == TransactionStatuses.PendingApproval
-    ||Model.Transaction.Status == TransactionStatuses.Rejected
+    || Model.Transaction.Status == TransactionStatuses.Rejected
     || Model.Transaction.IsStale())
 {
     <div id="cancel-txn-modal" class="modal fade">
