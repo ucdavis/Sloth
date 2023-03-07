@@ -220,6 +220,7 @@ namespace Sloth.Web.Controllers
                 id = apiKey.Id,
                 key = apiKey.Key,
                 issued = apiKey.Issued.ToPacificTime().ToString("g"),
+                issuedTicks = apiKey.Issued.Ticks,
             });
         }
 
