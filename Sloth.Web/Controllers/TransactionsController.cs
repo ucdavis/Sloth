@@ -324,8 +324,9 @@ namespace Sloth.Web.Controllers
 
             if (string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
             {
-                currentTransaction.SetStatus(TransactionStatuses.Scheduled, $"Edited by: {User.Identity.Name} Original values changed: {JsonSerializer.Serialize(oldTransferValues)}");
+                currentTransaction.SetStatus(TransactionStatuses.PendingApproval, $"Edited by: {User.Identity.Name} Original values changed: {JsonSerializer.Serialize(oldTransferValues)}");
                 await DbContext.SaveChangesAsync();
+                Log.Information("Transaction {TransactionId} edited by {User}", currentTransaction.Id, User.Identity.Name);
                 Message = oldTransferValues.Count > 0 ? "Transaction updated" : "No transfers updated. Transaction set to Scheduled";
             }
             else if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
