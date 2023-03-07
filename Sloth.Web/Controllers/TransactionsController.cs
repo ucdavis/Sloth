@@ -391,6 +391,8 @@ namespace Sloth.Web.Controllers
 
             await DbContext.SaveChangesAsync();
 
+            Log.Information("Transaction {TransactionId} cancelled by {User}", transaction.Id, User.Identity.Name);
+
             return RedirectToAction(nameof(Details), new { id });
         }
 
@@ -631,7 +633,7 @@ namespace Sloth.Web.Controllers
                 else
                 {
                     Message = $"Processor Tracking Number found: {filter.TrackingNum}";
-                }                
+                }
                 return RedirectToAction("Details", new { id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id });
             }
 

@@ -174,13 +174,12 @@
             <button type="submit" class="btn btn-primary" @(!isTeamManager ? "Disabled" : "")>Edit Transaction</button>
         </div>
     </form>
-
-
-
-
         <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
-
-
+}
+else if (Model.Transaction.Status == TransactionStatuses.PendingApproval)
+{
+        var isTeamManager = Context.HasTeamRole(TeamRole.Manager);
+        <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
 }
     </div>
 </div>
