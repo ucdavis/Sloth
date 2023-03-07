@@ -138,7 +138,7 @@ namespace Sloth.Core.Services
         {
             var transactions = new List<Transaction>();
 
-            await using (var tran = await _context.Database.BeginTransactionAsync())
+            await ResilientTransaction.ExecuteAsync(_context, async tran =>
             {
                 try
                 {
@@ -279,7 +279,7 @@ namespace Sloth.Core.Services
                     log.Error(ex, ex.Message);
                     await tran.RollbackAsync();
                 }
-            }
+            });
 
             TransactionBlob transactionBlob = null;
             CybersourceBankReconcileIntegrationDetails details = new();

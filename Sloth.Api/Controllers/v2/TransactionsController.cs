@@ -285,21 +285,20 @@ namespace Sloth.Api.Controllers.v2
                 }
             }
 
-            await using var txn = await _context.Database.BeginTransactionAsync();
-
-            // create document number
-            transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(txn.GetDbTransaction());
-
-            // create kfs number if necessary
-            if (string.IsNullOrWhiteSpace(transactionToCreate.KfsTrackingNumber))
+            await ResilientTransaction.ExecuteAsync(_context, async txn =>
             {
-                transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(txn.GetDbTransaction());
-            }
+                // create document number
+                transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(txn.GetDbTransaction());
 
-            _context.Transactions.Add(transactionToCreate);
-            await _context.SaveChangesAsync();
+                // create kfs number if necessary
+                if (string.IsNullOrWhiteSpace(transactionToCreate.KfsTrackingNumber))
+                {
+                    transactionToCreate.KfsTrackingNumber = await _context.GetNextKfsTrackingNumber(txn.GetDbTransaction());
+                }
 
-            await txn.CommitAsync();
+                _context.Transactions.Add(transactionToCreate);
+                await _context.SaveChangesAsync();
+            });
 
             return new JsonResult(transactionToCreate);
         }
