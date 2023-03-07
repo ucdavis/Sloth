@@ -266,9 +266,11 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction(nameof(Edit), new { id });
             }
 
-            if (currentTransaction.Status != TransactionStatuses.Rejected && !currentTransaction.IsStale())
+            if (currentTransaction.Status != TransactionStatuses.PendingApproval
+                && currentTransaction.Status != TransactionStatuses.Rejected
+                && !currentTransaction.IsStale())
             {
-                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days) or Rejected";
+                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days), Rejected or PendingApproval";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
