@@ -22,9 +22,9 @@
     <partial name="_KfsDetails" model="Model" />
 }
 else
-{ 
+{
     <partial name="_AeDetails" model="Model" />
-} 
+}
 
 <div class="row mt-5">
     <h2>Activity Timeline</h2>
@@ -67,7 +67,9 @@ else
 
 </div>
 
-@if (Model.Transaction.Status == TransactionStatuses.Rejected || Model.Transaction.IsStale())
+@if (Model.Transaction.Status == TransactionStatuses.PendingApproval
+    || Model.Transaction.Status == TransactionStatuses.Rejected
+    || Model.Transaction.IsStale())
 {
     <div id="cancel-txn-modal" class="modal fade">
       <div class="modal-dialog" role="document">

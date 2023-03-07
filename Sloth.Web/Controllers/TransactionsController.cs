@@ -266,9 +266,11 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction(nameof(Edit), new { id });
             }
 
-            if (currentTransaction.Status != TransactionStatuses.Rejected && !currentTransaction.IsStale())
+            if (currentTransaction.Status != TransactionStatuses.PendingApproval
+                && currentTransaction.Status != TransactionStatuses.Rejected
+                && !currentTransaction.IsStale())
             {
-                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days) or Rejected";
+                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days), Rejected or PendingApproval";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
@@ -324,8 +326,9 @@ namespace Sloth.Web.Controllers
 
             if (string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
             {
-                currentTransaction.SetStatus(TransactionStatuses.Scheduled, $"Edited by: {User.Identity.Name} Original values changed: {JsonSerializer.Serialize(oldTransferValues)}");
+                currentTransaction.SetStatus(TransactionStatuses.PendingApproval, $"Edited by: {User.Identity.Name} Original values changed: {JsonSerializer.Serialize(oldTransferValues)}");
                 await DbContext.SaveChangesAsync();
+                Log.Information("Transaction {TransactionId} edited by {User}", currentTransaction.Id, User.Identity.Name);
                 Message = oldTransferValues.Count > 0 ? "Transaction updated" : "No transfers updated. Transaction set to Scheduled";
             }
             else if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
@@ -381,15 +384,19 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            if (transaction.Status != TransactionStatuses.Rejected && !transaction.IsStale())
+            if (transaction.Status != TransactionStatuses.PendingApproval
+                && transaction.Status != TransactionStatuses.Rejected
+                && !transaction.IsStale())
             {
-                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days) or Rejected";
+                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days), Rejected or PendingApproval";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
             transaction.SetStatus(TransactionStatuses.Cancelled, $"Cancelled by: {User.Identity.Name} Reason: {reason}");
 
             await DbContext.SaveChangesAsync();
+
+            Log.Information("Transaction {TransactionId} cancelled by {User}", transaction.Id, User.Identity.Name);
 
             return RedirectToAction(nameof(Details), new { id });
         }
@@ -631,7 +638,7 @@ namespace Sloth.Web.Controllers
                 else
                 {
                     Message = $"Processor Tracking Number found: {filter.TrackingNum}";
-                }                
+                }
                 return RedirectToAction("Details", new { id = txns.First(a => a.ProcessorTrackingNumber == filter.TrackingNum).Id });
             }
 
