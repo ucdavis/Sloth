@@ -101,6 +101,34 @@ namespace Sloth.Api.Controllers.v2
         }
 
         /// <summary>
+        /// Fetch Transactions by Processor Tracking Number
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpGet("processortrackingnumber/{id}")]
+        [ProducesResponseType(typeof(Transaction), 200)]
+        public async Task<IList<Transaction>> GetAllByProcessorId(string id)
+        {
+            var teamId = GetTeamId();
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                return new List<Transaction>();
+            }
+
+            var transactions = await _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
+                .Include(t => t.Creator)
+                .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
+                .Where(t => t.ProcessorTrackingNumber == id)
+                .AsNoTracking()
+                .ToListAsync();
+
+            return transactions;
+        }
+
+        /// <summary>
         /// Fetch Transactions by KfsKey
         /// </summary>
         /// <param name="id"></param>
