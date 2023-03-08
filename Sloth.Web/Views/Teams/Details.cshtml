@@ -366,6 +366,7 @@
                         // save user info to form
                         var user = result.user;
                         $('#add-user-modal-user-results').show();
+                        $('#add-user-modal-search-icon-success').show();
                         $('#add-user-modal-user-id').val(user.id);
                         $('#add-user-modal-user-name').val(user.fullname);
                         $('#add-user-modal-user-username').val(user.username);
@@ -375,7 +376,7 @@
                         $('#add-user-modal-search-icon-search').hide();
                         $('#add-user-modal-search-icon-spinner').hide();
                         $('#add-user-modal-search-icon-warning').hide();
-                        $('#add-user-modal-search-icon-success').hide();
+                        //$('#add-user-modal-search-icon-success').hide();
                         $('#add-user-modal-user-warning').hide();
                     });
             },
@@ -386,6 +387,8 @@
         $('#add-user-modal-user-search').keyup(function() {
             // clear results
             $('#add-user-modal-user-results').hide();
+            $('#add-user-modal-search-icon-success').hide();
+            $('#add-user-modal-search-icon-search').show();
 
             // start query
             var query = $(this).val();
