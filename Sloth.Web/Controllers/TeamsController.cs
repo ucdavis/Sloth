@@ -147,12 +147,33 @@ namespace Sloth.Web.Controllers
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
             // find user
-            var user = await DbContext.Users
+            var user = await DbContext.Users.Include(a => a.UserTeamRoles).ThenInclude(r => r.Role)
                 .FirstOrDefaultAsync(u => u.Id == userId);
+
+            var userRoles = team.UserTeamRoles
+                .Where(r => r.UserId == user.Id)
+                .Select(r => r.Role.Name);
 
             // find role
             var role = await DbContext.TeamRoles
                 .FirstOrDefaultAsync(r => r.Id == roleId);
+
+            if ((role.Name == TeamRole.Manager && userRoles.Contains(TeamRole.Approver)) || role.Name == TeamRole.Approver && userRoles.Contains(TeamRole.Manager))
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "User can't have both approver and manager roles."
+                });
+            }
+            if (userRoles.Contains(role.Name))
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "User already has this role."
+                });
+            };
 
             team.AddUserToRole(user, role);
             await DbContext.SaveChangesAsync();

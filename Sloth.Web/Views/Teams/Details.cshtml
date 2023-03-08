@@ -428,25 +428,32 @@
                     return $.post(addUserUrl, request);
                 })
                 .then(function(result) {
+                    if(result.success === true)
+                    {
+                        // create new row in table
+                        var fullname = $('#add-user-modal-user-name').val();
+                        var username = $('#add-user-modal-user-username').val();
+                        var email = $('#add-user-modal-user-email').val();
+                        var rolename = $('#add-user-modal-role option:selected').text();
 
-                    // create new row in table
-                    var fullname = $('#add-user-modal-user-name').val();
-                    var username = $('#add-user-modal-user-username').val();
-                    var email = $('#add-user-modal-user-email').val();
-                    var rolename = $('#add-user-modal-role option:selected').text();
-
-                    var usersTable = $('#usersTable').DataTable();
-                    usersTable.row.add([
-                        fullname,
-                        username,
-                        email,
-                        rolename,
-                        "Added",
-                    ]).draw();
-
-                    $('#add-user-modal').modal('hide');
+                        var usersTable = $('#usersTable').DataTable();
+                        usersTable.row.add([
+                            fullname,
+                            username,
+                            email,
+                            rolename,
+                            "Added",
+                        ]).draw();
+                        
+                        $('#add-user-modal').modal('hide');
+                    }
+                    else
+                    {
+                        alert("Unable to add user: " + result.message);
+                    }                                        
                 })
                 .fail(function(err) {
+                    alert("Something went wrong. Please try again later.");
                     console.error(err);
                 });
         });
