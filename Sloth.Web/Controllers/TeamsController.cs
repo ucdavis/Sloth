@@ -143,11 +143,11 @@ namespace Sloth.Web.Controllers
         {
             // fetch team from db
             var team = await DbContext.Teams
-                .Include(t => t.ApiKeys)
+                .Include(a => a.UserTeamRoles).ThenInclude(r => r.Role)
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
             // find user
-            var user = await DbContext.Users.Include(a => a.UserTeamRoles).ThenInclude(r => r.Role)
+            var user = await DbContext.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             var userRoles = team.UserTeamRoles
