@@ -142,17 +142,38 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> CreateUserRole(string teamId, string userId, string roleId)
         {
             // fetch team from db
-            var team = await DbContext.Teams
-                .Include(t => t.ApiKeys)
+            var team = await DbContext.Teams                
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
             // find user
             var user = await DbContext.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
+            var userRoles = await DbContext.UserTeamRoles
+                .Where(r => r.UserId == user.Id && r.TeamId == team.Id)
+                .Select(r => r.Role.Name)
+                .ToArrayAsync();
+
             // find role
             var role = await DbContext.TeamRoles
                 .FirstOrDefaultAsync(r => r.Id == roleId);
+
+            if ((role.Name == TeamRole.Manager && userRoles.Contains(TeamRole.Approver)) || role.Name == TeamRole.Approver && userRoles.Contains(TeamRole.Manager))
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "User can't have both approver and manager roles."
+                });
+            }
+            if (userRoles.Contains(role.Name))
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = "User already has this role."
+                });
+            };
 
             team.AddUserToRole(user, role);
             await DbContext.SaveChangesAsync();
