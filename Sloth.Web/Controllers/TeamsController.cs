@@ -142,17 +142,17 @@ namespace Sloth.Web.Controllers
         public async Task<IActionResult> CreateUserRole(string teamId, string userId, string roleId)
         {
             // fetch team from db
-            var team = await DbContext.Teams
-                .Include(a => a.UserTeamRoles).ThenInclude(r => r.Role)
+            var team = await DbContext.Teams                
                 .FirstOrDefaultAsync(t => t.Id == teamId);
 
             // find user
             var user = await DbContext.Users
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
-            var userRoles = team.UserTeamRoles
-                .Where(r => r.UserId == user.Id)
-                .Select(r => r.Role.Name);
+            var userRoles = await DbContext.UserTeamRoles
+                .Where(r => r.UserId == user.Id && r.TeamId == team.Id)
+                .Select(r => r.Role.Name)
+                .ToArrayAsync();
 
             // find role
             var role = await DbContext.TeamRoles
