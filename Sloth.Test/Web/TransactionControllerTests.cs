@@ -26,6 +26,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Runtime.CompilerServices;
 
 namespace Sloth.Test.Web
 {
@@ -39,6 +40,7 @@ namespace Sloth.Test.Web
         public Mock<IDbContextTransaction> MockDbContextTransaction { get; set; }
         public Mock<DbTransaction> MockDbTransaction { get; set; }
         public Mock<IAggieEnterpriseService> MockAggieEnterpriseService { get; set; }
+        public Mock<IExecutionStrategy> MockExecutionStrategy { get; set; }
 
         public TransactionsController Controller { get; set; }
 
@@ -61,6 +63,7 @@ namespace Sloth.Test.Web
             MockHttpContext = new Mock<HttpContext>();
             MockDbTransaction = new Mock<DbTransaction>();
             MockAggieEnterpriseService = new Mock<IAggieEnterpriseService>();
+            MockExecutionStrategy = new Mock<IExecutionStrategy>();
 
             //Default Data
             UserData = new List<User>();
@@ -83,6 +86,27 @@ namespace Sloth.Test.Web
                 .Returns(Task.FromResult($"Doc{NextId++}"));
             MockDatabase.Setup(a => a.BeginTransactionAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(MockDbContextTransaction.Object);
+            MockExecutionStrategy.SetupGet(a => a.RetriesOnFailure).Returns(false);
+            MockExecutionStrategy.Setup(a => a.ExecuteAsync(
+                It.IsAny<It.IsAnyType>(), // state
+                It.IsAny<Func<DbContext, It.IsAnyType, CancellationToken, Task<bool>>>(), //operation
+                It.IsAny<Func<DbContext, It.IsAnyType, CancellationToken, Task<ExecutionResult<bool>>>>(), //verifySucceeded
+                It.IsAny<CancellationToken>() //cancellationToken
+            ))
+            .Callback((object arg1, object arg2, object arg3, object arg4)
+                =>
+            {
+                // arg1 is a closure passed to strategy.ExecuteAsync in ResilientTransaction.ExecuteAsync
+                var resilientTransactionFunc = (Func<Task>)arg1;
+                // arg2 appears to be a closure defined in Microsoft.EntityFrameworkCore.ExecutionStrategyExtensions
+                var execStrategyFunc = (Func<DbContext, Func<Task>, CancellationToken, Task<bool>>)arg2;
+                var cancellationToken = (CancellationToken)arg4;
+
+                execStrategyFunc.Invoke(MockDbContext.Object, resilientTransactionFunc, cancellationToken);
+            })
+            .Returns(Task.FromResult(true));
+            MockDatabase.Setup(a => a.CreateExecutionStrategy())
+                .Returns(MockExecutionStrategy.Object);
             MockDbContextTransaction.Setup(a => a.RollbackAsync(It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
             MockDbContextTransaction.Setup(a => a.CommitAsync(It.IsAny<CancellationToken>()))
@@ -120,7 +144,8 @@ namespace Sloth.Test.Web
             Transaction reversal = null;
             var mockDbSet = transactions.AsQueryable().MockAsyncDbSet();
             mockDbSet.Setup(a => a.AddAsync(It.IsAny<Transaction>(), It.IsAny<CancellationToken>()))
-                .Callback((Transaction t, CancellationToken _) => {
+                .Callback((Transaction t, CancellationToken _) =>
+                {
                     reversal = t;
                     //return Task.FromResult<ValueTask<EntityEntry<Transaction>>>(default);
                 });
@@ -154,7 +179,8 @@ namespace Sloth.Test.Web
             Transaction reversal = null;
             var mockDbSet = transactions.AsQueryable().MockAsyncDbSet();
             mockDbSet.Setup(a => a.AddAsync(It.IsAny<Transaction>(), It.IsAny<CancellationToken>()))
-                .Callback((Transaction t, CancellationToken _) => {
+                .Callback((Transaction t, CancellationToken _) =>
+                {
                     reversal = t;
                     //return Task.FromResult<ValueTask<EntityEntry<Transaction>>>(default);
                 });
