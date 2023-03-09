@@ -40,6 +40,10 @@ namespace Sloth.Core.Services
             {
                 logger = Log.Logger;
             }
+            if (scrubber.Source.DocumentType == null)
+            {
+                throw new ArgumentNullException(nameof(scrubber.Source.DocumentType));
+            }
 
             await using var ms = new MemoryStream();
             await using var sw = new StreamWriter(ms);

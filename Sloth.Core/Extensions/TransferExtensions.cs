@@ -28,7 +28,7 @@ namespace Sloth.Core.Extensions
                 SequenceNumber  = transfer.SequenceNumber,
                 Description     = transfer.Description,
                 BalanceType     = FinancialBalanceTypeCode.AC,
-                DocType         = GetDocumentType(transfer.Transaction.DocumentType),
+                DocType         = transfer.Transaction.DocumentType == null ? FinancialDocumentTypeCode.ERROR : GetDocumentType(transfer.Transaction.DocumentType),
                 TransactionDate = transfer.Transaction.TransactionDate,
             };
 

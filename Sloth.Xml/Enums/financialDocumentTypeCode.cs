@@ -27,5 +27,6 @@ namespace Sloth.Xml
         
         /// <remarks/>
         GLDE,
+        ERROR,
     }
 }
