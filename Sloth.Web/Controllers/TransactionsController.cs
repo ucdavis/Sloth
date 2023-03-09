@@ -223,9 +223,11 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            if (transaction.Status != TransactionStatuses.Rejected && !transaction.IsStale())
+            if (transaction.Status != TransactionStatuses.PendingApproval
+                && transaction.Status != TransactionStatuses.Rejected
+                && !transaction.IsStale())
             {
-                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days) or Rejected";
+                ErrorMessage = "Transaction is not Stale (Processing for more than 5 days), Rejected or PendingApproval";
                 return RedirectToAction(nameof(Details), new { id });
             }
 
@@ -481,92 +483,94 @@ namespace Sloth.Web.Controllers
 
             var percentage = reversalAmount / totalAmount;
 
-            await using var tran = await DbContext.Database.BeginTransactionAsync();
-            var user = await UserManager.GetUserAsync(User);
+            Transaction reversal = null;
 
-            var documentNumber = await DbContext.GetNextDocumentNumber(tran.GetDbTransaction());
-
-            // create new transaction
-            var reversal = new Transaction
+            await ResilientTransaction.ExecuteAsync(DbContext, async tran =>
             {
-                Source = transaction.Source,
-                Creator = user,
-                TransactionDate = DateTime.UtcNow,
-                DocumentNumber = documentNumber,
-                KfsTrackingNumber = transaction.KfsTrackingNumber,
-                MerchantTrackingNumber = transaction.MerchantTrackingNumber,
-                MerchantTrackingUrl = transaction.MerchantTrackingUrl,
-                ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
-                Description = reversalAmount != totalAmount ? "Partial Reversal" : "Full Reversal",
-            }.SetStatus(TransactionStatuses.Scheduled);
+                var user = await UserManager.GetUserAsync(User);
 
-            // add reversal transfers
-            foreach (var transfer in transaction.Transfers)
-            {
-                var amount = Math.Round(transfer.Amount * percentage, 2);
-                // don't create a transfer if it rounds to less than one cent
-                if (amount < 0.01m)
+                var documentNumber = await DbContext.GetNextDocumentNumber(tran.GetDbTransaction());
+
+                // create new transaction
+                reversal = new Transaction
                 {
-                    continue;
+                    Source = transaction.Source,
+                    Creator = user,
+                    TransactionDate = DateTime.UtcNow,
+                    DocumentNumber = documentNumber,
+                    KfsTrackingNumber = transaction.KfsTrackingNumber,
+                    MerchantTrackingNumber = transaction.MerchantTrackingNumber,
+                    MerchantTrackingUrl = transaction.MerchantTrackingUrl,
+                    ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
+                    Description = reversalAmount != totalAmount ? "Partial Reversal" : "Full Reversal",
+                }.SetStatus(TransactionStatuses.Scheduled);
+
+                // add reversal transfers
+                foreach (var transfer in transaction.Transfers)
+                {
+                    var amount = Math.Round(transfer.Amount * percentage, 2);
+                    // don't create a transfer if it rounds to less than one cent
+                    if (amount < 0.01m)
+                    {
+                        continue;
+                    }
+
+                    // same info, except reverse direction
+                    var direction = transfer.Direction == Transfer.CreditDebit.Credit
+                        ? Transfer.CreditDebit.Debit
+                        : Transfer.CreditDebit.Credit;
+
+                    reversal.Transfers.Add(new Transfer
+                    {
+                        Amount = amount,
+                        Account = transfer.Account,
+                        Chart = transfer.Chart,
+                        Description = transfer.Description,
+                        Direction = direction,
+                        FiscalPeriod = DateTime.UtcNow.GetFiscalPeriod(),
+                        FiscalYear = DateTime.UtcNow.GetFinancialYear(),
+                        ObjectCode = transfer.ObjectCode,
+                        ObjectType = transfer.ObjectType,
+                        Project = transfer.Project,
+                        ReferenceId = transfer.ReferenceId,
+                        SequenceNumber = transfer.SequenceNumber,
+                        FinancialSegmentString = transfer.FinancialSegmentString,
+                        SubAccount = transfer.SubAccount,
+                        SubObjectCode = transfer.SubObjectCode,
+                    });
                 }
 
-                // same info, except reverse direction
-                var direction = transfer.Direction == Transfer.CreditDebit.Credit
-                    ? Transfer.CreditDebit.Debit
-                    : Transfer.CreditDebit.Credit;
+                var reversalCredits = reversal.Transfers.Where(t => t.Direction == Transfer.CreditDebit.Credit).ToArray();
+                var reversalDebits = reversal.Transfers.Where(t => t.Direction == Transfer.CreditDebit.Debit).ToArray();
+                var totalReversalCredit = reversalCredits.Sum(t => t.Amount);
+                var totalReversalDebit = reversalDebits.Sum(t => t.Amount);
 
-                reversal.Transfers.Add(new Transfer
+                /// adjust for rounding error
+                if (totalReversalDebit > totalReversalCredit)
                 {
-                    Amount = amount,
-                    Account = transfer.Account,
-                    Chart = transfer.Chart,
-                    Description = transfer.Description,
-                    Direction = direction,
-                    FiscalPeriod = DateTime.UtcNow.GetFiscalPeriod(),
-                    FiscalYear = DateTime.UtcNow.GetFinancialYear(),
-                    ObjectCode = transfer.ObjectCode,
-                    ObjectType = transfer.ObjectType,
-                    Project = transfer.Project,
-                    ReferenceId = transfer.ReferenceId,
-                    SequenceNumber = transfer.SequenceNumber,
-                    FinancialSegmentString = transfer.FinancialSegmentString,
-                    SubAccount = transfer.SubAccount,
-                    SubObjectCode = transfer.SubObjectCode,
-                });
-            }
-
-            var reversalCredits = reversal.Transfers.Where(t => t.Direction == Transfer.CreditDebit.Credit).ToArray();
-            var reversalDebits = reversal.Transfers.Where(t => t.Direction == Transfer.CreditDebit.Debit).ToArray();
-            var totalReversalCredit = reversalCredits.Sum(t => t.Amount);
-            var totalReversalDebit = reversalDebits.Sum(t => t.Amount);
-
-            /// adjust for rounding error
-            if (totalReversalDebit > totalReversalCredit)
-            {
-                var centIncrements = (int)Math.Round((totalReversalDebit - totalReversalCredit) * 100);
-                for (var i = 0; i < centIncrements; i++)
-                {
-                    reversalCredits[i % reversalCredits.Length].Amount += 0.01m;
+                    var centIncrements = (int)Math.Round((totalReversalDebit - totalReversalCredit) * 100);
+                    for (var i = 0; i < centIncrements; i++)
+                    {
+                        reversalCredits[i % reversalCredits.Length].Amount += 0.01m;
+                    }
                 }
-            }
-            else if (totalReversalCredit > totalReversalDebit)
-            {
-                var centIncrements = (int)Math.Round((totalReversalCredit - totalReversalDebit) * 100);
-                for (var i = 0; i < centIncrements; i++)
+                else if (totalReversalCredit > totalReversalDebit)
                 {
-                    reversalDebits[i % reversalDebits.Length].Amount += 0.01m;
+                    var centIncrements = (int)Math.Round((totalReversalCredit - totalReversalDebit) * 100);
+                    for (var i = 0; i < centIncrements; i++)
+                    {
+                        reversalDebits[i % reversalDebits.Length].Amount += 0.01m;
+                    }
                 }
-            }
 
-            // save transaction to establish id
-            await DbContext.Transactions.AddAsync(reversal);
-            await DbContext.SaveChangesAsync();
+                // save transaction to establish id
+                await DbContext.Transactions.AddAsync(reversal);
+                await DbContext.SaveChangesAsync();
 
-            // save relationship
-            transaction.AddReversalTransaction(reversal);
-            await DbContext.SaveChangesAsync();
-
-            await tran.CommitAsync();
+                // save relationship
+                transaction.AddReversalTransaction(reversal);
+                await DbContext.SaveChangesAsync();
+            });
 
             Message = "Reversal created successfully";
             return RedirectToAction("Details", new { id = reversal.Id });
