@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sloth.Core;
+using Sloth.Core.Extensions;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
@@ -201,8 +202,10 @@ namespace Sloth.Web.Controllers
             // should we create a new secret?
             if (model.ReportPasswordDirty)
             {
+                // ensure the secret is base64 encoded, because reasons
+                var base64Password = model.ReportPassword.IsBase64() ? model.ReportPassword : model.ReportPassword.Base64Encode();
                 var secretId = Guid.NewGuid().ToString("D");
-                await _secretsService.UpdateSecret(secretId, model.ReportPassword);
+                await _secretsService.UpdateSecret(secretId, base64Password);
                 integration.ReportPasswordKey = secretId;
             }
 
