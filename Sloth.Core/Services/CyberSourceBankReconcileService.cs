@@ -158,6 +158,7 @@ namespace Sloth.Core.Services
             var transactions = new List<Transaction>();
             string documentNumber = null;
             string kfsTrackingNumber = null;
+            var webhookPayloads = new Dictionary<string, BankReconcileWebHookPayload>();
 
             await ResilientTransaction.ExecuteAsync(_context, async tran =>
             {
@@ -273,21 +274,16 @@ namespace Sloth.Core.Services
 
                         _context.Transactions.Add(transaction);
 
-                        // push webhook for this reconcile
-                        try
+                        // prepare webhook payloads for sending outside of ResilientTransaction delegate
+                        if (!webhookPayloads.ContainsKey(kfsTrackingNumber))
                         {
-                            await _webHookService.SendWebHooksForTeam(integration.Team,
-                                new BankReconcileWebHookPayload()
-                                {
-                                    KfsTrackingNumber = kfsTrackingNumber,
-                                    MerchantTrackingNumber = deposit.MerchantReferenceNumber,
-                                    ProcessorTrackingNumber = deposit.RequestID,
-                                    TransactionDate = deposit.LocalizedRequestDate,
-                                });
-                        }
-                        catch (Exception ex)
-                        {
-                            log.Error(ex, "Error when pushing webhook information");
+                            webhookPayloads.Add(kfsTrackingNumber, new BankReconcileWebHookPayload()
+                            {
+                                KfsTrackingNumber = kfsTrackingNumber,
+                                MerchantTrackingNumber = deposit.MerchantReferenceNumber,
+                                ProcessorTrackingNumber = deposit.RequestID,
+                                TransactionDate = deposit.LocalizedRequestDate,
+                            });
                         }
                     }
 
@@ -304,6 +300,19 @@ namespace Sloth.Core.Services
                     messageBuilder.AppendLine($"Error processing report: {ex.Message}");
                 }
             });
+
+            foreach (var payload in webhookPayloads.Values)
+            {
+                try
+                {
+                    await _webHookService.SendWebHooksForTeam(integration.Team, payload);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, $"Error when pushing {nameof(BankReconcileWebHookPayload)}");
+                    messageBuilder.AppendLine($"Error when pushing {nameof(BankReconcileWebHookPayload)}: {ex.Message}");
+                }
+            }
 
             TransactionBlob transactionBlob = null;
 
