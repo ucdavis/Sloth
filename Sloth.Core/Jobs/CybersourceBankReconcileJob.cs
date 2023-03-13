@@ -63,10 +63,19 @@ namespace Sloth.Core.Jobs
                 }
                 catch (Exception ex)
                 {
-                    innerLog.Error(ex, ex.Message);
+                    // ProcessIntegration is pretty aggressive about swallowing and logging exceptions, but just in case...
+                    innerLog.Error(ex, $"Error processing integration: {ex.Message}");
+                    details.IntegrationDetails.Add(new CybersourceBankReconcileIntegrationDetails
+                    {
+                        IntegrationId = integration.Id,
+                        TeamName = integration.Team.Name,
+                        Message = $"Error processing integration: {ex.Message}"
+                    });
                 }
                 innerLog.Information("Completed integration for {TeamName}");
             }
+
+            details.Message = $"Processed {details.IntegrationDetails.Count} integrations";
 
             return details;
         }

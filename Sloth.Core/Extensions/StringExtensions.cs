@@ -24,6 +24,18 @@ namespace Sloth.Core.Extensions
             return System.Text.Encoding.UTF8.GetString(base64EncodedBytes);
         }
 
+        public static string Base64Encode(this string plainText)
+        {
+            var plainTextBytes = System.Text.Encoding.UTF8.GetBytes(plainText);
+            return System.Convert.ToBase64String(plainTextBytes);
+        }
+
+        public static bool IsBase64(this string base64)
+        {
+            Span<byte> buffer = new Span<byte>(new byte[base64.Length]);
+            return Convert.TryFromBase64String(base64, buffer , out int bytesParsed);
+        }
+
         public static string SafeTruncate(this string value, int max)
         {
             if (string.IsNullOrWhiteSpace(value) || value.Length <= max)

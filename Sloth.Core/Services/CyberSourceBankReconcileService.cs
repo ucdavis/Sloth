@@ -17,6 +17,7 @@ using Sloth.Integrations.Cybersource.Clients;
 using Sloth.Integrations.Cybersource.Helpers;
 using Sloth.Integrations.Cybersource.Resources;
 using Sloth.Core.Abstractions;
+using System.Text;
 
 namespace Sloth.Core.Services
 {
@@ -42,6 +43,8 @@ namespace Sloth.Core.Services
     public class CybersourceBankReconcileIntegrationDetails
     {
         public string IntegrationId { get; set; }
+        public string TeamName { get; set; }
+        public string Message { get; set; }
         public string BlobId { get; set; }
         public List<string> TransactionIds { get; set; } = new();
     }
@@ -94,7 +97,12 @@ namespace Sloth.Core.Services
 
             if (count < 1)
             {
-                return null;
+                return new CybersourceBankReconcileIntegrationDetails
+                {
+                    IntegrationId = integration.Id,
+                    TeamName = integration.Team.Name,
+                    Message = "No records found."
+                };
             }
 
             return await ProcessReport(report, reportXml, integration, log);
@@ -127,7 +135,12 @@ namespace Sloth.Core.Services
 
             if (count < 1)
             {
-                return null;
+                return new CybersourceBankReconcileIntegrationDetails
+                {
+                    IntegrationId = integration.Id,
+                    TeamName = integration.Team.Name,
+                    Message = "No records found."
+                };
             }
 
             return await ProcessReport(report, reportXml, integration, log);
@@ -136,7 +149,16 @@ namespace Sloth.Core.Services
         private async Task<CybersourceBankReconcileIntegrationDetails> ProcessReport(Report report, string reportXml, Integration integration,
             ILogger log)
         {
+            var details = new CybersourceBankReconcileIntegrationDetails
+            {
+                IntegrationId = integration.Id,
+                TeamName = integration.Team.Name,
+            };
+            var messageBuilder = new StringBuilder();
             var transactions = new List<Transaction>();
+            string documentNumber = null;
+            string kfsTrackingNumber = null;
+            var webhookPayloads = new Dictionary<string, BankReconcileWebHookPayload>();
 
             await ResilientTransaction.ExecuteAsync(_context, async tran =>
             {
@@ -174,9 +196,10 @@ namespace Sloth.Core.Services
 
                         var amount = decimal.Parse(paymentInfo.Amount);
 
-                        // create document number
-                        var documentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
-                        var kfsTrackingNumber = await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
+                        // ensure document and tracking numbers are created only once, in case this code gets
+                        // called multiple times due to a transient error
+                        documentNumber ??= await _context.GetNextDocumentNumber(tran.GetDbTransaction());
+                        kfsTrackingNumber ??= await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
 
                         transaction = new Transaction()
                         {
@@ -251,38 +274,47 @@ namespace Sloth.Core.Services
 
                         _context.Transactions.Add(transaction);
 
-                        // push webhook for this reconcile
-                        try
+                        // prepare webhook payloads for sending outside of ResilientTransaction delegate
+                        if (!webhookPayloads.ContainsKey(kfsTrackingNumber))
                         {
-                            await _webHookService.SendWebHooksForTeam(integration.Team,
-                                new BankReconcileWebHookPayload()
-                                {
-                                    KfsTrackingNumber = kfsTrackingNumber,
-                                    MerchantTrackingNumber = deposit.MerchantReferenceNumber,
-                                    ProcessorTrackingNumber = deposit.RequestID,
-                                    TransactionDate = deposit.LocalizedRequestDate,
-                                });
-                        }
-                        catch (Exception ex)
-                        {
-                            log.Error(ex, "Error when pushing webhook information");
+                            webhookPayloads.Add(kfsTrackingNumber, new BankReconcileWebHookPayload()
+                            {
+                                KfsTrackingNumber = kfsTrackingNumber,
+                                MerchantTrackingNumber = deposit.MerchantReferenceNumber,
+                                ProcessorTrackingNumber = deposit.RequestID,
+                                TransactionDate = deposit.LocalizedRequestDate,
+                            });
                         }
                     }
 
                     // push changes for this integration
                     var inserted = await _context.SaveChangesAsync();
                     await tran.CommitAsync();
-                    log.Information("{count} records created.", new { count = inserted });
+                    log.Information("{transactions} transactions created.", transactions.Count);
+                    messageBuilder.AppendLine($"{transactions.Count} transactions created.");
                 }
                 catch (Exception ex)
                 {
                     log.Error(ex, ex.Message);
                     await tran.RollbackAsync();
+                    messageBuilder.AppendLine($"Error processing report: {ex.Message}");
                 }
             });
 
+            foreach (var payload in webhookPayloads.Values)
+            {
+                try
+                {
+                    await _webHookService.SendWebHooksForTeam(integration.Team, payload);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex, $"Error when pushing {nameof(BankReconcileWebHookPayload)}");
+                    messageBuilder.AppendLine($"Error when pushing {nameof(BankReconcileWebHookPayload)}: {ex.Message}");
+                }
+            }
+
             TransactionBlob transactionBlob = null;
-            CybersourceBankReconcileIntegrationDetails details = new();
 
             try
             {
@@ -306,18 +338,18 @@ namespace Sloth.Core.Services
                 };
                 _context.TransactionBlobs.Add(transactionBlob);
                 await _context.SaveChangesAsync();
-                details = new CybersourceBankReconcileIntegrationDetails()
-                {
-                    IntegrationId = integration.Id,
-                    BlobId = blob.Id,
-                    TransactionIds = transactions.Select(t => t.Id).ToList(),
-                };
+                details.BlobId = blob.Id;
+                details.TransactionIds = transactions.Select(t => t.Id).ToList();
+                messageBuilder.AppendLine($"Report saved to blob storage: {blob.Id}");
             }
             catch (Exception ex)
             {
                 log.ForContext("container", _options.ReportBlobContainer)
                     .Error(ex, ex.Message);
+                messageBuilder.AppendLine($"Error saving report to blob storage: {ex.Message}");
             }
+
+            details.Message = messageBuilder.ToString();
 
             return details;
         }
