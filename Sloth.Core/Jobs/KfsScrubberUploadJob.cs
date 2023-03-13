@@ -30,7 +30,7 @@ namespace Sloth.Core.Jobs
             {
                 // fetch staged transactions with accounts populated
                 var transactions = await _context.Transactions
-                    .Where(t => t.Transfers.Any(tran => tran.Account != null))
+                    .Where(t => t.Transfers.Any(tran => tran.Account != null) && t.Transfers.All(tran => tran.FinancialSegmentString == null))
                     .Where(t => t.Status == TransactionStatuses.Scheduled)
                     .Include(t => t.Transfers)
                     .Include(t => t.Source)
