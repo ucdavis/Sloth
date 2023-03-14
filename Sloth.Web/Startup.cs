@@ -67,7 +67,7 @@ namespace Sloth.Web
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
             services.AddScoped<IWebHookService, WebHookService>();
-            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
+            services.AddTransient<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<INotificationService, NotificationService>();
 

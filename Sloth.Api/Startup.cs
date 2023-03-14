@@ -52,7 +52,7 @@ namespace Sloth.Api
 
             // add infrastructure services
             services.AddSingleton<IKfsService, KfsService>();
-            services.AddSingleton<IAggieEnterpriseService, AggieEnterpriseService>();
+            services.AddTransient<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddSingleton<ISecretsService, SecretsService>();
             services.AddSingleton<IStorageService, StorageService>();
 
