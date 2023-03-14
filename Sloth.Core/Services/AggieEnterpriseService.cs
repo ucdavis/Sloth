@@ -23,13 +23,14 @@ namespace Sloth.Core.Services
 
     public class AggieEnterpriseService : IAggieEnterpriseService
     {
-        private readonly IAggieEnterpriseClient _aggieClient;
+        private IAggieEnterpriseClient _aggieClient;
         private readonly AggieEnterpriseOptions _options;
 
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
-            _aggieClient = AggieEnterpriseApi.GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
             _options = options.Value;
+            _aggieClient = AggieEnterpriseApi.GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
+
         }
 
         public async Task<bool> IsAccountValid(string financialSegmentString, bool validateCVRs = true)
