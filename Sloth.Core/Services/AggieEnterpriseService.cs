@@ -29,7 +29,8 @@ namespace Sloth.Core.Services
         public AggieEnterpriseService(IOptions<AggieEnterpriseOptions> options)
         {
             _options = options.Value;
-            _aggieClient = AggieEnterpriseApi.GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token);
+            //_aggieClient = AggieEnterpriseApi.GraphQlClient.Get(options.Value.GraphQlUrl, options.Value.Token); //If we want to use regular token
+            _aggieClient = GraphQlClient.Get(_options.GraphQlUrl, _options.TokenEndpoint, _options.ConsumerKey, _options.ConsumerSecret, $"{_options.ScopeApp}-{_options.ScopeEnv}");
 
         }
 
