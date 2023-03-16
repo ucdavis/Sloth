@@ -485,7 +485,8 @@ namespace Sloth.Web.Controllers
 
             Transaction reversal = null;
 
-            await ResilientTransaction.ExecuteAsync(DbContext, async tran =>
+            await using var tran = await DbContext.Database.BeginTransactionAsync();
+            await DbContext.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
                 var user = await UserManager.GetUserAsync(User);
 
@@ -570,6 +571,7 @@ namespace Sloth.Web.Controllers
                 // save relationship
                 transaction.AddReversalTransaction(reversal);
                 await DbContext.SaveChangesAsync();
+                await tran.CommitAsync();
             });
 
             Message = "Reversal created successfully";

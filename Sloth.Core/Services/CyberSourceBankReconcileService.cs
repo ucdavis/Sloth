@@ -160,7 +160,8 @@ namespace Sloth.Core.Services
             string kfsTrackingNumber = null;
             var webhookPayloads = new Dictionary<string, BankReconcileWebHookPayload>();
 
-            await ResilientTransaction.ExecuteAsync(_context, async tran =>
+            await using var tran = await _context.Database.BeginTransactionAsync();
+            await _context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
                 try
                 {

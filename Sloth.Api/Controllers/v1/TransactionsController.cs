@@ -213,7 +213,8 @@ namespace Sloth.Api.Controllers.v1
                 ? TransactionStatuses.Scheduled
                 : TransactionStatuses.PendingApproval);
 
-            await ResilientTransaction.ExecuteAsync(_context, async tran =>
+            await using var tran = await _context.Database.BeginTransactionAsync();
+            await _context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
                 // create document number
                 transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
@@ -226,6 +227,7 @@ namespace Sloth.Api.Controllers.v1
 
                 _context.Transactions.Add(transactionToCreate);
                 await _context.SaveChangesAsync();
+                await tran.CommitAsync();
             });
 
             return new JsonResult(transactionToCreate);
