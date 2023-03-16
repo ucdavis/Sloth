@@ -313,9 +313,11 @@ namespace Sloth.Api.Controllers.v2
                 }
             }
 
-            await using var txn = await _context.Database.BeginTransactionAsync();
+
             await _context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
+                await using var txn = await _context.Database.BeginTransactionAsync();
+
                 // create document number
                 transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(txn.GetDbTransaction());
 
