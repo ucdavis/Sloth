@@ -213,9 +213,11 @@ namespace Sloth.Api.Controllers.v1
                 ? TransactionStatuses.Scheduled
                 : TransactionStatuses.PendingApproval);
 
-            await using var tran = await _context.Database.BeginTransactionAsync();
+
             await _context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
+                await using var tran = await _context.Database.BeginTransactionAsync();
+
                 // create document number
                 transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(tran.GetDbTransaction());
 

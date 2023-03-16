@@ -485,9 +485,10 @@ namespace Sloth.Web.Controllers
 
             Transaction reversal = null;
 
-            await using var tran = await DbContext.Database.BeginTransactionAsync();
             await DbContext.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
+                await using var tran = await DbContext.Database.BeginTransactionAsync();
+
                 var user = await UserManager.GetUserAsync(User);
 
                 var documentNumber = await DbContext.GetNextDocumentNumber(tran.GetDbTransaction());
