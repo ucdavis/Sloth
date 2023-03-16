@@ -313,7 +313,8 @@ namespace Sloth.Api.Controllers.v2
                 }
             }
 
-            await ResilientTransaction.ExecuteAsync(_context, async txn =>
+            await using var txn = await _context.Database.BeginTransactionAsync();
+            await _context.Database.CreateExecutionStrategy().ExecuteAsync(async () =>
             {
                 // create document number
                 transactionToCreate.DocumentNumber = await _context.GetNextDocumentNumber(txn.GetDbTransaction());
@@ -326,6 +327,7 @@ namespace Sloth.Api.Controllers.v2
 
                 _context.Transactions.Add(transactionToCreate);
                 await _context.SaveChangesAsync();
+                await txn.CommitAsync();
             });
 
             return new JsonResult(transactionToCreate);
