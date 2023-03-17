@@ -80,8 +80,6 @@ namespace Sloth.Core.Jobs
 
         private async Task<FailedTxnResult> NotifyApproversAboutReversals()
         {
-
-            // get transactions that are rejected or have been processing for longer than 5 days
             var teamsWithPendingReversals = await _dbContext.Transactions
                 .Where(t => t.Status == TransactionStatuses.PendingApproval && t.IsReversal)
                 .Select(t => t.Source.Team.Slug)

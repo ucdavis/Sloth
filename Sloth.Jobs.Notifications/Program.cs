@@ -27,7 +27,7 @@ namespace Sloth.Jobs.Notifications
             // log run
             var jobRecord = new JobRecord()
             {
-                Name = ResendPendingWebHookRequestsJob.JobName, //This is wrong...
+                Name = NotificationJob.JobName, //This is wrong... should be NotificationJob
                 StartedAt = DateTime.UtcNow,
                 Status = JobRecord.Statuses.Running,
             };
@@ -67,7 +67,7 @@ namespace Sloth.Jobs.Notifications
 
             jobRecord = new JobRecord()
             {
-                Name = "Notify Reversals needing Approval", 
+                Name = NotificationJob.JobName, 
                 StartedAt = DateTime.UtcNow,
                 Status = JobRecord.Statuses.Running,
             };
