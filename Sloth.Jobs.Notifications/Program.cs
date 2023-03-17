@@ -64,34 +64,6 @@ namespace Sloth.Jobs.Notifications
             {
                 await dbContext.SaveChangesAsync();
             }
-
-            jobRecord = new JobRecord()
-            {
-                Name = NotificationJob.JobName, 
-                StartedAt = DateTime.UtcNow,
-                Status = JobRecord.Statuses.Running,
-            };
-            dbContext.JobRecords.Add(jobRecord);
-            await dbContext.SaveChangesAsync();
-
-            try
-            {
-                // create job service
-                var notificationJob = provider.GetService<NotificationJob>();
-
-                var jobDetails = await notificationJob.ProcessNotifications(failures: false);
-                _log.Information("Finished");
-                jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
-            }
-            catch (Exception ex)
-            {
-                _log.Error("Unexpected error", ex);
-                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
-            }
-            finally
-            {
-                await dbContext.SaveChangesAsync();
-            }
         }
 
         private static ServiceProvider ConfigureServices()
