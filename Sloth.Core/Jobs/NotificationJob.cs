@@ -22,21 +22,15 @@ namespace Sloth.Core.Jobs
             _dbContext = dbContext;
         }
 
-        public async Task<NotificationJobDetails> ProcessNotifications(bool failures = true)
+        public async Task<NotificationJobDetails> ProcessNotifications()
         {
             var jobDetails = new NotificationJobDetails();
-            if (failures)
-            {
-                jobDetails.FailedTxnResult = await ProcessFailedTransactionNotifications();
-            }
-            else
-            {
-                jobDetails.FailedTxnResult = await NotifyApproversAboutReversals();
-            }
+            jobDetails.NotificationResults.Add(await ProcessFailedTransactionNotifications());
+            jobDetails.NotificationResults.Add(await NotifyApproversAboutReversals());
             return jobDetails;
         }
 
-        private async Task<FailedTxnResult> ProcessFailedTransactionNotifications()
+        private async Task<NotificationResult> ProcessFailedTransactionNotifications()
         {
             var fiveDaysAgo = DateTime.UtcNow.Date.AddDays(-5);
 
@@ -48,7 +42,7 @@ namespace Sloth.Core.Jobs
                 .Distinct()
                 .ToArrayAsync();
 
-            var failedTxnResult = new FailedTxnResult();
+            var failedTxnResult = new NotificationResult();
 
             if (!teamsWithFailedTransactions.Any())
             {
@@ -66,19 +60,19 @@ namespace Sloth.Core.Jobs
                 if (!notifySuccess)
                 {
                     Log.Error("Error sending failed transactions notification for team {TeamSlug}", team);
-                    failedTxnResult.FailedTxnTeamsNotEmailed.Add(team);
+                    failedTxnResult.TeamsNotEmailed.Add(team);
                     //TODO: queue notification for retry
                 }
                 else
                 {
-                    failedTxnResult.FailedTxnTeamsEmailed.Add(team);
+                    failedTxnResult.TeamsEmailed.Add(team);
                 }
             }
 
             return failedTxnResult;
         }
 
-        private async Task<FailedTxnResult> NotifyApproversAboutReversals()
+        private async Task<NotificationResult> NotifyApproversAboutReversals()
         {
             var teamsWithPendingReversals = await _dbContext.Transactions
                 .Where(t => t.Status == TransactionStatuses.PendingApproval && t.IsReversal)
@@ -86,7 +80,7 @@ namespace Sloth.Core.Jobs
                 .Distinct()
                 .ToArrayAsync();
 
-            var failedTxnResult = new FailedTxnResult();
+            var failedTxnResult = new NotificationResult();
 
             if (!teamsWithPendingReversals.Any())
             {
@@ -104,12 +98,12 @@ namespace Sloth.Core.Jobs
                 if (!notifySuccess)
                 {
                     Log.Error("Error sending Transactions Needing Approval notification for team {TeamSlug}", team);
-                    failedTxnResult.FailedTxnTeamsNotEmailed.Add(team);
+                    failedTxnResult.TeamsNotEmailed.Add(team);
                     //TODO: queue notification for retry
                 }
                 else
                 {
-                    failedTxnResult.FailedTxnTeamsEmailed.Add(team);
+                    failedTxnResult.TeamsEmailed.Add(team);
                 }
             }
 
@@ -117,14 +111,14 @@ namespace Sloth.Core.Jobs
         }
     }
 
-    public class FailedTxnResult
+    public class NotificationResult
     {
-        public List<string> FailedTxnTeamsEmailed { get; set; } = new();
-        public List<string> FailedTxnTeamsNotEmailed { get; set; } = new();
+        public List<string> TeamsEmailed { get; set; } = new();
+        public List<string> TeamsNotEmailed { get; set; } = new();
     }
 
     public class NotificationJobDetails
     {
-        public FailedTxnResult FailedTxnResult { get; set; } = new();
+        public List<NotificationResult> NotificationResults { get; set; } = new();
     }
 }
