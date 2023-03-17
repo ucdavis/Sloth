@@ -22,12 +22,17 @@ namespace Sloth.Core.Jobs
             _dbContext = dbContext;
         }
 
-        public async Task<NotificationJobDetails> ProcessNotifications()
+        public async Task<NotificationJobDetails> ProcessNotifications(bool failures = true)
         {
-            var jobDetails = new NotificationJobDetails
+            var jobDetails = new NotificationJobDetails();
+            if (failures)
             {
-                FailedTxnResult = await ProcessFailedTransactionNotifications()
-            };
+                jobDetails.FailedTxnResult = await ProcessFailedTransactionNotifications();
+            }
+            else
+            {
+                jobDetails.FailedTxnResult = await NotifyApproversAboutReversals();
+            }
             return jobDetails;
         }
 
@@ -61,6 +66,46 @@ namespace Sloth.Core.Jobs
                 if (!notifySuccess)
                 {
                     Log.Error("Error sending failed transactions notification for team {TeamSlug}", team);
+                    failedTxnResult.FailedTxnTeamsNotEmailed.Add(team);
+                    //TODO: queue notification for retry
+                }
+                else
+                {
+                    failedTxnResult.FailedTxnTeamsEmailed.Add(team);
+                }
+            }
+
+            return failedTxnResult;
+        }
+
+        private async Task<FailedTxnResult> NotifyApproversAboutReversals()
+        {
+
+            // get transactions that are rejected or have been processing for longer than 5 days
+            var teamsWithPendingReversals = await _dbContext.Transactions
+                .Where(t => t.Status == TransactionStatuses.PendingApproval && t.IsReversal)
+                .Select(t => t.Source.Team.Slug)
+                .Distinct()
+                .ToArrayAsync();
+
+            var failedTxnResult = new FailedTxnResult();
+
+            if (!teamsWithPendingReversals.Any())
+            {
+                Log.Information("No reversals needing approval transactions found");
+                return failedTxnResult;
+            }
+
+            foreach (var team in teamsWithPendingReversals)
+            {
+                var notifySuccess = await _notificationService.Notify(Notification
+                    .Message($"One or more {team} transactions have Pending Reversals")
+                    .WithEmailsToTeam(team, TeamRole.Approver)
+                    .WithCcEmailsToTeam(team, TeamRole.Manager)
+                    .WithLinkBack("View Transactions Needing Approval", $"/{team}/Transactions/NeedApproval"));
+                if (!notifySuccess)
+                {
+                    Log.Error("Error sending Transactions Needing Approval notification for team {TeamSlug}", team);
                     failedTxnResult.FailedTxnTeamsNotEmailed.Add(team);
                     //TODO: queue notification for retry
                 }

@@ -27,7 +27,7 @@ namespace Sloth.Jobs.Notifications
             // log run
             var jobRecord = new JobRecord()
             {
-                Name = ResendPendingWebHookRequestsJob.JobName,
+                Name = ResendPendingWebHookRequestsJob.JobName, //This is wrong...
                 StartedAt = DateTime.UtcNow,
                 Status = JobRecord.Statuses.Running,
             };
@@ -52,6 +52,34 @@ namespace Sloth.Jobs.Notifications
                 var notificationJob = provider.GetService<NotificationJob>();
 
                 var jobDetails = await notificationJob.ProcessNotifications();
+                _log.Information("Finished");
+                jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
+            }
+            catch (Exception ex)
+            {
+                _log.Error("Unexpected error", ex);
+                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
+            }
+            finally
+            {
+                await dbContext.SaveChangesAsync();
+            }
+
+            jobRecord = new JobRecord()
+            {
+                Name = "Notify Reversals needing Approval", 
+                StartedAt = DateTime.UtcNow,
+                Status = JobRecord.Statuses.Running,
+            };
+            dbContext.JobRecords.Add(jobRecord);
+            await dbContext.SaveChangesAsync();
+
+            try
+            {
+                // create job service
+                var notificationJob = provider.GetService<NotificationJob>();
+
+                var jobDetails = await notificationJob.ProcessNotifications(failures: false);
                 _log.Information("Finished");
                 jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
             }
