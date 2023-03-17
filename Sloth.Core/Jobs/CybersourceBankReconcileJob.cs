@@ -41,7 +41,7 @@ namespace Sloth.Core.Jobs
                 if (!integrations.Any())
                 {
                     log.Information("Early exit, no active integrations found.");
-                    details.Message = "No active integrations found";
+                    details.Messages.Add("No active integrations found");
                     return details;
                 }
 
@@ -49,7 +49,7 @@ namespace Sloth.Core.Jobs
             catch (Exception ex)
             {
                 log.Error(ex, ex.Message);
-                details.Message = "Error fetching integrations";
+                details.Messages.Add("Error fetching integrations");
                 return details;
             }
 
@@ -69,13 +69,13 @@ namespace Sloth.Core.Jobs
                     {
                         IntegrationId = integration.Id,
                         TeamName = integration.Team.Name,
-                        Message = $"Error processing integration: {ex.Message}"
+                        Messages = new() { $"Error processing integration: {ex.Message}" }
                     });
                 }
                 innerLog.Information("Completed integration for {TeamName}");
             }
 
-            details.Message = $"Processed {details.IntegrationDetails.Count} integrations";
+            details.Messages.Add($"Processed {details.IntegrationDetails.Count} integrations");
 
             return details;
         }

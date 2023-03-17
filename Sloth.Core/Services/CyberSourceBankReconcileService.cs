@@ -17,7 +17,6 @@ using Sloth.Integrations.Cybersource.Clients;
 using Sloth.Integrations.Cybersource.Helpers;
 using Sloth.Integrations.Cybersource.Resources;
 using Sloth.Core.Abstractions;
-using System.Text;
 
 namespace Sloth.Core.Services
 {
@@ -32,7 +31,7 @@ namespace Sloth.Core.Services
     public class CybersourceBankReconcileDetails : IHasTransactionIds
     {
         public List<CybersourceBankReconcileIntegrationDetails> IntegrationDetails { get; set; } = new();
-        public string Message { get; set; }
+        public List<string> Messages { get; set; } = new();
 
         public IEnumerable<string> GetTransactionIds()
         {
@@ -44,7 +43,7 @@ namespace Sloth.Core.Services
     {
         public string IntegrationId { get; set; }
         public string TeamName { get; set; }
-        public string Message { get; set; }
+        public List<string> Messages { get; set; } = new();
         public string BlobId { get; set; }
         public List<string> TransactionIds { get; set; } = new();
     }
@@ -101,7 +100,7 @@ namespace Sloth.Core.Services
                 {
                     IntegrationId = integration.Id,
                     TeamName = integration.Team.Name,
-                    Message = "No records found."
+                    Messages = new() { "No records found." }
                 };
             }
 
@@ -139,7 +138,7 @@ namespace Sloth.Core.Services
                 {
                     IntegrationId = integration.Id,
                     TeamName = integration.Team.Name,
-                    Message = "No records found."
+                    Messages = new() { "No records found." }
                 };
             }
 
@@ -154,7 +153,6 @@ namespace Sloth.Core.Services
                 IntegrationId = integration.Id,
                 TeamName = integration.Team.Name,
             };
-            var messageBuilder = new StringBuilder();
             var transactions = new List<Transaction>();
             var mapDepositsToDocAndKfsTrackingNumbers = new Dictionary<ReportRequest, (string docNumber, string kfsNumber)>();
             var webhookPayloads = new Dictionary<string, BankReconcileWebHookPayload>();
@@ -298,13 +296,13 @@ namespace Sloth.Core.Services
                     var inserted = await _context.SaveChangesAsync();
                     await tran.CommitAsync();
                     log.Information("{transactions} transactions created.", transactions.Count);
-                    messageBuilder.AppendLine($"{transactions.Count} transactions created.");
+                    details.Messages.Add($"{transactions.Count} transactions created.");
                 }
                 catch (Exception ex)
                 {
                     log.Error(ex, ex.Message);
                     await tran.RollbackAsync();
-                    messageBuilder.AppendLine($"Error processing report: {ex.Message}");
+                    details.Messages.Add($"Error processing report: {ex.Message}");
                 }
             });
 
@@ -317,7 +315,7 @@ namespace Sloth.Core.Services
                 catch (Exception ex)
                 {
                     log.Error(ex, $"Error when pushing {nameof(BankReconcileWebHookPayload)}");
-                    messageBuilder.AppendLine($"Error when pushing {nameof(BankReconcileWebHookPayload)}: {ex.Message}");
+                    details.Messages.Add($"Error when pushing {nameof(BankReconcileWebHookPayload)}: {ex.Message}");
                 }
             }
 
@@ -347,16 +345,14 @@ namespace Sloth.Core.Services
                 await _context.SaveChangesAsync();
                 details.BlobId = blob.Id;
                 details.TransactionIds = transactions.Select(t => t.Id).ToList();
-                messageBuilder.AppendLine($"Report saved to blob storage: {blob.Id}");
+                details.Messages.Add($"Report saved to blob storage: {blob.Id}");
             }
             catch (Exception ex)
             {
                 log.ForContext("container", _options.ReportBlobContainer)
                     .Error(ex, ex.Message);
-                messageBuilder.AppendLine($"Error saving report to blob storage: {ex.Message}");
+                details.Messages.Add($"Error saving report to blob storage: {ex.Message}");
             }
-
-            details.Message = messageBuilder.ToString();
 
             return details;
         }
