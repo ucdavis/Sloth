@@ -156,8 +156,7 @@ namespace Sloth.Core.Services
             };
             var messageBuilder = new StringBuilder();
             var transactions = new List<Transaction>();
-            string documentNumber = null;
-            string kfsTrackingNumber = null;
+            var mapDepositsToDocAndKfsTrackingNumbers = new Dictionary<ReportRequest, (string docNumber, string kfsNumber)>();
             var webhookPayloads = new Dictionary<string, BankReconcileWebHookPayload>();
 
 
@@ -198,16 +197,22 @@ namespace Sloth.Core.Services
 
                         var amount = decimal.Parse(paymentInfo.Amount);
 
-                        // ensure document and tracking numbers are created only once, in case this code gets
+                        // ensure document and tracking numbers are created only once per deposit, in case this code gets
                         // called multiple times due to a transient error
-                        documentNumber ??= await _context.GetNextDocumentNumber(tran.GetDbTransaction());
-                        kfsTrackingNumber ??= await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction());
+                        if (!mapDepositsToDocAndKfsTrackingNumbers.TryGetValue(deposit, out var docAndkfsTrackingNumbers))
+                        {
+                            docAndkfsTrackingNumbers = (
+                                await _context.GetNextDocumentNumber(tran.GetDbTransaction()),
+                                await _context.GetNextKfsTrackingNumber(tran.GetDbTransaction())
+                            );
+                            mapDepositsToDocAndKfsTrackingNumbers.Add(deposit, docAndkfsTrackingNumbers);
+                        }
 
                         transaction = new Transaction()
                         {
                             Source = integration.Source,
-                            DocumentNumber = documentNumber,
-                            KfsTrackingNumber = kfsTrackingNumber,
+                            DocumentNumber = docAndkfsTrackingNumbers.docNumber,
+                            KfsTrackingNumber = docAndkfsTrackingNumbers.kfsNumber,
                             MerchantTrackingNumber = deposit.MerchantReferenceNumber,
                             ProcessorTrackingNumber = deposit.RequestID,
                             TransactionDate = deposit.LocalizedRequestDate,
@@ -277,11 +282,11 @@ namespace Sloth.Core.Services
                         _context.Transactions.Add(transaction);
 
                         // prepare webhook payloads for sending outside of ResilientTransaction delegate
-                        if (!webhookPayloads.ContainsKey(kfsTrackingNumber))
+                        if (!webhookPayloads.ContainsKey(docAndkfsTrackingNumbers.kfsNumber))
                         {
-                            webhookPayloads.Add(kfsTrackingNumber, new BankReconcileWebHookPayload()
+                            webhookPayloads.Add(docAndkfsTrackingNumbers.kfsNumber, new BankReconcileWebHookPayload()
                             {
-                                KfsTrackingNumber = kfsTrackingNumber,
+                                KfsTrackingNumber = docAndkfsTrackingNumbers.kfsNumber,
                                 MerchantTrackingNumber = deposit.MerchantReferenceNumber,
                                 ProcessorTrackingNumber = deposit.RequestID,
                                 TransactionDate = deposit.LocalizedRequestDate,
