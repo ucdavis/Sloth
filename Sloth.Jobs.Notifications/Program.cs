@@ -27,7 +27,7 @@ namespace Sloth.Jobs.Notifications
             // log run
             var jobRecord = new JobRecord()
             {
-                Name = ResendPendingWebHookRequestsJob.JobName,
+                Name = NotificationJob.JobName, 
                 StartedAt = DateTime.UtcNow,
                 Status = JobRecord.Statuses.Running,
             };
