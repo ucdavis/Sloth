@@ -27,7 +27,7 @@ namespace Sloth.Jobs.Notifications
             // log run
             var jobRecord = new JobRecord()
             {
-                Name = NotificationJob.JobName, //This is wrong... should be NotificationJob
+                Name = NotificationJob.JobName, 
                 StartedAt = DateTime.UtcNow,
                 Status = JobRecord.Statuses.Running,
             };
