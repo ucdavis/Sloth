@@ -147,7 +147,7 @@ namespace Sloth.Web.Controllers
                         if (scrubberIds.Length > 0)
                         {
                             var transactions = await _dbContext.Transactions
-                                .Where(t => scrubberIds.Contains(t.ScrubberId))
+                                .Where(t => t.ScrubberId != null && scrubberIds.Contains(t.ScrubberId))
                                 .Include(t => t.Transfers)
                                 .Include(a => a.Source)
                                     .ThenInclude(a => a.Team)
