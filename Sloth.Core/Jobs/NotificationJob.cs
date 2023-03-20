@@ -75,7 +75,7 @@ namespace Sloth.Core.Jobs
         private async Task<NotificationResult> NotifyApproversAboutReversals()
         {
             var teamsWithPendingReversals = await _dbContext.Transactions
-                .Where(t => t.Status == TransactionStatuses.PendingApproval && t.IsReversal)
+                .Where(t => t.Status == TransactionStatuses.PendingApproval && t.ReversalOfTransactionId != null)
                 .Select(t => t.Source.Team.Slug)
                 .Distinct()
                 .ToArrayAsync();
