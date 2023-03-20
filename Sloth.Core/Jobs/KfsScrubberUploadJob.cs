@@ -94,6 +94,9 @@ namespace Sloth.Core.Jobs
 
                         // save per scrubber
                         await _context.SaveChangesAsync();
+
+                        //Write the scrubber id to the details to show TXNs that were uploaded with this scrubber
+                        transactionGroupDetails.ScrubberId = scrubber.Id;
                     }
                     catch (Exception ex)
                     {
