@@ -88,7 +88,7 @@ namespace Sloth.Core.Services
                 var glide = new GlideInput
                 {
                     LineDescription = transfer.Description.SafeTruncate(50),
-                    TransactionDate = transaction.TransactionDate.Date,
+                    TransactionDate = transaction.TransactionDate.Date.ToString("yyyy-MM-dd"),
                     UdfString1      = transaction.Description.SafeTruncate(50),
                     UdfString2      = transaction.KfsTrackingNumber.StripToErpName(50),
                     UdfString3      = transaction.ProcessorTrackingNumber.SafeTruncate(50),
