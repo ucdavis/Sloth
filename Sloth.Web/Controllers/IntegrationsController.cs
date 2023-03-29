@@ -64,7 +64,6 @@ namespace Sloth.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateIntegrationViewModel model)
         {
-            // TODO: validate model
             var adminTeams = await GetUsersAdminTeams();
             var team = adminTeams.FirstOrDefault(t => t.Slug == TeamSlug);
             if (team == null)
@@ -72,9 +71,34 @@ namespace Sloth.Web.Controllers
                 return View(model);
             }
 
-            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == model.SourceId);
+            var source = await DbContext.Sources
+                .Where(s => s.Team.Slug == TeamSlug)
+                .FirstOrDefaultAsync(s => s.Id == model.SourceId);
             if (source == null)
             {
+                ModelState.AddModelError(nameof(model.SourceId), "Source not found");
+            }
+
+            if (!await _aggieEnterpriseService.IsAccountValid(model.ClearingAccount, true))
+            {
+                ModelState.AddModelError(nameof(model.ClearingAccount), "Invalid Clearing Account");
+            }
+
+            if (!await _aggieEnterpriseService.IsAccountValid(model.HoldingAccount, true))
+            {
+                ModelState.AddModelError(nameof(model.HoldingAccount), "Invalid Holding Account");
+            }
+
+            if (ModelState.ErrorCount > 0)
+            {
+                ViewBag.ErrorMessage = "Validation Failed";
+                ViewBag.Sources = await DbContext.Sources
+                    .Where(s => s.Team.Slug == TeamSlug)
+                    .ToListAsync();
+                ViewBag.Types = new[]
+                {
+                    IntegrationTypes.CyberSource
+                };
                 return View(model);
             }
 
@@ -155,7 +179,9 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var source = await DbContext.Sources.FirstOrDefaultAsync(s => s.Id == model.SourceId);
+            var source = await DbContext.Sources
+                .Where(s => s.Team.Slug == TeamSlug)
+                .FirstOrDefaultAsync(s => s.Id == model.SourceId);
             if (source == null)
             {
                 ViewBag.ErrorMessage = "Validation Failed";
@@ -182,7 +208,9 @@ namespace Sloth.Web.Controllers
 
             if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
             {
-                ViewBag.Sources = await DbContext.Sources.ToListAsync();
+                ViewBag.Sources = await DbContext.Sources
+                    .Where(s => s.Team.Slug == TeamSlug)
+                    .ToListAsync();
                 ViewBag.Types = new[]
                 {
                     IntegrationTypes.CyberSource
