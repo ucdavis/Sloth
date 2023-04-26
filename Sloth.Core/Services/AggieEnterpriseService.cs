@@ -87,7 +87,7 @@ namespace Sloth.Core.Services
                 //TODO: Have a flag if this is for Devar's as they might want other fields? Or use the Journal Source?
                 var glide = new GlideInput
                 {
-                    LineDescription = transfer.Description.SafeTruncate(50),
+                    LineDescription = transfer.Description.SafeTruncate(100), //Line Desc is max 100 chars, our desc is currently max 40 chars
                     TransactionDate = transaction.TransactionDate.Date.ToString("yyyy-MM-dd"),
                     UdfString1      = transaction.Description.SafeTruncate(50),
                     UdfString2      = transaction.KfsTrackingNumber.StripToErpName(50),
