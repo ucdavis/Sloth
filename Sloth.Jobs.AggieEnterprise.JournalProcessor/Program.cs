@@ -1,4 +1,4 @@
-﻿using Sloth.Core.Models.Settings;
+using Sloth.Core.Models.Settings;
 using Sloth.Core.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +41,7 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
             // 1. check journal status for pending transactions
             var jobRecord = new JobRecord
             {
-                Name = AggieEnterpriseJournalJob.JobNameUploadTransactions,
+                Name = AggieEnterpriseJournalJob.JobNameResolveProcessingJournals,
                 StartedAt = DateTime.UtcNow,
                 Status = JobRecord.Statuses.Running
             };
