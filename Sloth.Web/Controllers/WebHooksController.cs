@@ -131,6 +131,7 @@ namespace Sloth.Web.Controllers
         {
             var webhook = await DbContext.WebHooks
                 .Where(i => i.Team.Slug == TeamSlug)
+                .Include(i => i.Team)
                 .FirstOrDefaultAsync(i => i.Id == id);
             if (webhook == null)
             {

@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Routing.Tree;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -38,7 +39,10 @@ namespace Sloth.Core.Services
         public async Task<List<WebHookRequest>> SendWebHooksForTeam(Team team, WebHookPayload payload, bool persist = true)
         {
             // fetch webhooks for this team and ship the payload
-            var hooks = await _dbContext.WebHooks.Where(w => w.Team.Id == team.Id && w.IsActive).ToListAsync();
+            var hooks = await _dbContext.WebHooks
+                .Where(w => w.Team.Id == team.Id && w.IsActive)
+                .Include(w => w.Team)
+                .ToListAsync();
 
             var retryDelay = _options.RetryDelaySeconds * 1000;
 
@@ -72,6 +76,7 @@ namespace Sloth.Core.Services
             var webHookRequest = new WebHookRequest
             {
                 WebHookId = webHook.Id,
+                WebHook = webHook,
                 LastRequestDate = DateTime.UtcNow,
                 Payload = payloadData,
                 RequestCount = 0,
@@ -103,7 +108,7 @@ namespace Sloth.Core.Services
                             && r.Persist
                             && r.WebHook.IsActive
                             && r.LastRequestDate < DateTime.UtcNow.AddMinutes(-_options.MinFetchAgeMinutes))
-                .Include(r => r.WebHook)
+                .Include(r => r.WebHook.Team)
                 .ToListAsync();
 
             var retryDelay = _options.RetryDelaySeconds * 1000;
@@ -142,8 +147,8 @@ namespace Sloth.Core.Services
                 var httpResponse = await client.PostAsync(webHook.Url, body);
 
                 // log response
-                Log.ForContext("webhook", webHook, true)
-                    .ForContext("response", httpResponse, true)
+                Log.ForContext("webhook", new { webHook.Id, TeamSlug = webHook.Team?.Slug, webHook.Url }, true)
+                    .ForContext("response", new { httpResponse.StatusCode }, true)
                     .Information("Sent webhook");
 
                 webHookRequest.ResponseStatus = (int) httpResponse.StatusCode;
@@ -156,8 +161,8 @@ namespace Sloth.Core.Services
                 webHookRequest.ResponseStatus = (int) HttpStatusCode.InternalServerError;
                 webHookRequest.ResponseBody = errorMessage;
 
-                Log.ForContext("webhook", webHook, true)
-                    .ForContext("request", webHookRequest, true)
+                Log.ForContext("webhook", new { webHook.Id, TeamSlug = webHook.Team?.Slug, webHook.Url }, true)
+                    .ForContext("request", new { webHookRequest.Id, webHookRequest.RequestCount }, true)
                     .Error(ex, errorMessage);
 
                 throw;
