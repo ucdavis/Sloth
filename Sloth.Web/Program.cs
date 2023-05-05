@@ -24,6 +24,9 @@ namespace Sloth.Web
     {
         public static async Task Main(string[] args)
         {
+#if DEBUG
+            Serilog.Debugging.SelfLog.Enable(msg => System.Diagnostics.Debug.WriteLine(msg));
+#endif
             var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             var isDevelopment = string.Equals(environment, "development", StringComparison.OrdinalIgnoreCase);
 
