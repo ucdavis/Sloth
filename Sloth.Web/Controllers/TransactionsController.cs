@@ -157,6 +157,8 @@ namespace Sloth.Web.Controllers
                 .Include(t => t.Transfers)
                 .Include(t => t.ReversalTransaction)
                 .Include(t => t.ReversalOfTransaction)
+                .ThenInclude(t => t.Source)
+                .ThenInclude(s => s.Team)
                 .Include(t => t.StatusEvents)
                 .Include(t => t.Metadata)
                 .AsNoTracking()
@@ -185,7 +187,7 @@ namespace Sloth.Web.Controllers
                             (
                                 a.KfsTrackingNumber == transaction.KfsTrackingNumber ||
                                 (a.ProcessorTrackingNumber != null && a.ProcessorTrackingNumber == transaction.ProcessorTrackingNumber) ||
-                                a.MerchantTrackingNumber == transaction.MerchantTrackingNumber
+                                (a.MerchantTrackingNumber != null && a.MerchantTrackingNumber == transaction.MerchantTrackingNumber)
                             ))
                         .AsNoTracking()
                         .ToListAsync()
