@@ -185,7 +185,7 @@ namespace Sloth.Web.Controllers
                             (
                                 a.KfsTrackingNumber == transaction.KfsTrackingNumber ||
                                 (a.ProcessorTrackingNumber != null && a.ProcessorTrackingNumber == transaction.ProcessorTrackingNumber) ||
-                                a.MerchantTrackingNumber == transaction.MerchantTrackingNumber
+                                (a.MerchantTrackingNumber != null && a.MerchantTrackingNumber == transaction.MerchantTrackingNumber)
                             ))
                         .AsNoTracking()
                         .ToListAsync()
