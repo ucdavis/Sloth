@@ -69,6 +69,8 @@ namespace Sloth.Core.Services
                 throw new ArgumentException("Transaction must have at least one transfer");
             }
 
+            var containsPpm = false;
+
             // all accounting dates must be the same across all transfers, so we can use the first one
             var accountingDate = transaction.Transfers.First().AccountingDate;
 
@@ -122,6 +124,7 @@ namespace Sloth.Core.Services
                 else if (segmentStringType == FinancialChartStringType.Ppm)
                 {
                     line.PpmSegmentString = transfer.FinancialSegmentString;
+                    containsPpm = true;
                 }
                 else
                 {
@@ -140,7 +143,7 @@ namespace Sloth.Core.Services
                     ConsumerNotes =
                         transaction.Description.SafeTruncate(240),
                     BoundaryApplicationName = source.Name.SafeTruncate(80),
-                    BatchRequest = _options.BatchRequest // requests to promote thin ledger
+                    BatchRequest = containsPpm ? false : _options.BatchRequest // requests to promote thin ledger
                     // TODO: Seems to kill the API if specified, so don't specify for now.
                     // BatchRequest = true // always want to batch requests to promote thin ledger
                 },
