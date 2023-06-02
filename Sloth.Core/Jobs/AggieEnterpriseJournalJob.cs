@@ -296,8 +296,13 @@ namespace Sloth.Core.Jobs
                                 }
                             }
                             else if (result.GlJournalRequestStatus.RequestStatus.RequestStatus ==
-                                     RequestStatus.Complete)
+                                     RequestStatus.Complete || result.GlJournalRequestStatus.RequestStatus.RequestStatus == RequestStatus.Warning)
                             {
+                                if(result.GlJournalRequestStatus.RequestStatus.RequestStatus == RequestStatus.Warning)
+                                {
+                                    log.Warning("Journal request for transaction {TransactionId} completed with warning", transaction.Id);
+                                    transaction.SetStatus(TransactionStatuses.Completed, details: "Journal request completed with warning");
+                                }
                                 // success, update transaction status to uploaded
                                 transaction.SetStatus(TransactionStatuses.Completed);
                                 transaction.JournalRequest.Status =
