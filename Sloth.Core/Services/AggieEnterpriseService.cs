@@ -52,11 +52,11 @@ namespace Sloth.Core.Services
             {
 
                 var result =
-                    await _aggieClient.PpmStringSegmentsValidate.ExecuteAsync(financialSegmentString);
+                    await _aggieClient.PpmSegmentStringValidate.ExecuteAsync(financialSegmentString);
 
                 var data = result.ReadData();
 
-                return data.PpmStringSegmentsValidate.ValidationResponse.Valid;
+                return data.PpmSegmentStringValidate.ValidationResponse.Valid;
             }
 
             return false;
