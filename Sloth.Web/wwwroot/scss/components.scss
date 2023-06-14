@@ -109,6 +109,8 @@ a.stretched-link {
 .job {
   margin-bottom: 2%;
 }
-tr {
-  word-wrap: break-word;
+table#integrationsTable {
+  tr {
+    word-wrap: break-word !important;
+  }
 }
