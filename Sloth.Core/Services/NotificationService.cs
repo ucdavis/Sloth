@@ -9,6 +9,8 @@ using Serilog;
 using Sloth.Core.Configuration;
 using Sloth.Core.Models.Emails;
 using Sloth.Core.Views.Shared;
+using Mjml;
+using Mjml.Net;
 
 namespace Sloth.Core.Services
 {
@@ -22,12 +24,13 @@ namespace Sloth.Core.Services
         private readonly NotificationOptions _notificationOptions;
         private readonly ISmtpService _smtpService;
         private readonly SlothDbContext _dbContext;
+        private readonly IMjmlRenderer _mjmlRenderer;
 
-        public NotificationService(IOptions<NotificationOptions> notificationOptions,ISmtpService smtpService, SlothDbContext dbContext)
+        public NotificationService(IOptions<NotificationOptions> notificationOptions,ISmtpService smtpService, SlothDbContext dbContext, IMjmlRenderer mjmlRenderer)
         {
             _notificationOptions = notificationOptions.Value;
             _smtpService = smtpService;
-            _dbContext = dbContext;
+            _mjmlRenderer = mjmlRenderer;
         }
 
         public async Task<bool> Notify(Notification notification)
@@ -86,7 +89,7 @@ namespace Sloth.Core.Services
 
             try
             {
-                var body = !string.IsNullOrWhiteSpace(notification.Body)
+                var mjml = !string.IsNullOrWhiteSpace(notification.Body)
                     ? notification.Body
                     : !string.IsNullOrWhiteSpace(notification.ViewName)
                         ? await RazorTemplateEngine.RenderAsync(notification.ViewName, notification.Model, notification.ViewBagOrViewData)
@@ -96,6 +99,17 @@ namespace Sloth.Core.Services
                             Subject = notification.Subject,
                             LinkBackButton = notification.LinkBackButton
                         }, notification.ViewBagOrViewData);
+
+                var xml = _mjmlRenderer.FixXML(mjml);
+
+                var (body, errors) = _mjmlRenderer.Render(xml);
+
+                if (errors.Any())
+                {
+                    Log.Error("Error rendering notification for subject \"{Subject}\": {Errors}", notification.Subject,
+                        string.Join(Environment.NewLine, errors.Select(e => $"{e.Line}:{e.Column} {e.Error}")));
+                    return false;
+                }
 
                 await _smtpService.SendEmail(notification.Emails.ToArray(), notification.CcEmails.ToArray(), body, notification.MessageText, notification.Subject);
             }
