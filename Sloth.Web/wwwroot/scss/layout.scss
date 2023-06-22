@@ -30,6 +30,14 @@ header {
   padding: 4px 0;
   border-bottom: 1px solid $borders-sloth;
 }
+.profile-bar {
+  padding-top: 2%;
+  text-align: left;
+  @include breakpoint(md) {
+    padding-top: 0%;
+    text-align: right;
+  }
+}
 .search-wrapper {
   padding: 8px 0;
   border-bottom: 1px solid $borders-sloth;
@@ -68,12 +76,21 @@ footer {
   border-bottom: 1px solid $borders-sloth;
 }
 .nav-link {
-  padding: 8px 16px;
+  padding: 4px 8px;
   color: $secondary-font;
-  font-size: 1.3rem;
+  font-size: 0.8rem;
   svg {
-    margin-right: 4px;
-    padding-bottom: 2px;
+    display: none;
+  }
+  @include breakpoint(md) {
+    padding: 8px 16px;
+    color: $secondary-font;
+    font-size: 1.3rem;
+    svg {
+      display: inline;
+      margin-right: 4px;
+      padding-bottom: 2px;
+    }
   }
 }
 //body
