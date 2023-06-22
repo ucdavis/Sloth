@@ -110,7 +110,11 @@ a.stretched-link {
   margin-bottom: 2%;
 }
 table#integrationsTable {
-  td:nth-child(5), td:nth-child(4) {
-    word-wrap: anywhere ;
+  td:nth-child(5),
+  td:nth-child(4) {
+    word-wrap: anywhere;
   }
+}
+.responsive-table {
+  overflow-x: auto;
 }
