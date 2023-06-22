@@ -29,6 +29,7 @@ using Sloth.Web.Logging;
 using Sloth.Web.Models;
 using Sloth.Web.Resources;
 using Sloth.Web.Services;
+using Mjml.Net;
 
 namespace Sloth.Web
 {
@@ -70,6 +71,7 @@ namespace Sloth.Web
             services.AddTransient<IAggieEnterpriseService, AggieEnterpriseService>();
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IMjmlRenderer, MjmlRenderer>();
 
             // add jobs services
             services.AddHostedService<QueuedHostedService>();

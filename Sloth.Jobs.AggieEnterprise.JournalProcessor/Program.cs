@@ -9,6 +9,7 @@ using Sloth.Core.Configuration;
 using Sloth.Core.Jobs;
 using Sloth.Core.Models;
 using Sloth.Jobs.Core;
+using Mjml.Net;
 
 namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
 {
@@ -111,6 +112,7 @@ namespace Sloth.Jobs.AggieEnterprise.JournalProcessor
             services.AddSingleton(_log);
             services.AddScoped<ISmtpService, SmtpService>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IMjmlRenderer, MjmlRenderer>();
 
             return services.BuildServiceProvider();
         }
