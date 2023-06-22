@@ -104,6 +104,13 @@ namespace Sloth.Core.Services
 
                 var (body, errors) = _mjmlRenderer.Render(xml);
 
+                if (errors.Any())
+                {
+                    Log.Error("Error rendering notification for subject \"{Subject}\": {Errors}", notification.Subject,
+                        string.Join(Environment.NewLine, errors.Select(e => $"{e.Line}:{e.Column} {e.Error}")));
+                    return false;
+                }
+
                 await _smtpService.SendEmail(notification.Emails.ToArray(), notification.CcEmails.ToArray(), body, notification.MessageText, notification.Subject);
             }
             catch (Exception ex)
