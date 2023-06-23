@@ -1,21 +1,7 @@
 ﻿@using Sloth.Core.Views.Shared
 @model Sloth.Core.Views.Shared.EmailInnerDetailsModel
 
-@*
-<!-- This section should be pasted in mjml editor to generate this view's content. Uncomment to get intellisense for model properties -->
-<mjml>
-  <mj-body background-color="#FEFEFE">
-    <!-- BEGIN VIEW CONTENT -->
     <mj-text padding-top="0px" padding-left="0px" padding-bottom="5px">
       <p><b>@Model.Heading</b></p>
       <p>@Model.Text</p>
     </mj-text>
-    <!-- END VIEW CONTENT -->
-  </mj-body>
-</mjml>
-*@
-<div
-  style="font-family:Ubuntu, Helvetica, Arial, sans-serif;font-size:13px;line-height:1;text-align:left;color:#000000;">
-  <p><b>@Model.Heading</b></p>
-  <p>@Model.Text</p>
-</div>

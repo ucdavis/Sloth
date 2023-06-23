@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Mjml.Net;
 using Serilog;
 using Sloth.Core;
 using Sloth.Core.Configuration;
@@ -27,7 +28,7 @@ namespace Sloth.Jobs.Notifications
             // log run
             var jobRecord = new JobRecord()
             {
-                Name = NotificationJob.JobName, 
+                Name = NotificationJob.JobName,
                 StartedAt = DateTime.UtcNow,
                 Status = JobRecord.Statuses.Running,
             };
@@ -83,6 +84,7 @@ namespace Sloth.Jobs.Notifications
             services.AddTransient<INotificationService, NotificationService>();
             services.AddTransient<ISmtpService, SmtpService>();
             services.AddTransient<NotificationJob>();
+            services.AddTransient<IMjmlRenderer, MjmlRenderer>();
 
             services.AddSingleton(_log);
 
