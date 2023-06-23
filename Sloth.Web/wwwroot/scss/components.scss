@@ -117,4 +117,7 @@ table#integrationsTable {
 }
 .responsive-table {
   overflow-x: auto;
+  @include breakpoint(md) {
+    overflow: inherit;
+  }
 }
