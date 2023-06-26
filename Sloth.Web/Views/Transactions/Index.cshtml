@@ -25,7 +25,7 @@
         <h3>Filters</h3>
         <form class="row" id="transactionFilterForm" asp-controller="Transactions" asp-action="Index" method="get">
             <div class="row justify-content-between filters-wrapper">
-                <div class="col-4">
+                <div class="col-8 col-md-5">
                     <div id="filter-date-range" class="input-group">
                         <input name="from" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.From" asp-format="{0:MM/dd/yyyy}" aria-label="" />
                         <span class="input-group-text">to</span>

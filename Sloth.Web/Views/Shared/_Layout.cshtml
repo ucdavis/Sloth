@@ -104,8 +104,8 @@
             <div class="container">
                 <div class="row justify-content-between">
 
-                    <div class="col-8 d-flex search-bar">
-                        <div class="col-3 team-chooser">
+                    <div class="col-12 col-md-8 d-flex search-bar">
+                        <div class="col-4 team-chooser">
                             <select id="team-select" class="form-select" aria-label="Default select example">
                                 <option value="">-- Choose team --</option>
                                 @foreach (var item in teams)
@@ -131,7 +131,7 @@
                         }
 
                     </div>
-                    <div class="col-4 text-end profile-bar"><partial name="_LoginPartial" /></div>
+                    <div class="col-12 col-md-4 profile-bar"><partial name="_LoginPartial" /></div>
                 </div>
 
             </div>

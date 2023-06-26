@@ -10,7 +10,7 @@
 @{
     var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
 }
-
+<div class="responsive-table">
 <table id="transactionsTable" class="table sloth-table active-table">
     <thead>
         <tr>
@@ -74,3 +74,4 @@
         }
     </tbody>
 </table>
+</div>
