@@ -150,6 +150,10 @@ namespace Sloth.Core.Jobs
 
                                 transactionRunStatus.Action = requestStatus.RequestStatus.ToString();
                             }
+                            else if(requestStatus.RequestStatus == RequestStatus.Validated)
+                            {
+                                log.Error("Unexpected Aggie Enterprise status of Validated returned.");
+                            }
 
                             // TODO: These are likely the only two statuses possible for a new request, but confirm
 
