@@ -92,7 +92,7 @@ namespace Sloth.Core.Services
                     LineDescription = transfer.Description.SafeTruncate(100), //Line Desc is max 100 chars, our desc is currently max 40 chars
                     TransactionDate = transaction.TransactionDate.Date.ToString("yyyy-MM-dd"),
                     UdfString1      = transaction.Description.SafeTruncate(50),
-                    UdfString2      = transaction.KfsTrackingNumber.StripToErpName(50),
+                    UdfString2      = transaction.Source?.Team?.Name.SafeTruncate(50), //None of this should be null, but just in case
                     UdfString3      = transaction.ProcessorTrackingNumber.SafeTruncate(50),
                     UdfString4      = transaction.MerchantTrackingNumber.SafeTruncate(50),
                     UdfString5      = transfer.Id.SafeTruncate(50)
