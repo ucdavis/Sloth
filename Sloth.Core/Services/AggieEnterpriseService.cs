@@ -72,7 +72,7 @@ namespace Sloth.Core.Services
             var containsPpm = false;
 
             // all accounting dates must be the same across all transfers, so we can use the first one
-            var accountingDate = transaction.Transfers.First().AccountingDate;
+            var accountingDate = transaction.Transfers.First().AccountingDate; 
 
             var lines = new List<GlJournalLineInput>();
 
