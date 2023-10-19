@@ -153,7 +153,7 @@ namespace Sloth.Core.Services
                     JournalCategoryName = _options.JournalCategory.SafeTruncate(80),
                     JournalName = source.Name.StripToErpName(100),
                     JournalReference = source.Team.Name.StripToGlReferenceField(25),
-                    AccountingDate = accountingDate?.ToString("yyyy-mm-dd"),
+                    AccountingDate = accountingDate?.ToString("yyyy-MM-dd"),
                     JournalLines = lines
                 }
             };
