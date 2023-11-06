@@ -146,6 +146,7 @@ namespace Sloth.Core
             WebHookRequest.OnModelCreating(modelBuilder);
             JobRecord.OnModelCreating(modelBuilder);
             TransactionBlob.OnModelCreating(modelBuilder);
+            TransactionMetadata.OnModelCreating(modelBuilder);
         }
     }
 }
