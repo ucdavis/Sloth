@@ -21,6 +21,7 @@ namespace Sloth.Core.Models
         public string Name { get; set; }
 
         [Required]
+        [MaxLength(450)]
         public string Value { get; set; }
 
         public static void OnModelCreating(ModelBuilder modelBuilder)
@@ -28,8 +29,9 @@ namespace Sloth.Core.Models
             modelBuilder.Entity<TransactionMetadata>()
                 .HasIndex(r => r.TransactionId);
 
-            // modelBuilder.Entity<TransactionMetadata>()
-            //     .HasIndex(r => r.Name);
+            // create a covering index for key and value
+            modelBuilder.Entity<TransactionMetadata>()
+                .HasIndex(r => new { r.TransactionId, r.Name, r.Value });
         }
     }
 }

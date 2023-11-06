@@ -156,6 +156,35 @@ namespace Sloth.Api.Controllers.v2
             return transactions;
         }
 
+        /// <summary>
+        /// Fetch Transactions by Metadata
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        [HttpGet("metadata/{key}/{value}")]
+        [ProducesResponseType(typeof(IList<Transaction>), 200)]
+        public async Task<IList<Transaction>> GetByMetadata(string key, string value)
+        {
+            var teamId = GetTeamId();
+
+            if (string.IsNullOrWhiteSpace(key) || string.IsNullOrWhiteSpace(value))
+            {
+                return new List<Transaction>();
+            }
+
+            var transactions = await _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
+                .Include(t => t.Creator)
+                .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
+                .Where(t => t.Metadata.Any(m => m.Name == key && m.Value == value))
+                .AsNoTracking()
+                .ToListAsync();
+
+            return transactions;
+        }
+
         // TODO: just for testing, remove later
 
         /// <summary>
