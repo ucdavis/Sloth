@@ -194,17 +194,19 @@ namespace Sloth.Web.Controllers
                 ModelState.AddModelError(nameof(model.ReportPassword), "Password is required");
             }
 
-            if (!await _aggieEnterpriseService.IsAccountValid(model.ClearingAccount, true))
-            {
-                ViewBag.ErrorMessage = "Validation Failed";
-                ModelState.AddModelError(nameof(model.ClearingAccount), "Invalid Clearing Account");
-            }
+            ViewBag.ErrorMessage = "AE Account Validation Disabled. This probably saved. FIX before we put in AE accounts!!!!";
 
-            if (!await _aggieEnterpriseService.IsAccountValid(model.HoldingAccount, true))
-            {
-                ViewBag.ErrorMessage = "Validation Failed";
-                ModelState.AddModelError(nameof(model.HoldingAccount), "Invalid Holding Account");
-            }
+            //if (!await _aggieEnterpriseService.IsAccountValid(model.ClearingAccount, true))
+            //{
+            //    ViewBag.ErrorMessage = "Validation Failed";
+            //    ModelState.AddModelError(nameof(model.ClearingAccount), "Invalid Clearing Account");
+            //}
+
+            //if (!await _aggieEnterpriseService.IsAccountValid(model.HoldingAccount, true))
+            //{
+            //    ViewBag.ErrorMessage = "Validation Failed";
+            //    ModelState.AddModelError(nameof(model.HoldingAccount), "Invalid Holding Account");
+            //}
 
             if (!string.IsNullOrWhiteSpace(ViewBag.ErrorMessage))
             {
