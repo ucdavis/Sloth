@@ -44,6 +44,14 @@
             <span>@Model.Transaction.KfsTrackingNumber</span>
         </div>
     </div>
+    <div class="txn-detail-row">
+        <div class="txn-detail-label">
+            <span>@Html.DisplayNameFor(x => x.Transaction.DocumentNumber)</span>
+        </div>
+        <div class="txn-detail-result">
+            <span>@Model.Transaction.DocumentNumber</span>
+        </div>
+    </div>
     @if (Model.Transaction.JournalRequest != null)
     {
         <div class="txn-detail-row">
