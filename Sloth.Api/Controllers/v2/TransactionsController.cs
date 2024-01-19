@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Serilog;
 using Sloth.Api.Attributes;
 using Sloth.Api.Errors;
 using Sloth.Api.Models.v2;
@@ -185,8 +186,6 @@ namespace Sloth.Api.Controllers.v2
             return transactions;
         }
 
-        // TODO: just for testing, remove later
-
         /// <summary>
         /// Validate Financial Segment String
         /// </summary>
@@ -199,9 +198,6 @@ namespace Sloth.Api.Controllers.v2
             return await _aggieEnterpriseService.IsAccountValid(id);
         }
 
-
-        // TODO: update to AE
-
         /// <summary>
         /// Create a Transaction with a list of Transfers
         /// </summary>
@@ -212,6 +208,8 @@ namespace Sloth.Api.Controllers.v2
         [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
         public async Task<IActionResult> Post([FromBody] CreateTransactionViewModel transaction)
         {
+            LogTransactionCreating(transaction);
+
             var teamId = GetTeamId();
 
             if (!ModelState.IsValid)
@@ -362,6 +360,23 @@ namespace Sloth.Api.Controllers.v2
             });
 
             return new JsonResult(transactionToCreate);
+        }
+
+        private void LogTransactionCreating(CreateTransactionViewModel transaction)
+        {
+            var txn = new
+            {
+                transaction.KfsTrackingNumber,
+                transaction.ProcessorTrackingNumber,
+                transaction.MerchantTrackingNumber,
+                transaction.MerchantTrackingUrl,
+                transaction.Source,
+                transaction.SourceType,
+                Transfers = transaction.Transfers.Select(t => new { t.Amount, t.FinancialSegmentString, t.Description, t.Direction }).ToArray(),
+                Metadata = transaction.Metadata.Select(m => new { m.Name, m.Value }).ToArray(),
+            };
+
+            Log.Information("Transaction Creation Starting: {@Transaction}", txn);
         }
 
         private string GetTeamId()
