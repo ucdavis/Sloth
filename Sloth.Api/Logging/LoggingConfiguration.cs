@@ -7,6 +7,7 @@ using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.MSSqlServer;
+using StackifyLib;
 
 namespace Sloth.Api.Logging
 {
@@ -60,6 +61,11 @@ namespace Sloth.Api.Logging
             // add in stackify sink if the api key is valid
             if (!string.IsNullOrEmpty(loggingSection.GetValue<string>("ApiKey")))
             {
+                if (!_loggingSetup)
+                {
+                    _configuration.ConfigureStackifyLogging(); // applies stackify settings
+                }
+
                 logConfig = logConfig.WriteTo.Stackify();
             }
 
