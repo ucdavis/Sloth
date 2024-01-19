@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 using Serilog.Exceptions;
 using Serilog.Sinks.Elasticsearch;
 using Serilog.Sinks.MSSqlServer;
-using Serilog.Sinks.MSSqlServer.Sinks.MSSqlServer.Options;
+using StackifyLib;
 
 namespace Sloth.Web.Logging
 {
@@ -61,9 +60,14 @@ namespace Sloth.Web.Logging
             // add in stackify sink if the api key is valid
             if (!string.IsNullOrEmpty(loggingSection.GetValue<string>("ApiKey")))
             {
+                if (!_loggingSetup)
+                {
+                    _configuration.ConfigureStackifyLogging(); // applies stackify settings
+                }
+
                 logConfig = logConfig.WriteTo.Stackify();
             }
-            
+
             // add in elastic search sink if the uri is valid
             if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out var elasticUri))
             {
