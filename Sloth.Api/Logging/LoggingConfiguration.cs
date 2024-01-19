@@ -57,6 +57,12 @@ namespace Sloth.Api.Logging
             logConfig = logConfig
                 .WriteTo.Console();
 
+            // add in stackify sink if the api key is valid
+            if (!string.IsNullOrEmpty(loggingSection.GetValue<string>("ApiKey")))
+            {
+                logConfig = logConfig.WriteTo.Stackify();
+            }
+
             // add in elastic search sink if the uri is valid
             if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out var elasticUri))
             {

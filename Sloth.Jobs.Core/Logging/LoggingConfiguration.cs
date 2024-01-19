@@ -63,6 +63,12 @@ namespace Sloth.Jobs.Core.Logging
                 .WriteTo.Console()
                 .WriteToSqlCustom();
 
+            // add in stackify sink if the api key is valid
+            if (!string.IsNullOrEmpty(loggingSection.GetValue<string>("ApiKey")))
+            {
+                logConfig = logConfig.WriteTo.Stackify();
+            }
+
             // add in elastic search sink if the uri is valid
             if (Uri.TryCreate(loggingSection.GetValue<string>("ElasticUrl"), UriKind.Absolute, out var elasticUri))
             {
