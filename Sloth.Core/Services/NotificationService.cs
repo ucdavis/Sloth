@@ -31,6 +31,7 @@ namespace Sloth.Core.Services
             _notificationOptions = notificationOptions.Value;
             _smtpService = smtpService;
             _mjmlRenderer = mjmlRenderer;
+            _dbContext = dbContext; 
         }
 
         public async Task<bool> Notify(Notification notification)
