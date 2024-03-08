@@ -86,7 +86,7 @@ namespace Sloth.Web.Controllers
             };
 
             model.Transactions = await DbContext.Transactions.Include(a => a.Transfers).Include(a => a.Metadata)
-                .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= filter.From && t.TransactionDate <= filter.To).Select(TransactionWithTransfers.Projection()).ToListAsync();
+                .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= filter.From && t.TransactionDate <= filter.To).OrderBy(a => a.Id).ThenBy(a => a.TransactionDate).Select(TransactionWithTransfers.Projection()).ToListAsync();
 
             var team = await DbContext.Teams.FirstAsync(t => t.Slug == TeamSlug);
             ViewBag.Title = $"Transactions with Transfers - {team.Name}";

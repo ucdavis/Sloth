@@ -20,6 +20,7 @@ namespace Sloth.Web.Models.ReportViewModels
     public class TransactionWithTransfers
     {
         public string Id { get; set; }
+        public string DisplayId => $"...{Id[^4..]}"; // last 4 characters of the id
 
         public string Status { get; set; }
 
