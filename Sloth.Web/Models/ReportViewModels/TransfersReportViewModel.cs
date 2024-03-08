@@ -12,7 +12,7 @@ namespace Sloth.Web.Models.ReportViewModels
 {
     public class TransfersReportViewModel
     {
-        public TransactionsFilterModel filter { get; set; }
+        public TransactionsFilterModel Filter { get; set; }
 
         public IList<TransactionWithTransfers> Transactions { get; set; }
     }

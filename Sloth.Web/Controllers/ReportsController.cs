@@ -66,6 +66,8 @@ namespace Sloth.Web.Controllers
             return View("FailedTransactions", model);
         }
 
+        [Route("{team}/reports/downloadabletransactions/{filter?}")]
+        [HttpGet]
         public async Task<IActionResult> DownloadableTransactions(TransactionsFilterModel filter = null)
         {
             if (string.IsNullOrWhiteSpace(TeamSlug))
@@ -76,18 +78,18 @@ namespace Sloth.Web.Controllers
             if (filter == null)
                 filter = new TransactionsFilterModel();
 
-            filter.From = filter.From = new DateTime(2023, 10, 12);
-            filter.To = filter.To = new DateTime(2023, 10, 15);
-
             FilterHelpers.SanitizeTransactionsFilter(filter);
 
             var model = new TransfersReportViewModel
             {
-                filter = filter,
+                Filter = filter,
             };
 
             model.Transactions = await DbContext.Transactions.Include(a => a.Transfers).Include(a => a.Metadata)
                 .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= filter.From && t.TransactionDate <= filter.To).Select(TransactionWithTransfers.Projection()).ToListAsync();
+
+            var team = await DbContext.Teams.FirstAsync(t => t.Slug == TeamSlug);
+            ViewBag.Title = $"Transactions with Transfers - {team.Name}";
 
             return View(model);
         }

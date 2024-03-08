@@ -1,0 +1,33 @@
+@model Sloth.Web.Models.ReportViewModels.TransfersReportViewModel
+
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Routing
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
+}
+
+
+<div class="container">
+    <h2>@ViewBag.Title</h2>
+
+    <h3>Filters</h3>
+    <form class="row" id="transactionFilterForm" asp-controller="Reports" asp-action="DownloadableTransactions" method="get">
+        <div class="row justify-content-between filters-wrapper">
+            <div class="col-8 col-md-5">
+                <div id="filter-date-range" class="input-group">
+                    <input name="from" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.From" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                    <span class="input-group-text">to</span>
+                    <input name="to" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.To" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                </div>
+
+                <button type="submit" class="btn btn-link mt-1">Apply filter</button>
+            </div>
+
+        </div>
+    </form>
+    <div>@teamSlug</div>
+
+    <div>@Model.Transactions.Count</div>
+
+</div>

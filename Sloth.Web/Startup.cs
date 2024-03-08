@@ -164,6 +164,19 @@ namespace Sloth.Web
 
             app.UseEndpoints(routes =>
             {
+
+                //A team specific reports route (needed because this report has a filter)
+                //I replaced this with a route on the action
+                //routes.MapControllerRoute(
+                //    name: "team-report-downloadable-transactions",
+                //    pattern: "{team}/reports/downloadabletransactions",
+                //    defaults: new { controller = "Reports", action = "DownloadableTransactions" },
+                //    constraints: new
+                //    {
+                //        team = new CompositeRouteConstraint(new IRouteConstraint[] {
+                //            new RegexInlineRouteConstraint(Team.SlugRegex),
+                //        })
+                //    });
                 // non team root routes
                 routes.MapControllerRoute(
                     name: "non-team-routes",
