@@ -19,7 +19,9 @@ namespace Sloth.Web.Models.ReportViewModels
 
     public class TransactionWithTransfers
     {
+        [DisplayName("Txn Id")]
         public string Id { get; set; }
+        [DisplayName("Txn Id")]
         public string DisplayId => $"...{Id[^4..]}"; // last 4 characters of the id
 
         public string Status { get; set; }
@@ -45,6 +47,7 @@ namespace Sloth.Web.Models.ReportViewModels
         [DisplayName("Transaction Amount")]
         public decimal Amount { get; set; }
 
+        [DisplayName("Transfer Count")]
         public int TransferCount { get; set; }
 
         public IList<Transfer> Transfers { get; set; } // don't need all the info in here, but it shouldn't be too big.

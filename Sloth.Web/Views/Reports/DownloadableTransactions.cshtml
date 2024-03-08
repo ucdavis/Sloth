@@ -1,12 +1,13 @@
-@model Sloth.Web.Models.ReportViewModels.TransfersReportViewModel
-
+@using Humanizer
+@using Sloth.Core.Extensions
+@using Sloth.Core.Resources
 @using Microsoft.AspNetCore.Http
 @using Microsoft.AspNetCore.Routing
 @inject IHttpContextAccessor HttpContextAccessor
 @{
     var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
 }
-
+@model Sloth.Web.Models.ReportViewModels.TransfersReportViewModel
 
 <div class="container">
     <h2>@ViewBag.Title</h2>
@@ -47,6 +48,7 @@
                     <th>Description</th>
                     <th>Amount</th>
                     <th>Chart String</th>
+                    <th>Chart String</th>
                 </tr>
             </thead>
             <tbody>
@@ -57,8 +59,8 @@
                         <tr>
                             <td>@txn.Id</td>
                             <td>@txn.DisplayId</td>
-                            <td>@txn.Status</td>
-                            <td>@txn.TransactionDate</td>
+                            <td><span class="badge @(TransactionStatuses.GetBadgeClass(txn.Status))">@txn.Status.Humanize(LetterCasing.Title)</span></td>
+                            <td>@txn.TransactionDate.ToPacificTime()</td>
                             <td>@txn.KfsTrackingNumber</td>
                             <td>@txn.DocumentNumber</td>
                             <td>@txn.ProcessorTrackingNumber</td>
@@ -70,6 +72,7 @@
                             <td><span class="badge @(Transfer.GetDirectionBadgeClass(transfer.Direction))">@transfer.Direction</span></td>
                             <td>@transfer.Description</td>
                             <td>@transfer.Amount</td>
+                            <td>@transfer.ShortFinancialSegmentString</td>
                             <td>@transfer.FinancialSegmentString</td>
                         </tr>
                     }
@@ -80,3 +83,30 @@
     </div>
 
 </div>
+
+@section AdditionalScripts {
+    <script>
+        //setup datepickers
+        $('#filter-date-range').datepicker({
+            inputs: $('#filter-date-range input'),
+            keepEmptyValues: true,
+        });
+    </script>
+
+    <script>
+        $('#transactionsTable').dataTable({
+            "columnDefs": [
+                {
+                    "targets": [0,5,6,7,9,16],
+                    "visible": false,
+                }
+            ],
+            order: false,
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+        });
+
+    </script>
+}

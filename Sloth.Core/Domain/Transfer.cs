@@ -163,6 +163,8 @@ namespace Sloth.Core.Models
             }
             return result;
         }
+
+        public string ShortFinancialSegmentString => $"{FinancialSegmentString?[0..13]}...";
         #endregion
 
         public enum CreditDebit
