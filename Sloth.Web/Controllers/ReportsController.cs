@@ -20,6 +20,7 @@ using Sloth.Web.Models.BlobViewModels;
 using Sloth.Web.Models.ReportViewModels;
 using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Resources;
+using Sloth.Web.Helpers;
 
 namespace Sloth.Web.Controllers
 {
@@ -63,6 +64,32 @@ namespace Sloth.Web.Controllers
             };
 
             return View("FailedTransactions", model);
+        }
+
+        public async Task<IActionResult> DownloadableTransactions(TransactionsFilterModel filter = null)
+        {
+            if (string.IsNullOrWhiteSpace(TeamSlug))
+            {
+                return BadRequest("TeamSlug is required");
+            }
+
+            if (filter == null)
+                filter = new TransactionsFilterModel();
+
+            filter.From = filter.From = new DateTime(2023, 10, 12);
+            filter.To = filter.To = new DateTime(2023, 10, 15);
+
+            FilterHelpers.SanitizeTransactionsFilter(filter);
+
+            var model = new TransfersReportViewModel
+            {
+                filter = filter,
+            };
+
+            model.Transactions = await DbContext.Transactions.Include(a => a.Transfers).Include(a => a.Metadata)
+                .Where(t => t.Source.Team.Slug == TeamSlug && t.TransactionDate >= filter.From && t.TransactionDate <= filter.To).Select(TransactionWithTransfers.Projection()).ToListAsync();
+
+            return View(model);
         }
 
         [Authorize(Roles = Roles.SystemAdmin)]
