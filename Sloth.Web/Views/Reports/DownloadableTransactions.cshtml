@@ -26,8 +26,57 @@
 
         </div>
     </form>
-    <div>@teamSlug</div>
 
-    <div>@Model.Transactions.Count</div>
+    <div class="responsive-table">
+        <table id="transactionsTable" class="table sloth-table active-table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Id)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().DisplayId)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Status)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().TransactionDate)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().KfsTrackingNumber)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().DocumentNumber)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().ProcessorTrackingNumber)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().MerchantTrackingNumber)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().TxnDescription)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().MetaDataString)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().TransferCount)</th>
+                    <th>Total Amount</th>
+                    <th>Direction</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Chart String</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var txn in Model.Transactions)
+                {
+                    @foreach (var transfer in txn.Transfers)
+                    {
+                        <tr>
+                            <td>@txn.Id</td>
+                            <td>@txn.DisplayId</td>
+                            <td>@txn.Status</td>
+                            <td>@txn.TransactionDate</td>
+                            <td>@txn.KfsTrackingNumber</td>
+                            <td>@txn.DocumentNumber</td>
+                            <td>@txn.ProcessorTrackingNumber</td>
+                            <td>@txn.MerchantTrackingNumber</td>
+                            <td>@txn.TxnDescription</td>
+                            <td>@txn.MetaDataString</td>
+                            <td>@txn.TransferCount</td>
+                            <td>@txn.Amount</td>
+                            <td><span class="badge @(Transfer.GetDirectionBadgeClass(transfer.Direction))">@transfer.Direction</span></td>
+                            <td>@transfer.Description</td>
+                            <td>@transfer.Amount</td>
+                            <td>@transfer.FinancialSegmentString</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
 
 </div>

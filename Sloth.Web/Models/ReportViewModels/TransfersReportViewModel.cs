@@ -65,7 +65,7 @@ namespace Sloth.Web.Models.ReportViewModels
                 MetaDataString = string.Join(", ", txn.Metadata.Select(kv => $"{kv.Name}: {kv.Value}")),
                 Amount = txn.Transfers.Where(a => a.Direction == Transfer.CreditDebit.Credit).Sum(a => a.Amount),
                 TransferCount = txn.Transfers.Count,
-                Transfers = txn.Transfers,
+                Transfers = txn.Transfers.OrderBy(a => a.Direction).ToList(),
             };
 
         }
