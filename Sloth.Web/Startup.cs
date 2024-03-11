@@ -60,6 +60,7 @@ namespace Sloth.Web
             services.Configure<SparkpostOptions>(Configuration.GetSection("SparkPost"));
             services.Configure<NotificationOptions>(Configuration.GetSection("Notifications"));
             services.Configure<KfsOptions>(Configuration.GetSection("Kfs"));
+            services.Configure<DataLimitingOptions>(Configuration.GetSection("DataLimiting"));
 
 
             // add infrastructure services

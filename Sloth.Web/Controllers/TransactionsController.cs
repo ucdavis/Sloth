@@ -21,6 +21,8 @@ using Sloth.Web.Models.BlobViewModels;
 using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Resources;
 using Sloth.Web.Helpers;
+using Microsoft.Extensions.Options;
+using Sloth.Web.Models;
 
 namespace Sloth.Web.Controllers
 {
@@ -29,12 +31,14 @@ namespace Sloth.Web.Controllers
     {
         private readonly IWebHookService _webHookService;
         private readonly IAggieEnterpriseService _aggieEnterpriseService;
+        private readonly DataLimitingOptions _dataLimitingOptions;
 
         public TransactionsController(ApplicationUserManager userManager, SlothDbContext dbContext, IWebHookService webHookService,
-            IAggieEnterpriseService aggieEnterpriseService) : base(userManager, dbContext)
+            IAggieEnterpriseService aggieEnterpriseService, IOptions<DataLimitingOptions> dataLimitingOptions) : base(userManager, dbContext)
         {
             _webHookService = webHookService;
             _aggieEnterpriseService = aggieEnterpriseService;
+            _dataLimitingOptions = dataLimitingOptions.Value;
         }
 
 
@@ -45,7 +49,7 @@ namespace Sloth.Web.Controllers
             if (filter == null)
                 filter = new TransactionsFilterModel();
 
-            FilterHelpers.SanitizeTransactionsFilter(filter);
+            FilterHelpers.SanitizeTransactionsFilter(filter, _dataLimitingOptions.DefaultDateRange);
 
             IQueryable<Transaction> query;
 
