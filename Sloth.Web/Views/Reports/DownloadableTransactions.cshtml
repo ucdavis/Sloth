@@ -1,12 +1,6 @@
 @using Humanizer
 @using Sloth.Core.Extensions
 @using Sloth.Core.Resources
-@using Microsoft.AspNetCore.Http
-@using Microsoft.AspNetCore.Routing
-@inject IHttpContextAccessor HttpContextAccessor
-@{
-    var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
-}
 @model Sloth.Web.Models.ReportViewModels.TransfersReportViewModel
 
 <div class="container">
