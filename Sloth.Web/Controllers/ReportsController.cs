@@ -21,6 +21,8 @@ using Sloth.Web.Models.ReportViewModels;
 using Sloth.Web.Models.TransactionViewModels;
 using Sloth.Web.Resources;
 using Sloth.Web.Helpers;
+using Sloth.Web.Models;
+using Microsoft.Extensions.Options;
 
 namespace Sloth.Web.Controllers
 {
@@ -28,8 +30,11 @@ namespace Sloth.Web.Controllers
     [Authorize(Policy = PolicyCodes.TeamAnyRole)]
     public class ReportsController : SuperController
     {
-        public ReportsController(ApplicationUserManager userManager, SlothDbContext dbContext) : base(userManager, dbContext)
-        { }
+        private readonly DataLimitingOptions _dataLimitingOptions;
+        public ReportsController(ApplicationUserManager userManager, SlothDbContext dbContext, IOptions<DataLimitingOptions> dataLimitingOptions) : base(userManager, dbContext)
+        {
+            _dataLimitingOptions = dataLimitingOptions.Value;
+        }
 
         public IActionResult Index()
         {
@@ -78,7 +83,7 @@ namespace Sloth.Web.Controllers
             if (filter == null)
                 filter = new TransactionsFilterModel();
 
-            FilterHelpers.SanitizeTransactionsFilter(filter);
+            FilterHelpers.SanitizeTransactionsFilter(filter, _dataLimitingOptions.DefaultDateRange);
 
             var model = new TransfersReportViewModel
             {

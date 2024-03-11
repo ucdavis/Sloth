@@ -27,6 +27,8 @@ using System.Data;
 using System.Data.Common;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Runtime.CompilerServices;
+using Sloth.Web.Models;
+using Microsoft.Extensions.Options;
 
 namespace Sloth.Test.Web
 {
@@ -41,6 +43,8 @@ namespace Sloth.Test.Web
         public Mock<DbTransaction> MockDbTransaction { get; set; }
         public Mock<IAggieEnterpriseService> MockAggieEnterpriseService { get; set; }
         public Mock<IExecutionStrategy> MockExecutionStrategy { get; set; }
+
+        public Mock<IOptions<DataLimitingOptions>> MockOptions { get; set; }
 
         public TransactionsController Controller { get; set; }
 
@@ -64,6 +68,7 @@ namespace Sloth.Test.Web
             MockDbTransaction = new Mock<DbTransaction>();
             MockAggieEnterpriseService = new Mock<IAggieEnterpriseService>();
             MockExecutionStrategy = new Mock<IExecutionStrategy>();
+            MockOptions = new Mock<IOptions<DataLimitingOptions>>();
 
             //Default Data
             UserData = new List<User>();
@@ -117,7 +122,7 @@ namespace Sloth.Test.Web
 
             var routeData = new RouteData();
             routeData.Values.Add("team", "testSlug");
-            Controller = new TransactionsController(MockUserManager.Object, MockDbContext.Object, MockWebhookService.Object, MockAggieEnterpriseService.Object)
+            Controller = new TransactionsController(MockUserManager.Object, MockDbContext.Object, MockWebhookService.Object, MockAggieEnterpriseService.Object, MockOptions.Object)
             {
                 ControllerContext = new ControllerContext
                 {
