@@ -1,0 +1,128 @@
+@using Humanizer
+@using Sloth.Core.Extensions
+@using Sloth.Core.Resources
+@model Sloth.Web.Models.ReportViewModels.TransfersReportViewModel
+
+<div class="container">
+    <h2>@ViewBag.Title</h2>
+
+    <h3>Filters</h3>
+    <form class="row" id="transactionFilterForm" asp-controller="Reports" asp-action="DownloadableTransactions" method="get">
+        <div class="row justify-content-between filters-wrapper">
+            <div class="col-8 col-md-5">
+                <div id="filter-date-range" class="input-group">
+                    <input name="from" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.From" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                    <span class="input-group-text">to</span>
+                    <input name="to" type="text" class="form-control" placeholder="MM/DD/YYYY" asp-for="Filter.To" asp-format="{0:MM/dd/yyyy}" aria-label="" />
+                </div>
+
+                <button type="submit" class="btn btn-link mt-1">Apply filter</button>
+            </div>
+
+        </div>
+    </form>
+
+    <div class="responsive-table">
+        <table id="transactionsTable" class="table sloth-table active-table">
+            <thead>
+                <tr>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Id)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().DisplayId)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().Status)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().TransactionDate)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().KfsTrackingNumber)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().DocumentNumber)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().ProcessorTrackingNumber)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().MerchantTrackingNumber)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().TxnDescription)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().MetaDataString)</th>
+                    <th>@Html.DisplayNameFor(x => x.Transactions.FirstOrDefault().TransferCount)</th>
+                    <th>Total Amount</th>
+                    <th>Direction</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Chart String</th>
+                    <th>Chart String</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var txn in Model.Transactions)
+                {
+                    @foreach (var transfer in txn.Transfers)
+                    {
+                        <tr>
+                            <td>@txn.Id</td>
+                            <td>@txn.DisplayId</td>
+                            <td><span class="badge @(TransactionStatuses.GetBadgeClass(txn.Status))">@txn.Status.Humanize(LetterCasing.Title)</span></td>
+                            <td>@txn.TransactionDate.ToPacificTime()</td>
+                            <td>@txn.KfsTrackingNumber</td>
+                            <td>@txn.DocumentNumber</td>
+                            <td>@txn.ProcessorTrackingNumber</td>
+                            <td>@txn.MerchantTrackingNumber</td>
+                            <td>@txn.TxnDescription</td>
+                            <td>@txn.MetaDataString</td>
+                            <td>@txn.TransferCount</td>
+                            <td>@txn.Amount</td>
+                            <td><span class="badge @(Transfer.GetDirectionBadgeClass(transfer.Direction))">@transfer.Direction</span></td>
+                            <td>@transfer.Description</td>
+                            <td>@transfer.Amount</td>
+                            <td>@transfer.ShortFinancialSegmentString</td>
+                            <td>@transfer.FinancialSegmentString</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+@section AdditionalScripts {
+    <script>
+        //setup datepickers
+        $('#filter-date-range').datepicker({
+            inputs: $('#filter-date-range input'),
+            keepEmptyValues: true,
+        });
+    </script>
+
+    <script>
+        $('#transactionsTable').dataTable({
+            "dom": 'Bfrtip',
+            "columnDefs": [
+                {
+                    "targets": [0, 5, 6, 7, 9, 16],
+                    "visible": false,
+                },
+                { "type": "date", "targets": [3] },
+            ],
+            order: false,
+            "buttons": [
+                {
+                    extend: 'copyHtml5',
+                    exportOptions: {
+                        columns: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16]
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    exportOptions: {
+                        columns: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16]
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    exportOptions: {
+                        columns: [0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 16]
+                    }
+                },
+            ],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+        });
+
+    </script>
+}

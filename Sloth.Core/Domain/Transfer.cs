@@ -163,6 +163,8 @@ namespace Sloth.Core.Models
             }
             return result;
         }
+
+        public string ShortFinancialSegmentString => $"{FinancialSegmentString?[0..13]}..."; //Takes the first 13 characters of the FinancialSegmentString. Works with nulls
         #endregion
 
         public enum CreditDebit
