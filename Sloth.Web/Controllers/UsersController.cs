@@ -83,7 +83,6 @@ namespace Sloth.Web.Controllers
             });
         }
 
-        [Authorize(Policy = PolicyCodes.TeamAdmin)]
         [HttpPost]
         public async Task<IActionResult> CreateUserFromDirectory(string query)
         {
