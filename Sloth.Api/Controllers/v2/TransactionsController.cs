@@ -106,7 +106,7 @@ namespace Sloth.Api.Controllers.v2
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("processortrackingnumber/{id}")]
+        [HttpGet("processortrackingnumber/{id?}")]
         [ProducesResponseType(typeof(Transaction), 200)]
         public async Task<IList<Transaction>> GetAllByProcessorId(string id)
         {
@@ -134,7 +134,7 @@ namespace Sloth.Api.Controllers.v2
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [HttpGet("kfskey/{id}")]
+        [HttpGet("kfskey/{id?}")]
         [ProducesResponseType(typeof(IList<Transaction>), 200)]
         public async Task<IList<Transaction>> GetByKfsKey(string id)
         {
