@@ -101,7 +101,7 @@ namespace Sloth.Core.Services
                 var line = new GlJournalLineInput
                 {
                     ExternalSystemIdentifier = transaction.KfsTrackingNumber.StripToGlReferenceField(10),
-                    ExternalSystemReference = transfer.Id.StripToGlReferenceField(25),
+                    ExternalSystemReference = transfer.Id.StripToGlReferenceField(25),                    
                     Glide = glide
                 };
 
@@ -124,6 +124,24 @@ namespace Sloth.Core.Services
                 else if (segmentStringType == FinancialChartStringType.Ppm)
                 {
                     line.PpmSegmentString = transfer.FinancialSegmentString;
+                    if(string.IsNullOrWhiteSpace(transaction.Description))
+                    {
+                        line.PpmComment = transfer.Description.SafeTruncate(40);
+                    }
+                    else
+                    {
+                        if(transaction.Description.Contains(transfer.Description) && transfer.Description.Length > transaction.Description.Length)
+                        {
+                            //Payments may have a transaction description like "Funds Distribution INV 7284-001" and a transfer description like "Funds Distribution" we want to use the transaction description
+                            //Grow may have a transaction description like "McGuire_Jarman - Hort Innovation Lab" and a transfer description like "[S] GH183 (EH) / 104sqft________________" we want to use the transfer description
+                            line.PpmComment = transfer.Description.SafeTruncate(40);
+                        }
+                        else
+                        {
+                            line.PpmComment = transaction.Description.SafeTruncate(40);
+                        }
+                    }
+                    
                     containsPpm = true;
                 }
                 else
