@@ -126,7 +126,7 @@ namespace Sloth.Core.Services
                     line.PpmSegmentString = transfer.FinancialSegmentString;
                     if(string.IsNullOrWhiteSpace(transaction.Description))
                     {
-                        line.PpmComment = transfer.Description.SafeTruncate(40);
+                        line.PpmComment = transfer.Description.StripToErpName(40);
                     }
                     else
                     {
@@ -134,11 +134,11 @@ namespace Sloth.Core.Services
                         {
                             //Payments may have a transaction description like "Funds Distribution INV 7284-001" and a transfer description like "Funds Distribution" we want to use the transaction description
                             //Grow may have a transaction description like "McGuire_Jarman - Hort Innovation Lab" and a transfer description like "[S] GH183 (EH) / 104sqft________________" we want to use the transfer description
-                            line.PpmComment = transfer.Description.SafeTruncate(40);
+                            line.PpmComment = transfer.Description.StripToErpName(40);
                         }
                         else
                         {
-                            line.PpmComment = transaction.Description.SafeTruncate(40);
+                            line.PpmComment = transaction.Description.StripToErpName(40);
                         }
                     }
                     
