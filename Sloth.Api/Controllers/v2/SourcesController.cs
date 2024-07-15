@@ -38,7 +38,7 @@ namespace Sloth.Api.Controllers.v2
             return sources;
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [ProducesResponseType(typeof(SourceModel), 200)]
         public async Task<SourceModel> Get(string id)
         {
