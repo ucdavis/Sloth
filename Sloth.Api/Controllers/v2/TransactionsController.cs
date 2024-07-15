@@ -36,6 +36,17 @@ namespace Sloth.Api.Controllers.v2
             _aggieEnterpriseService = aggieEnterpriseService;
         }
 
+        [HttpGet]
+        [ProducesResponseType(typeof(bool), 200)]
+        public async Task<bool> ValidateTeamSource(string id)
+        {
+            var teamId = GetTeamId();
+
+            var sourceExists = await _context.Sources.AnyAsync(s => s.Name == id && s.Team.Id == teamId);
+
+            return sourceExists;
+        }
+
         /// <summary>
         /// Fetch Top 1 Transaction
         /// </summary>
