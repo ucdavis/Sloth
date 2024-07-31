@@ -172,7 +172,7 @@
                                 <a class="nav-link @(activeMenu == "Reports" ? "active" : "")" href="~/@(teamSlug)/Reports"><partial name="_ReportsSvgPartial" />Reports</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="https://caeshelp.ucdavis.edu/?appname=Sloth&team=@(teamSlug)" target="_blank"><partial name="_ReportsSvgPartial" />Help</a>
+                                <a class="nav-link" href="https://caeshelp.ucdavis.edu/?appname=Sloth&team=@(teamSlug)" target="_blank"><partial name="_HelpSvgPartial" />Help</a>
                             </li>
                         }
                         else if (User.IsInRole(Roles.SystemAdmin))
