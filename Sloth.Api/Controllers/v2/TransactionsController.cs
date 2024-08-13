@@ -222,12 +222,24 @@ namespace Sloth.Api.Controllers.v2
             {
                 if (transaction.ValidateFinancialSegmentStrings)
                 {
-                    // do full segment validation via the API
-                    if (!await _aggieEnterpriseService.IsAccountValid(t.FinancialSegmentString, true))
+                    try
                     {
+                        // do full segment validation via the API
+                        if (!await _aggieEnterpriseService.IsAccountValid(t.FinancialSegmentString, true))
+                        {
+                            return new BadRequestObjectResult(new
+                            {
+                                Message = "Invalid Chart String",
+                                t.FinancialSegmentString
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error(ex, "Error validating financial segment string: {FinancialSegmentString}", t.FinancialSegmentString);
                         return new BadRequestObjectResult(new
                         {
-                            Message = "Invalid Chart String",
+                            Message = "Error validating Chart String",
                             t.FinancialSegmentString
                         });
                     }
