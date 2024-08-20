@@ -178,7 +178,7 @@
     || Model.Transaction.IsStale())
 {
     var isTeamManager = Context.HasTeamRole(TeamRole.Manager);
-    var isTeamAdmin =  Context.HasTeamRole(TeamRole.Admin);
+    var isTeamAdmin =  Context.HasTeamRole(TeamRole.Admin);    
 
     <form asp-controller="Transactions" asp-action="Edit" asp-route-id="@Model.Transaction.Id" method="get">
         <div>
@@ -187,6 +187,12 @@
     </form>
         <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
 }
+@if(Model.Transaction.Status == TransactionStatuses.Rejected)
+        {
+            var canApprove = Context.HasTeamRole(TeamRole.Approver);
+            var isTeamAdmin = Context.HasTeamRole(TeamRole.Admin);
+            <button type="submit" class="btn btn-info" @(!canApprove && !isTeamAdmin ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#resubmit-txn-modal">Resubmit Transaction</button>
+        }
     </div>
 </div>
 
