@@ -441,7 +441,6 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = PolicyCodes.TeamApprover)]
         public async Task<IActionResult> ResubmitTransaction(string id)
         {
             var transaction = await DbContext.Transactions

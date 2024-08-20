@@ -189,9 +189,8 @@
 }
 @if(Model.Transaction.Status == TransactionStatuses.Rejected)
         {
-            var canApprove = Context.HasTeamRole(TeamRole.Approver);
-            var isTeamAdmin = Context.HasTeamRole(TeamRole.Admin);
-            <button type="submit" class="btn btn-info" @(!canApprove && !isTeamAdmin ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#resubmit-txn-modal">Resubmit Transaction</button>
+
+            <button type="submit" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#resubmit-txn-modal">Resubmit Transaction</button>
         }
     </div>
 </div>
