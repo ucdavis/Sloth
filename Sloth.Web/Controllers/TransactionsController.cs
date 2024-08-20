@@ -441,6 +441,34 @@ namespace Sloth.Web.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> ResubmitTransaction(string id)
+        {
+            var transaction = await DbContext.Transactions
+                .Where(t => t.Source.Team.Slug == TeamSlug)
+                .Include(t => t.Scrubber)
+                .Include(t => t.Transfers)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (transaction == null)
+            {
+                ErrorMessage = "Transaction not found";
+                return RedirectToAction(nameof(Index));
+            }
+
+            if (transaction.Status != TransactionStatuses.Rejected)
+            {
+                ErrorMessage = "Transaction is not Rejected";
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            transaction.SetStatus(TransactionStatuses.Scheduled, details: $"Resubmitted by {User.Identity.Name}");
+
+            await DbContext.SaveChangesAsync();
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
         [Authorize(Policy = PolicyCodes.TeamManager)]
         public async Task<IActionResult> CreateReversal(string id, decimal reversalAmount)
         {

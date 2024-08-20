@@ -94,6 +94,31 @@ else
     </div>
 }
 
+@if (Model.Transaction.Status == TransactionStatuses.Rejected)
+{
+    <div id="resubmit-txn-modal" class="modal fade">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Resubmit Transaction?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="resubmit-txn-modal-form" method="post" action="@Url.Action("ResubmitTransaction")">
+                        <input name="id" type="hidden" value="@Model.Transaction.Id" />
+                        <div>Please ensure the Chart String that caused this to be rejected is now valid before resubmitting</div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" id="resubmit-txn-modal-action" class="btn btn-primary">Resubmit Transaction</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
  @section AdditionalScripts {
     <script src="~/js/prism.js"></script>
     <script>
@@ -113,6 +138,12 @@ else
         $('#cancel-txn-modal-action').click(function () {
         $('#cancel-txn-modal-form').submit();
     });
+    </script>
+
+    <script>
+        $('#resubmit-txn-modal-action').click(function () {
+            $('#resubmit-txn-modal-form').submit();
+        });
     </script>
 
     @if (Model.Transaction.Metadata.Any())
