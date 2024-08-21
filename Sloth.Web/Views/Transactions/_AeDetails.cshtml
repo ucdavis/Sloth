@@ -185,12 +185,12 @@
             <button type="submit" class="@(Model.Transaction.Status == TransactionStatuses.PendingApproval ? "btn btn-secondary" : "btn btn-primary")" @(!isTeamManager && !isTeamAdmin ? "Disabled" : "")>Edit Transaction</button>
         </div>
     </form>
-        <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
+        <button type="submit" class="btn btn-danger" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
 }
 @if(Model.Transaction.Status == TransactionStatuses.Rejected)
         {
 
-            <button type="submit" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#resubmit-txn-modal">Resubmit Transaction</button>
+            <button type="submit" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#resubmit-txn-modal">Resubmit Transaction</button>
         }
     </div>
 </div>
