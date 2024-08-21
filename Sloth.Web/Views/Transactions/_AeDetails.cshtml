@@ -12,7 +12,7 @@
     var isUrlValid = Uri.TryCreate(Model.Transaction.MerchantTrackingUrl, UriKind.Absolute, out merchantUrl);
 }
 <div class="row txn-detail-wrapper">
-       <div class="txn-detail-row">
+    <div class="txn-detail-row">
         <div class="txn-detail-label">
             <span>@Html.DisplayNameFor(x => x.Transaction.Status)</span>
         </div>
@@ -93,15 +93,16 @@
             </div>
         }
     }
-        @if (Model.Transaction.Description !=null) {
-    <div class="txn-detail-row">
-        <div class="txn-detail-label">
-            <span>@Html.DisplayNameFor(x => x.Transaction.Description)</span>
+    @if (Model.Transaction.Description != null)
+    {
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>@Html.DisplayNameFor(x => x.Transaction.Description)</span>
+            </div>
+            <div class="txn-detail-result">
+                <span>@Model.Transaction.Description</span>
+            </div>
         </div>
-        <div class="txn-detail-result">
-            <span>@Model.Transaction.Description</span>
-        </div>
-    </div>
     }
     @if (Model.RelatedTransactions.Transactions.Any())
     {
@@ -149,48 +150,56 @@
 
 <div class="row justify-content-start mt-3 mb-3 button-row">
     <div class="col">
-@if (Model.Transaction.Status == TransactionStatuses.PendingApproval)
-{
-    var canApprove = Context.HasTeamRole(TeamRole.Approver);
+        @if (Model.Transaction.Status == TransactionStatuses.PendingApproval)
+        {
+            var canApprove = Context.HasTeamRole(TeamRole.Approver);
 
-    <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Transaction.Id" method="post">
-        <div>
-            <button type="submit" class="btn btn-primary" @(!canApprove ? "Disabled" : "")>Approve Transaction</button>
-        </div>
-    </form>
+            <form asp-controller="Transactions" asp-action="ScheduleTransaction" asp-route-id="@Model.Transaction.Id" method="post">
+                <div>
+                    <button type="submit" class="btn btn-primary" @(!canApprove ? "Disabled" : "")>Approve Transaction</button>
+                </div>
+            </form>
 
-}
+        }
 
-@if (Model.Transaction.Status == TransactionStatuses.Completed && Model.HasWebhooks)
-{
-    var canCallWebhook = Context.HasTeamRole(TeamRole.Manager);
+        @if (Model.Transaction.Status == TransactionStatuses.Completed && Model.HasWebhooks)
+        {
+            var canCallWebhook = Context.HasTeamRole(TeamRole.Manager);
 
-    <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
-        <div>
-            <button type="submit" class="btn btn-secondary" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
-        </div>
-    </form>
+            <form asp-controller="Transactions" asp-action="CallWebHook" asp-route-id="@Model.Transaction.Id" method="post">
+                <div>
+                    <button type="submit" class="btn btn-secondary" @(!canCallWebhook ? "Disabled" : "")>Call Webhook</button>
+                </div>
+            </form>
 
-}
+        }
 
-@if (Model.Transaction.Status == TransactionStatuses.PendingApproval
-    || Model.Transaction.Status == TransactionStatuses.Rejected
-    || Model.Transaction.IsStale())
-{
-    var isTeamManager = Context.HasTeamRole(TeamRole.Manager);
-    var isTeamAdmin =  Context.HasTeamRole(TeamRole.Admin);    
+        @if (Model.Transaction.Status == TransactionStatuses.PendingApproval
+        || Model.Transaction.Status == TransactionStatuses.Rejected
+        || Model.Transaction.IsStale())
+        {
+            var isTeamManager = Context.HasTeamRole(TeamRole.Manager);
+            var isTeamAdmin = Context.HasTeamRole(TeamRole.Admin);
 
-    <form asp-controller="Transactions" asp-action="Edit" asp-route-id="@Model.Transaction.Id" method="get">
-        <div>
-            <button type="submit" class="@(Model.Transaction.Status == TransactionStatuses.PendingApproval ? "btn btn-secondary" : "btn btn-primary")" @(!isTeamManager && !isTeamAdmin ? "Disabled" : "")>Edit Transaction</button>
-        </div>
-    </form>
-        <button type="submit" class="btn btn-warning" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
-}
-@if(Model.Transaction.Status == TransactionStatuses.Rejected)
+            <form asp-controller="Transactions" asp-action="Edit" asp-route-id="@Model.Transaction.Id" method="get">
+                <div>
+                    <button type="submit" class="@(Model.Transaction.Status == TransactionStatuses.PendingApproval ? "btn btn-secondary" : "btn btn-primary")" @(!isTeamManager && !isTeamAdmin ? "Disabled" : "")>Edit Transaction</button>
+                </div>
+            </form>
+
+        }
+        @if (Model.Transaction.Status == TransactionStatuses.Rejected)
         {
 
-            <button type="submit" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#resubmit-txn-modal">Resubmit Transaction</button>
+            <button type="submit" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#resubmit-txn-modal">Resubmit Transaction</button>
+        }
+        @if (Model.Transaction.Status == TransactionStatuses.PendingApproval
+        || Model.Transaction.Status == TransactionStatuses.Rejected
+        || Model.Transaction.IsStale())
+        {
+            var isTeamManager = Context.HasTeamRole(TeamRole.Manager);
+
+            <button type="submit" class="btn btn-danger" @(!isTeamManager ? "Disabled" : "") data-bs-toggle="modal" data-bs-target="#cancel-txn-modal">Cancel Transaction</button>
         }
     </div>
 </div>
