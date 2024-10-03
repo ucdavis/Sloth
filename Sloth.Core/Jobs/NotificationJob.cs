@@ -52,6 +52,7 @@ namespace Sloth.Core.Jobs
 
             foreach (var team in teamsWithFailedTransactions)
             {
+                //Could probably do a dictionary of team to failed transaction count but this is fine for now
                 var failedTxnCount = await _dbContext.Transactions
                     .Where(t => t.Source.Team.Slug == team
                         && (t.Status == TransactionStatuses.Rejected
@@ -59,7 +60,7 @@ namespace Sloth.Core.Jobs
                     .CountAsync();
 
                 var notifySuccess = await _notificationService.Notify(Notification
-                    .Message($"For team: {team} there are {failedTxnCount} transactions have failed")
+                    .Message($"For team: {team} there are {failedTxnCount} transactions that have failed.")
                     .WithEmailsToTeam(team, TeamRole.Admin)
                     .WithCcEmailsToTeam(team, TeamRole.Manager)
                     .WithLinkBack("View Failed Transactions", $"/{team}/Reports/FailedTransactions"));
