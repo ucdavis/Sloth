@@ -234,7 +234,7 @@ namespace Sloth.Core.Jobs
 
                 if (!transactions.Any())
                 {
-                    log.Information("No scheduled transactions found");
+                    log.Information("No processing transactions found");
                     return jobDetails;
                 }
 
