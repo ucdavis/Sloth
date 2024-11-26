@@ -22,53 +22,7 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
         {
 
             return;
-            //// setup env
-            //Configure();
-
-            //// TODO: create new record for new job type
-            //// log run
-            //var jobRecord = new JobRecord()
-            //{
-            //    Name       = KfsScrubberUploadJob.JobName,
-            //    StartedAt  = DateTime.UtcNow,
-            //    Status     = JobRecord.Statuses.Running,
-            //};
-
-            //_log = Log.Logger
-            //    .ForContext("jobname", jobRecord.Name)
-            //    .ForContext("jobid", jobRecord.Id);
-
-            //var assembyName = typeof(Program).Assembly.GetName();
-            //_log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
-
-            //// setup di
-            //var provider = ConfigureServices();
-            //var dbContext = provider.GetService<SlothDbContext>();
-
-            //// save log to db
-            //dbContext.JobRecords.Add(jobRecord);
-            //dbContext.SaveChanges();
-
-            //try
-            //{
-            //    // create job service
-            //    var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
-
-            //    // call methods
-            //    var jobDetails = await uploadScrubberJob.UploadScrubber(_log);
-            //    jobRecord.TotalTransactions = jobDetails.TransactionGroups.Select(g => g.TransactionCount).Sum();
-            //    _log.Information("Finished");
-            //    jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
-            //}
-            //catch (Exception ex)
-            //{
-            //    _log.Error("Unexpected error", ex);
-            //    jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
-            //}
-            //finally
-            //{
-            //    await dbContext.SaveChangesAsync();
-            //}
+           
         }
 
         private static ServiceProvider ConfigureServices()
