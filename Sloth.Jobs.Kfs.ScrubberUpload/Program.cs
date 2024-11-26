@@ -20,53 +20,55 @@ namespace Sloth.Jobs.Kfs.ScrubberUpload
 
         public static async Task Main(string[] args)
         {
-            // setup env
-            Configure();
 
-            // TODO: create new record for new job type
-            // log run
-            var jobRecord = new JobRecord()
-            {
-                Name       = KfsScrubberUploadJob.JobName,
-                StartedAt  = DateTime.UtcNow,
-                Status     = JobRecord.Statuses.Running,
-            };
+            return;
+            //// setup env
+            //Configure();
 
-            _log = Log.Logger
-                .ForContext("jobname", jobRecord.Name)
-                .ForContext("jobid", jobRecord.Id);
+            //// TODO: create new record for new job type
+            //// log run
+            //var jobRecord = new JobRecord()
+            //{
+            //    Name       = KfsScrubberUploadJob.JobName,
+            //    StartedAt  = DateTime.UtcNow,
+            //    Status     = JobRecord.Statuses.Running,
+            //};
 
-            var assembyName = typeof(Program).Assembly.GetName();
-            _log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
+            //_log = Log.Logger
+            //    .ForContext("jobname", jobRecord.Name)
+            //    .ForContext("jobid", jobRecord.Id);
 
-            // setup di
-            var provider = ConfigureServices();
-            var dbContext = provider.GetService<SlothDbContext>();
+            //var assembyName = typeof(Program).Assembly.GetName();
+            //_log.Information("Running {job} build {build}", assembyName.Name, assembyName.Version);
 
-            // save log to db
-            dbContext.JobRecords.Add(jobRecord);
-            dbContext.SaveChanges();
+            //// setup di
+            //var provider = ConfigureServices();
+            //var dbContext = provider.GetService<SlothDbContext>();
 
-            try
-            {
-                // create job service
-                var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
+            //// save log to db
+            //dbContext.JobRecords.Add(jobRecord);
+            //dbContext.SaveChanges();
 
-                // call methods
-                var jobDetails = await uploadScrubberJob.UploadScrubber(_log);
-                jobRecord.TotalTransactions = jobDetails.TransactionGroups.Select(g => g.TransactionCount).Sum();
-                _log.Information("Finished");
-                jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
-            }
-            catch (Exception ex)
-            {
-                _log.Error("Unexpected error", ex);
-                jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
-            }
-            finally
-            {
-                await dbContext.SaveChangesAsync();
-            }
+            //try
+            //{
+            //    // create job service
+            //    var uploadScrubberJob = provider.GetService<KfsScrubberUploadJob>();
+
+            //    // call methods
+            //    var jobDetails = await uploadScrubberJob.UploadScrubber(_log);
+            //    jobRecord.TotalTransactions = jobDetails.TransactionGroups.Select(g => g.TransactionCount).Sum();
+            //    _log.Information("Finished");
+            //    jobRecord.SetCompleted(JobRecord.Statuses.Finished, jobDetails);
+            //}
+            //catch (Exception ex)
+            //{
+            //    _log.Error("Unexpected error", ex);
+            //    jobRecord.SetCompleted(JobRecord.Statuses.Failed, new());
+            //}
+            //finally
+            //{
+            //    await dbContext.SaveChangesAsync();
+            //}
         }
 
         private static ServiceProvider ConfigureServices()
