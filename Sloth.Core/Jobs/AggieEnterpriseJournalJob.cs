@@ -4,9 +4,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using AggieEnterpriseApi;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Serilog;
 using Sloth.Core.Abstractions;
+using Sloth.Core.Configuration;
 using Sloth.Core.Models;
 using Sloth.Core.Resources;
 using Sloth.Core.Services;
@@ -18,16 +20,18 @@ namespace Sloth.Core.Jobs
         private readonly SlothDbContext _context;
         private readonly IAggieEnterpriseService _aggieEnterpriseService;
         private readonly INotificationService _notificationService;
+        private readonly AggieEnterpriseOptions _options;
 
         public const string JobName = "AggieEnterprise.JournalProcessor";
         public const string JobNameUploadTransactions = nameof(AggieEnterpriseJournalJob) + "." + nameof(UploadTransactions);
         public const string JobNameResolveProcessingJournals = nameof(AggieEnterpriseJournalJob) + "." + nameof(ResolveProcessingJournals);
 
-        public AggieEnterpriseJournalJob(SlothDbContext context, IAggieEnterpriseService aggieEnterpriseService, INotificationService notificationService)
+        public AggieEnterpriseJournalJob(SlothDbContext context, IAggieEnterpriseService aggieEnterpriseService, INotificationService notificationService, IOptions<AggieEnterpriseOptions> options)
         {
             _context = context;
             _aggieEnterpriseService = aggieEnterpriseService;
             _notificationService = notificationService;
+            _options = options.Value;
         }
 
         public class AggieEnterpriseJournalJobDetails : IHasTransactionIds
@@ -57,6 +61,12 @@ namespace Sloth.Core.Jobs
         public async Task<AggieEnterpriseJournalJobDetails> UploadTransactions(ILogger log)
         {
             var jobDetails = new AggieEnterpriseJournalJobDetails();
+
+            if(_options.DisableJournalUpload)
+            {
+                log.Warning("Journal upload is disabled in configuration");
+                return jobDetails;
+            }
 
             try
             {

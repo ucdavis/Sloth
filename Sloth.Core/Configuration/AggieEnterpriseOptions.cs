@@ -16,5 +16,7 @@ namespace Sloth.Core.Configuration
         public string JournalCategory { get; set; }
 
         public bool BatchRequest { get; set; } = true;
+
+        public bool DisableJournalUpload { get; set; } = false;
     }
 }

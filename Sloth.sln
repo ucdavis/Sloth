@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29326.143
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Core", "Sloth.Core\Sloth.Core.csproj", "{B2E2E365-565E-4A58-AFF2-EA468C89DE6B}"
 EndProject
@@ -28,15 +28,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Jobs", "Jobs", "{69F922A0-B
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.CyberSource.BankReconcile", "Sloth.Jobs.CyberSource.BankReconcile\Sloth.Jobs.CyberSource.BankReconcile.csproj", "{609AE699-4CF5-46EF-A7C5-52F0290DCDDE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.Kfs.ScrubberUpload", "Sloth.Jobs.Kfs.ScrubberUpload\Sloth.Jobs.Kfs.ScrubberUpload.csproj", "{1BA6F247-5BC5-4031-BFE8-0C4F3739C358}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.Core", "Sloth.Jobs.Core\Sloth.Jobs.Core.csproj", "{60693A8F-3E5C-4879-B159-3A46D4B25482}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.WebHooks.Resend", "Sloth.Jobs.WebHooks.Resend\Sloth.Jobs.WebHooks.Resend.csproj", "{8B2DE509-F577-457B-A1CD-9E2C122455DD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Jobs.AggieEnterprise.JournalProcessor", "Sloth.Jobs.AggieEnterprise.JournalProcessor\Sloth.Jobs.AggieEnterprise.JournalProcessor.csproj", "{B62FB659-EBA0-4F65-9F24-7B5558D46814}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.AggieEnterprise.JournalProcessor", "Sloth.Jobs.AggieEnterprise.JournalProcessor\Sloth.Jobs.AggieEnterprise.JournalProcessor.csproj", "{B62FB659-EBA0-4F65-9F24-7B5558D46814}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sloth.Jobs.Notifications", "Sloth.Jobs.Notifications\Sloth.Jobs.Notifications.csproj", "{BB500DB8-1B26-461D-8F53-E32C65253FCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sloth.Jobs.Notifications", "Sloth.Jobs.Notifications\Sloth.Jobs.Notifications.csproj", "{BB500DB8-1B26-461D-8F53-E32C65253FCF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,10 +72,6 @@ Global
 		{609AE699-4CF5-46EF-A7C5-52F0290DCDDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{609AE699-4CF5-46EF-A7C5-52F0290DCDDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{609AE699-4CF5-46EF-A7C5-52F0290DCDDE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1BA6F247-5BC5-4031-BFE8-0C4F3739C358}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1BA6F247-5BC5-4031-BFE8-0C4F3739C358}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1BA6F247-5BC5-4031-BFE8-0C4F3739C358}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1BA6F247-5BC5-4031-BFE8-0C4F3739C358}.Release|Any CPU.Build.0 = Release|Any CPU
 		{60693A8F-3E5C-4879-B159-3A46D4B25482}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{60693A8F-3E5C-4879-B159-3A46D4B25482}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{60693A8F-3E5C-4879-B159-3A46D4B25482}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -100,11 +94,10 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{609AE699-4CF5-46EF-A7C5-52F0290DCDDE} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
-		{1BA6F247-5BC5-4031-BFE8-0C4F3739C358} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 		{60693A8F-3E5C-4879-B159-3A46D4B25482} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 		{8B2DE509-F577-457B-A1CD-9E2C122455DD} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 		{B62FB659-EBA0-4F65-9F24-7B5558D46814} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
-    {BB500DB8-1B26-461D-8F53-E32C65253FCF} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
+		{BB500DB8-1B26-461D-8F53-E32C65253FCF} = {69F922A0-BE9E-4C89-AF91-51629451D3A0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {24A52AFC-C6F1-46E3-B01C-59D9D1977B9F}
