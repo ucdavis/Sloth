@@ -68,15 +68,6 @@ steps:
     arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Assemble Sloth.Jobs.Kfs.ScrubberUpload w/ Web'
-  inputs:
-    command: 'publish'
-    publishWebProjects: false
-    zipAfterPublish: false
-    projects: './sloth.jobs.kfs.scrubberupload/sloth.jobs.kfs.scrubberupload.csproj'
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)/sloth.web/app_data/jobs/triggered'
-
-- task: DotNetCoreCLI@2
   displayName: 'Assemble Sloth.Jobs.WebHooks.Resend w/ Web'
   inputs:
     command: 'publish'
