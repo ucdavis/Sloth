@@ -401,6 +401,16 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction(nameof(Details), new { id });
             }
 
+            if(!string.IsNullOrWhiteSpace( transaction.ReversalOfTransactionId))
+            {
+                //Need to update the txn that was reversed
+                var originalTransaction = await DbContext.Transactions
+                    .FirstOrDefaultAsync(t => t.Id == transaction.ReversalOfTransactionId && t.Source.Team.Slug == TeamSlug);
+                originalTransaction.CancelReversalTransaction(transaction);
+                originalTransaction = originalTransaction.AddStatusEvent($"Reversal: {transaction.Id} Cancelled by: {User.Identity.Name} Reason: {reason}");
+                DbContext.Update(originalTransaction);
+            }
+
             transaction.SetStatus(TransactionStatuses.Cancelled, $"Cancelled by: {User.Identity.Name} Reason: {reason}");
 
             await DbContext.SaveChangesAsync();
@@ -540,7 +550,8 @@ namespace Sloth.Web.Controllers
                     MerchantTrackingUrl = transaction.MerchantTrackingUrl,
                     ProcessorTrackingNumber = transaction.ProcessorTrackingNumber,
                     Description = reversalAmount != totalAmount ? "Partial Reversal" : "Full Reversal",
-                }.SetStatus(TransactionStatuses.PendingApproval);
+                }.SetStatus(TransactionStatuses.PendingApproval).AddStatusEvent($"Transaction that was reversed: {transaction.Id}");
+                
 
                 // add reversal transfers
                 foreach (var transfer in transaction.Transfers)
@@ -604,7 +615,8 @@ namespace Sloth.Web.Controllers
                 await DbContext.Transactions.AddAsync(reversal);
                 await DbContext.SaveChangesAsync();
 
-                // save relationship
+                // save relationship and write to the original activity line
+                transaction = transaction.AddStatusEvent($"Transaction Reversed. Reversed by: {User.Identity.Name} Reversal Id: {reversal.Id}");
                 transaction.AddReversalTransaction(reversal);
                 await DbContext.SaveChangesAsync();
                 await tran.CommitAsync();
@@ -666,6 +678,17 @@ namespace Sloth.Web.Controllers
                                     || t.MerchantTrackingNumber == filter.TrackingNum)).OrderBy(a => a.TransactionDate).ToListAsync();
             if (txns == null || txns.Count <= 0)
             {
+                //Try to find by id
+                if (Guid.TryParse(filter.TrackingNum, out var txnId))
+                {
+                    var txn = await DbContext.Transactions.Where(t => t.Source.Team.Slug == TeamSlug && t.Id == filter.TrackingNum).FirstOrDefaultAsync();
+                    if (txn != null)
+                    {
+                        return RedirectToAction("Details", new { id = txn.Id });
+                    }
+                }
+
+
                 ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
                 return RedirectToAction("Index");
 
