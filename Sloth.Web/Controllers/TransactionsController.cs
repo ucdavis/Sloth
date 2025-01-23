@@ -678,6 +678,17 @@ namespace Sloth.Web.Controllers
                                     || t.MerchantTrackingNumber == filter.TrackingNum)).OrderBy(a => a.TransactionDate).ToListAsync();
             if (txns == null || txns.Count <= 0)
             {
+                //Try to find by id
+                if (Guid.TryParse(filter.TrackingNum, out var txnId))
+                {
+                    var txn = await DbContext.Transactions.Where(t => t.Source.Team.Slug == TeamSlug && t.Id == filter.TrackingNum).FirstOrDefaultAsync();
+                    if (txn != null)
+                    {
+                        return RedirectToAction("Details", new { id = txn.Id });
+                    }
+                }
+
+
                 ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
                 return RedirectToAction("Index");
 
