@@ -164,6 +164,16 @@ namespace Sloth.Core.Models
             transaction.ReversalOfTransaction = this;
         }
 
+        /// <summary>
+        /// Undo the reversal transaction relationship
+        /// </summary>
+        /// <param name="transaction">The Reversal that is being cancelled</param>
+        public void CancelReversalTransaction(Transaction transaction)
+        {
+            this.ReversalTransaction = null;
+            transaction.ReversalOfTransaction = null;
+        }
+
         public Transaction SetStatus(string status, string details = "", [CallerMemberName] string memberName = "",
             [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
@@ -179,6 +189,23 @@ namespace Sloth.Core.Models
             });
 
             Status = status;
+
+            return this;
+        }
+
+        public Transaction AddStatusEvent(string details, [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
+            LastModified = DateTime.UtcNow;
+            StatusEvents.Add(new TransactionStatusEvent
+            {
+                TransactionId = Id,
+                Status = this.Status,
+                EventDate = LastModified,
+                EventDetails = !string.IsNullOrWhiteSpace(details)
+                    ? details
+                    : $"File: {Path.GetFileName(sourceFilePath)}, Member: {memberName}, Line: {sourceLineNumber}. {details}",
+            });
 
             return this;
         }
