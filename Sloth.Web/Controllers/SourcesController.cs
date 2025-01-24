@@ -49,30 +49,23 @@ namespace Sloth.Web.Controllers
             {
                 return View(model);
             }
+            model.Name = model.Name.Trim();
 
-            // assume if we have a chart, we are using KFS
-            var isKfs = !string.IsNullOrWhiteSpace(model.Chart);
+            // validate model
+            var isUnique = await DbContext.Sources
+                .AllAsync(s => s.Name.ToLower() != model.Name.ToLower());
 
-            // create new secret
-            var secretId = Guid.NewGuid().ToString("D");
-
-            if (isKfs)
+            if (!isUnique)
             {
-                // only create secret if we are using KFS
-                await _secretsService.UpdateSecret(secretId, model.KfsFtpPasswordKey);
+                ModelState.AddModelError(nameof(model.Name), "Name must be unique across all teams.");
+                return View(model);
             }
 
             var source = new Source()
             {
                 Name                  = model.Name,
                 Type                  = model.Type,
-                Chart                 = model.Chart,
-                OrganizationCode      = model.OrganizationCode,
                 Description           = model.Description,
-                OriginCode            = model.OriginCode,
-                DocumentType          = model.DocumentType,
-                KfsFtpUsername        = model.KfsFtpUsername,
-                KfsFtpPasswordKeyName = secretId,
                 Team                  = team
             };
             DbContext.Sources.Add(source);
@@ -99,13 +92,7 @@ namespace Sloth.Web.Controllers
             {
                 Name                   = source.Name,
                 Description            = source.Description,
-                Chart                  = source.Chart,
-                OrganizationCode       = source.OrganizationCode,
-                DocumentType           = source.DocumentType,
-                OriginCode             = source.OriginCode,
                 Type                   = source.Type,
-                KfsFtpUsername         = source.KfsFtpUsername,
-                KfsFtpPasswordKeyDirty = false,
             };
 
             return View(model);
@@ -130,8 +117,16 @@ namespace Sloth.Web.Controllers
                 return View(model);
             }
 
-            if (model.KfsFtpPasswordKeyDirty && string.IsNullOrWhiteSpace(model.KfsFtpPasswordKey))
+            model.Name = model.Name.Trim();
+
+            // validate model
+            var isUnique = await DbContext.Sources
+                .Where(a => a.Id != source.Id)
+                .AllAsync(s => s.Name.ToLower() != model.Name.ToLower());
+
+            if (!isUnique)
             {
+                ModelState.AddModelError(nameof(model.Name), "Name must be unique across all teams.");
                 return View(model);
             }
 
@@ -139,20 +134,7 @@ namespace Sloth.Web.Controllers
             source.Name             = model.Name;
             source.Type             = model.Type;
             source.Description      = model.Description;
-            source.Chart            = model.Chart;
-            source.OrganizationCode = model.OrganizationCode;
-            source.OriginCode       = model.OriginCode;
-            source.DocumentType     = model.DocumentType;
-            source.KfsFtpUsername   = model.KfsFtpUsername;
             source.Team             = team;
-
-            // should we create a new secret?
-            if (model.KfsFtpPasswordKeyDirty)
-            {
-                var secretId = Guid.NewGuid().ToString("D");
-                await _secretsService.UpdateSecret(secretId, model.KfsFtpPasswordKey);
-                source.KfsFtpPasswordKeyName = secretId;
-            }
 
             await DbContext.SaveChangesAsync();
 
