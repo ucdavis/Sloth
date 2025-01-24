@@ -19,20 +19,6 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card job">
-                    <a asp-action="JobList" asp-route-jobname="@KfsScrubberUploadJob.JobName">
-                        <div class="card-body">
-                            <h5 class="card-title">
-                                Kfs Scrubber Upload Job
-                            </h5>
-                            <p class="card-text">
-                                Runs at end of business. Collects all scheduled KFS transactions and groups them into scrubbers. Uploads scrubbers to KFS service for processing.
-                            </p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card job">
                     <a asp-action="JobList" asp-route-jobname="@CybersourceBankReconcileJob.JobName">
                         <div class="card-body">
                             <h5 class="card-title">

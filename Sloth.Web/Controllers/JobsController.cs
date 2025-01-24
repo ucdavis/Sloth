@@ -140,25 +140,6 @@ namespace Sloth.Web.Controllers
                         details = JsonSerializer.Deserialize<CybersourceBankReconcileDetails>(detailsJson);
                         jobModel.Job.Details = details;
                         break;
-                    case KfsScrubberUploadJob.JobName:
-                        var scrubberUploadDetails = JsonSerializer.Deserialize<KfsScrubberUploadJob.KfsScrubberUploadJobDetails>(detailsJson);
-                        jobModel.Job.Details = scrubberUploadDetails;
-                        var scrubberIds = scrubberUploadDetails.TransactionGroups.Select(g => g.ScrubberId).ToArray();
-                        if (scrubberIds.Length > 0)
-                        {
-                            var transactions = await _dbContext.Transactions
-                                .Where(t => t.ScrubberId != null && scrubberIds.Contains(t.ScrubberId))
-                                .Include(t => t.Transfers)
-                                .Include(a => a.Source)
-                                    .ThenInclude(a => a.Team)
-                                .AsNoTracking()
-                                .ToListAsync();
-                            jobModel.TransactionsTable = new TransactionsTableViewModel
-                            {
-                                Transactions = transactions
-                            };
-                        }
-                        break;
                     case AggieEnterpriseJournalJob.JobNameUploadTransactions:
                     case AggieEnterpriseJournalJob.JobNameResolveProcessingJournals:
                         details = JsonSerializer.Deserialize<AggieEnterpriseJournalJob.AggieEnterpriseJournalJobDetails>(detailsJson);
@@ -281,12 +262,6 @@ namespace Sloth.Web.Controllers
                     log.Information("Starting Job");
                     switch (scopedRecord.Name)
                     {
-                        case KfsScrubberUploadJob.JobName:
-                            var kfsScrubberUploadJob = serviceProvider.GetRequiredService<KfsScrubberUploadJob>();
-                            var kfsScrubberJobDetails = await kfsScrubberUploadJob.UploadScrubber(log);
-                            scopedRecord.TotalTransactions = kfsScrubberJobDetails.TransactionGroups.Select(g => g.TransactionCount).Sum();
-                            jobDetails = kfsScrubberJobDetails;
-                            break;
                         case CybersourceBankReconcileJob.JobName:
                             var yesterday = DateTime.UtcNow.Date.AddDays(-1);
                             var cybersourceBankReconcileJob = serviceProvider.GetRequiredService<CybersourceBankReconcileJob>();
