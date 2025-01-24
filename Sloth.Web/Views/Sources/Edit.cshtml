@@ -2,7 +2,7 @@
 @model Sloth.Web.Models.SourceViewModels.EditSourceViewModel
 
 @{
-    ViewBag.Title = "Edit KFS Feed Source";
+    ViewBag.Title = "Edit Feed Source";
 
     var sourceTypes = SourceTypes.GetAll().Select(t => new SelectListItem() { Text = t, Value = t });
     var documentTypes = DocumentTypes.GetAll().Select(t => new SelectListItem() { Text = t, Value = t });
@@ -35,48 +35,6 @@
             <small id="emailHelp" class="form-text text-muted">Optional: Extended description to remember this source by</small>
         </div>
 
-        <div class="alert alert-warning" role="alert">
-            The following fields are required only for KFS.  For Aggie Enterprise, leave them blank.
-        </div>
-
-        <div class="form-group">
-            @Html.DisplayNameFor(x => x.Chart)
-            @Html.TextBoxFor(x => x.Chart, new { @class = "form-control", placeholder = "XX" })
-            <span asp-validation-for="Chart" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            @Html.DisplayNameFor(x => x.OrganizationCode)
-            @Html.TextBoxFor(x => x.OrganizationCode, new { @class = "form-control", placeholder = "XXXX" })
-            <span asp-validation-for="OrganizationCode" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            @Html.DisplayNameFor(x => x.OriginCode)
-            @Html.TextBoxFor(x => x.OriginCode, new { @class = "form-control", placeholder = "XX" })
-            <span asp-validation-for="OriginCode" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            @Html.DisplayNameFor(x => x.DocumentType)
-            @Html.DropDownListFor(x => x.DocumentType, documentTypes, new { @class = "form-control" })
-            <span asp-validation-for="DocumentType" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(x => x.KfsFtpUsername)
-            @Html.TextBoxFor(x => x.KfsFtpUsername, new { @class = "form-control" })
-            <span asp-validation-for="KfsFtpUsername" class="text-danger"></span>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(x => x.KfsFtpPasswordKey)
-            @Html.HiddenFor(x => x.KfsFtpPasswordKeyDirty)
-            <div class="input-group">
-                @Html.PasswordFor(x => x.KfsFtpPasswordKey, new { @class = "form-control", value = "password", @readonly = true })
-                <div class="input-group-append">
-                    <div id="kfs-ftp-password-key-clear" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#passwordModal">
-                        <i class="fa fa-edit"></i>
-                    </div>
-                </div>
-            </div>
-            <span asp-validation-for="KfsFtpPasswordKey" class="text-danger"></span>
-        </div>
         <div class="d-grid">
             <input type="submit" value="Save" class="btn btn-primary" />
         </div>

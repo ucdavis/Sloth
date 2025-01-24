@@ -9,10 +9,7 @@
         <th>Team Name</th>
         <th>Source Name</th>
         <th>Type</th>
-        <th>Chart</th>
-        <th>Organization Code</th>
-        <th>Origin Code</th>
-        <th>Document Type</th>
+        <th>Source Description</th>
         <th></th>
     </tr>
     </thead>
@@ -23,10 +20,7 @@
             <td>@source.Team.Name</td>
             <td>@source.Name</td>
             <td>@source.Type</td>
-            <td>@source.Chart</td>
-            <td>@source.OrganizationCode</td>
-            <td>@source.OriginCode</td>
-            <td>@source.DocumentType</td>
+            <td>@source.Description</td>
             <td>
                 <a asp-controller="Sources" asp-action="Edit" asp-route-id="@source.Id" class="btn btn-primary btn-sm">Edit</a>
             </td>
