@@ -707,9 +707,6 @@ namespace Sloth.Web.Controllers
                     }
                 }
 
-                //ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
-                //return RedirectToAction("Index");
-
             }
 
             if (txns.Any(a => a.ProcessorTrackingNumber == filter.TrackingNum))
@@ -756,6 +753,35 @@ namespace Sloth.Web.Controllers
             if (User.IsInRole(Roles.SystemAdmin))
             {
                 //Allow System Admins to search all transactions for specific types.
+                //Try to find by id
+                if (Guid.TryParse(filter.TrackingNum, out var txnId))
+                {
+                    var txn = await DbContext.Transactions.Include(a => a.Source.Team).Where(t => t.Id == filter.TrackingNum).FirstOrDefaultAsync();
+                    if (txn != null)
+                    {
+                        Message = $"Different Team!!! - Transaction found by Id: {filter.TrackingNum}";
+                        return RedirectToAction("Details", "Transactions", new { id = txn.Id, team = txn.Source.Team.Slug });
+                    }
+                }
+
+                //Try to find by request id
+                if (Guid.TryParse(filter.TrackingNum, out var reqId))
+                {
+                    var txn = await DbContext.JournalRequests.Include(a => a.Transactions).Include(a => a.Source).Where(t => t.RequestId == reqId).FirstOrDefaultAsync();
+                    if (txn != null && txn.Transactions != null && txn.Transactions.Count >= 1)
+                    {
+                        var teamSlug = await DbContext.Sources.Include(a => a.Team).Where(a => a.Id == txn.Source.Id).Select(a => a.Team.Slug).FirstOrDefaultAsync();
+                        Message = $"Different Team!!! - Transaction found by Request Id: {filter.TrackingNum}";
+                        //This will work if we found an "active" journal request, but not if we replaced it.
+                        return RedirectToAction("Details", "Transactions", new { id = txn.Transactions.First().Id, team = teamSlug });
+                    }
+                    if (txn != null)
+                    {
+                        var teamSlug = await DbContext.Sources.Include(a => a.Team).Where(a => a.Id == txn.Source.Id).Select(a => a.Team.Slug).FirstOrDefaultAsync();
+                        Message = $"Different Team!!! - Replaced Journal Request found by Request Id: {filter.TrackingNum}";
+                        return RedirectToAction("Details", "Transactions", new { id = txn.SavedTransactionId, team = teamSlug});
+                    }
+                }
             }
 
 
