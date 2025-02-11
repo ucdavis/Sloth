@@ -114,7 +114,7 @@ namespace Sloth.Core.Jobs
 
                             // here we will store the result of the transaction upload
                             var journalRequest = new JournalRequest
-                            { Transactions = new[] { transaction }, Source = source };
+                            { Transactions = new[] { transaction }, Source = source, SavedTransactionId = transaction.Id };
 
                             if (requestStatus.RequestId.HasValue &&
                                 requestStatus.RequestStatus == RequestStatus.Pending)
