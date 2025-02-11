@@ -694,7 +694,7 @@ namespace Sloth.Web.Controllers
                 if(Guid.TryParse(filter.TrackingNum, out var reqId))
                 {
                     var txn = await DbContext.JournalRequests.Include(a => a.Transactions).Where(t => t.Source.Team.Slug == TeamSlug && t.RequestId == reqId).FirstOrDefaultAsync();
-                    if (txn != null && txn.Transactions != null)
+                    if (txn != null && txn.Transactions != null && txn.Transactions.Count >= 1)
                     {
                         Message = $"Transaction found by Request Id: {filter.TrackingNum}";
                         //This will work if we found an "active" journal request, but not if we replaced it.
@@ -703,7 +703,7 @@ namespace Sloth.Web.Controllers
                     if(txn != null)
                     {                        
                         Message = $"Replaced Journal Request found by Request Id: {filter.TrackingNum}";
-                        return RedirectToAction("Details", "JournalRequests", new { id = txn.SavedTransactionId });
+                        return RedirectToAction("Details", new { id = txn.SavedTransactionId });
                     }
                 }
 
