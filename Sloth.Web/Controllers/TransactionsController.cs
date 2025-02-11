@@ -667,6 +667,7 @@ namespace Sloth.Web.Controllers
         [Authorize(Policy = PolicyCodes.TeamAnyRole)]
         public async Task<IActionResult> Search(TransactionsFilterModel filter = null)
         {
+
             if (string.IsNullOrWhiteSpace(filter?.TrackingNum))
             {
                 return RedirectToAction("Index");
@@ -684,13 +685,30 @@ namespace Sloth.Web.Controllers
                     var txn = await DbContext.Transactions.Where(t => t.Source.Team.Slug == TeamSlug && t.Id == filter.TrackingNum).FirstOrDefaultAsync();
                     if (txn != null)
                     {
+                        Message = $"Transaction found by Id: {filter.TrackingNum}";
                         return RedirectToAction("Details", new { id = txn.Id });
                     }
                 }
 
+                //Try to find by request id
+                if(Guid.TryParse(filter.TrackingNum, out var reqId))
+                {
+                    var txn = await DbContext.JournalRequests.Include(a => a.Transactions).Where(t => t.Source.Team.Slug == TeamSlug && t.RequestId == reqId).FirstOrDefaultAsync();
+                    if (txn != null && txn.Transactions != null)
+                    {
+                        Message = $"Transaction found by Request Id: {filter.TrackingNum}";
+                        //This will work if we found an "active" journal request, but not if we replaced it.
+                        return RedirectToAction("Details", new { id = txn.Transactions.First().Id });
+                    }
+                    if(txn != null)
+                    {                        
+                        Message = $"Replaced Journal Request found by Request Id: {filter.TrackingNum}";
+                        return RedirectToAction("Details", "JournalRequests", new { id = txn.SavedTransactionId });
+                    }
+                }
 
-                ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
-                return RedirectToAction("Index");
+                //ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
+                //return RedirectToAction("Index");
 
             }
 
@@ -734,6 +752,12 @@ namespace Sloth.Web.Controllers
                 }
                 return RedirectToAction("Details", new { txns.First(a => a.MerchantTrackingNumber == filter.TrackingNum).Id });
             }
+
+            if (User.IsInRole(Roles.SystemAdmin))
+            {
+                //Allow System Admins to search all transactions for specific types.
+            }
+
 
             ErrorMessage = $"Search Returned no results: {filter.TrackingNum}";
             return RedirectToAction("Index");

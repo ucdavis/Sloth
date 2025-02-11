@@ -36,5 +36,12 @@ namespace Sloth.Core.Models
         [MinLength(1)]
         [Required]
         public IList<Transaction> Transactions { get; set; }
+
+        /// <summary>
+        /// Really, a journal request can only have 1 transaction, but if we re-send a JR we loose the tie to the original transaction
+        /// This doesn't have to be a foreign key, but it should be a unique identifier for the transaction
+        /// </summary>
+        [MaxLength(255)]
+        public string SavedTransactionId { get; set; }
     }
 }
