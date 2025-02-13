@@ -20,5 +20,37 @@
 
 @section AdditionalScripts
 {
-<partial name="_TransactionsTableScript" model=@(new TransactionsTableScriptViewModel{ HideColumns = new() {0,9}}) />
+
+
+    <script>
+        $('#transactionsTable').dataTable({
+            "dom": 'Bfrtip',
+            "columnDefs": [
+                {
+                    "targets": [0, 9],
+                    "visible": false,
+                },
+            ],
+            order: false,
+            "buttons": [
+                {
+                    extend: 'copyHtml5',
+
+                },
+                {
+                    extend: 'excelHtml5',
+
+                },
+                {
+                    extend: 'csvHtml5',
+
+                },
+            ],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+        });
+
+    </script>
 }
