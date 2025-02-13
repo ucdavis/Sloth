@@ -1,8 +1,16 @@
+@using Humanizer
+@using Microsoft.AspNetCore.Http
+@using Microsoft.AspNetCore.Routing
+@using Sloth.Core.Extensions
+@using Sloth.Core.Models
+@using Sloth.Core.Resources
 @using Sloth.Web.Models.TransactionViewModels
 @model Sloth.Web.Models.ReportViewModels.TransactionsReportViewModel
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
   ViewBag.Title = "Failed Transactions";
+    var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
 }
 
 @section AdditionalStyles
@@ -14,11 +22,122 @@
   <div>
     <h4>Transactions</h4>
     <hr />
-    <partial name="_TransactionsTable" model="Model.TransactionsTable" />
+        <div class="responsive-table">
+            <table id="transactionsTable" class="table sloth-table active-table">
+                <thead>
+                    <tr>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().Id)</th>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().Status)</th>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().TransactionDate)</th>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().KfsTrackingNumber)</th>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().DocumentNumber)</th>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().ProcessorTrackingNumber)</th>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().MerchantTrackingNumber)</th>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().Description)</th>
+                        <th>Amount</th>
+                        <th>Accounts</th>
+                        <th>Request ID</th>
+                        <th>Consumer Tracking ID</th>
+                        <th>@Html.DisplayNameFor(x => x.TransactionsTable.Transactions.FirstOrDefault().LastModified)</th>
+                        <th>Team</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var t in Model.TransactionsTable.Transactions)
+                    {
+                        var firstDebit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Debit);
+                        var firstCredit = t.Transfers.First(x => x.Direction == Transfer.CreditDebit.Credit);
+                        var description = firstDebit.Description;
+                        var amount = t.Transfers.Where(a => a.Direction == Transfer.CreditDebit.Credit).Sum(x => x.Amount);
+                        var accounts = string.Join(", ", t.Transfers.Select(a => a.FinancialSegmentString).Distinct().ToList());
+                        if (!string.IsNullOrWhiteSpace(t.Description))
+                        {
+                            description = t.Description;
+                        }
+
+                        var slug = !string.IsNullOrWhiteSpace(teamSlug) && teamSlug != "any" ? teamSlug : t.Source?.Team?.Slug;
+
+                        <tr data-href="/@slug/Transactions/Details/@t.Id">
+                            <th scope="row">@t.Id</th>
+                            <td>
+                                <span class="badge @(TransactionStatuses.GetBadgeClass(t.Status))">@t.Status.Humanize(LetterCasing.Title)</span>
+
+                            </td>
+                            <td nowrap data-sort="@t.TransactionDate.Ticks">@t.TransactionDate.ToPacificTime()</td>
+                            <td>@t.KfsTrackingNumber</td>
+                            <td>@t.DocumentNumber</td>
+                            <td>@t.ProcessorTrackingNumber</td>
+                            <td>@t.MerchantTrackingNumber</td>
+                            <td>
+                                <a class="stretched-link" href="/@slug/Transactions/Details/@t.Id">
+                                    @description
+                                </a>
+                            </td>
+                            <td>@amount.ToString("C")</td>
+                            <td>@accounts</td>
+                            <td>@t.JournalRequest?.RequestId</td>
+                            <td>@t.ConsumerTrackingId</td>
+                            <td nowrap data-sort="@t.LastModified.Ticks">@t.LastModified.ToPacificTime()</td>
+                            <td>@slug </td>
+
+
+                            @* @if (String.IsNullOrWhiteSpace(firstDebit.FinancialSegmentString))
+                {
+                    <td>@($"{firstDebit.Chart}-{firstDebit.Account}") -> @($"{firstCredit.Chart}-{firstCredit.Account}")</td>
+                }
+                else
+                {
+                    <td>See Details</td>
+                }
+                 *@
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
   </div>
 </div>
 
 @section AdditionalScripts
 {
-<partial name="_TransactionsTableScript" model=@(new TransactionsTableScriptViewModel{ HideColumns = new() {0,9}}) />
+    <script>
+        $('#transactionsTable').dataTable({
+            "dom": 'Blfrtip',
+            pageLength: 25,
+            lengthMenu: [10, 25, 50, 100],
+            "columnDefs": [
+                {
+                    "targets": [0, 9, 10, 11],
+                    "visible": false,
+                },
+            ],
+            order: [[12, 'asc']],
+            "buttons": [
+                {
+                    extend: 'copyHtml5',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 7, 8, 9, 10, 11, 12, 13]
+                    }
+                },
+                {
+                    extend: 'excelHtml5',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 7, 8, 9, 10, 11, 12, 13]
+                    }
+                },
+                {
+                    extend: 'csvHtml5',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 7, 8, 9, 10, 11, 12, 13]
+                    }
+                },
+            ],
+            language: {
+                searchPlaceholder: "Search Table",
+                search: "",
+            },
+        });
+
+    </script>
 }

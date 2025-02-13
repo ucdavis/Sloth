@@ -57,6 +57,7 @@ namespace Sloth.Web.Controllers
                     )
                 )
                 .Include(t => t.Transfers)
+                .Include(a => a.JournalRequest)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -107,6 +108,7 @@ namespace Sloth.Web.Controllers
                 .Where(t => t.Status == TransactionStatuses.Rejected
                     || (t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-5)))
                 .Include(t => t.Transfers)
+                .Include(a => a.JournalRequest)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
                 .AsNoTracking()
