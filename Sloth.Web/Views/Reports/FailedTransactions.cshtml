@@ -103,14 +103,16 @@
 {
     <script>
         $('#transactionsTable').dataTable({
-            "dom": 'Bfrtip',
+            "dom": 'Blfrtip',
+            pageLength: 25,
+            lengthMenu: [10, 25, 50, 100],
             "columnDefs": [
                 {
                     "targets": [0, 9, 10, 11],
                     "visible": false,
                 },
             ],
-            order: false,
+            order: [[12, 'asc']],
             "buttons": [
                 {
                     extend: 'copyHtml5',
