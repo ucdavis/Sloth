@@ -101,25 +101,35 @@ namespace Sloth.Web.Controllers
         }
 
         [Authorize(Roles = Roles.SystemAdmin)]
-        public async Task<IActionResult> FailedTransactionsAllTeams()
+        public async Task<IActionResult> FailedTransactionsAllTeams(bool pendingOlderThanADay = false)
         {
             // get transactions that are rejected or have been processing for longer than 5 days
-            var transactions = await DbContext.Transactions
-                .Where(t => t.Status == TransactionStatuses.Rejected
-                    || (t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-5)))
+            var query =  DbContext.Transactions
                 .Include(t => t.Transfers)
                 .Include(a => a.JournalRequest)
                 .Include(t => t.Source)
                     .ThenInclude(s => s.Team)
-                .AsNoTracking()
-                .ToListAsync();
+                .AsNoTracking();
+
+            if (pendingOlderThanADay)
+            {
+                query = query.Where(t => t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-1));
+            }
+            else
+            {
+                query = query.Where(t => t.Status == TransactionStatuses.Rejected
+                    || (t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-5)));
+            }
+
+            var transactions = await query.ToListAsync();
 
             var model = new TransactionsReportViewModel
             {
                 TransactionsTable = new TransactionsTableViewModel
                 {
                     Transactions = transactions,
-                }
+                },
+                Information = pendingOlderThanADay ? "Only transactions that have been processing for more than a day!!!" : null,
             };
 
             return View("FailedTransactions", model);
