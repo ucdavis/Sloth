@@ -19,6 +19,12 @@
 
 <div class="container">
   <h2>@ViewBag.Title</h2>
+    @if (Model.Information != null)
+    {
+        <div class="alert alert-info" role="alert">
+            @Model.Information
+        </div>
+    }
   <div>
     <h4>Transactions</h4>
     <hr />
