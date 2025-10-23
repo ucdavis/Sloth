@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AggieEnterpriseApi.Validation;
 using Microsoft.AspNetCore.Authorization;
@@ -196,6 +197,45 @@ namespace Sloth.Api.Controllers.v2
         public async Task<bool> ValidateFinancialSegmentString(string id)
         {
             return await _aggieEnterpriseService.IsAccountValid(id);
+        }
+
+        [HttpPost("search")]
+        [ProducesResponseType(typeof(IList<Transaction>), 200)]
+        [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
+        public async Task<IActionResult> Search([FromBody] TransactionSearchRequest request)
+        {
+            var teamId = GetTeamId();
+
+            if (request.Ids == null || request.Ids.Length == 0)
+            {
+                return new JsonResult(new List<Transaction>());
+            }
+
+            IQueryable<Transaction> query = _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
+                .Include(t => t.Creator)
+                .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
+                .AsNoTracking();
+
+            switch (request.Type)
+            {
+                case TransactionSearchType.ProcessorTrackingNumber:
+                    query = query.Where(t => request.Ids.Contains(t.ProcessorTrackingNumber));
+                    break;
+                case TransactionSearchType.KfsTrackingNumber:
+                    query = query.Where(t => request.Ids.Contains(t.KfsTrackingNumber));
+                    break;
+                case TransactionSearchType.Id:
+                    query = query.Where(t => request.Ids.Contains(t.Id));
+                    break;
+                default:
+                    return BadRequest("Invalid Type");
+            }
+
+            var transactions = await query.ToListAsync();
+
+            return new JsonResult(transactions);
         }
 
         /// <summary>
@@ -395,5 +435,19 @@ namespace Sloth.Api.Controllers.v2
         {
             return User.FindFirst(ClaimTypes.PrimaryGroupSid)?.Value;
         }
+    }
+
+    public class TransactionSearchRequest
+    {
+        public TransactionSearchType Type { get; set; }
+        public string[] Ids { get; set; }
+    }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum TransactionSearchType
+    {
+        ProcessorTrackingNumber,
+        KfsTrackingNumber,
+        Id
     }
 }
