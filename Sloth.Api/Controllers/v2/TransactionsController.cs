@@ -157,9 +157,9 @@ namespace Sloth.Api.Controllers.v2
             return transactions;
         }
 
-        [HttpGet("kfskeys/{ids?}")]
+        [HttpPost("search")]
         [ProducesResponseType(typeof(IList<Transaction>), 200)]
-        public async Task<IList<Transaction>> GetByKfsKeys(string[] ids)
+        public async Task<IList<Transaction>> SearchByKfsKeys([FromBody] string[] ids)
         {
             var teamId = GetTeamId();
 
