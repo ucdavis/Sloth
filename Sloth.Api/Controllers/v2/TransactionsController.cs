@@ -157,6 +157,29 @@ namespace Sloth.Api.Controllers.v2
             return transactions;
         }
 
+        [HttpGet("kfskeys/{ids?}")]
+        [ProducesResponseType(typeof(IList<Transaction>), 200)]
+        public async Task<IList<Transaction>> GetByKfsKeys(string[] ids)
+        {
+            var teamId = GetTeamId();
+
+            if (ids == null || ids.Length == 0)
+            {
+                return new List<Transaction>();
+            }
+
+            var transactions = await _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
+                .Include(t => t.Creator)
+                .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
+                .Where(t => ids.Contains(t.KfsTrackingNumber))
+                .AsNoTracking()
+                .ToListAsync();
+
+            return transactions;
+        }
+
         /// <summary>
         /// Fetch Transactions by Metadata
         /// </summary>
