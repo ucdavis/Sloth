@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using AggieEnterpriseApi.Validation;
 using Microsoft.AspNetCore.Authorization;
@@ -219,13 +220,13 @@ namespace Sloth.Api.Controllers.v2
 
             switch (request.Type)
             {
-                case "ProcessorTrackingNumber":
+                case TransactionSearchType.ProcessorTrackingNumber:
                     query = query.Where(t => request.Ids.Contains(t.ProcessorTrackingNumber));
                     break;
-                case "KfsTrackingNumber":
+                case TransactionSearchType.KfsTrackingNumber:
                     query = query.Where(t => request.Ids.Contains(t.KfsTrackingNumber));
                     break;
-                case "Id":
+                case TransactionSearchType.Id:
                     query = query.Where(t => request.Ids.Contains(t.Id));
                     break;
                 default:
@@ -438,7 +439,15 @@ namespace Sloth.Api.Controllers.v2
 
     public class TransactionSearchRequest
     {
-        public string Type { get; set; } // "KfsTrackingNumber", "ProcessorTrackingNumber", or "Id"
+        public TransactionSearchType Type { get; set; }
         public string[] Ids { get; set; }
+    }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum TransactionSearchType
+    {
+        ProcessorTrackingNumber,
+        KfsTrackingNumber,
+        Id
     }
 }
