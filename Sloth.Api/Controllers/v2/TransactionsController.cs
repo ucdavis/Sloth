@@ -157,29 +157,6 @@ namespace Sloth.Api.Controllers.v2
             return transactions;
         }
 
-        [HttpPost("search")]
-        [ProducesResponseType(typeof(IList<Transaction>), 200)]
-        public async Task<IList<Transaction>> SearchByKfsKeys([FromBody] string[] ids)
-        {
-            var teamId = GetTeamId();
-
-            if (ids == null || ids.Length == 0)
-            {
-                return new List<Transaction>();
-            }
-
-            var transactions = await _context.Transactions
-                .Where(t => t.Source.Team.Id == teamId)
-                .Include(t => t.Creator)
-                .Include(t => t.Transfers)
-                .Include(t => t.Metadata)
-                .Where(t => ids.Contains(t.KfsTrackingNumber))
-                .AsNoTracking()
-                .ToListAsync();
-
-            return transactions;
-        }
-
         /// <summary>
         /// Fetch Transactions by Metadata
         /// </summary>
@@ -219,6 +196,45 @@ namespace Sloth.Api.Controllers.v2
         public async Task<bool> ValidateFinancialSegmentString(string id)
         {
             return await _aggieEnterpriseService.IsAccountValid(id);
+        }
+
+        [HttpPost("search")]
+        [ProducesResponseType(typeof(IList<Transaction>), 200)]
+        [ProducesResponseType(typeof(BadRequestObjectResult), 400)]
+        public async Task<IActionResult> Search([FromBody] TransactionSearchRequest request)
+        {
+            var teamId = GetTeamId();
+
+            if (request.Ids == null || request.Ids.Length == 0)
+            {
+                return new JsonResult(new List<Transaction>());
+            }
+
+            IQueryable<Transaction> query = _context.Transactions
+                .Where(t => t.Source.Team.Id == teamId)
+                .Include(t => t.Creator)
+                .Include(t => t.Transfers)
+                .Include(t => t.Metadata)
+                .AsNoTracking();
+
+            switch (request.Type)
+            {
+                case "ProcessorTrackingNumber":
+                    query = query.Where(t => request.Ids.Contains(t.ProcessorTrackingNumber));
+                    break;
+                case "KfsTrackingNumber":
+                    query = query.Where(t => request.Ids.Contains(t.KfsTrackingNumber));
+                    break;
+                case "Id":
+                    query = query.Where(t => request.Ids.Contains(t.Id));
+                    break;
+                default:
+                    return BadRequest("Invalid Type");
+            }
+
+            var transactions = await query.ToListAsync();
+
+            return new JsonResult(transactions);
         }
 
         /// <summary>
@@ -418,5 +434,11 @@ namespace Sloth.Api.Controllers.v2
         {
             return User.FindFirst(ClaimTypes.PrimaryGroupSid)?.Value;
         }
+    }
+
+    public class TransactionSearchRequest
+    {
+        public string Type { get; set; } // "KfsTrackingNumber", "ProcessorTrackingNumber", or "Id"
+        public string[] Ids { get; set; }
     }
 }
