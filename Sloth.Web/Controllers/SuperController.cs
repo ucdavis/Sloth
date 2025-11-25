@@ -35,7 +35,7 @@ namespace Sloth.Web.Controllers
             if (User.IsInRole(Roles.SystemAdmin))
             {
                 // get all teams
-                return await DbContext.Teams.ToListAsync();
+                return await DbContext.Teams.OrderBy(a => a.Name).ToListAsync();
             }
 
             // get user + roles, include their teams

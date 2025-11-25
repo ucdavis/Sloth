@@ -45,7 +45,7 @@ namespace Sloth.Core.Models
 
         public IEnumerable<Team> GetTeams()
         {
-            return UserTeamRoles.Select(p => p.Team).Distinct();
+            return UserTeamRoles.Select(p => p.Team).OrderBy(a => a.Name).Distinct();
         }
 
         public bool IsTeamAdmin(string teamName)
