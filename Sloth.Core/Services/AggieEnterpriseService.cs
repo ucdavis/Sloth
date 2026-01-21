@@ -1,16 +1,16 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
-using Sloth.Core.Configuration;
 using AggieEnterpriseApi;
 using AggieEnterpriseApi.Extensions;
 using AggieEnterpriseApi.Types;
 using AggieEnterpriseApi.Validation;
+using Microsoft.Extensions.Options;
 using Serilog;
-using Sloth.Core.Models;
+using Sloth.Core.Configuration;
 using Sloth.Core.Extensions;
+using Sloth.Core.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Sloth.Core.Services
 {
@@ -19,6 +19,8 @@ namespace Sloth.Core.Services
         Task<bool> IsAccountValid(string financialSegmentString, bool validateCVRs = true);
         Task<IGlJournalRequestResult> CreateJournal(Source source, Transaction transaction);
         Task<IGlJournalRequestStatusResult> GetJournalStatus(Guid requestId);
+
+        Task<bool> PingAggieEnterprise();
     }
 
     public class AggieEnterpriseService : IAggieEnterpriseService
@@ -207,6 +209,28 @@ namespace Sloth.Core.Services
                 ExpenditureType = segments.ExpenditureType,
                 FundingSource = segments.FundingSource,
             };
+        }
+
+        public async Task<bool> PingAggieEnterprise()
+        {
+            var rtValue = false;
+            try
+            {
+                //3110 is the main campus code. If we can find it, Aggie Enterprise is reachable.
+                var filter = new ErpEntityFilterInput() { Code = new StringFilterInput { Eq = "3110" } };
+                var result = await _aggieClient.ErpEntitySearch.ExecuteAsync(filter, "3110");
+                var data = result.ReadData();
+                if(data.ErpEntity.Code == "3110")
+                {
+                    rtValue = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Aggie Enterprise ping failed");
+                rtValue = false;
+            }
+            return await Task.FromResult(rtValue);
         }
     }
 }
