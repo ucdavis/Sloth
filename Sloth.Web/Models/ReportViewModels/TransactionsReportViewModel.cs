@@ -8,5 +8,7 @@ namespace Sloth.Web.Models.ReportViewModels
         public TransactionsTableViewModel TransactionsTable { get; set; }
 
         public string? Information { get; set; }
+
+        public bool StuckOnly { get; set; } = false;
     }
 }

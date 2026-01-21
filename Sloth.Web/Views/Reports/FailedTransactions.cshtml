@@ -9,7 +9,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-  ViewBag.Title = "Failed Transactions";
+  ViewBag.Title = Model?.StuckOnly == true ? "Stuck Transactions" : "Failed Transactions";
     var teamSlug = HttpContextAccessor.HttpContext.GetRouteData().Values["team"] as string;
 }
 
