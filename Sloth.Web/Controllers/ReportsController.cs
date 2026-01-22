@@ -100,6 +100,43 @@ namespace Sloth.Web.Controllers
             return View(model);
         }
 
+
+        public async Task<IActionResult> StuckTransactions()
+        {
+            if (string.IsNullOrWhiteSpace(TeamSlug))
+            {
+                return BadRequest("TeamSlug is required");
+            }
+
+            // get transactions that are rejected or have been processing for longer than 5 days
+            var query = DbContext.Transactions
+                .Include(t => t.Transfers)
+                .Include(a => a.JournalRequest)
+                .Include(t => t.Source)
+                    .ThenInclude(s => s.Team)
+                .AsNoTracking();
+
+                query = query.Where(t => t.Source.Team.Slug == TeamSlug &&
+                    ((t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-1)) ||
+                    (t.Status == TransactionStatuses.Scheduled && t.LastModified < DateTime.UtcNow.Date.AddDays(-1))))
+                ;
+
+
+            var transactions = await query.ToListAsync();
+
+            var model = new TransactionsReportViewModel
+            {
+                TransactionsTable = new TransactionsTableViewModel
+                {
+                    Transactions = transactions,
+                },
+                Information = "Only transactions that have been processing or scheduled for more than a day!!!",
+                StuckOnly = true,
+            };
+
+            return View("FailedTransactions", model);
+        }
+
         [Authorize(Roles = Roles.SystemAdmin)]
         public async Task<IActionResult> FailedTransactionsAllTeams(bool pendingOlderThanADay = false)
         {
@@ -113,7 +150,10 @@ namespace Sloth.Web.Controllers
 
             if (pendingOlderThanADay)
             {
-                query = query.Where(t => t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-1));
+                query = query.Where(t =>
+                    (t.Status == TransactionStatuses.Processing && t.LastModified < DateTime.UtcNow.Date.AddDays(-1)) ||
+                    (t.Status == TransactionStatuses.Scheduled && t.LastModified < DateTime.UtcNow.Date.AddDays(-1)))
+                ;
             }
             else
             {
@@ -129,7 +169,8 @@ namespace Sloth.Web.Controllers
                 {
                     Transactions = transactions,
                 },
-                Information = pendingOlderThanADay ? "Only transactions that have been processing for more than a day!!!" : null,
+                Information = pendingOlderThanADay ? "Only transactions that have been processing or scheduled for more than a day!!!" : null,
+                StuckOnly = pendingOlderThanADay,
             };
 
             return View("FailedTransactions", model);

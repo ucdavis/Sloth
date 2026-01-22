@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
@@ -14,6 +14,7 @@ using Sloth.Web.Identity;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AggieEnterpriseApi;
 
 
 namespace Sloth.Web.Controllers
@@ -23,12 +24,14 @@ namespace Sloth.Web.Controllers
     {
         private readonly INotificationService _notificationService;
         private readonly NotificationOptions _notificationOptions;
+        private readonly IAggieEnterpriseService _aggieEnterpriseService;
 
         public TestController(ApplicationUserManager userManager, SlothDbContext dbContext, INotificationService notificationService,
-                              IOptions<NotificationOptions> notificationOptions) : base(userManager, dbContext)
+                              IOptions<NotificationOptions> notificationOptions, IAggieEnterpriseService aggieEnterpriseService) : base(userManager, dbContext)
         {
             _notificationService = notificationService;
             _notificationOptions = notificationOptions.Value;
+            _aggieEnterpriseService = aggieEnterpriseService;
         }
 
         public IActionResult ViewDefaultNotification()
@@ -64,6 +67,15 @@ namespace Sloth.Web.Controllers
 
             Message = "Test email sent";
             return RedirectToAction("Index", "Home");
+        }
+
+        public async Task<IActionResult> TestAE()
+        {
+            var rtValue = await _aggieEnterpriseService.PingAggieEnterprise();
+
+            var test = rtValue;
+
+            return Content($"AE Ping returned: {rtValue}");
         }
 
 

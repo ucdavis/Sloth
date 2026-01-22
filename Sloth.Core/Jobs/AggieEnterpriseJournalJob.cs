@@ -68,6 +68,13 @@ namespace Sloth.Core.Jobs
                 return jobDetails;
             }
 
+            var isAggieEnterpriseUp = await _aggieEnterpriseService.PingAggieEnterprise();
+            if(!isAggieEnterpriseUp)
+            {
+                log.Error("Aggie Enterprise service is not reachable. Aborting journal upload.");
+                return jobDetails;
+            }
+
             try
             {
                 // fetch staged transactions with FinancialSegmentString populated
