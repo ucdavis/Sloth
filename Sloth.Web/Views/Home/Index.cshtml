@@ -4,21 +4,14 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="container">
-    <div class="row">
-        <div class="col">
-            <h1>SLOTH</h1>
-            <ul>
-                <li>Secure <span style="text-decoration: line-through">Scrubber</span></li>
-                <li>Ledger <span style="text-decoration: line-through">Loader</span></li>
-                <li>Online</li>
-                <li>Transaction</li>
-                <li>Hub</li>
-            </ul>
-            </div>
-            </div>
-                        
-        <h2>@(User.IsInRole(Roles.SystemAdmin) ? "All Teams:" : "Your Teams:")</h2>
+<div class="container home-page">
+    <div class="home-heading">
+        <h1>S.L.O.T.H.</h1>
+        <p>Secure Ledger Online Transaction Hub</p>
+    </div>
+
+    <div class="home-teams">
+        <h2>@(User.IsInRole(Roles.SystemAdmin) ? "All Teams" : "Your Teams")</h2>
 
         <div class="responsive-table">
             <table id="homeTeamsTable" class="table sloth-table active-table">
@@ -48,6 +41,7 @@
                 </tbody>
             </table>
         </div>
+    </div>
 </div>
 
 @section AdditionalScripts {
