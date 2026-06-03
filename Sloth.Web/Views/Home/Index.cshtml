@@ -1,5 +1,5 @@
 @using Sloth.Core.Resources
-@model IEnumerable<Sloth.Core.Models.Team>
+@model Sloth.Web.Models.HomeViewModels.HomeIndexViewModel
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -23,15 +23,54 @@
 
         <h2>All Teams:</h2>
 
-        <div class="row flex-column align-items-start justify-content-center">
-            @foreach (var team in Model)
-            {
-                <div class="col-sm-12 col-md-5">
-                    <a asp-controller="Home" asp-action="TeamIndex" asp-route-team="@team.Slug">
-                        <span>@team.Name</span>
-                    </a>
-                </div>
-            }
+        <div class="responsive-table">
+            <table id="homeTeamsTable" class="table sloth-table active-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Slug</th>
+                        <th>Sources</th>
+                        <th>Failed Transactions</th>
+                        <th>Stuck Transactions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var team in Model.Teams)
+                    {
+                        var teamUrl = Url.Action("TeamIndex", "Home", new { team = team.Slug });
+                        <tr data-href="@teamUrl">
+                            <td>
+                                <a href="@teamUrl">@team.Name</a>
+                            </td>
+                            <td>@team.Slug</td>
+                            <td>@(team.SourceNames.Any() ? string.Join(", ", team.SourceNames) : "None")</td>
+                            <td>@team.FailedTransactionCount</td>
+                            <td>@team.StuckTransactionCount</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
         </div>
     }
 </div>
+
+@section AdditionalScripts {
+    @if (User.IsInRole(Roles.SystemAdmin))
+    {
+        <script>
+            $('#homeTeamsTable').DataTable({
+                order: [[0, 'asc']],
+                pageLength: -1,
+                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'All']],
+                language: {
+                    searchPlaceholder: "Search Table",
+                    search: "",
+                },
+            });
+
+            $('#homeTeamsTable tbody').on('click', 'tr', function () {
+                window.location = $(this).data('href');
+            });
+        </script>
+    }
+}
