@@ -32,41 +32,45 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction(nameof(TransactionsController.Index), "Transactions", new { team = team.Slug });
             }
 
-            var model = new HomeIndexViewModel();
-            if (User.IsInRole(Roles.SystemAdmin))
+            var teamIds = teams.Select(t => t.Id).ToList();
+            var teamSlugs = teams.Select(t => t.Slug).ToList();
+            var stuckCutoff = DateTime.UtcNow.Date.AddDays(-1);
+            var failedProcessingCutoff = DateTime.UtcNow.Date.AddDays(-5);
+
+            var teamsWithSources = await DbContext.Teams
+                .Include(t => t.Sources)
+                .Where(t => teamIds.Contains(t.Id))
+                .AsNoTracking()
+                .OrderBy(t => t.Name)
+                .ToListAsync();
+
+            var failedTransactionCounts = await DbContext.Transactions
+                .Where(t => teamSlugs.Contains(t.Source.Team.Slug)
+                    && (t.Status == TransactionStatuses.Rejected
+                        || (t.Status == TransactionStatuses.Processing && t.LastModified < failedProcessingCutoff)))
+                .GroupBy(t => t.Source.Team.Slug)
+                .Select(t => new
+                {
+                    Slug = t.Key,
+                    Count = t.Count(),
+                })
+                .ToDictionaryAsync(t => t.Slug, t => t.Count);
+
+            var stuckTransactionCounts = await DbContext.Transactions
+                .Where(t => teamSlugs.Contains(t.Source.Team.Slug)
+                    && ((t.Status == TransactionStatuses.Processing && t.LastModified < stuckCutoff)
+                        || (t.Status == TransactionStatuses.Scheduled && t.LastModified < stuckCutoff)))
+                .GroupBy(t => t.Source.Team.Slug)
+                .Select(t => new
+                {
+                    Slug = t.Key,
+                    Count = t.Count(),
+                })
+                .ToDictionaryAsync(t => t.Slug, t => t.Count);
+
+            var model = new HomeIndexViewModel
             {
-                var stuckCutoff = DateTime.UtcNow.Date.AddDays(-1);
-                var failedProcessingCutoff = DateTime.UtcNow.Date.AddDays(-5);
-
-                var teamsWithSources = await DbContext.Teams
-                    .Include(t => t.Sources)
-                    .AsNoTracking()
-                    .OrderBy(t => t.Name)
-                    .ToListAsync();
-
-                var failedTransactionCounts = await DbContext.Transactions
-                    .Where(t => t.Status == TransactionStatuses.Rejected
-                        || (t.Status == TransactionStatuses.Processing && t.LastModified < failedProcessingCutoff))
-                    .GroupBy(t => t.Source.Team.Slug)
-                    .Select(t => new
-                    {
-                        Slug = t.Key,
-                        Count = t.Count(),
-                    })
-                    .ToDictionaryAsync(t => t.Slug, t => t.Count);
-
-                var stuckTransactionCounts = await DbContext.Transactions
-                    .Where(t => (t.Status == TransactionStatuses.Processing && t.LastModified < stuckCutoff)
-                        || (t.Status == TransactionStatuses.Scheduled && t.LastModified < stuckCutoff))
-                    .GroupBy(t => t.Source.Team.Slug)
-                    .Select(t => new
-                    {
-                        Slug = t.Key,
-                        Count = t.Count(),
-                    })
-                    .ToDictionaryAsync(t => t.Slug, t => t.Count);
-
-                model.Teams = teamsWithSources
+                Teams = teamsWithSources
                     .Select(t => new HomeTeamSummaryViewModel
                     {
                         Name = t.Name,
@@ -75,8 +79,8 @@ namespace Sloth.Web.Controllers
                         FailedTransactionCount = failedTransactionCounts.TryGetValue(t.Slug, out var failedCount) ? failedCount : 0,
                         StuckTransactionCount = stuckTransactionCounts.TryGetValue(t.Slug, out var stuckCount) ? stuckCount : 0,
                     })
-                    .ToList();
-            }
+                    .ToList(),
+            };
 
             return View(model);
         }
