@@ -98,6 +98,55 @@ footer {
 .body-content {
   padding-top: 2rem;
 }
+.home-page {
+  .home-heading {
+    width: 100%;
+    max-width: 960px;
+    margin: 0;
+    padding: 2.5rem 0 1.25rem;
+
+    h1 {
+      margin-bottom: 0.1rem;
+      font-size: 2rem;
+      line-height: 1.1;
+    }
+
+    p {
+      margin-bottom: 0;
+      color: $secondary-font;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+    }
+  }
+
+  .home-teams {
+    margin-top: 3.5rem;
+
+    h2 {
+      display: inline-block;
+      margin: 0 0 1rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 3px solid $primary-color;
+      color: $primary-color;
+      font-size: 1.5rem;
+      line-height: 1.2;
+    }
+  }
+
+  .responsive-table {
+    border: 1px solid $borders-sloth;
+    background-color: #fff;
+  }
+
+  table.sloth-table {
+    margin-bottom: 0;
+    border: 0;
+
+    thead th {
+      background-color: $bg-primary;
+    }
+  }
+}
 .filters-wrapper {
   margin-bottom: 3%;
   .status-filter {

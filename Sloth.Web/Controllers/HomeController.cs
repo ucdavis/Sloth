@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +10,7 @@ using Sloth.Core;
 using Sloth.Core.Resources;
 using Sloth.Web.Identity;
 using Sloth.Web.Models;
+using Sloth.Web.Models.HomeViewModels;
 using Sloth.Web.Resources;
 
 namespace Sloth.Web.Controllers
@@ -29,7 +32,55 @@ namespace Sloth.Web.Controllers
                 return RedirectToAction(nameof(TransactionsController.Index), "Transactions", new { team = team.Slug });
             }
 
-            return View(teams);
+            var teamIds = teams.Select(t => t.Id).ToList();
+            var teamSlugs = teams.Select(t => t.Slug).ToList();
+            var stuckCutoff = DateTime.UtcNow.Date.AddDays(-1);
+
+            var teamsWithSources = await DbContext.Teams
+                .Include(t => t.Sources)
+                .Where(t => teamIds.Contains(t.Id))
+                .AsNoTracking()
+                .OrderBy(t => t.Name)
+                .ToListAsync();
+
+            var failedTransactionCounts = await DbContext.Transactions
+                .Where(t => teamSlugs.Contains(t.Source.Team.Slug)
+                    && t.Status == TransactionStatuses.Rejected)
+                .GroupBy(t => t.Source.Team.Slug)
+                .Select(t => new
+                {
+                    Slug = t.Key,
+                    Count = t.Count(),
+                })
+                .ToDictionaryAsync(t => t.Slug, t => t.Count);
+
+            var stuckTransactionCounts = await DbContext.Transactions
+                .Where(t => teamSlugs.Contains(t.Source.Team.Slug)
+                    && ((t.Status == TransactionStatuses.Processing && t.LastModified < stuckCutoff)
+                        || (t.Status == TransactionStatuses.Scheduled && t.LastModified < stuckCutoff)))
+                .GroupBy(t => t.Source.Team.Slug)
+                .Select(t => new
+                {
+                    Slug = t.Key,
+                    Count = t.Count(),
+                })
+                .ToDictionaryAsync(t => t.Slug, t => t.Count);
+
+            var model = new HomeIndexViewModel
+            {
+                Teams = teamsWithSources
+                    .Select(t => new HomeTeamSummaryViewModel
+                    {
+                        Name = t.Name,
+                        Slug = t.Slug,
+                        SourceNames = t.Sources?.OrderBy(s => s.Name).Select(s => s.Name).ToList() ?? new List<string>(),
+                        FailedTransactionCount = failedTransactionCounts.TryGetValue(t.Slug, out var failedCount) ? failedCount : 0,
+                        StuckTransactionCount = stuckTransactionCounts.TryGetValue(t.Slug, out var stuckCount) ? stuckCount : 0,
+                    })
+                    .ToList(),
+            };
+
+            return View(model);
         }
 
         [Authorize(Policy = PolicyCodes.TeamAnyRole)]
