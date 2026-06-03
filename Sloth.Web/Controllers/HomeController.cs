@@ -35,7 +35,6 @@ namespace Sloth.Web.Controllers
             var teamIds = teams.Select(t => t.Id).ToList();
             var teamSlugs = teams.Select(t => t.Slug).ToList();
             var stuckCutoff = DateTime.UtcNow.Date.AddDays(-1);
-            var failedProcessingCutoff = DateTime.UtcNow.Date.AddDays(-5);
 
             var teamsWithSources = await DbContext.Teams
                 .Include(t => t.Sources)
@@ -46,8 +45,7 @@ namespace Sloth.Web.Controllers
 
             var failedTransactionCounts = await DbContext.Transactions
                 .Where(t => teamSlugs.Contains(t.Source.Team.Slug)
-                    && (t.Status == TransactionStatuses.Rejected
-                        || (t.Status == TransactionStatuses.Processing && t.LastModified < failedProcessingCutoff)))
+                    && t.Status == TransactionStatuses.Rejected)
                 .GroupBy(t => t.Source.Team.Slug)
                 .Select(t => new
                 {
