@@ -20,8 +20,8 @@
                         <th>Name</th>
                         <th>Slug</th>
                         <th>Sources</th>
-                        <th>Rejected Transactions</th>
-                        <th>Pending Approval Transactions</th>
+                        <th>Pending Approval</th>
+                        <th>Rejected Transactions</th>                        
                         <th>Stuck Transactions</th>
                     </tr>
                 </thead>
@@ -35,8 +35,8 @@
                             </td>
                             <td>@team.Slug</td>
                             <td>@(team.SourceNames.Any() ? string.Join(", ", team.SourceNames) : "None")</td>
-                            <td>@team.FailedTransactionCount</td>
                             <td>@team.PendingApprovalTransactionCount</td>
+                            <td>@team.FailedTransactionCount</td>                            
                             <td>@team.StuckTransactionCount</td>
                         </tr>
                     }
