@@ -54,6 +54,17 @@ namespace Sloth.Web.Controllers
                 })
                 .ToDictionaryAsync(t => t.Slug, t => t.Count);
 
+            var pendingApprovalTransactionCounts = await DbContext.Transactions
+                .Where(t => teamSlugs.Contains(t.Source.Team.Slug)
+                    && t.Status == TransactionStatuses.PendingApproval)
+                .GroupBy(t => t.Source.Team.Slug)
+                .Select(t => new
+                {
+                    Slug = t.Key,
+                    Count = t.Count(),
+                })
+                .ToDictionaryAsync(t => t.Slug, t => t.Count);
+
             var stuckTransactionCounts = await DbContext.Transactions
                 .Where(t => teamSlugs.Contains(t.Source.Team.Slug)
                     && ((t.Status == TransactionStatuses.Processing && t.LastModified < stuckCutoff)
@@ -75,6 +86,7 @@ namespace Sloth.Web.Controllers
                         Slug = t.Slug,
                         SourceNames = t.Sources?.OrderBy(s => s.Name).Select(s => s.Name).ToList() ?? new List<string>(),
                         FailedTransactionCount = failedTransactionCounts.TryGetValue(t.Slug, out var failedCount) ? failedCount : 0,
+                        PendingApprovalTransactionCount = pendingApprovalTransactionCounts.TryGetValue(t.Slug, out var pendingApprovalCount) ? pendingApprovalCount : 0,
                         StuckTransactionCount = stuckTransactionCounts.TryGetValue(t.Slug, out var stuckCount) ? stuckCount : 0,
                     })
                     .ToList(),
