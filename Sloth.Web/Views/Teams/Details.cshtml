@@ -481,15 +481,13 @@
                         .text('Revoke Key');
 
                     // create new row in table
+                    var $row = $('<tr></tr>');
+                    $row.append($('<td nowrap></td>').text(result.key));
+                    $row.append($('<td></td>').attr('data-sort', result.issuedTicks).text(result.issued));
+                    $row.append($('<td></td>').append($button));
+
                     var apiKeysTable = $('#apiKeysTable').DataTable();
-                    apiKeysTable.row.add([
-                        result.key,
-                        {
-                            "display": result.issued,
-                            "@@data-sort": result.issuedTicks,
-                        },
-                        $('<div>').append($button).html(),
-                    ]).draw();
+                    apiKeysTable.row.add($row[0]).draw();
 
                     $('#create-key-modal').modal('hide');
                 });
