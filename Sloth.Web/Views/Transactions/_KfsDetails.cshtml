@@ -93,6 +93,38 @@
         </div>
     </div>
     }
+    @if (!string.IsNullOrWhiteSpace(Model.Transaction.ReversalOfTransactionId))
+    {
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>Reversal Of</span>
+            </div>
+            <div class="txn-detail-result">
+                <span>
+                    <a asp-controller="Transactions"
+                       asp-action="Details"
+                       asp-route-team="@Model.Transaction.Source.Team.Slug"
+                       asp-route-id="@Model.Transaction.ReversalOfTransactionId">Click here to view reversed transaction</a>
+                </span>
+            </div>
+        </div>
+    }
+    @if (!string.IsNullOrWhiteSpace(Model.Transaction.ReversalTransactionId))
+    {
+        <div class="txn-detail-row">
+            <div class="txn-detail-label">
+                <span>Reversal Transaction</span>
+            </div>
+            <div class="txn-detail-result">
+                <span>
+                    <a asp-controller="Transactions"
+                       asp-action="Details"
+                       asp-route-team="@Model.Transaction.Source.Team.Slug"
+                       asp-route-id="@Model.Transaction.ReversalTransactionId">Click here to view reversal transaction</a>
+                </span>
+            </div>
+        </div>
+    }
     @if (Model.RelatedTransactions.Transactions.Any())
     {
         <div class="txn-detail-row">
