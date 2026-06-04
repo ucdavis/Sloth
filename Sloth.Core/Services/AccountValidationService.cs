@@ -31,39 +31,22 @@ namespace Sloth.Core.Services
         /// <returns></returns>
         public async Task<bool> IsAccountValid(string accountString, bool validateCVRs = true)
         {
-            if (accountString.Length == 9)
-            {
-                // KFS account
-                // break into chart and account following 3-******* format
-                var chart = accountString.Substring(0, 1);
-                var account = accountString.Substring(2, 7);
-                return await _kfsService.IsAccountValid(chart, account);
-            }
-            else
-            {
-                // assume anything else is an Aggie Enterprise GL/PPM string
 
-                if (FinancialChartValidation.GetFinancialChartStringType(accountString) ==
-                    FinancialChartStringType.Invalid)
-                {
-                    // format is invalid, so don't bother validating via API
-                    return false;
-                }
 
-                return await _aggieEnterpriseService.IsAccountValid(accountString, validateCVRs);
+            if (FinancialChartValidation.GetFinancialChartStringType(accountString) ==
+                FinancialChartStringType.Invalid)
+            {
+                // format is invalid, so don't bother validating via API
+                return false;
             }
+
+            return await _aggieEnterpriseService.IsAccountValid(accountString, validateCVRs);
+            
         }
 
         public static bool IsKfsAccount(string accountString)
         {
-            if(accountString.Length == 7)
-            {
-                return true;
-            }
-            if(accountString.Count(a => a == '-') <=3 )
-            {
-                return true;
-            }
+
             return false;
         }
     }
