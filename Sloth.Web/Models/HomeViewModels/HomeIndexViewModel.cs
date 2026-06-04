@@ -17,6 +17,8 @@ namespace Sloth.Web.Models.HomeViewModels
 
         public int FailedTransactionCount { get; set; }
 
+        public int PendingApprovalTransactionCount { get; set; }
+
         public int StuckTransactionCount { get; set; }
     }
 }
