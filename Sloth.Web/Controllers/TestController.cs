@@ -68,7 +68,7 @@ namespace Sloth.Web.Controllers
             Message = "Test email sent";
             return RedirectToAction("Index", "Home");
         }
-
+        //Rebuild comment
         public async Task<IActionResult> TestAE()
         {
             var rtValue = await _aggieEnterpriseService.PingAggieEnterprise();
