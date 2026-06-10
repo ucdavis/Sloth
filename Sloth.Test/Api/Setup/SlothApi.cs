@@ -2,6 +2,7 @@ using System.IO;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,7 @@ public class SlothApi : WebApplicationFactory<Sloth.Api.Startup>
         builder.ConfigureServices(services =>
         {
             services.RemoveAll(typeof(DbContextOptions<SlothDbContext>));
+            services.RemoveAll(typeof(IDbContextOptionsConfiguration<SlothDbContext>));
             services.AddIdentity<User, IdentityRole>()
                 .AddEntityFrameworkStores<SlothDbContext>()
                 .AddUserManager<TestApplicationUserManager>();
